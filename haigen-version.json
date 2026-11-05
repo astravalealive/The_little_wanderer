@@ -1,4 +1,4 @@
 {
-  "build": 66,
-  "notes": "Moonlit indigo-blue night grading, flickering radial light from lit campfires, equipped torch and campsite lantern, subtle player moonlight. Frog rendering and behaviour untouched."
+  "build": 67,
+  "notes": "Replace washed-out blue night haze with contrast-preserving violet, cobalt and magenta palette blending. Retain warm animated fire and torch lighting; frog code unchanged."
 }
