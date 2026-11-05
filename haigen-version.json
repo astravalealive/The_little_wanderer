@@ -1,4 +1,4 @@
 {
-  "build": 39,
-  "notes": "Craft a shovel or pickaxe and discover different minerals in woodland, marsh, grove and highland terrain. Finds persist in the existing save."
+  "build": 40,
+  "notes": "Crafting menu now separates Weapons & Tools, Buildings & Upgrades, and Remedies & Food while preserving progressive unlocks."
 }
