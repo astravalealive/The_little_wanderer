@@ -1,4 +1,4 @@
 {
-  "build": 42,
-  "notes": "Fix startup syntax error in fox animation rendering."
+  "build": 43,
+  "notes": "Visible swinging animations for axe, shovel, pickaxe and torch with impact particles."
 }
