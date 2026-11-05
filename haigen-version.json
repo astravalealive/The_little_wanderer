@@ -1,4 +1,4 @@
 {
-  "build": 62,
-  "notes": "Gradual hunger decay at 0.06 points per second, hunger warnings, color-changing meter, and autonomous eating below 48 hunger."
+  "build": 63,
+  "notes": "Frogs restricted to lake-edge and Mossfen Marsh habitats, including when startled; escape hops steer toward water and remain within habitat."
 }
