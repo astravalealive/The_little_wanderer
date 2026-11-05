@@ -442,7 +442,42 @@ function drawWoodlandCritter(c){
  }
 }
 function drawFrog(f){const p=f.hopUntil>time?Math.max(0,1-(f.hopUntil-time)/450):1;const jumping=f.hopUntil>time;const x=jumping?f.fromX+(f.toX-f.fromX)*p:f.x,y=(jumping?f.fromY+(f.toY-f.fromY)*p:f.y)-(jumping?Math.sin(p*Math.PI)*17:0);ellipse(x,y+6,12,4,'#315b4777');ellipse(x-8,y+2,7,4,f.colour);ellipse(x+8,y+2,7,4,f.colour);ellipse(x,y-3,12,9,f.colour);ellipse(x-7,y-10,5,5,f.colour);ellipse(x+7,y-10,5,5,f.colour);ellipse(x-7,y-11,2,2,'#1d3024');ellipse(x+7,y-11,2,2,'#1d3024');if(!jumping&&Math.sin(time*.001+f.phase)>.98){ctx.strokeStyle='#badb91';ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y-3,17,0,Math.PI);ctx.stroke()}}
-function updateFrogs(){for(const f of frogs){if(f.hopUntil&&time>=f.hopUntil){f.x=f.toX;f.y=f.toY;f.hopUntil=0}if(f.hopUntil||time<f.hopAt)continue;const scared=dist(f,state)<125;const a=scared?Math.atan2(f.y-state.y,f.x-state.x):Math.sin(f.phase+time*.0002)*Math.PI*2;const distance=scared?68:14+seeded(Math.floor(time/2000)+f.phase)*18;const nx=f.x+Math.cos(a)*distance,ny=f.y+Math.sin(a)*distance;if(scared||Math.hypot(nx-f.homeX,ny-f.homeY)<110){f.fromX=f.x;f.fromY=f.y;f.toX=nx;f.toY=ny;f.hopUntil=time+(scared?340:450)}f.hopAt=time+(scared?280:2600+seeded(f.phase+Math.floor(time/3000))*3600)}}
+// Amphibians remain in pond or marsh habitat, including when startled.
+function frogHabitat(f,x,y){
+ if(f.habitat==='marsh')return Math.hypot((x-2100)/280,(y-2420)/185)<=1;
+ const level=lakeLevel(x,y);return level>=.68&&level<=1.27;
+}
+function frogReturnPoint(f,x,y){
+ if(frogHabitat(f,x,y))return {x,y};
+ const cx=f.habitat==='marsh'?2100:pond.x,cy=f.habitat==='marsh'?2420:pond.y;
+ const dx=x-cx,dy=y-cy;
+ if(f.habitat==='marsh'){const scale=Math.min(1,.96/Math.max(.01,Math.hypot(dx/280,dy/185)));return {x:cx+dx*scale,y:cy+dy*scale}}
+ const angle=Math.atan2(dy/pond.ry,dx/pond.rx),r=lakeRadius(angle);
+ const level=Math.max(.72,Math.min(1.19,lakeLevel(x,y)));
+ return {x:cx+Math.cos(angle)*pond.rx*r*level,y:cy+Math.sin(angle)*pond.ry*r*level};
+}
+function updateFrogs(){
+ for(const f of frogs){
+  if(!f.habitat)f.habitat=Math.hypot(f.homeX-2100,f.homeY-2420)<330?'marsh':'pond';
+  if(f.hopUntil&&time>=f.hopUntil){f.x=f.toX;f.y=f.toY;f.hopUntil=0}
+  if(f.hopUntil||time<f.hopAt)continue;
+  const scared=dist(f,state)<125;
+  let a=scared?Math.atan2(f.y-state.y,f.x-state.x):Math.sin(f.phase+time*.0002)*Math.PI*2;
+  const distance=scared?68:14+seeded(Math.floor(time/2000)+f.phase)*18;
+  let nx=f.x+Math.cos(a)*distance,ny=f.y+Math.sin(a)*distance;
+  // On danger, escape toward water if a direct hop would leave the habitat.
+  if(!frogHabitat(f,nx,ny)&&scared){
+   const cx=f.habitat==='marsh'?2100:pond.x,cy=f.habitat==='marsh'?2420:pond.y;
+   a=Math.atan2(cy-f.y,cx-f.x);nx=f.x+Math.cos(a)*distance;ny=f.y+Math.sin(a)*distance;
+  }
+  const target=frogReturnPoint(f,nx,ny);
+  if(frogHabitat(f,target.x,target.y)){
+   f.fromX=f.x;f.fromY=f.y;f.toX=target.x;f.toY=target.y;
+   f.hopUntil=time+(scared?340:450);
+  }
+  f.hopAt=time+(scared?500:2600+seeded(f.phase+Math.floor(time/3000))*3600);
+ }
+}
 function updateBirds(dt){
  const step=Math.min(dt,50)/1000;
  for(const b of birds){
@@ -534,7 +569,7 @@ open(`<h2>${selected.title}</h2><p>${selected.subtitle}</p><button class="btn" i
 document.getElementById('craftBack').onclick=()=>craft();document.querySelectorAll('[data-recipe]').forEach(b=>b.onclick=()=>build(+b.dataset.recipe))}
 function build(i){let r=recipes[i];if(!r)return;if(['salve','tea','mushroomMeal','meal'].includes(r.kind)&&dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Return to camp or a campfire to prepare this.');return}if(campStages.some(t=>t.kind===r.kind)&&campStages[state.campTier]?.kind!==r.kind){notify('🔒 Finish the current home upgrade first.');return}const herbTotal=Object.values(state.herbs).reduce((a,b)=>a+b,0);if(state.wood<r.wood||state.stone<r.stone||state.berries<(r.berries||0)||state.mushrooms<(r.mushrooms||0)||herbTotal<(r.herbs||0)||state.twigs<(r.twigs||0)||state.leaves<(r.leaves||0)){notify('Not enough materials yet!');return}state.wood-=r.wood;state.stone-=r.stone;state.berries-=r.berries||0;state.mushrooms-=r.mushrooms||0;state.twigs-=r.twigs||0;state.leaves-=r.leaves||0;let need=r.herbs||0;for(const k of Object.keys(state.herbs)){const used=Math.min(need,state.herbs[k]);state.herbs[k]-=used;need-=used;if(!need)break}if(['salve','tea','mushroomMeal'].includes(r.kind)){if(r.kind==='salve')state.potions++;else state.food++;close();notify(r.name+' prepared!');save();return}if(['axe','torch','shovel','pickaxe'].includes(r.kind)){state.tools[r.kind]++;equipTool(r.kind);close();notify(r.name+' crafted!');save();return}if(r.kind==='meal'){state.food++;close();notify('🍲 Meal prepared!');save();return}if(campStages.some(t=>t.kind===r.kind)){state.campTier++;state.structures=state.structures.filter(q=>!campStages.some(t=>t.kind===q.kind));memory('🏡 Haigen upgraded the campsite: '+r.name+'!');close();notify('✨ New home built! Another plan has been unlocked.');save();return}const firstBuild=r.kind==='shelter'&&!state.structures.some(q=>q.kind==='shelter')?{x:cottage.x+35,y:cottage.y-10}:r.kind==='campfire'&&!state.structures.some(q=>q.kind==='campfire')?firstFire:r.kind==='garden'&&near(cottage,170)?{x:cottage.x-105,y:cottage.y+78}:{x:clamp(state.x+rand(70,125),100,WORLD-100),y:clamp(state.y+rand(55,105),100,WORLD-100)};state.structures.push({kind:r.kind,x:firstBuild.x,y:firstBuild.y,...(r.kind==='campfire'?{lit:false,fuel:0}:{})});if(r.kind==='shelter')memory('🏕️ Haigen built his first woodland shelter in the clearing!');if(r.kind==='campfire')memory('🔥 Haigen laid a stone-ring fire pit for his first camp!');if(!state.quests.home){state.quests.home=true;memory('Haigen built his first woodland structure!')}close();notify(`${r.name} built!`);save()}function help(){open(`<h2>🌲 Welcome to Haigen's World</h2><p><b>Your adventure:</b> Explore the woodland, collect materials, build structures, discover secrets and befriend Dillon and Skölli.</p><p>🎮 <b>Move:</b> Drag the on-screen joystick, use an Xbox controller's left stick or D-pad, or use WASD / arrow keys.<br>✨ <b>Interact:</b> Stand near a tree, rock, bush, friend or landmark and tap Interact.<br>🍓 <b>Friends:</b> Collect berries and give them to your companions.<br>🔨 <b>Build:</b> Craft a campfire, garden or shelter.<br>📖 <b>Journal:</b> Remember your adventures.</p><p><b>First quest:</b> Chop trees, gather 6 wood, 2 twigs and 3 leaves, and build a lean-to shelter. Then build a stone-ring campfire!</p><p class="small">Version 0.4 • Offline-friendly after loading • Progress stored in this browser, not synced between devices.</p><button class="btn" id="resetBtn">Reset saved world</button>`);$('resetBtn').onclick=()=>{if(confirm('Start a new world? This deletes your local progress.')){localStorage.removeItem('wandererTestSave');location.reload()}}}function joyMove(e){const rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;let x=(e.clientX-cx)/43,y=(e.clientY-cy)/43,m=Math.hypot(x,y);joy={x:x/Math.max(1,m),y:y/Math.max(1,m)};$('stick').style.transform=`translate(${joy.x*32}px,${joy.y*32}px)`}const j=$('joy');j.addEventListener('pointerdown',e=>{j.setPointerCapture(e.pointerId);joyMove(e)});j.addEventListener('pointermove',e=>{if(j.hasPointerCapture(e.pointerId))joyMove(e)});function release(){joy={x:0,y:0};$('stick').style.transform='translate(0,0)'}j.addEventListener('pointerup',release);j.addEventListener('pointercancel',release);addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key===' '&&!e.repeat)interact();if(e.key==='Escape')close();if(e.key.toLowerCase()==='m'&&!e.repeat){if($('overlay').classList.contains('open'))close();else showMap()}});addEventListener('keyup',e=>keys[e.key]=false);$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
 for(const [id,fn] of [['modeBtn',()=>setAutonomy(!state.autonomy)],['mapBtn',showMap],['journalBtn',journal],['craftBtn',craft],['helpBtn',help]]){const el=$(id);let handled=0;el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();e.stopPropagation();handled=Date.now();fn()}},true);el.addEventListener('click',e=>{if(Date.now()-handled<800){e.preventDefault();e.stopImmediatePropagation()}},true)}$('closeBtn').onclick=close;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))close()});function frame(now){let dt=Math.min(now-last,50);last=now;menuController();if(!$('overlay').classList.contains('open'))update(dt);draw();requestAnimationFrame(frame)}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=62;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=63;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
