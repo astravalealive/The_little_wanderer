@@ -1,4 +1,4 @@
 {
-  "build": 27,
-  "notes": "Companion movement stabilized: no per-frame retargeting, slower movement, longer natural pauses and committed destinations."
+  "build": 28,
+  "notes": "Rare companion gifts: Dillon occasionally brings leaves or twigs; Skölli brings sticks or berries. Gifts add to inventory and are saved."
 }
