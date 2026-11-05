@@ -1,4 +1,4 @@
 {
-  "build": 43,
-  "notes": "Visible swinging animations for axe, shovel, pickaxe and torch with impact particles."
+  "build": 44,
+  "notes": "Remove stationary held axe and torch so only the animated tool appears when used; hotbar still shows equipped item."
 }
