@@ -1,4 +1,4 @@
 {
-  "build": 19,
-  "notes": "Controller Start map, B close menus, right stick camera look, and touch Map button."
+  "build": 20,
+  "notes": "Fix campsite layering: ground stays behind characters; sign and objects use depth sorting."
 }
