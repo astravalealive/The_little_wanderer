@@ -1,4 +1,4 @@
 {
-  "build": 57,
-  "notes": "Replaced oversized striped road crossings with narrow earth woodland trails, true shared junctions and subtler verge details."
+  "build": 58,
+  "notes": "Chunky storybook roads restored; all road borders and surfaces render in shared layers for merged intersections; main and branch widths, gravel, earth flecks and grassy verges."
 }
