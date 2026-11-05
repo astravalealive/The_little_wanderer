@@ -481,7 +481,60 @@ function drawWoodlandCritter(c){
   ellipse(x,y,5.8,5.8,'#ffe79c55');ellipse(x,y,2.7,2.7,c.phase%3<1?'#d7ffb1':'#fff0a3');ctx.restore();
  }
 }
-function drawFrog(f){const p=f.hopUntil>time?Math.max(0,1-(f.hopUntil-time)/450):1;const jumping=f.hopUntil>time;const x=jumping?f.fromX+(f.toX-f.fromX)*p:f.x,y=(jumping?f.fromY+(f.toY-f.fromY)*p:f.y)-(jumping?Math.sin(p*Math.PI)*17:0);ellipse(x,y+6,12,4,'#315b4777');ellipse(x-8,y+2,7,4,f.colour);ellipse(x+8,y+2,7,4,f.colour);ellipse(x,y-3,12,9,f.colour);ellipse(x-7,y-10,5,5,f.colour);ellipse(x+7,y-10,5,5,f.colour);ellipse(x-7,y-11,2,2,'#1d3024');ellipse(x+7,y-11,2,2,'#1d3024');if(!jumping&&Math.sin(time*.001+f.phase)>.98){ctx.strokeStyle='#badb91';ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y-3,17,0,Math.PI);ctx.stroke()}}
+function drawFrog(f){
+ const jumping=f.hopUntil>time;
+ const duration=f.hopDuration||450;
+ const p=jumping?Math.max(0,Math.min(1,1-(f.hopUntil-time)/duration)):1;
+ const eased=p*p*(3-2*p),arc=jumping?Math.sin(Math.PI*p):0;
+ const gx=jumping?f.fromX+(f.toX-f.fromX)*eased:f.x;
+ const gy=jumping?f.fromY+(f.toY-f.fromY)*eased:f.y;
+ const rise=arc*(f.scaredHop?31:23);
+ const dx=(f.toX||gx)-(f.fromX||gx),dy=(f.toY||gy)-(f.fromY||gy);
+ const facing=Math.abs(dx)>1?(dx>=0?1:-1):1;
+ const bodyY=gy-rise;
+ ctx.save();
+ // Ground shadow stays put as the frog springs up; it shrinks in midair.
+ ctx.globalAlpha=.38-arc*.18;
+ ellipse(gx,gy+6,12-arc*4,4-arc,'#274a39');
+ ctx.globalAlpha=1;
+ // Tiny concentric landing ripples near water, no expensive particle systems.
+ if(!jumping&&f.landedAt&&time-f.landedAt<440){
+  const t=(time-f.landedAt)/440;
+  ctx.save();ctx.globalAlpha=(1-t)*.55;ctx.strokeStyle='#d9f0c0';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.ellipse(gx,gy+5,8+t*17,3+t*6,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+ }
+ ctx.translate(gx,bodyY);ctx.scale(facing,1);
+ const stretch=jumping?Math.sin(p*Math.PI)*.12:0;
+ const crouch=jumping?(p<.13?(1-p/.13)*3:p>.84?(p-.84)/.16*3:0):Math.sin(time*.002+f.phase)*.5;
+ ctx.save();ctx.translate(0,crouch);ctx.scale(1+stretch,1-stretch*.45);
+ const hind=f.colour==='#a18a54'?'#857347':'#4b873c';
+ const toes=f.colour==='#a18a54'?'#c2ad6c':'#a1ce74';
+ // Jointed hind legs: crouched before launch, extended behind in flight,
+ // then tucked again as the frog comes down.
+ const kick=jumping?Math.sin(Math.PI*Math.min(1,p*1.12)):0;
+ for(const side of [-1,1]){
+  const hipX=side*7,hipY=0;
+  const kneeX=side*(13+kick*10),kneeY=3+kick*5;
+  const footX=side*(18+kick*22),footY=5+kick*9;
+  ctx.strokeStyle=hind;ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.beginPath();ctx.moveTo(hipX,hipY);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
+  ctx.strokeStyle=toes;ctx.lineWidth=1.8;
+  for(let toe=-1;toe<=1;toe++){ctx.beginPath();ctx.moveTo(footX,footY);ctx.lineTo(footX+side*5,footY+toe*3+2);ctx.stroke()}
+ }
+ ellipse(0,-4,12,9,f.colour);
+ ellipse(0,-1,7,4,'#d1d9a166');
+ // Forelegs brace for landing; front toes spread naturally.
+ for(const side of [-1,1]){
+  ctx.strokeStyle=hind;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(side*7,-2);ctx.lineTo(side*10,6);ctx.lineTo(side*14,7);ctx.stroke();
+  ctx.strokeStyle=toes;ctx.lineWidth=1.2;for(let j=-1;j<=1;j++){ctx.beginPath();ctx.moveTo(side*14,7);ctx.lineTo(side*(17+j),9);ctx.stroke()}
+ }
+ ellipse(-7,-10,5,5,f.colour);ellipse(7,-10,5,5,f.colour);
+ const blink=!jumping&&Math.sin(time*.0011+f.phase)>.992;
+ if(blink){ellipse(-7,-11,2.7,.7,'#27392b');ellipse(7,-11,2.7,.7,'#27392b')}
+ else{ellipse(-7,-11,2.5,2.5,'#e5e4ba');ellipse(7,-11,2.5,2.5,'#e5e4ba');ellipse(-6.4,-11,1.25,1.7,'#1d3024');ellipse(7.6,-11,1.25,1.7,'#1d3024')}
+ ellipse(0,-5,1.3,.8,'#335b3a');
+ ctx.restore();ctx.restore();
+}
 // Amphibians remain in pond or marsh habitat, including when startled.
 function frogHabitat(f,x,y){
  if(f.habitat==='marsh')return Math.hypot((x-2100)/280,(y-2420)/185)<=1;
@@ -499,7 +552,7 @@ function frogReturnPoint(f,x,y){
 function updateFrogs(){
  for(const f of frogs){
   if(!f.habitat)f.habitat=Math.hypot(f.homeX-2100,f.homeY-2420)<330?'marsh':'pond';
-  if(f.hopUntil&&time>=f.hopUntil){f.x=f.toX;f.y=f.toY;f.hopUntil=0}
+  if(f.hopUntil&&time>=f.hopUntil){f.x=f.toX;f.y=f.toY;f.hopUntil=0;f.landedAt=time}
   if(f.hopUntil||time<f.hopAt)continue;
   const scared=dist(f,state)<125;
   let a=scared?Math.atan2(f.y-state.y,f.x-state.x):Math.sin(f.phase+time*.0002)*Math.PI*2;
@@ -513,7 +566,7 @@ function updateFrogs(){
   const target=frogReturnPoint(f,nx,ny);
   if(frogHabitat(f,target.x,target.y)){
    f.fromX=f.x;f.fromY=f.y;f.toX=target.x;f.toY=target.y;
-   f.hopUntil=time+(scared?340:450);
+   f.hopDuration=scared?340:450;f.scaredHop=scared;f.hopUntil=time+f.hopDuration;
   }
   f.hopAt=time+(scared?500:2600+seeded(f.phase+Math.floor(time/3000))*3600);
  }
@@ -609,7 +662,7 @@ open(`<h2>${selected.title}</h2><p>${selected.subtitle}</p><button class="btn" i
 document.getElementById('craftBack').onclick=()=>craft();document.querySelectorAll('[data-recipe]').forEach(b=>b.onclick=()=>build(+b.dataset.recipe))}
 function build(i){let r=recipes[i];if(!r)return;if(['salve','tea','mushroomMeal','meal'].includes(r.kind)&&dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Return to camp or a campfire to prepare this.');return}if(campStages.some(t=>t.kind===r.kind)&&campStages[state.campTier]?.kind!==r.kind){notify('🔒 Finish the current home upgrade first.');return}const herbTotal=Object.values(state.herbs).reduce((a,b)=>a+b,0);if(state.wood<r.wood||state.stone<r.stone||state.berries<(r.berries||0)||state.mushrooms<(r.mushrooms||0)||herbTotal<(r.herbs||0)||state.twigs<(r.twigs||0)||state.leaves<(r.leaves||0)){notify('Not enough materials yet!');return}state.wood-=r.wood;state.stone-=r.stone;state.berries-=r.berries||0;state.mushrooms-=r.mushrooms||0;state.twigs-=r.twigs||0;state.leaves-=r.leaves||0;let need=r.herbs||0;for(const k of Object.keys(state.herbs)){const used=Math.min(need,state.herbs[k]);state.herbs[k]-=used;need-=used;if(!need)break}if(['salve','tea','mushroomMeal'].includes(r.kind)){if(r.kind==='salve')state.potions++;else state.food++;close();notify(r.name+' prepared!');save();return}if(['axe','torch','shovel','pickaxe'].includes(r.kind)){state.tools[r.kind]++;equipTool(r.kind);close();notify(r.name+' crafted!');save();return}if(r.kind==='meal'){state.food++;close();notify('🍲 Meal prepared!');save();return}if(campStages.some(t=>t.kind===r.kind)){state.campTier++;state.structures=state.structures.filter(q=>!campStages.some(t=>t.kind===q.kind));memory('🏡 Haigen upgraded the campsite: '+r.name+'!');close();notify('✨ New home built! Another plan has been unlocked.');save();return}const firstBuild=r.kind==='shelter'&&!state.structures.some(q=>q.kind==='shelter')?{x:cottage.x+35,y:cottage.y-10}:r.kind==='campfire'&&!state.structures.some(q=>q.kind==='campfire')?firstFire:r.kind==='garden'&&near(cottage,170)?{x:cottage.x-105,y:cottage.y+78}:{x:clamp(state.x+rand(70,125),100,WORLD-100),y:clamp(state.y+rand(55,105),100,WORLD-100)};state.structures.push({kind:r.kind,x:firstBuild.x,y:firstBuild.y,...(r.kind==='campfire'?{lit:false,fuel:0}:{})});if(r.kind==='shelter')memory('🏕️ Haigen built his first woodland shelter in the clearing!');if(r.kind==='campfire')memory('🔥 Haigen laid a stone-ring fire pit for his first camp!');if(!state.quests.home){state.quests.home=true;memory('Haigen built his first woodland structure!')}close();notify(`${r.name} built!`);save()}function help(){open(`<h2>🌲 Welcome to Haigen's World</h2><p><b>Your adventure:</b> Explore the woodland, collect materials, build structures, discover secrets and befriend Dillon and Skölli.</p><p>🎮 <b>Move:</b> Drag the on-screen joystick, use an Xbox controller's left stick or D-pad, or use WASD / arrow keys.<br>✨ <b>Interact:</b> Stand near a tree, rock, bush, friend or landmark and tap Interact.<br>🍓 <b>Friends:</b> Collect berries and give them to your companions.<br>🔨 <b>Build:</b> Craft a campfire, garden or shelter.<br>📖 <b>Journal:</b> Remember your adventures.</p><p><b>First quest:</b> Chop trees, gather 6 wood, 2 twigs and 3 leaves, and build a lean-to shelter. Then build a stone-ring campfire!</p><p class="small">Version 0.4 • Offline-friendly after loading • Progress stored in this browser, not synced between devices.</p><button class="btn" id="resetBtn">Reset saved world</button>`);$('resetBtn').onclick=()=>{if(confirm('Start a new world? This deletes your local progress.')){localStorage.removeItem('wandererTestSave');location.reload()}}}function joyMove(e){const rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;let x=(e.clientX-cx)/43,y=(e.clientY-cy)/43,m=Math.hypot(x,y);joy={x:x/Math.max(1,m),y:y/Math.max(1,m)};$('stick').style.transform=`translate(${joy.x*32}px,${joy.y*32}px)`}const j=$('joy');j.addEventListener('pointerdown',e=>{j.setPointerCapture(e.pointerId);joyMove(e)});j.addEventListener('pointermove',e=>{if(j.hasPointerCapture(e.pointerId))joyMove(e)});function release(){joy={x:0,y:0};$('stick').style.transform='translate(0,0)'}j.addEventListener('pointerup',release);j.addEventListener('pointercancel',release);addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key===' '&&!e.repeat)interact();if(e.key==='Escape')close();if(e.key.toLowerCase()==='m'&&!e.repeat){if($('overlay').classList.contains('open'))close();else showMap()}});addEventListener('keyup',e=>keys[e.key]=false);$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
 for(const [id,fn] of [['modeBtn',()=>setAutonomy(!state.autonomy)],['mapBtn',showMap],['journalBtn',journal],['craftBtn',craft],['helpBtn',help]]){const el=$(id);let handled=0;el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();e.stopPropagation();handled=Date.now();fn()}},true);el.addEventListener('click',e=>{if(Date.now()-handled<800){e.preventDefault();e.stopImmediatePropagation()}},true)}$('closeBtn').onclick=close;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))close()});function frame(now){let dt=Math.min(now-last,50);last=now;menuController();if(!$('overlay').classList.contains('open'))update(dt);draw();requestAnimationFrame(frame)}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=64;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=65;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
