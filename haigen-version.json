@@ -1,4 +1,4 @@
 {
-  "build": 41,
-  "notes": "Fix Skölli's fox tail to follow his body in rear, front and side walking animations."
+  "build": 42,
+  "notes": "Fix startup syntax error in fox animation rendering."
 }
