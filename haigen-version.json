@@ -1,4 +1,4 @@
 {
-  "build": 40,
-  "notes": "Crafting menu now separates Weapons & Tools, Buildings & Upgrades, and Remedies & Food while preserving progressive unlocks."
+  "build": 41,
+  "notes": "Fix Skölli's fox tail to follow his body in rear, front and side walking animations."
 }
