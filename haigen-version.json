@@ -1,4 +1,4 @@
 {
-  "build": 24,
-  "notes": "Correct iPad gameplay camera scale to show more of the world; map zoom remains independent."
+  "build": 25,
+  "notes": "Compact 3000x3000 world, central campsite, nearby lake, highlands, grove and marsh; saved position and constructions migrated."
 }
