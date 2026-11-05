@@ -1,4 +1,4 @@
 {
-  "build": 20,
-  "notes": "Fix campsite layering: ground stays behind characters; sign and objects use depth sorting."
+  "build": 21,
+  "notes": "Fire pit ground-layer fix and iPad canvas viewport sizing."
 }
