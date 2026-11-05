@@ -1,4 +1,4 @@
 {
-  "build": 21,
-  "notes": "Fire pit ground-layer fix and iPad canvas viewport sizing."
+  "build": 22,
+  "notes": "Map zoom using right stick up/down, with touchscreen plus and minus buttons."
 }
