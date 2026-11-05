@@ -1,4 +1,4 @@
 {
-  "build": 35,
-  "notes": "Thought bubbles now appear briefly, disappear completely and leave 9–16 seconds of quiet before the next line; danger warnings remain immediate."
+  "build": 36,
+  "notes": "Persistent 100-point health meter; boar and wolf attacks deal damage; eat meals, eggs or berries to heal; fainting returns Haigen safely to camp."
 }
