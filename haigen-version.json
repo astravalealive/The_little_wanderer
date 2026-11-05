@@ -1,4 +1,4 @@
 {
-  "build": 26,
-  "notes": "Companions now forage, nibble, sniff, rest, investigate, stalk and pounce, with purposeful returns and call responses."
+  "build": 27,
+  "notes": "Companion movement stabilized: no per-frame retargeting, slower movement, longer natural pauses and committed destinations."
 }
