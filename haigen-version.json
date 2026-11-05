@@ -1,4 +1,4 @@
 {
-  "build": 30,
-  "notes": "Map now has a visible Close (B) button and working zoom controls; Xbox B exits the map."
+  "build": 31,
+  "notes": "Four-direction animated Haigen, Dillon and Skölli: front/back/side facing, walking, hopping and fox tail motion."
 }
