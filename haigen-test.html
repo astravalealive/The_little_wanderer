@@ -227,24 +227,47 @@ function drawToolSwing(){if(!toolSwing)return;const progress=Math.min(1,(perform
  if(progress>.62&&progress<.94){for(let i=0;i<4;i++){const a=i*1.6+progress*4;ellipse(state.x+Math.cos(a)*(18+progress*20),state.y+8+Math.sin(a)*9,3,2,kind==='axe'?'#b78c55':'#c9bda2')}}
 }
 function drawHaigenHair(dir,phase,moving){
- // Soft, finely textured sandy-blonde hair. Keep face, eyes and smile unobstructed.
- const back=dir==='up',side=dir==='left'||dir==='right',sway=Math.sin(phase*.004)*(moving?1:.3);
- ctx.save();ctx.lineCap='round';
- ctx.fillStyle='#d7ae79';ctx.beginPath();ctx.moveTo(-20,-57);
- ctx.quadraticCurveTo(-25,-73,-11,-79);ctx.quadraticCurveTo(5,-86,18,-75);
- ctx.quadraticCurveTo(25,-68,22,-56);ctx.lineTo(20+sway,-43);
- ctx.quadraticCurveTo(15,-43,13,-51);ctx.lineTo(-13,-51);
- ctx.quadraticCurveTo(-18,-43,-22+sway,-44);ctx.closePath();ctx.fill();
- // Thin individual wisps along the sides, not thick dangling tubes.
- for(let i=0;i<8;i++){const x=-18+i*5.2;ctx.strokeStyle=i%3===0?'#b88c5a':'#f1d3a3';ctx.lineWidth=i%3===0?1.4:1;
- ctx.beginPath();ctx.moveTo(x,-77+Math.abs(x)*.25);ctx.quadraticCurveTo(x+3,-66,x+(i%2?3:-3)+sway,-54);ctx.stroke()}
- if(back){for(let i=0;i<5;i++){let x=-16+i*8;ctx.strokeStyle='#f1d3a3';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,-58);ctx.quadraticCurveTo(x+4,-47,x+sway,-41);ctx.stroke()}}
- else{
- // Fringe stays ABOVE the eyes at y=-47; the forehead and face remain visible.
- ctx.fillStyle='#e8c28e';ctx.beginPath();ctx.moveTo(-20,-68);
- ctx.quadraticCurveTo(-2,-82,19,-69);ctx.quadraticCurveTo(13,-60,-5,-57);
- ctx.quadraticCurveTo(-14,-60,-20,-68);ctx.fill();
- for(let i=0;i<5;i++){ctx.strokeStyle=i%2?'#f7ddb2':'#bb905e';ctx.lineWidth=.9;ctx.beginPath();ctx.moveTo(-14+i*6,-75);ctx.quadraticCurveTo(-4+i*5,-65,-7+i*5,-58);ctx.stroke()}
+ // Springy sandy-blonde waves: separate clumps, curl highlights and moving tips.
+ // All front curls end above the eyes so Haigen's expression stays visible.
+ const back=dir==='up',side=dir==='left'||dir==='right';
+ const bounce=Math.sin(phase*.012)*(moving?2.2:.45);
+ const breeze=Math.sin(time*.0017+phase*.002)*(moving?2:.7);
+ const shades=['#c99b61','#d9ad72','#e7c18a','#f3d7a6','#b98b57'];
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ // Darker under-layer at the ears and nape, not a solid helmet.
+ ctx.fillStyle='#bd905e';ctx.beginPath();ctx.moveTo(-19,-64);
+ ctx.quadraticCurveTo(-27,-60,-22,-46);ctx.lineTo(-16+breeze,-41);
+ ctx.lineTo(16+breeze,-41);ctx.quadraticCurveTo(27,-49,22,-65);
+ ctx.quadraticCurveTo(0,-85,-19,-64);ctx.fill();
+ // Overlapping irregular curls across the crown; each lock has its own motion.
+ for(let i=0;i<11;i++){
+  const x=-20+i*4.1;
+  const crown=-72-Math.sin(i*.73)*4-(i%3===0?3:0);
+  const wave=Math.sin(time*.002+i*1.8)*(moving?1.4:.45);
+  const y=crown+bounce*(.3+.12*(i%3));
+  ctx.fillStyle=shades[(i*3)%shades.length];
+  ctx.beginPath();ctx.ellipse(x+wave,y,5.5+(i%3),7+(i%2)*2,(i%2?-.32:.3),0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#f6dcae';ctx.lineWidth=1.15;ctx.beginPath();
+  ctx.arc(x+wave-1,y-1,3.2,Math.PI*.95,Math.PI*2.1);ctx.stroke();
+ }
+ // Side and nape ringlets curl outwards and spring with movement.
+ for(const sideSign of [-1,1])for(let j=0;j<4;j++){
+  const x=sideSign*(18+j*1.5),y=-62+j*5;
+  const flick=breeze*(.5+j*.2)+Math.sin(time*.004+j*1.6)*(.6+j*.2);
+  ctx.strokeStyle=shades[(j+1)%shades.length];ctx.lineWidth=3.1-j*.3;
+  ctx.beginPath();ctx.moveTo(x,y-6);ctx.bezierCurveTo(x+sideSign*7+flick,y-2,x-sideSign*5+flick,y+4,x+sideSign*3+flick,y+7);ctx.stroke();
+  ctx.strokeStyle='#f5d6a3';ctx.lineWidth=.9;ctx.beginPath();ctx.arc(x+sideSign*3+flick,y+5,2,0,Math.PI*1.5);ctx.stroke();
+ }
+ if(back){
+  // Rear view has extra loose strands at the nape.
+  for(let i=0;i<7;i++){const x=-17+i*5.7;ctx.strokeStyle=shades[i%shades.length];ctx.lineWidth=2;
+   ctx.beginPath();ctx.moveTo(x,-65);ctx.bezierCurveTo(x+6,-56,x-5+breeze,-49,x+2+breeze,-42);ctx.stroke()}
+ }else{
+  // A few little forehead curls, no Bieber curtain and no covered eyes.
+  for(let i=0;i<5;i++){const x=-14+i*7;const tip=-57+(i%2)*2+bounce*.3;
+   ctx.strokeStyle=shades[(i+2)%shades.length];ctx.lineWidth=3.2;
+   ctx.beginPath();ctx.moveTo(x-3,-69);ctx.bezierCurveTo(x+8,-68,x-7,-60,x+1+breeze*.4,tip);ctx.stroke();
+   ctx.strokeStyle='#f8e1b7';ctx.lineWidth=.9;ctx.beginPath();ctx.arc(x+1+breeze*.4,tip,2.3,0,Math.PI*1.4);ctx.stroke()}
  }
  ctx.restore();
 }
@@ -387,7 +410,7 @@ open(`<h2>${selected.title}</h2><p>${selected.subtitle}</p><button class="btn" i
 document.getElementById('craftBack').onclick=()=>craft();document.querySelectorAll('[data-recipe]').forEach(b=>b.onclick=()=>build(+b.dataset.recipe))}
 function build(i){let r=recipes[i];if(!r)return;if(['salve','tea','mushroomMeal','meal'].includes(r.kind)&&dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Return to camp or a campfire to prepare this.');return}if(campStages.some(t=>t.kind===r.kind)&&campStages[state.campTier]?.kind!==r.kind){notify('🔒 Finish the current home upgrade first.');return}const herbTotal=Object.values(state.herbs).reduce((a,b)=>a+b,0);if(state.wood<r.wood||state.stone<r.stone||state.berries<(r.berries||0)||state.mushrooms<(r.mushrooms||0)||herbTotal<(r.herbs||0)||state.twigs<(r.twigs||0)||state.leaves<(r.leaves||0)){notify('Not enough materials yet!');return}state.wood-=r.wood;state.stone-=r.stone;state.berries-=r.berries||0;state.mushrooms-=r.mushrooms||0;state.twigs-=r.twigs||0;state.leaves-=r.leaves||0;let need=r.herbs||0;for(const k of Object.keys(state.herbs)){const used=Math.min(need,state.herbs[k]);state.herbs[k]-=used;need-=used;if(!need)break}if(['salve','tea','mushroomMeal'].includes(r.kind)){if(r.kind==='salve')state.potions++;else state.food++;close();notify(r.name+' prepared!');save();return}if(['axe','torch','shovel','pickaxe'].includes(r.kind)){state.tools[r.kind]++;equipTool(r.kind);close();notify(r.name+' crafted!');save();return}if(r.kind==='meal'){state.food++;close();notify('🍲 Meal prepared!');save();return}if(campStages.some(t=>t.kind===r.kind)){state.campTier++;state.structures=state.structures.filter(q=>!campStages.some(t=>t.kind===q.kind));memory('🏡 Haigen upgraded the campsite: '+r.name+'!');close();notify('✨ New home built! Another plan has been unlocked.');save();return}const firstBuild=r.kind==='shelter'&&!state.structures.some(q=>q.kind==='shelter')?{x:cottage.x+35,y:cottage.y-10}:r.kind==='campfire'&&!state.structures.some(q=>q.kind==='campfire')?firstFire:r.kind==='garden'&&near(cottage,170)?{x:cottage.x-105,y:cottage.y+78}:{x:clamp(state.x+rand(70,125),100,WORLD-100),y:clamp(state.y+rand(55,105),100,WORLD-100)};state.structures.push({kind:r.kind,x:firstBuild.x,y:firstBuild.y,...(r.kind==='campfire'?{lit:false,fuel:0}:{})});if(r.kind==='shelter')memory('🏕️ Haigen built his first woodland shelter in the clearing!');if(r.kind==='campfire')memory('🔥 Haigen laid a stone-ring fire pit for his first camp!');if(!state.quests.home){state.quests.home=true;memory('Haigen built his first woodland structure!')}close();notify(`${r.name} built!`);save()}function help(){open(`<h2>🌲 Welcome to Haigen's World</h2><p><b>Your adventure:</b> Explore the woodland, collect materials, build structures, discover secrets and befriend Dillon and Skölli.</p><p>🎮 <b>Move:</b> Drag the on-screen joystick, use an Xbox controller's left stick or D-pad, or use WASD / arrow keys.<br>✨ <b>Interact:</b> Stand near a tree, rock, bush, friend or landmark and tap Interact.<br>🍓 <b>Friends:</b> Collect berries and give them to your companions.<br>🔨 <b>Build:</b> Craft a campfire, garden or shelter.<br>📖 <b>Journal:</b> Remember your adventures.</p><p><b>First quest:</b> Chop trees, gather 6 wood, 2 twigs and 3 leaves, and build a lean-to shelter. Then build a stone-ring campfire!</p><p class="small">Version 0.4 • Offline-friendly after loading • Progress stored in this browser, not synced between devices.</p><button class="btn" id="resetBtn">Reset saved world</button>`);$('resetBtn').onclick=()=>{if(confirm('Start a new world? This deletes your local progress.')){localStorage.removeItem('wandererTestSave');location.reload()}}}function joyMove(e){const rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;let x=(e.clientX-cx)/43,y=(e.clientY-cy)/43,m=Math.hypot(x,y);joy={x:x/Math.max(1,m),y:y/Math.max(1,m)};$('stick').style.transform=`translate(${joy.x*32}px,${joy.y*32}px)`}const j=$('joy');j.addEventListener('pointerdown',e=>{j.setPointerCapture(e.pointerId);joyMove(e)});j.addEventListener('pointermove',e=>{if(j.hasPointerCapture(e.pointerId))joyMove(e)});function release(){joy={x:0,y:0};$('stick').style.transform='translate(0,0)'}j.addEventListener('pointerup',release);j.addEventListener('pointercancel',release);addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key===' '&&!e.repeat)interact();if(e.key==='Escape')close();if(e.key.toLowerCase()==='m'&&!e.repeat){if($('overlay').classList.contains('open'))close();else showMap()}});addEventListener('keyup',e=>keys[e.key]=false);$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
 for(const [id,fn] of [['modeBtn',()=>setAutonomy(!state.autonomy)],['mapBtn',showMap],['journalBtn',journal],['craftBtn',craft],['helpBtn',help]]){const el=$(id);let handled=0;el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();e.stopPropagation();handled=Date.now();fn()}},true);el.addEventListener('click',e=>{if(Date.now()-handled<800){e.preventDefault();e.stopImmediatePropagation()}},true)}$('closeBtn').onclick=close;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))close()});function frame(now){let dt=Math.min(now-last,50);last=now;menuController();if(!$('overlay').classList.contains('open'))update(dt);draw();requestAnimationFrame(frame)}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=51;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=52;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
