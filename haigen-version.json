@@ -1,4 +1,4 @@
 {
-  "build": 49,
-  "notes": "Separate hunger meter, food for hunger, woodland salve for injuries, and autonomous recovery and retreat to camp."
+  "build": 50,
+  "notes": "Hunger and health separated; food feeds, salve heals; camp cooking and mixing action; autonomous self-care; extra strange thoughts."
 }
