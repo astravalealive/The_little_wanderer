@@ -1,4 +1,4 @@
 {
-  "build": 61,
-  "notes": "Wildlife reactivity: frogs hop away, squirrels flee with animated leaps, birds forage on ground then take off near Haigen, small loose flocks steer together."
+  "build": 62,
+  "notes": "Gradual hunger decay at 0.06 points per second, hunger warnings, color-changing meter, and autonomous eating below 48 hunger."
 }
