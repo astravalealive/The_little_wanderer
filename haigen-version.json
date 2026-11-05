@@ -1,4 +1,4 @@
 {
-  "build": 53,
-  "notes": "Selectable persistent hairstyles, mood-based expressions, editable personal diary, local request mailbox and automatic exploration after 90 seconds idle."
+  "build": 54,
+  "notes": "Persistent hairstyle selection, mood face, diary, local mailbox, idle independence; chickens sorted behind trees correctly and squirrels hop/climb."
 }
