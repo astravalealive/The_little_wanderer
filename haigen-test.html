@@ -201,35 +201,50 @@ function roadDistance(x,y){let best=Infinity;for(const route of roadRoutes)for(l
 // This prevents the border of one road drawing a line across another at a junction.
 const roadWidths=[90,55,67,50,65,56,43,34,50,42];
 function roadWidthAt(x,y){let best=Infinity,w=0;for(let r=0;r<roadRoutes.length;r++){const route=roadRoutes[r];for(let i=1;i<route.length;i++){const a=route[i-1],b=route[i],dx=b.x-a.x,dy=b.y-a.y,len=dx*dx+dy*dy,t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/len)),d=Math.hypot(x-a.x-t*dx,y-a.y-t*dy);if(d<best){best=d;w=roadWidths[r]}}}return {distance:best,width:w}}
+// Render all road branches as one continuous painted network.
+// The back-to-front destination-over layers eliminate internal borders at forks.
+let roadCanvas=null,roadCtx=null;
+function roadTrace(g,route){
+ g.beginPath();g.moveTo(route[0].x,route[0].y);
+ for(let i=1;i<route.length-1;i++){
+  const p=route[i],q=route[i+1];
+  g.quadraticCurveTo(p.x,p.y,(p.x+q.x)*.5,(p.y+q.y)*.5);
+ }
+ const last=route[route.length-1];g.lineTo(last.x,last.y);
+}
 function path(){
- ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
- const drawLayer=(extra,colour)=>{ctx.strokeStyle=colour;for(let r=0;r<roadRoutes.length;r++){const route=roadRoutes[r];ctx.lineWidth=roadWidths[r]+extra;ctx.beginPath();ctx.moveTo(route[0].x,route[0].y);for(let i=1;i<route.length;i++){const p=route[i];ctx.lineTo(p.x,p.y)}ctx.stroke()}};
- // Shared outer silhouette: all branches merge before the surface is painted.
- drawLayer(19,'#63805266');
- drawLayer(11,'#89714e');
- drawLayer(0,'#b69a70');
- drawLayer(-12,'#d0b58a');
- // Irregular dirt and fine gravel instead of continuous centre stripes.
- // Keep detail within the road surface so it never divides a junction.
- for(let i=0;i<2100;i++){
+ const pw=ctx.canvas.width,ph=ctx.canvas.height;
+ if(!roadCanvas||roadCanvas.width!==pw||roadCanvas.height!==ph){
+  roadCanvas=document.createElement('canvas');roadCanvas.width=pw;roadCanvas.height=ph;
+  roadCtx=roadCanvas.getContext('2d');
+ }
+ const g=roadCtx;
+ g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,pw,ph);
+ g.setTransform(ctx.getTransform());g.lineCap='round';g.lineJoin='round';
+ // Inner road first; each subsequent wider band is painted BEHIND it.
+ // This makes T-junctions and forks genuinely merge without cut-through lines.
+ const bands=[[-12,'#d2ba91'],[0,'#b99c72'],[9,'#967b57'],[16,'#6c765255']];
+ for(let layer=0;layer<bands.length;layer++){
+  g.globalCompositeOperation=layer===0?'source-over':'destination-over';
+  g.strokeStyle=bands[layer][1];
+  for(let r=0;r<roadRoutes.length;r++){
+   g.lineWidth=Math.max(7,roadWidths[r]+bands[layer][0]);
+   roadTrace(g,roadRoutes[r]);g.stroke();
+  }
+ }
+ g.globalCompositeOperation='source-over';
+ // Speckled worn-earth texture, confined to the actual road centre.
+ for(let i=0;i<1250;i++){
   const x=seeded(51000+i*5)*WORLD,y=seeded(51001+i*5)*WORLD;
-  if(Math.abs(x-cam.x)>1000||Math.abs(y-cam.y)>800)continue;
+  if(Math.abs(x-cam.x)>950||Math.abs(y-cam.y)>750)continue;
   const hit=roadWidthAt(x,y);
-  if(hit.distance>hit.width*.5-7)continue;
-  const n=seeded(51002+i*5),sz=1.1+n*3.8;
-  ellipse(x,y,sz*(n>.78?2.1:1),sz*.42,n>.75?'#9b7c59a0':n>.35?'#ead4aa88':'#aa906d77');
+  if(hit.distance>hit.width*.5-10)continue;
+  const n=seeded(51002+i*5),sz=1.1+n*3.1;
+  g.fillStyle=n>.75?'#9f825f88':n>.35?'#e8d1a688':'#aa916f66';
+  g.beginPath();g.ellipse(x,y,sz*(n>.78?1.7:1),sz*.43,0,0,Math.PI*2);g.fill();
  }
- // Grass, flowers and small stones on the verges, away from the driving surface.
- for(let i=0;i<850;i++){
-  const x=seeded(72000+i*4)*WORLD,y=seeded(72001+i*4)*WORLD;
-  if(Math.abs(x-cam.x)>1000||Math.abs(y-cam.y)>800)continue;
-  const hit=roadWidthAt(x,y),edge=hit.width*.5;
-  if(hit.distance<edge+5||hit.distance>edge+21)continue;
-  ctx.strokeStyle=i%3?'#638e4d':'#88a760';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-3,y-6);ctx.moveTo(x,y);ctx.lineTo(x+3,y-4);ctx.stroke();
-  if(i%8===0)ellipse(x+3,y-5,2.5,2.5,i%2?'#e3c76f':'#e7dfc1');
- }
- ctx.restore();
+ // Draw the assembled road image in screen coordinates, preserving world transform.
+ ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(roadCanvas,0,0);ctx.restore();
 }
 function ellipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}function poly(points,fill,stroke){ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=3;ctx.stroke()}}function tree(o){const s=o.size;ctx.save();ctx.translate(o.x,o.y);ctx.scale(s,s);ellipse(6,15,39,14,'#1c493355');ctx.fillStyle='#694a35';ctx.fillRect(-10,-33,20,48);ctx.fillStyle='#a27a50';ctx.fillRect(-6,-31,3,42);for(let i=0;i<3;i++){ctx.strokeStyle='#4e372c';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(1+i*3,-28+i*12);ctx.lineTo(1+i*3,-18+i*12);ctx.stroke()}ctx.save();const sway=Math.sin(time*.00065+o.x*.014+o.y*.009)*.034;ctx.translate(0,-28);ctx.rotate(sway);ctx.translate(0,28);for(let [x,y,rx,ry,c] of [[-26,-48,37,28,'#3d7749'],[25,-53,38,29,'#4d8b51'],[1,-79,43,35,'#609f5a'],[-12,-77,30,24,'#7db76b']]){ellipse(x+3,y+5,rx,ry,'#285e3b55');ellipse(x,y,rx,ry,c);ellipse(x-8,y-9,rx*.44,ry*.28,'#b6d98a44')}for(let i=0;i<7;i++){const x=-30+seeded(o.id*17+i)*63,y=-94+seeded(o.id*23+i)*55;ellipse(x,y,3.5,2,'#a8d48788')}ctx.restore();ctx.restore()}function rock(o){ellipse(o.x+5,o.y+7,26,13,'#21453677');poly([[o.x-27,o.y],[o.x-16,o.y-22],[o.x+13,o.y-25],[o.x+30,o.y-6],[o.x+17,o.y+11],[o.x-13,o.y+11]],'#88938b','#617a76');poly([[o.x-16,o.y-22],[o.x+13,o.y-25],[o.x+3,o.y-5],[o.x-27,o.y]],'#b3b7a4')}function bush(o){ellipse(o.x,o.y+5,28,12,'#1e5b38');ellipse(o.x-14,o.y-12,20,20,'#5a994d');ellipse(o.x+13,o.y-13,22,21,'#79b25c');for(let i=0;i<5;i++)ellipse(o.x-19+i*9,o.y-16+(i%2)*8,4,4,'#db5570')}function flower(o){const f=flowerKind(o);ellipse(o.x,o.y,17,8,'#40794c');ctx.strokeStyle='#4c8750';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x,o.y-22);ctx.stroke();for(let j=0;j<6;j++){let a=j*Math.PI/3;ellipse(o.x+Math.cos(a)*9,o.y-22+Math.sin(a)*9,6,6,f.color)}ellipse(o.x,o.y-22,5,5,'#f7e6a4')}function clearingGround(x,y){ellipse(x,y+14,113,49,'#b3a477');ellipse(x,y+12,95,37,'#8f9567');for(let i=0;i<6;i++)ellipse(x-80+i*29,y+23+(i%2)*12,9,5,'#698d50')}function startingClearing(x,y){ctx.strokeStyle='#8b633e';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x-37,y-9);ctx.lineTo(x-37,y-92);ctx.moveTo(x-37,y-92);ctx.lineTo(x+12,y-101);ctx.stroke();ctx.fillStyle='#ead39a';ctx.fillRect(x-36,y-89,57,27);ctx.font='bold 11px system-ui';ctx.fillStyle='#4c4531';ctx.textAlign='center';ctx.fillText('FIRST CAMP',x-7,y-72);for(let i=0;i<3;i++){ctx.fillStyle='#805a38';ctx.fillRect(x+27+i*11,y+7-i*3,31,8)}ctx.font='13px system-ui';ctx.fillStyle='#f7e8b1';ctx.fillText('Build your shelter',x,y-112)}function house(x,y){ellipse(x,y+24,105,43,'#173f32aa');ctx.fillStyle='#a27b4c';ctx.fillRect(x-69,y-85,138,109);poly([[x-91,y-78],[x,y-167],[x+91,y-78]],'#745346','#473e35');poly([[x-76,y-83],[x,y-149],[x+76,y-83]],'#b77b4e');ctx.fillStyle='#543c32';ctx.fillRect(x-17,y-34,34,58);ctx.fillStyle='#f6d18a';ctx.fillRect(x+32,y-50,25,27);ctx.fillStyle='#775139';ctx.fillRect(x+42,y-50,4,27);ctx.fillStyle='#a8b97b';ctx.fillRect(x-65,y-10,30,23);ctx.fillStyle='#dbbd7c';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText('HOME',x,y-177)}function ruin(x,y){ellipse(x,y,70,30,'#304b3c');for(let i=-1;i<=1;i++){ctx.fillStyle='#8d9c91';ctx.fillRect(x+i*44-12,y-54,24,65);ctx.fillStyle='#b8bdab';ctx.fillRect(x+i*44-12,y-54,24,9)}ctx.font='24px serif';ctx.textAlign='center';ctx.fillStyle='#f5d78b';ctx.fillText('ᚠ',x,y-24)}function structure(s){if(s.kind==='shelter'){ellipse(s.x,s.y+15,78,28,'#284a3288');poly([[s.x-70,s.y+5],[s.x,s.y-88],[s.x+70,s.y+5]],'#96794c','#4e5839');poly([[s.x-54,s.y+3],[s.x,s.y-73],[s.x+5,s.y+3]],'#b7a16d');ctx.fillStyle='#453b2c';ctx.fillRect(s.x+5,s.y-28,36,33);ctx.strokeStyle='#755137';ctx.lineWidth=5;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(s.x-55+i*24,s.y+4);ctx.lineTo(s.x,s.y-76);ctx.stroke()}ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3e2ad';ctx.fillText('🌿 Woodland shelter',s.x,s.y-103)}else if(s.kind==='garden'){ellipse(s.x,s.y,67,39,'#76593b');for(let i=0;i<6;i++){ellipse(s.x-38+i*15,s.y-8+(i%2)*15,9,10,'#5fb057')}}else if(s.kind==='campfire'){ellipse(s.x,s.y,43,23,'#4b473d');for(let i=0;i<7;i++)ellipse(s.x+Math.cos(i)*25,s.y+Math.sin(i)*14,9,7,'#9a9c8d');if(s.lit!==false){poly([[s.x-8,s.y],[s.x-4,s.y-36],[s.x+12,s.y-6],[s.x+5,s.y+3]],'#f1aa40');poly([[s.x-2,s.y],[s.x+2,s.y-21],[s.x+8,s.y-3]],'#ffe28c')}else{ctx.fillStyle='#72533d';ctx.fillRect(s.x-18,s.y-8,36,10)}}}const campStages=[
  {kind:'shelter',name:'🏕️ Leaf-and-log lean-to',wood:6,stone:0,twigs:2,leaves:3,desc:'A first shelter from the weather'},
@@ -485,7 +500,7 @@ open(`<h2>${selected.title}</h2><p>${selected.subtitle}</p><button class="btn" i
 document.getElementById('craftBack').onclick=()=>craft();document.querySelectorAll('[data-recipe]').forEach(b=>b.onclick=()=>build(+b.dataset.recipe))}
 function build(i){let r=recipes[i];if(!r)return;if(['salve','tea','mushroomMeal','meal'].includes(r.kind)&&dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Return to camp or a campfire to prepare this.');return}if(campStages.some(t=>t.kind===r.kind)&&campStages[state.campTier]?.kind!==r.kind){notify('🔒 Finish the current home upgrade first.');return}const herbTotal=Object.values(state.herbs).reduce((a,b)=>a+b,0);if(state.wood<r.wood||state.stone<r.stone||state.berries<(r.berries||0)||state.mushrooms<(r.mushrooms||0)||herbTotal<(r.herbs||0)||state.twigs<(r.twigs||0)||state.leaves<(r.leaves||0)){notify('Not enough materials yet!');return}state.wood-=r.wood;state.stone-=r.stone;state.berries-=r.berries||0;state.mushrooms-=r.mushrooms||0;state.twigs-=r.twigs||0;state.leaves-=r.leaves||0;let need=r.herbs||0;for(const k of Object.keys(state.herbs)){const used=Math.min(need,state.herbs[k]);state.herbs[k]-=used;need-=used;if(!need)break}if(['salve','tea','mushroomMeal'].includes(r.kind)){if(r.kind==='salve')state.potions++;else state.food++;close();notify(r.name+' prepared!');save();return}if(['axe','torch','shovel','pickaxe'].includes(r.kind)){state.tools[r.kind]++;equipTool(r.kind);close();notify(r.name+' crafted!');save();return}if(r.kind==='meal'){state.food++;close();notify('🍲 Meal prepared!');save();return}if(campStages.some(t=>t.kind===r.kind)){state.campTier++;state.structures=state.structures.filter(q=>!campStages.some(t=>t.kind===q.kind));memory('🏡 Haigen upgraded the campsite: '+r.name+'!');close();notify('✨ New home built! Another plan has been unlocked.');save();return}const firstBuild=r.kind==='shelter'&&!state.structures.some(q=>q.kind==='shelter')?{x:cottage.x+35,y:cottage.y-10}:r.kind==='campfire'&&!state.structures.some(q=>q.kind==='campfire')?firstFire:r.kind==='garden'&&near(cottage,170)?{x:cottage.x-105,y:cottage.y+78}:{x:clamp(state.x+rand(70,125),100,WORLD-100),y:clamp(state.y+rand(55,105),100,WORLD-100)};state.structures.push({kind:r.kind,x:firstBuild.x,y:firstBuild.y,...(r.kind==='campfire'?{lit:false,fuel:0}:{})});if(r.kind==='shelter')memory('🏕️ Haigen built his first woodland shelter in the clearing!');if(r.kind==='campfire')memory('🔥 Haigen laid a stone-ring fire pit for his first camp!');if(!state.quests.home){state.quests.home=true;memory('Haigen built his first woodland structure!')}close();notify(`${r.name} built!`);save()}function help(){open(`<h2>🌲 Welcome to Haigen's World</h2><p><b>Your adventure:</b> Explore the woodland, collect materials, build structures, discover secrets and befriend Dillon and Skölli.</p><p>🎮 <b>Move:</b> Drag the on-screen joystick, use an Xbox controller's left stick or D-pad, or use WASD / arrow keys.<br>✨ <b>Interact:</b> Stand near a tree, rock, bush, friend or landmark and tap Interact.<br>🍓 <b>Friends:</b> Collect berries and give them to your companions.<br>🔨 <b>Build:</b> Craft a campfire, garden or shelter.<br>📖 <b>Journal:</b> Remember your adventures.</p><p><b>First quest:</b> Chop trees, gather 6 wood, 2 twigs and 3 leaves, and build a lean-to shelter. Then build a stone-ring campfire!</p><p class="small">Version 0.4 • Offline-friendly after loading • Progress stored in this browser, not synced between devices.</p><button class="btn" id="resetBtn">Reset saved world</button>`);$('resetBtn').onclick=()=>{if(confirm('Start a new world? This deletes your local progress.')){localStorage.removeItem('wandererTestSave');location.reload()}}}function joyMove(e){const rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;let x=(e.clientX-cx)/43,y=(e.clientY-cy)/43,m=Math.hypot(x,y);joy={x:x/Math.max(1,m),y:y/Math.max(1,m)};$('stick').style.transform=`translate(${joy.x*32}px,${joy.y*32}px)`}const j=$('joy');j.addEventListener('pointerdown',e=>{j.setPointerCapture(e.pointerId);joyMove(e)});j.addEventListener('pointermove',e=>{if(j.hasPointerCapture(e.pointerId))joyMove(e)});function release(){joy={x:0,y:0};$('stick').style.transform='translate(0,0)'}j.addEventListener('pointerup',release);j.addEventListener('pointercancel',release);addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key===' '&&!e.repeat)interact();if(e.key==='Escape')close();if(e.key.toLowerCase()==='m'&&!e.repeat){if($('overlay').classList.contains('open'))close();else showMap()}});addEventListener('keyup',e=>keys[e.key]=false);$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
 for(const [id,fn] of [['modeBtn',()=>setAutonomy(!state.autonomy)],['mapBtn',showMap],['journalBtn',journal],['craftBtn',craft],['helpBtn',help]]){const el=$(id);let handled=0;el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();e.stopPropagation();handled=Date.now();fn()}},true);el.addEventListener('click',e=>{if(Date.now()-handled<800){e.preventDefault();e.stopImmediatePropagation()}},true)}$('closeBtn').onclick=close;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))close()});function frame(now){let dt=Math.min(now-last,50);last=now;menuController();if(!$('overlay').classList.contains('open'))update(dt);draw();requestAnimationFrame(frame)}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=59;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=60;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
