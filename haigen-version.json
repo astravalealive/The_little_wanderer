@@ -1,4 +1,4 @@
 {
-  "build": 84,
-  "notes": "Camera pan is more responsive while dragging; after release the view lingers for 0.85 seconds, then glides back to Haigen gently. Zoom, frogs, animals and Ember unchanged."
+  "build": 85,
+  "notes": "Camera directly follows finger movement at current zoom with no tracking resistance; pauses stationary for 0.95 seconds after release, then eases toward Haigen over a gentle 1.25-second follow response. Frogs, saves, controls, animals and Ember untouched."
 }
