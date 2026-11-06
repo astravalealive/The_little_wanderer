@@ -892,13 +892,7 @@ function drawCampDecor(){
   if(Math.hypot(px-firstFire.x,py-firstFire.y)<62||Math.hypot(px-chickenNest.x,py-chickenNest.y)<54)continue;
   ellipse(px,py,5+seeded(i+6400)*9,3+seeded(i+6500)*5,i%2?'#8d9d73aa':'#c6b18b99');
  }
- // A tidy little woodpile beside the cooking area.
- const wx=x+185,wy=y-9;
- ellipse(wx,wy+11,43,13,'#365d4055');
- for(let j=0;j<7;j++){const lx=wx-29+(j%4)*19,ly=wy+Math.floor(j/4)*9;
-  ctx.strokeStyle='#735036';ctx.lineWidth=9;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(lx-6,ly-10);ctx.lineTo(lx+8,ly-14);ctx.stroke();
-  ellipse(lx+8,ly-14,4.5,4,'#d7b58a');ellipse(lx+8,ly-14,2,2,'#97754f');
- }
+ // The new physical shed plot displays all stored wood.
  // Water bucket, stump seat and useful supply baskets.
  const bx=x-112,by=y+83;
  ellipse(bx,by+6,22,8,'#335b4066');poly([[bx-13,by-16],[bx+13,by-16],[bx+10,by+5],[bx-10,by+5]],'#806149');
@@ -920,6 +914,140 @@ function drawCampDecor(){
  }
  ctx.restore();
 }
+function drawHomesteadPlot(p){
+ if(Math.abs(p.x-cam.x)>950||Math.abs(p.y-cam.y)>750)return;
+ const tier=p.kind==='coop'?state.coopTier:p.kind==='woodstore'?state.woodStorageTier:state.jettyBuilt?1:0;
+ const x=p.x,y=p.y;ctx.save();
+ if(p.kind==='jetty'){
+  if(!tier){ellipse(x,y+7,58,24,'#d7bf8b');ctx.strokeStyle='#efdbaa';ctx.lineWidth=4;ctx.strokeRect(x-42,y-17,84,28)}
+  else{
+   for(const sign of [-1,1]){ctx.fillStyle='#78513a';ctx.fillRect(x+sign*41-5,y-1,10,130)}
+   for(let i=0;i<8;i++){ctx.fillStyle=i%2?'#b58b5e':'#caa473';ctx.fillRect(x-46,y+i*16-7,92,14)}
+   if(state.castAt){const bx=x+34+Math.sin(time*.002)*8,by=y+125+Math.sin(time*.003)*5;ellipse(bx,by,5,5,'#f2e7c9');ctx.strokeStyle='#d7ede0';ctx.lineWidth=2;ctx.beginPath();ctx.arc(bx,by,11,0,Math.PI*2);ctx.stroke()}
+  }
+ }else{
+  ellipse(x,y+13,92,35,tier?'#869b6b':'#d0b68b');
+  if(!tier){ctx.strokeStyle='#e9dfb4';ctx.lineWidth=4;ctx.setLineDash([12,9]);ctx.strokeRect(x-69,y-46,138,90);ctx.setLineDash([])}
+  else if(p.kind==='coop'){
+   const w=75+tier*12,h=65+tier*13;ctx.fillStyle='#b07a4c';ctx.fillRect(x-w/2,y-h,w,h);
+   for(let i=0;i<5;i++){ctx.strokeStyle='#74503b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x-w/2+i*w/4,y-h);ctx.lineTo(x-w/2+i*w/4,y);ctx.stroke()}
+   poly([[x-w/2-14,y-h],[x,y-h-39],[x+w/2+14,y-h]],tier>1?'#58705c':'#82573f');
+   ctx.fillStyle='#493b31';ctx.fillRect(x-16,y-36,32,38);
+   if(tier>=2){ctx.fillStyle='#e6bf82';ctx.fillRect(x-w/2+8,y-h+14,19,17)}
+   if(tier>=3){ctx.strokeStyle='#e2cf9e';ctx.lineWidth=3;ctx.strokeRect(x-w/2-17,y-16,w+34,31)}
+  }else{
+   const w=80+tier*18,h=50+tier*20;
+   for(let i=0;i<Math.min(9+state.woodStored,18);i++){
+    const xx=x-w/2+15+(i%6)*14,yy=y-6-Math.floor(i/6)*13;
+    ctx.strokeStyle='#76513b';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(xx,yy);ctx.lineTo(xx+10,yy-2);ctx.stroke();ellipse(xx+10,yy-2,4,4,'#d7b286');
+   }
+   ctx.strokeStyle='#735238';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x-w/2,y+4);ctx.lineTo(x-w/2,y-h);ctx.lineTo(x+w/2,y-h);ctx.lineTo(x+w/2,y+4);ctx.stroke();
+   poly([[x-w/2-14,y-h],[x,y-h-25],[x+w/2+14,y-h]],tier===1?'#986b49':'#617965');
+   ctx.textAlign='center';ctx.font='bold 11px system-ui';ctx.fillStyle='#ffebbd';ctx.fillText(state.woodStored+'/'+woodStoreLimit(),x,y-14);
+  }
+ }
+ ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillStyle='#ffe9ab';
+ ctx.fillText((tier?'✋ ':'🔨 ')+p.name+(tier?' · Lv '+tier:' · Build'),x,y-(tier?(p.kind==='jetty'?34:116):61));ctx.restore();
+}
+function homesteadCost(wood,stone=0,twigs=0,berries=0){
+ if(availableCampWood()<wood||state.stone<stone||state.twigs<twigs||state.berries<berries){
+  notify('🧱 Need '+wood+' wood, '+stone+' stone, '+twigs+' twigs, '+berries+' berries.');return false;
+ }
+ if(!spendCampWood(wood))return false;
+ state.stone-=stone;state.twigs-=twigs;state.berries-=berries;return true;
+}
+function homesteadMenu(kind){
+ const plot=homesteadPlots.find(p=>p.kind===kind);if(!plot)return;
+ const items=[];let info='';
+ if(kind==='coop'){
+  if(!state.coopTier){
+   info='Build a safe home for two hens. Until the coop is built, there are no chickens wandering around the camp.';
+   items.push(['Build coop · 6 wood, 3 stone, 2 twigs',()=>{
+    if(!homesteadCost(6,3,2))return;state.coopTier=1;state.henCount=2;state.lastEggAt=Date.now();syncChickens();
+    notify('🐔 Your first two hens have arrived!');save();homesteadMenu(kind)
+   }]);
+  }else{
+   info='Level '+state.coopTier+' · '+state.henCount+' hens · '+state.chicks.length+' chicks · '+state.nestEggs+' eggs in nest · Space for '+henCapacity();
+   items.push(['Collect '+state.nestEggs+' eggs',()=>{
+    if(!state.nestEggs){notify('🥚 No eggs ready yet.');return}
+    const n=state.nestEggs;state.eggs+=n;state.nestEggs=0;notify('🥚 Collected '+n+' fresh eggs.');save();homesteadMenu(kind)
+   }]);
+   if(state.henCount+state.chicks.length+(state.incubateUntil?1:0)<henCapacity())items.push(['Buy a hen · 12 berries, 2 wood',()=>{
+    if(!homesteadCost(2,0,0,12))return;state.henCount++;syncChickens();
+    notify('🐔 Another hen joins the flock!');save();homesteadMenu(kind)
+   }]);
+   if(state.coopTier<3)items.push(['Upgrade coop · '+(state.coopTier===1?'9 wood, 4 stone':'16 wood, 7 stone'),()=>{
+    if(!homesteadCost(state.coopTier===1?9:16,state.coopTier===1?4:7))return;
+    state.coopTier++;notify('🏠 The coop is bigger!');save();homesteadMenu(kind)
+   }]);
+   if(state.coopTier>=2&&!state.rooster)items.push(['Buy rooster · 25 berries, 2 stone',()=>{
+    if(!homesteadCost(0,2,0,25))return;state.rooster=true;
+    notify('🐓 The rooster joins your flock. You can now hatch chicks!');save();homesteadMenu(kind)
+   }]);
+   if(state.rooster&&!state.incubateUntil&&state.nestEggs>=2&&state.henCount+state.chicks.length<henCapacity())items.push(['Incubate 2 eggs · raise a chick',()=>{
+    state.nestEggs-=2;state.incubateUntil=Date.now()+120000;
+    notify('🐣 The eggs are warming!');save();homesteadMenu(kind)
+   }]);
+   if(state.incubateUntil)info+=' · Eggs incubating';
+  }
+ }else if(kind==='woodstore'){
+  if(!state.woodStorageTier){
+   info='Build a proper shed where logs are stored and the graphic grows with each upgrade.';
+   items.push(['Build wood shed · 7 wood, 3 stone',()=>{
+    if(!homesteadCost(7,3))return;state.woodStorageTier=1;
+    notify('🪵 Wood shed built. Bring gathered logs here!');save();homesteadMenu(kind)
+   }]);
+  }else{
+   info='Level '+state.woodStorageTier+' · '+state.woodStored+'/'+woodStoreLimit()+' stored · '+state.wood+'/'+woodCarryLimit+' carried';
+   items.push(['Deposit all carried wood',()=>{
+    const qty=Math.min(state.wood,Math.max(0,woodStoreLimit()-state.woodStored));
+    if(qty<=0){notify('🪵 Nothing to deposit, or the shed is full.');return}
+    state.wood-=qty;state.woodStored+=qty;notify('📦 Stored '+qty+' wood.');save();homesteadMenu(kind)
+   }]);
+   items.push(['Withdraw up to carrying limit',()=>{
+    const qty=Math.min(state.woodStored,Math.max(0,woodCarryLimit-state.wood));
+    if(qty<=0){notify('🪵 Carrying limit reached, or the shed is empty.');return}
+    state.wood+=qty;state.woodStored-=qty;notify('🪵 Took '+qty+' logs.');save();homesteadMenu(kind)
+   }]);
+   if(state.woodStorageTier<3)items.push(['Upgrade shed · '+(state.woodStorageTier===1?'10 wood, 4 stone':'17 wood, 7 stone'),()=>{
+    if(!homesteadCost(state.woodStorageTier===1?10:17,state.woodStorageTier===1?4:7))return;
+    state.woodStorageTier++;notify('📦 Shed capacity now '+woodStoreLimit()+'.');save();homesteadMenu(kind)
+   }]);
+  }
+ }else if(kind==='jetty'){
+  if(!state.jettyBuilt){
+   info='A little wooden jetty reaching out into the pond, with a fishing spot at its end.';
+   items.push(['Build jetty · 12 wood, 5 stone, 4 twigs',()=>{
+    if(!homesteadCost(12,5,4))return;state.jettyBuilt=true;
+    notify('🎣 Jetty built! Now craft a fishing rod.');save();homesteadMenu(kind)
+   }]);
+  }else{
+   info='Fish caught: '+state.fish+(state.fishingRod?' · Fishing rod equipped.':' · Craft a rod to go fishing.');
+   if(!state.fishingRod)items.push(['Craft rod · 3 wood, 2 twigs',()=>{
+    if(!homesteadCost(3,0,2))return;state.fishingRod=true;notify('🎣 Fishing rod crafted!');save();homesteadMenu(kind)
+   }]);
+   else if(!state.castAt)items.push(['Cast fishing line',()=>{
+    state.castAt=Date.now();state.biteAt=state.castAt+5500+Math.floor(Math.random()*4000);
+    notify('🎣 Line cast! Return when the float starts to bob.');save();close();
+   }]);
+   else items.push(['Reel in the line',()=>{
+    if(Date.now()<state.biteAt){notify('🎣 No bite yet. Watch the float a little longer.');close();return}
+    const qty=Math.random()<.25?2:1;state.fish+=qty;state.castAt=0;state.biteAt=0;
+    notify('🐟 Caught '+qty+' lake fish! Cook them at camp.');save();homesteadMenu(kind)
+   }]);
+  }
+ }
+ open('<h2>'+plot.name+'</h2><p>'+info+'</p><p class="small">🪵 '+state.wood+' carried + '+state.woodStored+' stored · 🪨 '+state.stone+' · 🌿 '+state.twigs+' · 🍓 '+state.berries+'</p>'+items.map((a,i)=>'<p><button class="btn" style="width:100%" id="homesteadAction'+i+'">'+a[0]+'</button></p>').join('')+'<p class="small">Tap the build patch or press X Collect beside it. Saves automatically.</p>');
+ items.forEach((a,i)=>{$('homesteadAction'+i).onclick=a[1]});
+}
+function interactHomestead(){
+ if(state.coopTier&&Math.hypot(state.x-chickenNest.x,state.y-chickenNest.y)<56&&state.nestEggs){
+  const n=state.nestEggs;state.eggs+=n;state.nestEggs=0;notify('🥚 Collected '+n+' eggs!');save();return true;
+ }
+ const p=homesteadPlots.filter(p=>Math.hypot(state.x-p.x,state.y-p.y)<108).sort((a,b)=>Math.hypot(state.x-a.x,state.y-a.y)-Math.hypot(state.x-b.x,state.y-b.y))[0];
+ if(p){homesteadMenu(p.kind);return true}return false;
+}
+
 function drawCampHome(){const tier=state.campTier;if(tier<1)return;const x=cottage.x+35,y=cottage.y-10;if(tier===1){structure({kind:'shelter',x,y});return}
  const w=tier===2?100:tier===3?145:205,h=tier===2?95:tier===3?128:165;
  ellipse(x,y+24,w+28,36,'#183f3299');
@@ -1871,7 +1999,7 @@ for(let i=0;i<11;i++){
  ctx.beginPath();ctx.arc(px+Math.sin(time*.003+i)*5,py-travel,2+(i%3),0,Math.PI*2);ctx.stroke();
  ctx.restore();
 }
-for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();const visible=objects.filter(o=>!state.removed.includes(o.id)&&canPlaceScenery(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);const drawables=[...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.fillStyle='#8d603d';ctx.fillRect(o.x-22,o.y-8,44,17);ellipse(o.x+22,o.y,8,9,'#c9a67b')}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>({tree,rock,bush,flower,mushroom:flower,cactus:drawRegionalScenery,palm:drawRegionalScenery,fir:drawRegionalScenery,bareTree:drawRegionalScenery}[o.type](o))})),...woodlandDetails.filter(o=>canPlaceScenery(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),{y:state.y,draw:()=>{const depth=lakeLevel(state.x,state.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);(state.resting?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.55));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy')}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier)drawables.push({y:chickenNest.y,draw:drawChickenNest});drawables.push(...beasts.map(b=>({y:b.y,draw:()=>drawBeast(b)})));drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();if(state.autonomy&&autoBubbleTimer>0){const msg=autoBubble,bx=state.x,by=state.y-108;ctx.save();ctx.font='bold 14px system-ui';const bw=Math.min(315,Math.max(145,ctx.measureText(msg).width+26));ctx.fillStyle='#fff6dc';ctx.strokeStyle='#6b5536';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(bx-bw/2,by-35,bw,39,13);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(bx-8,by+3);ctx.lineTo(bx+2,by+16);ctx.lineTo(bx+12,by+3);ctx.fill();ctx.fillStyle='#253d32';ctx.textAlign='center';ctx.fillText(msg,bx,by-11,bw-20);ctx.restore()}if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();const visible=objects.filter(o=>!state.removed.includes(o.id)&&canPlaceScenery(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);const drawables=[...homesteadPlots.map(p=>({y:p.y,draw:()=>drawHomesteadPlot(p)})),...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.fillStyle='#8d603d';ctx.fillRect(o.x-22,o.y-8,44,17);ellipse(o.x+22,o.y,8,9,'#c9a67b')}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>({tree,rock,bush,flower,mushroom:flower,cactus:drawRegionalScenery,palm:drawRegionalScenery,fir:drawRegionalScenery,bareTree:drawRegionalScenery}[o.type](o))})),...woodlandDetails.filter(o=>canPlaceScenery(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),{y:state.y,draw:()=>{const depth=lakeLevel(state.x,state.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);(state.resting?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.55));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy')}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier)drawables.push({y:chickenNest.y,draw:drawChickenNest});drawables.push(...beasts.map(b=>({y:b.y,draw:()=>drawBeast(b)})));drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();if(state.autonomy&&autoBubbleTimer>0){const msg=autoBubble,bx=state.x,by=state.y-108;ctx.save();ctx.font='bold 14px system-ui';const bw=Math.min(315,Math.max(145,ctx.measureText(msg).width+26));ctx.fillStyle='#fff6dc';ctx.strokeStyle='#6b5536';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(bx-bw/2,by-35,bw,39,13);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(bx-8,by+3);ctx.lineTo(bx+2,by+16);ctx.lineTo(bx+12,by+3);ctx.fill();ctx.fillStyle='#253d32';ctx.textAlign='center';ctx.fillText(msg,bx,by-11,bw-20);ctx.restore()}if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
@@ -2245,7 +2373,7 @@ function drawWardenOmen(){
 }
 function closest(){// Nearby mushrooms take priority over ambient wildlife when gathering.
 const mushroom=objects.filter(o=>o.type==='mushroom'&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<75).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(mushroom)return {o:mushroom,d:dist(mushroom,state),type:'resource'};
-const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,state),type:'frog'};const critter=woodlandCritters.filter(o=>dist(o,state)<70).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(critter)return {o:critter,d:dist(critter,state),type:'critter'};if(state.coopTier&&dist(state,chickenNest)<58&&state.nestEggs>0)return {o:chickenNest,d:dist(state,chickenNest),type:'eggs'};let candidates=state.fallen.filter(o=>near(o,100)).map(o=>({o,d:dist(o,state)-20,type:'fallen'}));candidates.push(...objects.filter(o=>!campsiteProtected(o)&&!state.removed.includes(o.id)&&near(o,90)).map(o=>({o,d:dist(o,state),type:'resource'})));for(let c of companions)if(near(c,110))candidates.push({o:c,d:dist(c,state),type:'friend'});for(let f of state.structures)if(f.kind==='campfire'&&near(f,100))candidates.push({o:f,d:dist(f,state),type:'fire'});if(near(cottage,125))candidates.push({o:cottage,d:dist(cottage,state),type:'home'});if(near(firstFire,90)&&!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80))candidates.push({o:firstFire,d:dist(firstFire,state),type:'fireSite'});if(near(ruins,100))candidates.push({o:ruins,d:dist(ruins,state),type:'ruins'});return candidates.sort((a,b)=>a.d-b.d)[0]}function interact(){const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}const nearbyMushroom=objects.filter(o=>o.type==='mushroom'&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<115).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(nearbyMushroom){harvest(nearbyMushroom);state.mushrooms=(Number(state.mushrooms)||0)+2;notify('🍄 Collected 2 mushrooms!');save();return}if(storyInteract())return;let c=closest();if(c&&c.type==='frog'){c.o.hopAt=0;notify('🐸 Ribbit! The little frog hops away.');return}if(c&&c.type==='critter'){c.o.scaredUntil=time+4500;notify(c.o.kind==='squirrel'?'🐿️ The squirrel darts up a tree!':c.o.kind==='butterfly'?'🦋 The butterfly flutters away!':'✨ The little firefly dances away!');return}if(c&&c.type==='eggs'){if(state.nestEggs>0){const count=state.nestEggs;state.eggs+=count;state.nestEggs=0;notify('🥚 Collected '+count+' fresh egg'+(count===1?'':'s')+'! Total: '+state.eggs);save()}else notify('🐔 No eggs yet. The hens need some time.');return}if(!c){notify('Walk close to a tree, rock, berry bush or friend.');return}if(c.type==='fallen'){const item=c.o;if(item.kind==='log')state.wood+=2;if(item.kind==='twig')state.twigs+=2;if(item.kind==='leaves')state.leaves+=3;state.fallen=state.fallen.filter(o=>o.id!==item.id);notify(item.kind==='log'?'🪵 Collected 2 wood':item.kind==='twig'?'🌿 Collected 2 twigs':'🍃 Collected 3 leaves');save();return}if(c.type==='resource'){let o=c.o;if(['cactus','palm','fir','bareTree'].includes(o.type)){notify('🌿 This is part of the local habitat. Leave it growing!');return}if(o.type==='tree'){notify('🪓 Equip your axe and press RT to chop trees.');return}harvest(o);if(o.type==='flower')gatherFlower(o);if(o.type==='mushroom'){state.mushrooms=(Number(state.mushrooms)||0)+2;notify('🍄 Collected 2 mushrooms!')}if(o.type==='tree'){let amount=state.tools.axe?4:2;state.wood+=amount;notify('🪵 Collected '+amount+' wood!')}if(o.type==='rock'){state.stone+=2;notify('🪨 Collected 2 stone!')}if(o.type==='bush'){state.berries+=3;notify('🍓 Collected 3 berries!')}}else if(c.type==='friend'){let f=c.o;if(state.berries>0){state.berries--;state.friends[f.kind==='fox'?'skolli':'heri']=Math.min(100,state.friends[f.kind==='fox'?'skolli':'heri']+8);notify(`🍓 ${f.name} enjoyed a berry! Friendship grew.`)}else{notify(`${f.name} is ${f.mode}. Bring berries to make friends!`)}}else if(c.type==='fire'){let fire=c.o;if(fire.lit===false){if(state.wood<1){notify('Need 1 wood to light this fire.');return}state.wood--;fire.lit=true;fire.fuel=180;notify('🔥 Campfire lit!')}else if(state.berries>=2){state.berries-=2;state.food++;notify('🍲 Cooked a berry meal!')}else if(state.wood>=1){state.wood--;fire.fuel=(fire.fuel||180)+120;notify('🪵 Added fuel to the fire!')}else notify('Bring berries to cook or wood for fuel.')}else if(c.type==='home'){campBuild();return}else if(c.type==='fireSite'){notify('🔥 This is the fire pit. Open Build to make your first campfire.')}else{notify('ᚠ An ancient rune. What secrets does this forest hold?')}save()}$('eatBtn').addEventListener('click',eatFood);$('healBtn').addEventListener('click',healSelf);$('restBtn').addEventListener('click',toggleRest);$('styleBtn').addEventListener('click',hairstyleMenu);$('mailBtn').addEventListener('click',mailbox);$('cookBtn').addEventListener('click',cookingStation);
+const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,state),type:'frog'};const critter=woodlandCritters.filter(o=>dist(o,state)<70).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(critter)return {o:critter,d:dist(critter,state),type:'critter'};if(state.coopTier&&dist(state,chickenNest)<58&&state.nestEggs>0)return {o:chickenNest,d:dist(state,chickenNest),type:'eggs'};let candidates=state.fallen.filter(o=>near(o,100)).map(o=>({o,d:dist(o,state)-20,type:'fallen'}));candidates.push(...objects.filter(o=>!campsiteProtected(o)&&!state.removed.includes(o.id)&&near(o,90)).map(o=>({o,d:dist(o,state),type:'resource'})));for(let c of companions)if(near(c,110))candidates.push({o:c,d:dist(c,state),type:'friend'});for(let f of state.structures)if(f.kind==='campfire'&&near(f,100))candidates.push({o:f,d:dist(f,state),type:'fire'});if(near(cottage,125))candidates.push({o:cottage,d:dist(cottage,state),type:'home'});if(near(firstFire,90)&&!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80))candidates.push({o:firstFire,d:dist(firstFire,state),type:'fireSite'});if(near(ruins,100))candidates.push({o:ruins,d:dist(ruins,state),type:'ruins'});return candidates.sort((a,b)=>a.d-b.d)[0]}function interact(){const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const nearbyMushroom=objects.filter(o=>o.type==='mushroom'&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<115).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(nearbyMushroom){harvest(nearbyMushroom);state.mushrooms=(Number(state.mushrooms)||0)+2;notify('🍄 Collected 2 mushrooms!');save();return}if(storyInteract())return;let c=closest();if(c&&c.type==='frog'){c.o.hopAt=0;notify('🐸 Ribbit! The little frog hops away.');return}if(c&&c.type==='critter'){c.o.scaredUntil=time+4500;notify(c.o.kind==='squirrel'?'🐿️ The squirrel darts up a tree!':c.o.kind==='butterfly'?'🦋 The butterfly flutters away!':'✨ The little firefly dances away!');return}if(c&&c.type==='eggs'){if(state.nestEggs>0){const count=state.nestEggs;state.eggs+=count;state.nestEggs=0;notify('🥚 Collected '+count+' fresh egg'+(count===1?'':'s')+'! Total: '+state.eggs);save()}else notify('🐔 No eggs yet. The hens need some time.');return}if(!c){notify('Walk close to a tree, rock, berry bush or friend.');return}if(c.type==='fallen'){const item=c.o;if(item.kind==='log')state.wood+=2;if(item.kind==='twig')state.twigs+=2;if(item.kind==='leaves')state.leaves+=3;state.fallen=state.fallen.filter(o=>o.id!==item.id);notify(item.kind==='log'?'🪵 Collected 2 wood':item.kind==='twig'?'🌿 Collected 2 twigs':'🍃 Collected 3 leaves');save();return}if(c.type==='resource'){let o=c.o;if(['cactus','palm','fir','bareTree'].includes(o.type)){notify('🌿 This is part of the local habitat. Leave it growing!');return}if(o.type==='tree'){notify('🪓 Equip your axe and press RT to chop trees.');return}harvest(o);if(o.type==='flower')gatherFlower(o);if(o.type==='mushroom'){state.mushrooms=(Number(state.mushrooms)||0)+2;notify('🍄 Collected 2 mushrooms!')}if(o.type==='tree'){let amount=state.tools.axe?4:2;state.wood+=amount;notify('🪵 Collected '+amount+' wood!')}if(o.type==='rock'){state.stone+=2;notify('🪨 Collected 2 stone!')}if(o.type==='bush'){state.berries+=3;notify('🍓 Collected 3 berries!')}}else if(c.type==='friend'){let f=c.o;if(state.berries>0){state.berries--;state.friends[f.kind==='fox'?'skolli':'heri']=Math.min(100,state.friends[f.kind==='fox'?'skolli':'heri']+8);notify(`🍓 ${f.name} enjoyed a berry! Friendship grew.`)}else{notify(`${f.name} is ${f.mode}. Bring berries to make friends!`)}}else if(c.type==='fire'){let fire=c.o;if(fire.lit===false){if(state.wood<1){notify('Need 1 wood to light this fire.');return}state.wood--;fire.lit=true;fire.fuel=180;notify('🔥 Campfire lit!')}else if(state.berries>=2){state.berries-=2;state.food++;notify('🍲 Cooked a berry meal!')}else if(state.wood>=1){state.wood--;fire.fuel=(fire.fuel||180)+120;notify('🪵 Added fuel to the fire!')}else notify('Bring berries to cook or wood for fuel.')}else if(c.type==='home'){campBuild();return}else if(c.type==='fireSite'){notify('🔥 This is the fire pit. Open Build to make your first campfire.')}else{notify('ᚠ An ancient rune. What secrets does this forest hold?')}save()}$('eatBtn').addEventListener('click',eatFood);$('healBtn').addEventListener('click',healSelf);$('restBtn').addEventListener('click',toggleRest);$('styleBtn').addEventListener('click',hairstyleMenu);$('mailBtn').addEventListener('click',mailbox);$('cookBtn').addEventListener('click',cookingStation);
 // Terrain follows the existing broad landscape colours; mining sites regrow after a short rest.
 function terrainAt(x,y){const region=expandedRegion(x,y);if(region)return region.id;const high=Math.hypot((x-1540)/620,(y-480)/400),marsh=Math.hypot((x-2100)/510,(y-2420)/360),grove=Math.hypot((x-2470)/510,(y-1280)/360);if(high<1)return 'highlands';if(marsh<1)return 'marsh';if(grove<1)return 'grove';if(inPond(x,y,45))return 'shore';return 'woodland'}
 function digGround(tool){const ground=terrainAt(state.x,state.y),rocky=ground==='highlands',wet=ground==='marsh'||ground==='shore';if(tool==='shovel'&&rocky){notify('⛏️ The highland stone is too hard for a shovel.');return}if(tool==='pickaxe'&&!rocky&&ground!=='grove'){notify('🥄 This soil is soft. Try the shovel here.');return}
@@ -2314,6 +2442,19 @@ function stopCameraPointer(e){
  if(cameraTouches.size===0)cameraReleaseAt=performance.now();
 }
 gameCanvas.addEventListener('pointerup',stopCameraPointer);
+const homesteadTap=new Map();
+gameCanvas.addEventListener('pointerdown',e=>homesteadTap.set(e.pointerId,{x:e.clientX,y:e.clientY}));
+gameCanvas.addEventListener('pointerup',e=>{
+ const start=homesteadTap.get(e.pointerId);homesteadTap.delete(e.pointerId);
+ if(!start||Math.hypot(e.clientX-start.x,e.clientY-start.y)>13||$('overlay').classList.contains('open'))return;
+ const bounds=gameCanvas.getBoundingClientRect(),z=clamp(Math.min(W/1024,H/768),.52,1)*cameraZoom;
+ const wx=cam.x+((e.clientX-bounds.left)*W/bounds.width-W/2)/z;
+ const wy=cam.y+((e.clientY-bounds.top)*H/bounds.height-H/2)/z;
+ const p=homesteadPlots.find(p=>Math.hypot(wx-p.x,wy-p.y)<80);
+ if(p){if(state.autonomy)setAutonomy(false);homesteadMenu(p.kind)}
+});
+gameCanvas.addEventListener('pointercancel',e=>homesteadTap.delete(e.pointerId));
+
 gameCanvas.addEventListener('pointercancel',stopCameraPointer);
 gameCanvas.addEventListener('wheel',e=>{e.preventDefault();cameraZoom=clamp(cameraZoom*Math.exp(-e.deltaY*.001),.7,2.4)},{passive:false});
 let lastWorldError='';
