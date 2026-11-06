@@ -788,6 +788,19 @@ function character(x,y,type,actor,deepWater=false){
    else if(travelRegion.id==='coast'){ctx.fillStyle='#f3dfae';ctx.fillRect(-18,-23,36,6)}
    else if(travelRegion.id==='wasteland'){ctx.beginPath();ctx.moveTo(-19,-37);ctx.lineTo(0,-10);ctx.lineTo(18,-37);ctx.stroke()}
    ctx.restore()}
+  // Keep the selected tool visibly in Haigen's hand between swings.
+  // The separate swing animation takes over during a strike.
+  if(state.equipped!=='hands'&&state.tools?.[state.equipped]&&!(toolSwing&&performance.now()-toolSwing.started<toolSwing.duration)){
+   const kind=state.equipped,bob=moving?Math.sin(phase*.012)*2:0;
+   ctx.save();ctx.translate(side?21:back?19:22,-25+bob);ctx.rotate(side?-.15:.14);
+   ctx.strokeStyle='#795233';ctx.lineWidth=5;ctx.lineCap='round';
+   ctx.beginPath();ctx.moveTo(0,8);ctx.lineTo(2,-30);ctx.stroke();
+   if(kind==='axe'){ctx.fillStyle='#b8c4c5';ctx.beginPath();ctx.moveTo(-4,-33);ctx.lineTo(-15,-40);ctx.lineTo(-16,-23);ctx.lineTo(-4,-27);ctx.closePath();ctx.fill()}
+   else if(kind==='pickaxe'){ctx.strokeStyle='#aebcbd';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-17,-32);ctx.quadraticCurveTo(0,-42,18,-31);ctx.stroke()}
+   else if(kind==='shovel'){ctx.fillStyle='#aebbb5';ctx.beginPath();ctx.ellipse(2,-38,9,13,0,0,Math.PI*2);ctx.fill()}
+   else if(kind==='torch'){ctx.fillStyle='#ffb54b';ctx.beginPath();ctx.arc(2,-35,9+Math.sin(time*.015)*2,0,Math.PI*2);ctx.fill()}
+   ctx.restore();
+  }
   if(deepWater)drawHaigenSnorkelLocal(dir);
  }else if(type==='rabbit'){
   // Dillon: round marshmallow body, expressive ears and twitchy little nose.
