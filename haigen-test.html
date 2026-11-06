@@ -36,10 +36,30 @@ const expandedRegions=[
 ];
 function expandedRegion(x,y){return expandedRegions.find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h)||null}
 const regionWardrobe={downs:'#7b8d51',desert:'#e7c38b',coast:'#6aa9ac',wasteland:'#6f6766',snow:'#d3e5eb',fen:'#586d56'};
-const regionalWildlife=[];for(let i=0;i<140;i++){const r=expandedRegions[i%expandedRegions.length],x=r.x+90+seeded(78000+i*7)*(r.w-180),y=r.y+90+seeded(78001+i*7)*(r.h-180);regionalWildlife.push({x,y,animal:r.animals[Math.floor(seeded(78002+i*7)*r.animals.length)]})}
-function drawExpandedTerrain(night){const halfW=W/Math.max(.4,cameraZoom),halfH=H/Math.max(.4,cameraZoom);for(const r of expandedRegions){if(r.x>cam.x+halfW||r.x+r.w<cam.x-halfW||r.y>cam.y+halfH||r.y+r.h<cam.y-halfH)continue;ctx.fillStyle=mixColour(r.color,'#303d58',night);ctx.fillRect(r.x,r.y,r.w,r.h);ctx.fillStyle='#3d5143';ctx.font='bold 34px system-ui';ctx.textAlign='center';ctx.fillText(r.name,r.x+r.w/2,r.y+200)}}
+const regionalWildlife=[];for(let i=0;i<140;i++){const r=expandedRegions[i%expandedRegions.length],x=r.x+90+seeded(78000+i*7)*(r.w-180),y=r.y+90+seeded(78001+i*7)*(r.h-180);regionalWildlife.push({x,y,homeX:x,homeY:y,phase:seeded(i*9)*6.28,speed:8+seeded(i*13)*19,animal:r.animals[Math.floor(seeded(78002+i*7)*r.animals.length)]})}
+function drawExpandedTerrain(night){
+ const halfW=W/Math.max(.4,cameraZoom),halfH=H/Math.max(.4,cameraZoom);
+ for(const r of expandedRegions){
+  if(r.x>cam.x+halfW||r.x+r.w<cam.x-halfW||r.y>cam.y+halfH||r.y+r.h<cam.y-halfH)continue;
+  ctx.save();ctx.beginPath();ctx.rect(r.x,r.y,r.w,r.h);ctx.clip();
+  ctx.fillStyle=mixColour(r.color,'#303d58',night);ctx.fillRect(r.x,r.y,r.w,r.h);
+  // Deterministic terrain texture. Only visible cells are drawn.
+  const tile=145,loX=Math.max(r.x,Math.floor((cam.x-halfW-160)/tile)*tile),hiX=Math.min(r.x+r.w,cam.x+halfW+160);
+  const loY=Math.max(r.y,Math.floor((cam.y-halfH-160)/tile)*tile),hiY=Math.min(r.y+r.h,cam.y+halfH+160);
+  for(let y=loY;y<hiY;y+=tile)for(let x=loX;x<hiX;x+=tile){
+   const h=seeded(Math.floor(x/tile)*731+Math.floor(y/tile)*191+900);
+   if(r.id==='desert'||r.id==='coast'){ellipse(x+45,y+60,60+h*75,13+h*12,r.id==='desert'?'#f2d89b':'#f9e7ba');if(h>.67){ctx.strokeStyle='#c7aa73';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x+30,y+80,30,Math.PI*1.15,Math.PI*1.85);ctx.stroke()}}
+   else if(r.id==='snow'){ellipse(x+40,y+35,65+h*40,20+h*15,'#f4faf7');if(h>.78){ctx.fillStyle='#c7d8df';ctx.fillRect(x+22,y+20,18,3)}}
+   else if(r.id==='fen'){ellipse(x+30,y+70,25+h*55,10+h*20,h>.48?'#547f77':'#789a6c');if(h>.6){ctx.strokeStyle='#476e51';ctx.lineWidth=3;for(let k=0;k<3;k++){ctx.beginPath();ctx.moveTo(x+k*12,y+55);ctx.lineTo(x+k*12-4,y+29);ctx.stroke()}}}
+   else if(r.id==='wasteland'){ctx.strokeStyle='#665f5a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+20,y+40);ctx.lineTo(x+45+h*30,y+58);ctx.lineTo(x+32,y+83);ctx.stroke();if(h>.6)ellipse(x+75,y+60,35,13,'#aca29a')}
+   else{ellipse(x+50,y+70,55+h*50,18+h*13,h>.5?'#9cb96f':'#c9d69b');if(h>.7){ctx.fillStyle='#f1e4a1';for(let k=0;k<4;k++)ellipse(x+20+k*15,y+30+(k%2)*13,3,3,'#f1e4a1')}}
+  }
+  if(r.id==='coast'){const shore=r.x+r.w*.73;ctx.fillStyle='#4fa9bd';ctx.fillRect(shore,r.y,r.w*.27,r.h);for(let y=Math.floor(loY/120)*120;y<hiY;y+=120){ctx.strokeStyle='#b8e6df';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(shore+14,y+Math.sin(time*.001+y)*12);ctx.quadraticCurveTo(shore+42,y-12,shore+75,y+4);ctx.stroke()}}
+  ctx.fillStyle='#37473c';ctx.font='bold 34px system-ui';ctx.textAlign='center';ctx.fillText(r.name,r.x+r.w/2,r.y+170);ctx.restore();
+ }
+}
 function drawRegionalScenery(o){ctx.save();ctx.translate(o.x,o.y);const t=o.type;ctx.lineCap='round';if(t==='cactus'){ctx.fillStyle='#488a63';ctx.fillRect(-8,-50,16,62);ctx.fillRect(-24,-31,16,9);ctx.fillRect(-24,-44,8,17);ctx.fillRect(8,-25,16,9);ctx.fillRect(17,-39,7,21)}else if(t==='palm'){ctx.strokeStyle='#9d7952';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(0,8);ctx.quadraticCurveTo(12,-33,0,-77);ctx.stroke();for(let i=0;i<7;i++){const a=i*Math.PI*2/7;ctx.strokeStyle='#4c9668';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(0,-77);ctx.quadraticCurveTo(Math.cos(a)*30,-107+Math.sin(a)*15,Math.cos(a)*54,-66+Math.sin(a)*28);ctx.stroke()}}else{ctx.fillStyle=t==='fir'?'#547e71':'#75685d';ctx.fillRect(-6,-30,12,40);if(t==='fir')for(let j=0;j<3;j++)poly([[-29+j*4,-16-j*19],[0,-75-j*7],[29-j*4,-16-j*19]],j%2?'#4b7768':'#6c9485')}ctx.restore()}
-function drawRegionalWildlife(){ctx.save();ctx.font='29px system-ui';ctx.textAlign='center';for(const a of regionalWildlife)if(Math.abs(a.x-cam.x)<1100&&Math.abs(a.y-cam.y)<850)ctx.fillText(a.animal,a.x,a.y);ctx.restore()}
+function drawRegionalWildlife(){ctx.save();ctx.font='29px system-ui';ctx.textAlign='center';for(const a of regionalWildlife){const x=a.homeX+Math.cos(time*.0003*a.speed+a.phase)*Math.min(110,a.speed*4),y=a.homeY+Math.sin(time*.00023*a.speed+a.phase)*Math.min(90,a.speed*3);if(Math.abs(x-cam.x)<1100&&Math.abs(y-cam.y)<850){ctx.fillText(a.animal,x,y+Math.sin(time*.003+a.phase)*3)}}ctx.restore()}
 const objects=[];for(let i=0;i<1050;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;if(Math.hypot(x-1500,y-1500)<235)continue;const r=seeded(i*3+2);objects.push({id:i,x,y,type:r<.48?'tree':r<.69?'rock':r<.88?'bush':'flower',size:rand(0.85,1.25)})}for(let i=1050;i<1230;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;objects.push({id:i,x,y,type:'mushroom',size:.65+seeded(i*3+2)*.5})}for(let i=1230;i<2030;i++){const x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.42?'flower':v<.73?'bush':v<.92?'mushroom':'tree',size:.7+v*.5})}// New outer woodland ring preserves every original object and existing save coordinate.
 for(let i=2030;i<4400;i++){const x=100+seeded(i*3)*4000,y=100+seeded(i*3+1)*4000;if(x<2990&&y<2990)continue;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.44?'tree':v<.62?'rock':v<.8?'bush':v<.93?'flower':'mushroom',size:.75+v*.55})}
 // Extra scenery uses fresh IDs; existing 0-4399 object IDs remain stable.
