@@ -36,6 +36,7 @@ const expandedRegions=[
 ];
 function expandedRegion(x,y){return expandedRegions.find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h)||null}
 const regionWardrobe={downs:'#7b8d51',desert:'#e7c38b',coast:'#6aa9ac',wasteland:'#6f6766',snow:'#d3e5eb',fen:'#586d56'};
+const coastRegion=expandedRegions.find(r=>r.id==='coast');
 const wildlifeSpecies={
  downs:['bison','hare','fox'],desert:['lizard','scorpion','snake'],
  coast:['crab','turtle','gull'],wasteland:['raven','rat','lizard'],
@@ -165,7 +166,6 @@ function drawWildAnimal(a){
  ctx.restore();
 }
 const regionalNightPalette={downs:'#6e856e',desert:'#a58e74',coast:'#a99d83',wasteland:'#777177',snow:'#b3cbd8',fen:'#506d69'};
-const coastRegion=expandedRegions.find(r=>r.id==='coast');
 function coastWaterline(y){return coastRegion.x+coastRegion.w*(.715+.038*Math.sin(y/390)+.016*Math.sin(y/135))}
 function biomeColor(r,night){return mixColour(r.color,regionalNightPalette[r.id]||'#647568',night*.87)}
 function drawExpandedTerrain(night){
