@@ -392,7 +392,7 @@ function drawHaigenHair(dir,phase,moving){
  ctx.restore();
 }
 function drawSleepingHaigen(x,y){ctx.save();ctx.translate(x,y);ellipse(0,8,53,15,'#254d3977');ctx.save();ctx.translate(0,-7);ctx.rotate(-.09);ellipse(0,0,43,12,'#713e40');ellipse(36,-5,16,15,'#f3c69e');ellipse(35,-17,16,9,'#d7ae79');ctx.strokeStyle='#b88c5a';ctx.lineWidth=1;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(23+i*6,-19);ctx.lineTo(26+i*6,-13);ctx.stroke()}ctx.strokeStyle='#54483c';ctx.lineWidth=2;ctx.beginPath();ctx.arc(41,-5,4,.1,Math.PI-.1);ctx.stroke();ellipse(-33,2,12,6,'#514b35');ctx.restore();const breath=Math.sin(time*.003)*2;ctx.fillStyle='#e9e5d3';ctx.font='bold 16px system-ui';ctx.fillText('z',54,-24+breath);ctx.font='bold 11px system-ui';ctx.fillText('z',65,-37+breath);ctx.restore()}
-function character(x,y,type,actor){
+function character(x,y,type,actor,deepWater=false){
  const motion=actor||playerMotion,dir=motion.dir||'down',moving=!!motion.moving,phase=motion.anim||0;
  const gait=moving?Math.sin(phase*(type==='rabbit'?.018:type==='fox'?.014:.012)):0;
  const hop=moving?(type==='rabbit'?Math.abs(gait)*8:type==='fox'?Math.abs(gait)*3:Math.abs(gait)*2):0;
@@ -486,6 +486,7 @@ function character(x,y,type,actor){
    }
   }
   drawHaigenHair(dir,phase,moving);
+  if(deepWater)drawHaigenSnorkelLocal(dir);
  }else if(type==='rabbit'){
   ellipse(-10+gait*3,5,9,6,'#e4d3b7');ellipse(10-gait*3,5,9,6,'#e4d3b7');
   ellipse(0,-9,19,17,'#c9b99e');
@@ -899,26 +900,36 @@ function drawBird(b){
 function updateWoodlandCritters(dt){updateFrogs();updateBirds(dt);updateDucks(dt);for(const c of woodlandCritters){const d=dist(c,state);if(d<115&&time>c.scaredUntil){c.scaredUntil=time+rand(1900,3300);if(c.kind==='squirrel'){const angle=Math.atan2(c.y-state.y,c.x-state.x);c.escapeX=Math.max(35,Math.min(WORLD-35,c.x+Math.cos(angle)*115));c.escapeY=Math.max(35,Math.min(WORLD-35,c.y+Math.sin(angle)*115))}}if(c.kind==='squirrel'&&time<c.scaredUntil&&c.escapeX!==undefined){const dx=c.escapeX-c.x,dy=c.escapeY-c.y,d=Math.hypot(dx,dy);if(d>3){const step=Math.min(d,dt*.12);c.x+=dx/d*step;c.y+=dy/d*step}}}}
 
 // A playful snorkel appears only in the pond's genuinely deep centre.
-function drawHaigenSnorkel(x,y){
+function drawHaigenSnorkelLocal(dir){
+ // Local head-space coordinates; inherits Haigen's movement, bob and facing flip.
+ const back=dir==='up',side=dir==='left'||dir==='right';
  ctx.save();
- // Clear aqua mask across the eyes, drawn over the hair's side edges.
- ctx.fillStyle='#2b6678';ctx.strokeStyle='#83edf2';ctx.lineWidth=2.8;
- ctx.beginPath();ctx.roundRect(x-19,y-65,38,19,7);ctx.fill();ctx.stroke();
- ctx.fillStyle='#a6f2f188';ctx.beginPath();ctx.roundRect(x-16,y-62,32,12,5);ctx.fill();
- // Bright coral snorkel curves upward above the surface.
- ctx.strokeStyle='#ffac52';ctx.lineWidth=6;ctx.lineCap='round';
- ctx.beginPath();ctx.moveTo(x+17,y-54);ctx.lineTo(x+25,y-54);
- ctx.quadraticCurveTo(x+29,y-56,x+29,y-64);
- ctx.lineTo(x+29,y-98);ctx.stroke();
- ctx.strokeStyle='#ffd7a0';ctx.lineWidth=2;ctx.beginPath();
- ctx.moveTo(x+28,y-91);ctx.lineTo(x+28,y-76);ctx.stroke();
- ellipse(x+29,y-99,5,3,'#f27950');
- const puff=(time*.017)%48;
- for(let i=0;i<3;i++){
-  const bx=x+35+Math.sin(time*.003+i)*4+i*4;
-  ctx.save();ctx.globalAlpha=(1-puff/48)*.65;
-  ctx.strokeStyle='#d6ffff';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.arc(bx,y-95-puff-i*9,2.8+i,0,Math.PI*2);ctx.stroke();ctx.restore();
+ if(back){
+  // Strap behind his hair; breathing tube emerges over his right shoulder.
+  ctx.strokeStyle='#3d7c84';ctx.lineWidth=4;ctx.beginPath();
+  ctx.moveTo(-17,-55);ctx.quadraticCurveTo(0,-62,17,-55);ctx.stroke();
+ }else{
+  ctx.fillStyle='#397c92';ctx.strokeStyle='#91edef';ctx.lineWidth=2.4;
+  ctx.beginPath();
+  if(side)ctx.roundRect(3,-62,19,17,6);
+  else ctx.roundRect(-19,-63,38,17,6);
+  ctx.fill();ctx.stroke();
+  ctx.fillStyle='#b5f7ed77';ctx.beginPath();
+  if(side)ctx.roundRect(6,-59,13,10,4);
+  else ctx.roundRect(-16,-60,32,10,4);
+  ctx.fill();
+  ctx.strokeStyle='#366f82';ctx.lineWidth=2.5;ctx.beginPath();
+  ctx.moveTo(side?5:-19,-54);ctx.lineTo(-23,-55);ctx.stroke();
+ }
+ ctx.strokeStyle='#ffae56';ctx.lineWidth=5.4;ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.beginPath();ctx.moveTo(19,-51);ctx.lineTo(27,-51);
+ ctx.quadraticCurveTo(30,-55,30,-62);ctx.lineTo(30,-96);ctx.stroke();
+ ctx.strokeStyle='#ffe3a4';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(29,-89);ctx.lineTo(29,-76);ctx.stroke();
+ ellipse(30,-97,5,3,'#eb7650');
+ const bubble=(time*.018)%45;
+ for(let i=0;i<2;i++){
+  ctx.save();ctx.globalAlpha=(1-bubble/45)*.7;ctx.strokeStyle='#d8fbf2';ctx.lineWidth=1.3;
+  ctx.beginPath();ctx.arc(36+i*7,-103-bubble-i*8,2.5+i,0,Math.PI*2);ctx.stroke();ctx.restore();
  }
  ctx.restore();
 }
@@ -963,7 +974,7 @@ for(let i=0;i<11;i++){
  ctx.beginPath();ctx.arc(px+Math.sin(time*.003+i)*5,py-travel,2+(i%3),0,Math.PI*2);ctx.stroke();
  ctx.restore();
 }
-for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}const visible=objects.filter(o=>!state.removed.includes(o.id)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);const drawables=[...state.fallen.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.fillStyle='#8d603d';ctx.fillRect(o.x-22,o.y-8,44,17);ellipse(o.x+22,o.y,8,9,'#c9a67b')}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>({tree,rock,bush,flower,mushroom:flower}[o.type](o))})),...woodlandDetails.filter(o=>Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),{y:state.y,draw:()=>{const depth=lakeLevel(state.x,state.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);(state.resting?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy'));if(depth<.55&&!state.resting)drawHaigenSnorkel(state.x,state.y);ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy')}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));drawables.push({y:chickenNest.y,draw:drawChickenNest});drawables.push(...beasts.map(b=>({y:b.y,draw:()=>drawBeast(b)})));drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());drawToolSwing();if(state.autonomy&&autoBubbleTimer>0){const msg=autoBubble,bx=state.x,by=state.y-108;ctx.save();ctx.font='bold 14px system-ui';const bw=Math.min(315,Math.max(145,ctx.measureText(msg).width+26));ctx.fillStyle='#fff6dc';ctx.strokeStyle='#6b5536';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(bx-bw/2,by-35,bw,39,13);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(bx-8,by+3);ctx.lineTo(bx+2,by+16);ctx.lineTo(bx+12,by+3);ctx.fill();ctx.fillStyle='#253d32';ctx.textAlign='center';ctx.fillText(msg,bx,by-11,bw-20);ctx.restore()}if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}const visible=objects.filter(o=>!state.removed.includes(o.id)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);const drawables=[...state.fallen.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.fillStyle='#8d603d';ctx.fillRect(o.x-22,o.y-8,44,17);ellipse(o.x+22,o.y,8,9,'#c9a67b')}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>({tree,rock,bush,flower,mushroom:flower}[o.type](o))})),...woodlandDetails.filter(o=>Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),{y:state.y,draw:()=>{const depth=lakeLevel(state.x,state.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);(state.resting?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.55));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy')}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));drawables.push({y:chickenNest.y,draw:drawChickenNest});drawables.push(...beasts.map(b=>({y:b.y,draw:()=>drawBeast(b)})));drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());drawToolSwing();if(state.autonomy&&autoBubbleTimer>0){const msg=autoBubble,bx=state.x,by=state.y-108;ctx.save();ctx.font='bold 14px system-ui';const bw=Math.min(315,Math.max(145,ctx.measureText(msg).width+26));ctx.fillStyle='#fff6dc';ctx.strokeStyle='#6b5536';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(bx-bw/2,by-35,bw,39,13);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(bx-8,by+3);ctx.lineTo(bx+2,by+16);ctx.lineTo(bx+12,by+3);ctx.fill();ctx.fillStyle='#253d32';ctx.textAlign='center';ctx.fillText(msg,bx,by-11,bw-20);ctx.restore()}if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
