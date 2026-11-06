@@ -23,12 +23,12 @@
  .hint{display:none}.toast{top:85px;z-index:9}
  .update-banner{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 205px);padding:8px;font-size:12px}
 }
- .dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.106</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v106 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="instructBtn">💬 Tell Haigen</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">📬 Mail</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+ .dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.107</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v107 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="instructBtn">💬 Tell Haigen</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">📬 Mail</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
     const el=document.getElementById('worldError');
-    if(el){el.style.display='block';el.textContent='⚠️ Haigen\'s World V.97 could not start: '+message+'. Please send this message to the developer.';}
+    if(el){el.style.display='block';el.textContent='⚠️ Haigen\'s World V.107 could not start: '+message+'. Please send this message to the developer.';}
   }
   window.addEventListener('error',function(e){showStartupError(e.message||'JavaScript error');});
   window.addEventListener('unhandledrejection',function(e){showStartupError(String(e.reason&&e.reason.message||e.reason||'Startup error'));});
@@ -648,7 +648,7 @@ function drawMeatDrop(o){
 
 let dangerWarningCooldown=0,damageFlashUntil=0;
 function moveBeast(b,tx,ty,dt,speed){const d=Math.hypot(tx-b.x,ty-b.y);if(d>2){b.x+=(tx-b.x)/d*Math.min(d,dt*speed);b.y+=(ty-b.y)/d*Math.min(d,dt*speed);b.dir=Math.abs(tx-b.x)>Math.abs(ty-b.y)?(tx>b.x?'right':'left'):(ty>b.y?'down':'up')}}
-function takeDamage(amount,name,venom=false){if(collapseRemaining>0||time-state.lastHitAt<1500)return false;state.lastHitAt=time;damageFlashUntil=time+1050;state.health=Math.max(0,state.health-amount);notify('💥 '+name+' lunged! -'+amount+' health');if(venom)applyPoison();if(state.health<=0)rescueHaigen();save();return true}
+function takeDamage(amount,name,venom=false){if(collapseRemaining>0||time-state.lastHitAt<1500)return false;state.lastHitAt=time;damageFlashUntil=time+1050;state.health=Math.max(0,state.health-amount);soundEffect('hurt');notify('💥 '+name+' lunged! -'+amount+' health');if(venom)applyPoison();if(state.health<=0)rescueHaigen();save();return true}
 function eatFood(){if(state.hunger>=100){notify('🍲 Haigen is already full!');return}let gain=0;if(state.food>0){state.food--;gain=42}else if(state.eggs>=2){state.eggs-=2;gain=24}else if(state.vegetables>=2){state.vegetables-=2;gain=22}else if(state.berries>=3){state.berries-=3;gain=16}else{notify('🥕 Gather berries, eggs or vegetables, or prepare a meal.');return}state.hunger=Math.min(100,state.hunger+gain);notify('🍲 Tummy filled! +'+gain+' hunger.');save()}
 function healSelf(){if(curePoison())return true;if(state.poisonMs>0&&state.potions<=0)return false;if(state.health>=100){notify('❤️ No healing needed.');return false}if(state.potions>0){state.potions--;state.health=Math.min(100,state.health+45);notify('🌿 Applied woodland salve! +45 health.');save();return true}notify('🌿 Make a woodland salve at the cooking station to treat injuries.');return false}
 function toggleRest(){if(state.resting){state.resting=false;notify('🌤️ Haigen wakes up. Apparently the ground is still there.');save();return}if(dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<170)){notify('💤 Find a safe spot by camp or a campfire to rest.');return}state.resting=true;state.autonomy=false;autoDestination=null;notify('💤 Haigen curls up for a nap by the fire.');save()}
@@ -802,7 +802,7 @@ function pickBerries(o){
  if(!berryReady(o)){notify('🫐 This bush needs time to grow more berries.');return false}
  state.harvestedAt[o.id]=Date.now();
  state.removed=state.removed.filter(id=>id!==o.id);
- state.berries+=3;notify('🫐 Picked 3 berries! The bush stays growing.');
+ state.berries+=3;soundEffect('gather');notify('🫐 Picked 3 berries! The bush stays growing.');
  return true;
 }
 // Forest-floor mushroom clusters are no longer just decorative.
@@ -819,7 +819,7 @@ function woodlandFungiReady(o){const at=Number(state.harvestedAt['fungi:'+o.seed
 function pickWoodlandFungi(o){
  if(!woodlandFungiReady(o))return false;
  state.harvestedAt['fungi:'+o.seed]=Date.now();
- gatherMushroom(o);
+ gatherMushroom(o);soundEffect('gather');
  return true;
 }
 function harvest(o){if(o.type==='bush')return pickBerries(o);if(!state.removed.includes(o.id))state.removed.push(o.id);state.harvestedAt[o.id]=Date.now();return true}function regenerate(){const now=Date.now();state.removed=state.removed.filter(id=>{const o=objects.find(x=>x.id===id);if(!o)return false;if(o.type==='bush')return false;if(campsiteProtected(o))return true;const delay=regrowMs[o.type];if(!delay)return true;const taken=Number(state.harvestedAt[id])||0;if(!taken)return false;if(now-taken>=delay){delete state.harvestedAt[id];return false}return true})}regenerate();setInterval(regenerate,15000);
@@ -2932,12 +2932,114 @@ function frame(now){
  }catch(error){reportWorldError(error);}
  requestAnimationFrame(frame);
 }// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=106;document.getElementById('devVersion').textContent='V.'+GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=107;document.getElementById('devVersion').textContent='V.'+GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
 $('laterUpdateBtn').addEventListener('click',()=>$('updateBanner').classList.remove('show'));
 setTimeout(checkForUpdates,5000);setInterval(checkForUpdates,60000);addEventListener('visibilitychange',()=>{if(!document.hidden)checkForUpdates()});
+
+
+// V107 opt-in procedural audio: original music, region-specific ambience and small sound cues.
+const soundProfiles={
+ woodland:{root:50,seq:[0,null,3,7,10,null,7,3,12,null,7,5,3,null,0,5],voice:'sine',air:560,wind:.055},
+ downs:{root:53,seq:[0,4,7,null,12,9,7,null,4,7,11,null,12,7,4,null],voice:'triangle',air:970,wind:.045},
+ desert:{root:50,seq:[0,null,1,5,7,null,8,5,12,null,8,7,5,null,1,null],voice:'triangle',air:380,wind:.063},
+ coast:{root:55,seq:[0,4,7,12,11,7,4,null,0,2,7,9,12,null,7,null],voice:'sine',air:1350,wind:.072},
+ wasteland:{root:43,seq:[0,null,null,1,6,null,5,null,0,null,6,null,1,null,-5,null],voice:'triangle',air:220,wind:.078},
+ snow:{root:48,seq:[0,null,7,null,12,null,5,null,3,null,12,null,7,null,0,null],voice:'sine',air:700,wind:.063},
+ fen:{root:45,seq:[0,null,3,5,null,7,6,null,3,null,0,10,null,5,3,null],voice:'triangle',air:330,wind:.089}
+};
+let soundMode=0,soundCtx=null,soundMaster=null,soundBed=null,soundFilter=null;
+let soundTimer=null,soundBeat=0,soundRegion='';
+const soundButton=document.createElement('button');
+soundButton.type='button';soundButton.id='soundBtn';soundButton.className='btn';
+soundButton.title='Cycle through sound off, natural ambience and original music';
+document.querySelector('.hud>.right').append(soundButton);
+function soundArea(){return expandedRegion(state.x,state.y)?.id||'woodland'}
+function soundLabel(){
+ soundButton.textContent=['🔇 Sound off','🌬️ Ambience','🎶 Music + ambience'][soundMode];
+ soundButton.setAttribute('aria-label','Sound mode: '+['off','environmental ambience','music and ambience'][soundMode]);
+ soundButton.setAttribute('aria-pressed',String(soundMode>0));
+}
+function initialiseSound(){
+ if(soundCtx)return true;
+ const Ctor=window.AudioContext||window.webkitAudioContext;
+ if(!Ctor)return false;
+ soundCtx=new Ctor();soundMaster=soundCtx.createGain();soundMaster.gain.value=0;
+ soundMaster.connect(soundCtx.destination);
+ soundFilter=soundCtx.createBiquadFilter();soundFilter.type='lowpass';
+ soundBed=soundCtx.createGain();soundBed.gain.value=0;
+ soundFilter.connect(soundBed);soundBed.connect(soundMaster);
+ const sr=soundCtx.sampleRate,buf=soundCtx.createBuffer(1,sr*2,sr),data=buf.getChannelData(0);
+ let seed=97193;
+ for(let i=0;i<data.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;data[i]=(seed/2147483648-1)*.55}
+ const wind=soundCtx.createBufferSource();wind.buffer=buf;wind.loop=true;wind.connect(soundFilter);wind.start();
+ return true;
+}
+function soundTone(frequency,duration,volume,voice,finishFrequency){
+ if(!soundCtx||soundCtx.state!=='running')return;
+ const at=soundCtx.currentTime,osc=soundCtx.createOscillator(),gain=soundCtx.createGain();
+ osc.type=voice||'sine';osc.frequency.setValueAtTime(frequency,at);
+ if(finishFrequency)osc.frequency.exponentialRampToValueAtTime(Math.max(35,finishFrequency),at+duration*.7);
+ gain.gain.setValueAtTime(.0001,at);
+ gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),at+.055);
+ gain.gain.exponentialRampToValueAtTime(.0001,at+duration);
+ osc.connect(gain);gain.connect(soundMaster);osc.start(at);osc.stop(at+duration+.04);
+ osc.onended=()=>{osc.disconnect();gain.disconnect()};
+}
+function soundEffect(kind){
+ if(!soundMode||!soundCtx||soundCtx.state!=='running'||document.hidden)return;
+ if(kind==='hurt')soundTone(196,.28,.15,'sawtooth',82);
+ else if(kind==='gather')soundTone(523,.17,.09,'sine',659);
+ else if(kind==='bird')soundTone(880,.28,.025,'sine',1320);
+ else if(kind==='frog')soundTone(235,.18,.038,'triangle',180);
+ else if(kind==='ash')soundTone(104,.65,.033,'triangle',70);
+ else if(kind==='surf')soundTone(390,.4,.024,'sine',330);
+}
+function soundPulse(){
+ if(!soundMode||!soundCtx||soundCtx.state!=='running'||document.hidden)return;
+ const biome=soundArea(),profile=soundProfiles[biome]||soundProfiles.woodland;
+ if(soundRegion!==biome){soundRegion=biome;soundBeat=0}
+ const now=soundCtx.currentTime,wet=state.weather?.mode==='rain';
+ soundFilter.frequency.setTargetAtTime(profile.air*(wet?1.6:1),now,1.1);
+ soundBed.gain.setTargetAtTime(profile.wind*(wet?1.35:1),now,1.1);
+ if(soundMode===2){
+  const semi=profile.seq[soundBeat%profile.seq.length];
+  if(semi!==null){const hz=440*Math.pow(2,(profile.root+semi-69)/12);soundTone(hz,biome==='snow'?1.8:1.17,.055,profile.voice)}
+  if(soundBeat%8===0){const hz=440*Math.pow(2,(profile.root-81)/12);soundTone(hz,4.3,.028,'sine')}
+  soundBeat++;
+ }
+ if(biome==='woodland'||biome==='downs'){if(Math.random()<.23)soundEffect('bird')}
+ else if(biome==='fen'){if(Math.random()<.29)soundEffect('frog')}
+ else if(biome==='wasteland'){if(Math.random()<.19)soundEffect('ash')}
+ else if(biome==='coast'){if(Math.random()<.2)soundEffect('surf')}
+}
+function setSoundMode(next){
+ soundMode=next;soundLabel();
+ if(soundMode===0){
+  if(soundTimer!==null){clearInterval(soundTimer);soundTimer=null}
+  if(soundCtx){soundMaster.gain.setTargetAtTime(0,soundCtx.currentTime,.08);
+   // Suspend after the short fade; keeps muted audio off the CPU.
+   soundCtx.suspend().catch(()=>{})}
+  return;
+ }
+ try{
+  if(!initialiseSound()){soundMode=0;soundLabel();notify('🔇 Audio is unavailable in this browser.');return}
+  soundCtx.resume().then(()=>{
+   if(!soundMode)return;
+   soundMaster.gain.setTargetAtTime(.7,soundCtx.currentTime,.13);
+   if(soundTimer===null){soundPulse();soundTimer=setInterval(soundPulse,1300)}
+  }).catch(()=>{soundMode=0;soundLabel();notify('🔇 Tap sound again to unlock audio.')});
+ }catch(e){soundMode=0;soundLabel();notify('🔇 Audio is unavailable on this device.')}
+}
+soundButton.addEventListener('click',()=>setSoundMode((soundMode+1)%3));
+document.addEventListener('visibilitychange',()=>{
+ if(!soundCtx)return;
+ if(document.hidden){soundCtx.suspend().catch(()=>{});return}
+ if(soundMode)soundCtx.resume().then(()=>{if(soundMode)soundPulse()}).catch(()=>{});
+});
+soundLabel();
 
 // Move existing buttons so their handlers and live labels remain intact.
 const mobileLayout=matchMedia('(max-width:600px), (pointer:coarse) and (max-height:600px)');
