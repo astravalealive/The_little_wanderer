@@ -719,8 +719,11 @@ function character(x,y,type,actor,deepWater=false){
    ctx.strokeStyle='#514a52';ctx.lineWidth=2;ctx.beginPath();
    ctx.moveTo(-6,10);ctx.lineTo(7,10);ctx.stroke();ctx.restore();
   }
-  // Rounded charcoal hoodie with folds and gathered waist.
-  ctx.fillStyle='#343138';ctx.beginPath();ctx.moveTo(-14,-42);
+  // Region-aware travel clothing; the original charcoal outfit remains in the woodland.
+  const travelRegion=expandedRegion(state.x,state.y);
+  const travelCoat=travelRegion?regionWardrobe[travelRegion.id]:'#343138';
+  // Rounded hoodie with folds and gathered waist.
+  ctx.fillStyle=travelCoat;ctx.beginPath();ctx.moveTo(-14,-42);
   ctx.quadraticCurveTo(-23,-37,-19,-24);ctx.lineTo(-18,-12);
   ctx.quadraticCurveTo(0,-9,18,-12);ctx.lineTo(19,-24);
   ctx.quadraticCurveTo(23,-37,14,-42);ctx.closePath();ctx.fill();
@@ -778,6 +781,13 @@ function character(x,y,type,actor,deepWater=false){
    }
   }
   drawHaigenHair(dir,phase,moving);
+  if(travelRegion){ctx.save();ctx.fillStyle=travelCoat;ctx.strokeStyle='#ece3cb';ctx.lineWidth=2;
+   if(travelRegion.id==='snow'){ctx.beginPath();ctx.arc(0,-53,25,Math.PI*1.05,Math.PI*1.95);ctx.stroke();ctx.fillRect(-18,-32,36,7)}
+   else if(travelRegion.id==='desert'){ctx.fillRect(-19,-34,38,7);ctx.fillStyle='#e6d7b4';ctx.fillRect(-18,-24,36,5)}
+   else if(travelRegion.id==='fen'){ctx.fillRect(-17,-12,34,7);ctx.fillStyle='#444e3e';ctx.fillRect(-17,7,13,7);ctx.fillRect(5,7,13,7)}
+   else if(travelRegion.id==='coast'){ctx.fillStyle='#f3dfae';ctx.fillRect(-18,-23,36,6)}
+   else if(travelRegion.id==='wasteland'){ctx.beginPath();ctx.moveTo(-19,-37);ctx.lineTo(0,-10);ctx.lineTo(18,-37);ctx.stroke()}
+   ctx.restore()}
   if(deepWater)drawHaigenSnorkelLocal(dir);
  }else if(type==='rabbit'){
   // Dillon: round marshmallow body, expressive ears and twitchy little nose.
