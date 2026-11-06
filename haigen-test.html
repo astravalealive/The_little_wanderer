@@ -690,16 +690,20 @@ function character(x,y,type,actor,deepWater=false){
    ellipse(0,-9,21,19,'#d6c7b4');ellipse(2,-5,13,11,'#f6e8d5');
    ellipse(-17,1,9,8,'#f6eee0');
   }
-  for(const sign of [-1,1]){
-   const ex=sign*10;
-   ctx.save();ctx.translate(ex,-38);ctx.rotate(sign*(.13+earFlick*.015)+(moving?gait*.08:0));
-   ellipse(0,-7,8,25,'#c8b49c');ellipse(0,-8,4.5,18,'#d99fa0');
+  // Profile ears overlap in depth; front/back ears sit apart.
+  for(let j=0;j<2;j++){
+   const sign=j===0?-1:1,ex=side?(j===0?-5:3):sign*10;
+   ctx.save();ctx.translate(ex,-38);
+   ctx.rotate((side?.16:sign*.13)+sign*earFlick*.015+(moving?gait*.08:0));
+   ellipse(0,-7,side&&j===0?6.4:8,25,side&&j===0?'#bba993':'#c8b49c');
+   if(!back)ellipse(0,-8,side?3.2:4.5,18,'#d99fa0');
    ellipse(0,-19,4,7,'#f2dfcd');ctx.restore();
   }
   // Profile needs a projecting muzzle and ONE cheek, not two frontal cheeks.
   if(back){ellipse(0,-25,17,16,'#d5c2ab')}
   else if(side){
    ellipse(-2,-25,17,16,'#e6d6bf');
+   ellipse(-7,-18,12,9,'#f5e7d5');
    ellipse(10,-22,13,9,'#f3e5d4');ellipse(19,-19,10,6,'#f8ead8');
    ellipse(4,-29,4.5,5.5,'#fffaf2');ellipse(5,-29,2.7,3.5,'#312b2c');
    ellipse(5,-30,1,1,'#fff');
@@ -739,6 +743,11 @@ function character(x,y,type,actor,deepWater=false){
   }
   ellipse(-13+gait*3,6,9,8,'#8e482f');ellipse(12-gait*3,6,9,8,'#8e482f');
   ellipse(0,-10,24,21,'#d87539');ellipse(0,-7,15,17,'#f7e5cb');
+  // Soft irregular fur tips give Skölli's chest a readable furry silhouette.
+  for(const sign of [-1,1]){
+   poly([[sign*13,-18],[sign*26,-14],[sign*13,-9]],'#f4e5cc');
+   poly([[sign*12,-6],[sign*20,2],[sign*7,1]],'#f1dfc5');
+  }
   // Distinct fox profiles, no forward-facing face components on a sideways fox.
   for(const sign of [-1,1])poly([[sign*11,-18],[sign*25,-23],[sign*18,-10]],'#f5e6ce');
   if(side){
@@ -748,6 +757,7 @@ function character(x,y,type,actor,deepWater=false){
    ellipse(6,-29,19,17,'#e98141');
    ellipse(17,-22,14,8,'#fff0d4');ellipse(29,-22,3.6,3,'#342c2b');
    ellipse(10,-32,4.8,5.4,'#fff1d5');ellipse(12,-32,2.7,3.6,'#2c3130');
+   ellipse(12,-33,1.1,1.3,'#fff9e8');
    ctx.strokeStyle='#7b4930';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(7,-39);ctx.quadraticCurveTo(12,-42,16,-39);ctx.stroke();
   }else{
    for(const sign of [-1,1]){
@@ -768,7 +778,8 @@ function character(x,y,type,actor,deepWater=false){
    }
   }
   if(actor&&actor.mode==='sniffing'){
-   const sniff=Math.sin(time*.023)*2;ellipse(0,-17+sniff,4,3,'#43352e');
+   const sniff=Math.sin(time*.023)*2;
+   ellipse(side?29:0,side?-22+sniff:-17+sniff,side?3.6:4,3,'#43352e');
   }
   ctx.restore();
  }
