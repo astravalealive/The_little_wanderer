@@ -485,6 +485,109 @@ const beasts=[
  {kind:'wolf',name:'Greyfang',homeX:2180,homeY:1090,x:2180,y:1090,angle:1.2,t:1800,mode:'patrol',cooldown:0,anim:0},
  {kind:'boar',name:'Bristleback',homeX:2140,homeY:2240,x:2140,y:2240,angle:2.5,t:2600,mode:'rooting',cooldown:0,anim:0}
 ];
+// Non-graphic wildlife encounters. Save-compatible HP, drops, poison and rescue.
+state.wildlifeHp=state.wildlifeHp&&typeof state.wildlifeHp==='object'?state.wildlifeHp:{};
+state.defeatedWildlife=state.defeatedWildlife&&typeof state.defeatedWildlife==='object'?state.defeatedWildlife:{};
+state.meatDrops=Array.isArray(state.meatDrops)?state.meatDrops:[];
+state.rawMeat=Math.max(0,Number(state.rawMeat)||0);
+state.antidotes=Math.max(0,Number(state.antidotes)||0);
+state.poisonMs=Math.max(0,Number(state.poisonMs)||0);
+state.lastHitAt=0;
+let collapseRemaining=0,poisonTick=0;
+const wildlifeHealth={wolf:7,boar:8,bison:9,stag:5,goat:5,fox:4,hare:2,snake:3,scorpion:2,lizard:2,rat:2,crab:2,turtle:5,otter:4,raven:2,gull:2,heron:3,frog:2,watcher:4,ashCreeper:4,scuttleback:4};
+const wildlifeMeat={wolf:3,boar:5,bison:6,stag:4,goat:3,fox:2,hare:1,snake:1,scorpion:0,lizard:1,rat:0,crab:1,turtle:2,otter:2,raven:1,gull:1,heron:2,frog:0,watcher:0,ashCreeper:0,scuttleback:0};
+const hostileTypes=new Set(['wolf','boar','snake','scorpion']);
+function animalId(a){return a.kind?'beast:'+a.kind:'wild:'+a.id}
+function animalAlive(a){
+ const id=animalId(a),dead=Number(state.defeatedWildlife[id])||0;
+ if(!dead)return true;
+ if(Date.now()-dead>=600000){delete state.defeatedWildlife[id];delete state.wildlifeHp[id];return true}
+ return false;
+}
+function animalHp(a){const id=animalId(a);return Number.isFinite(state.wildlifeHp[id])?state.wildlifeHp[id]:(wildlifeHealth[a.kind||a.type]||3)}
+function dropMeat(a){
+ const kind=a.kind||a.type,n=wildlifeMeat[kind]||0;
+ if(n){
+  state.meatDrops.push({id:animalId(a)+':'+Date.now(),x:a.x,y:a.y,amount:n,kind:'meat'});
+  state.meatDrops=state.meatDrops.slice(-90);
+  notify('🥩 '+(a.name||kind)+' dropped '+n+' meat. Collect it with X.');
+ }else notify('🌿 The '+kind+' left no meat behind.');
+}
+function hurtAnimal(a,damage){
+ if(!animalAlive(a))return false;
+ if(a.kind==='boar'&&state.story?.stage===4){notify('🐗 Bristleback is helping with the stream quest.');return false}
+ const id=animalId(a),hp=Math.max(0,animalHp(a)-damage);
+ if(hp>0){
+  state.wildlifeHp[id]=hp;a.hitFlash=time+240;
+  if(!a.kind){a.scaredUntil=time+1800;a.pause=0}
+  notify('💥 '+(a.name||a.type)+' · '+hp+' health remaining');
+ }else{
+  state.defeatedWildlife[id]=Date.now();delete state.wildlifeHp[id];
+  a.hitFlash=0;if(a.kind){a.mode='retreating';a.cooldown=0}
+  dropMeat(a);
+ }
+ save();return true;
+}
+function hitWildlife(){
+ const equipped=state.equipped;
+ if(!['hands','axe','pickaxe'].includes(equipped))return false;
+ const reach=equipped==='hands'?65:92;
+ const targets=[...beasts,...regionalWildlife].filter(a=>animalAlive(a)&&dist(a,state)<reach).sort((a,b)=>dist(a,state)-dist(b,state));
+ if(!targets.length)return false;
+ return hurtAnimal(targets[0],equipped==='axe'?3:equipped==='pickaxe'?2:1);
+}
+function collectMeat(){
+ const item=state.meatDrops.filter(d=>dist(d,state)<98).sort((a,b)=>dist(a,state)-dist(b,state))[0];
+ if(!item)return false;
+ state.rawMeat+=item.amount;state.meatDrops=state.meatDrops.filter(d=>d.id!==item.id);
+ notify('🥩 Collected '+item.amount+' raw meat. Cook it at camp.');save();return true;
+}
+function applyPoison(){
+ if(collapseRemaining>0)return;
+ state.poisonMs=Math.max(state.poisonMs,85000);
+ notify('🟢 Poisoned! Prepare an antidote at camp.');save();
+}
+function rescueHaigen(){
+ if(collapseRemaining>0)return;
+ state.health=0;state.poisonMs=0;poisonTick=0;collapseRemaining=1900;
+ state.autonomy=false;state.resting=false;autoDestination=null;
+ notify('💤 Haigen passed out! Skölli is coming to help…');save();
+}
+function updateSurvival(dt){
+ if(collapseRemaining>0){
+  collapseRemaining=Math.max(0,collapseRemaining-dt);
+  if(collapseRemaining===0){
+   state.x=cottage.x;state.y=cottage.y+85;state.health=22;
+   state.energy=Math.min(state.energy,30);state.poisonMs=0;
+   state.hunger=Math.max(20,state.hunger);state.lastHitAt=time;
+   for(const b of beasts){b.mode='retreating';b.cooldown=15000}
+   notify('🦊 Skölli dragged Haigen back to camp! Be more cautious out there.');
+   memory('🦊 Skölli rescued Haigen after he collapsed and brought him safely home.');save();
+  }
+  return;
+ }
+ if(state.health<=0){rescueHaigen();return}
+ if(state.poisonMs>0){
+  state.poisonMs=Math.max(0,state.poisonMs-dt);poisonTick+=dt;
+  while(poisonTick>=2500&&state.poisonMs>0){
+   poisonTick-=2500;state.health=Math.max(0,state.health-2);
+   if(state.health<=0){rescueHaigen();return}
+  }
+  if(state.poisonMs===0){poisonTick=0;notify('🌿 The poison has worn off.')}
+ }
+}
+function curePoison(){
+ if(state.poisonMs<=0)return false;
+ if(state.antidotes>0){state.antidotes--;state.poisonMs=0;poisonTick=0;notify('🧪 Antidote used! Poison cured.');save();return true}
+ notify('🟢 Craft an antidote from herbs and medicinal mushrooms at camp.');return true;
+}
+function drawMeatDrop(o){
+ ellipse(o.x,o.y+7,20,7,'#294e3755');
+ ellipse(o.x,o.y-4,17,11,'#ad6758');ellipse(o.x-5,o.y-8,6,5,'#d69578');
+ ellipse(o.x+12,o.y-4,5,3,'#e9d9bf');ctx.font='bold 13px system-ui';
+ ctx.textAlign='center';ctx.fillStyle='#fff5d6';ctx.fillText('🥩 '+o.amount,o.x,o.y-27);
+}
+
 let dangerWarningCooldown=0;
 function moveBeast(b,tx,ty,dt,speed){const d=Math.hypot(tx-b.x,ty-b.y);if(d>2){b.x+=(tx-b.x)/d*Math.min(d,dt*speed);b.y+=(ty-b.y)/d*Math.min(d,dt*speed);b.dir=Math.abs(tx-b.x)>Math.abs(ty-b.y)?(tx>b.x?'right':'left'):(ty>b.y?'down':'up')}}
 function takeDamage(amount,name){if(time-state.lastHitAt<2300)return;state.lastHitAt=time;state.health=Math.max(0,state.health-amount);notify('💥 '+name+' attacked! -'+amount+' health');if(state.health<=0){state.health=35;state.x=cottage.x;state.y=cottage.y+80;notify('🏕️ Haigen escaped back to camp! Rest and eat to recover.')}save()}
