@@ -1,4 +1,4 @@
 {
-  "build": 101,
-  "notes": "Depth-order fix: homestead build pads and walkable jetty render beneath Haigen; built chicken coop and wood shed depth-sort at ground contact and block movement; interaction menus, inventory and saved progress preserved."
+  "build": 102,
+  "notes": "V102 tree visibility: trees obscuring Haigen fade smoothly to roughly 30% opacity and return to full colour when clear. V101 homestead build pads and structure collisions retained. Saves preserved."
 }
