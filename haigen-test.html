@@ -321,61 +321,53 @@ function drawToolSwing(){if(!toolSwing)return;const progress=Math.min(1,(perform
  if(progress>.62&&progress<.94){for(let i=0;i<4;i++){const a=i*1.6+progress*4;ellipse(state.x+Math.cos(a)*(18+progress*20),state.y+8+Math.sin(a)*9,3,2,kind==='axe'?'#b78c55':'#c9bda2')}}
 }
 function drawHaigenHair(dir,phase,moving){
- // Natural tousled curls: one cohesive silhouette, subtle locks, no spiral donuts.
- const back=dir==='up',short=state.hairStyle==='short',wild=state.hairStyle==='wild',curly=state.hairStyle==='curls';
- const bounce=Math.sin(phase*.014)*(moving?2.1:.35);
- const sway=Math.sin(time*.003+phase*.002)*(moving?1.2:.4);
- const base='#d8aa51',mid='#edc46a',light='#f7da89',shadow='#b78b40';
+ // Dangly Blonde Noodles: thin flowing locks, face clear, never rounded hair blobs.
+ const back=dir==='up',side=dir==='left'||dir==='right';
+ const short=state.hairStyle==='short',wild=state.hairStyle==='wild',curly=state.hairStyle==='curls';
+ const bounce=moving?Math.sin(phase*.015)*2.1:Math.sin(time*.0018)*.25;
+ const locks=short?5:wild?10:curly?9:7;
+ const colours=['#d2a04a','#ebc46c','#f8d985','#dcb159','#ffe3a0'];
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
- // The hair follows the skull rather than forming separate floating circles.
- ctx.fillStyle=base;ctx.beginPath();ctx.moveTo(-19,-66);
- ctx.bezierCurveTo(-22,-78,-11,-83,0,-81+bounce*.3);
- ctx.bezierCurveTo(13,-85,23,-76,21,-65);
- ctx.lineTo(19,-58);ctx.quadraticCurveTo(0,-65,-19,-58);ctx.closePath();ctx.fill();
- // Asymmetric overlapping soft tufts give the hairstyle its silhouette.
- const locks=short?7:wild?13:curly?11:9;
+ // A low, narrow root layer actually attached to the head.
+ ctx.fillStyle='#d5a54f';ctx.beginPath();
+ ctx.moveTo(-18,-64);ctx.bezierCurveTo(-22,-74,-13,-80,0,-80+bounce*.25);
+ ctx.bezierCurveTo(15,-83,23,-74,18,-63);
+ ctx.quadraticCurveTo(0,-67,-18,-63);ctx.closePath();ctx.fill();
+ // Loose vertical locks with pointed tips. Different lengths and delayed bounce.
  for(let i=0;i<locks;i++){
-  const u=i/(locks-1),x=-18+u*36;
-  const rise=(short?3:7)+Math.sin(i*2.2)*2+(wild?3:0);
-  const y=-76-rise+bounce*(.2+.08*(i%3));
-  const w=short?5.2:6.3,h=short?5:7.2;
-  ellipse(x+sway*.3,y,w,h,i%4===0?light:i%3===0?shadow:mid);
+  const u=i/(locks-1),rootX=-17+u*34;
+  const rootY=-77+Math.cos(u*Math.PI*2)*2;
+  const wave=Math.sin(time*.004+i*1.9+phase*.004)*(moving?2.1:.45);
+  const endX=rootX+(i%2?3:-3)+wave;
+  const endY=(short?-64:-59)+(i%3)*1.7+(wild?2:0)+bounce*(.3+.05*i);
+  const width=short?3.2:curly?4.3:3.8;
+  // Shadow strand, then blonde highlight: never closed loops or outlined circles.
+  ctx.strokeStyle=colours[i%colours.length];ctx.lineWidth=width+1.6;
+  ctx.beginPath();ctx.moveTo(rootX,rootY);
+  ctx.bezierCurveTo(rootX+(i%2?6:-5),rootY+7,rootX+(i%2?-5:6),endY-7,endX,endY);
+  ctx.stroke();
+  ctx.strokeStyle='#ffe2a0';ctx.lineWidth=1.05;
+  ctx.beginPath();ctx.moveTo(rootX-1,rootY+3);
+  ctx.quadraticCurveTo(rootX+(i%2?3:-3),rootY+11,endX-1,endY-4);ctx.stroke();
+  // A tiny hook at the end suggests curly hair, without making a ring.
+  if(!short){ctx.strokeStyle=colours[(i+2)%colours.length];ctx.lineWidth=2.3;
+   ctx.beginPath();ctx.moveTo(endX,endY-2);ctx.quadraticCurveTo(endX+(i%2?4:-4),endY+2,endX+(i%2?2:-2),endY+4);ctx.stroke()}
  }
- // Soft hair texture: fine curved strokes, not outlined circles.
- ctx.strokeStyle='#ffe5a0';ctx.lineWidth=1.2;
- for(let i=0;i<(short?5:9);i++){
-  const x=-16+i*(32/(short?4:8)),y=-77-(i%3)*3+bounce*.2;
-  ctx.beginPath();ctx.moveTo(x-2,y+3);ctx.quadraticCurveTo(x+2,y-2,x+5,y+1);ctx.stroke();
- }
- // Fringe stops well above the eyes at y=-47. Keep the face unobstructed.
- if(!back){
-  for(let i=0;i<(short?4:6);i++){
-   const x=-15+i*(30/(short?3:5)),y=-65+(i%3===0?1:0)+bounce*.12;
-   ellipse(x,y,short?4:5,short?3:4,i%2?mid:light);
-  }
- }
- // Loose side wisps are slender S-curves outside the cheek, not corkscrews.
- if(!short)for(const side of [-1,1]){
-  const x=side*21;
+ // Side locks hang at the temples, beyond the face outline (head edges +/-20).
+ if(!short)for(const sign of [-1,1]){
   for(let j=0;j<(wild?3:curly?2:1);j++){
-   const y=-63+j*7;
-   ctx.strokeStyle=j%2?mid:base;ctx.lineWidth=3-j*.4;
-   ctx.beginPath();ctx.moveTo(x,y-5);
-   ctx.bezierCurveTo(x+side*(4+sway),y-2,x-side*2,y+3,x+side*(2+sway),y+6);
-   ctx.stroke();
+   const x=sign*(20+j*2.2),y=-67+j*4;
+   const lag=Math.sin(time*.005+j*1.5+phase*.003)*(moving?2:.5);
+   ctx.strokeStyle=colours[(j+1)%colours.length];ctx.lineWidth=3;
+   ctx.beginPath();ctx.moveTo(x,y);
+   ctx.bezierCurveTo(x+sign*4,y+5,x-sign*3+lag,y+10,x+sign*2+lag,y+14);ctx.stroke();
   }
  }
- if(back){
-  // Back of head has continuous blonde hair, not a brown exposed bowl.
-  ellipse(0,-56,18,12,base);
-  for(let i=0;i<7;i++){
-   const x=-15+i*5,y=-60+(i%2)*3+bounce*.12;
-   ellipse(x,y,5,5,i%3===0?light:mid);
-  }
-  ctx.strokeStyle=shadow;ctx.lineWidth=1.2;
-  for(let i=0;i<5;i++){
-   const x=-12+i*6;ctx.beginPath();ctx.moveTo(x,-59);ctx.quadraticCurveTo(x+3,-54,x,-50);ctx.stroke();
-  }
+ // Rear silhouette is still blonde; fine nape locks without a solid brown bowl.
+ if(back){ctx.fillStyle='#d7ad5c';ctx.beginPath();ctx.ellipse(0,-57,17,10,0,0,Math.PI*2);ctx.fill();
+  for(let i=0;i<7;i++){const x=-15+i*5;
+   ctx.strokeStyle=colours[i%colours.length];ctx.lineWidth=3;
+   ctx.beginPath();ctx.moveTo(x,-61);ctx.bezierCurveTo(x+3,-56,x-3,-53,x+1,-49+(i%2)*3);ctx.stroke()}
  }
  ctx.restore();
 }
@@ -397,8 +389,8 @@ function character(x,y,type,actor){
   ctx.fillStyle='#d9b583';ctx.fillRect(-20+gait*3,-19,9,22);ctx.fillRect(12-gait*3,-19,9,22);
   ellipse(0,-48,20,21,'#f3c69e');ellipse(-19,-48,4,7,'#eeb58d');ellipse(19,-48,4,7,'#eeb58d');
   if(back){ctx.fillStyle='#713e40';ctx.fillRect(-9,-33,18,7)}
-  else if(side){ellipse(12,-47,3,3,'#334638');ellipse(17,-39,4,2,'#d38b79')}
-  else{ellipse(-7,-51,5,2,'#e9aa8f66');ellipse(8,-51,5,2,'#e9aa8f66');const feeling=mood();if(feeling==='sleepy'){ctx.strokeStyle='#334638';ctx.lineWidth=2;for(const ex of [-7,8]){ctx.beginPath();ctx.moveTo(ex-3,-47);ctx.lineTo(ex+3,-47);ctx.stroke()}}else{ellipse(-7,-47,2.5,feeling==='hurt'?2:3,'#334638');ellipse(8,-47,2.5,feeling==='hurt'?2:3,'#334638')}ctx.strokeStyle='#a96c65';ctx.lineWidth=2;ctx.beginPath();if(feeling==='happy')ctx.arc(0,-40,5,.1,Math.PI-.1);else if(feeling==='hurt'||feeling==='hungry')ctx.arc(0,-35,4,Math.PI*1.12,Math.PI*1.9);else{ctx.moveTo(-4,-38);ctx.lineTo(4,-38)}ctx.stroke()}
+  else if(side){ellipse(12,-48,3.2,3.6,'#263b32');ellipse(16,-43,2.4,1.6,'#df9b7d');ellipse(15,-37,3,1.3,'#a96c65')}
+  else{ellipse(-7,-51,5,2,'#e9aa8f66');ellipse(8,-51,5,2,'#e9aa8f66');ellipse(0,-43,2.3,1.7,'#d99579');ctx.strokeStyle='#886043';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-11,-54);ctx.lineTo(-4,-54);ctx.moveTo(5,-54);ctx.lineTo(12,-54);ctx.stroke();const feeling=mood();if(feeling==='sleepy'){ctx.strokeStyle='#334638';ctx.lineWidth=2;for(const ex of [-7,8]){ctx.beginPath();ctx.moveTo(ex-3,-47);ctx.lineTo(ex+3,-47);ctx.stroke()}}else{ellipse(-7,-47,2.5,feeling==='hurt'?2:3,'#334638');ellipse(8,-47,2.5,feeling==='hurt'?2:3,'#334638')}ctx.strokeStyle='#a96c65';ctx.lineWidth=2;ctx.beginPath();if(feeling==='happy')ctx.arc(0,-40,5,.1,Math.PI-.1);else if(feeling==='hurt'||feeling==='hungry')ctx.arc(0,-35,4,Math.PI*1.12,Math.PI*1.9);else{ctx.moveTo(-4,-38);ctx.lineTo(4,-38)}ctx.stroke()}
   drawHaigenHair(dir,phase,moving);
   // The equipped tool is represented by the hotbar; only draw it in-world during its action.
 
@@ -800,7 +792,7 @@ gameCanvas.addEventListener('pointerup',stopCameraPointer);
 gameCanvas.addEventListener('pointercancel',stopCameraPointer);
 gameCanvas.addEventListener('wheel',e=>{e.preventDefault();cameraZoom=clamp(cameraZoom*Math.exp(-e.deltaY*.001),.7,2.4)},{passive:false});
 function frame(now){let dt=Math.min(now-last,50);last=now;menuController();if(!$('overlay').classList.contains('open'))update(dt);draw();requestAnimationFrame(frame)}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=74;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=75;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
