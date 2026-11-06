@@ -1,4 +1,4 @@
 {
-  "build": 93,
-  "notes": "World expansion preview: seven regions, terrain scenery, moving wildlife, regional outfits, accessible Explore World map and v93 indicator; original woodland story and saves kept."
+  "build": 94,
+  "notes": "Subtle always-visible V.94 build identifier, updated in-game version check, and expanded biome/world preview. Existing saves preserved."
 }
