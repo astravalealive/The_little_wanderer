@@ -534,6 +534,8 @@ function animalId(a){return a.kind?'beast:'+a.kind:'wild:'+a.id}
 function animalAlive(a){
  const id=animalId(a),dead=Number(state.defeatedWildlife[id])||0;
  if(!dead)return true;
+ // The Silent Pond quest can always summon Bristleback, even if previously defeated.
+ if(a.kind==='boar'&&state.story?.stage===4){delete state.defeatedWildlife[id];delete state.wildlifeHp[id];return true}
  if(Date.now()-dead>=600000){delete state.defeatedWildlife[id];delete state.wildlifeHp[id];return true}
  return false;
 }
