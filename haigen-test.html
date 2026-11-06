@@ -65,6 +65,23 @@ for(let i=0;i<108;i++){
   pause:1200+seeded(i*17+8)*4500,scaredUntil:0,walking:false
  });
 }
+// Unknown wasteland wildlife: peaceful, rare, and confined to the Ashen Expanse.
+// Original 108 animal placements stay intact; new IDs begin at 108.
+const wasteRegion=expandedRegions.find(r=>r.id==='wasteland');
+for(let i=0;i<15;i++){
+ const type=['watcher','ashCreeper','scuttleback'][i%3];
+ const x=wasteRegion.x+170+seeded(92000+i*31)*(wasteRegion.w-340);
+ const y=wasteRegion.y+170+seeded(92001+i*31)*(wasteRegion.h-340);
+ if(islandDepth(x,y)<110)continue;
+ regionalWildlife.push({
+  id:108+i,region:'wasteland',type,x,y,homeX:x,homeY:y,targetX:x,targetY:y,
+  speed:type==='watcher'?23:type==='ashCreeper'?9:17,
+  size:(type==='watcher'?.8:1)+seeded(92002+i*31)*.2,
+  phase:seeded(92003+i*31)*6.28,face:1,gait:0,
+  pause:1100+seeded(92004+i*31)*6200,scaredUntil:0,walking:false
+ });
+}
+
 function regionalLandPoint(a,x,y){
  const r=expandedRegions.find(z=>z.id===a.region);
  if(!r)return {x,y};
@@ -175,6 +192,37 @@ function drawWildAnimal(a){
   poly([[-10,-16],[-21,-22],[-11,-6]],raven?'#353d4d':'#c3cbd0');
   if(heron){stroke([[4,-20],[17,-38],[23,-37]],c,5);e(23,-36,6,6,c);poly([[28,-37],[43,-34],[28,-32]],'#cbb078');eye(24,-39)}
   else{e(13,-16,7,6,c);poly([[17,-16],[30,-13],[17,-11]],raven?'#66717d':'#e6b55f');eye(15,-18)}
+ }else if(k==='watcher'){
+  // Hooded pebble-shaped thing with enormous luminous eyes and springy feet.
+  const twitch=Math.sin(time*.011+a.phase)*2;
+  for(const sign of [-1,1])stroke([[sign*10,-4],[sign*17+twitch,7],[sign*23,11]],'#746f79',3);
+  e(0,-12,17,15,'#65666d');e(0,-17,14,11,'#454951');
+  e(-10,-27,9,9,'#8d8f89');e(10,-27,9,9,'#8d8f89');
+  for(const x of [-10,10]){e(x,-29,5,6,'#d5d8b4');e(x,-29,2.5,4,'#283d3f')}
+  e(0,-11,4,2,'#8a9186');
+ }else if(k==='ashCreeper'){
+  // Low, many-legged creature that scuttles over the ruined earth.
+  const flex=Math.sin(time*.007+a.phase)*3;
+  for(let i=0;i<4;i++)for(const sign of [-1,1]){
+   const xx=-21+i*14;
+   stroke([[xx,-10],[xx+sign*7,-1],[xx+sign*(15+flex),9]],'#756d67',2.8);
+  }
+  e(-5,-13,28,11,'#85817a');e(-10,-17,20,7,'#55595b');
+  poly([[-30,-13],[-39,-19],[-36,-5]],'#6c6a64');
+  e(21,-12,10,8,'#9d9584');e(27,-15,3,3,'#d8ca97');e(27,-15,1.5,1.8,'#343939');
+  stroke([[25,-18],[35,-32+flex]],'#7c7971',2);
+ }else if(k==='scuttleback'){
+  // Beetle-lizard hybrid, plated shell and darting little legs.
+  stroke([[-19,-11],[-33,-16],[-43,-8]],'#74766b',4);
+  for(let i=0;i<3;i++)for(const sign of [-1,1]){
+   const step=a.walking?Math.sin(a.gait*1.9+i+sign)*4:0;
+   stroke([[-13+i*13,-10],[-17+i*13,sign*7],[-23+i*13+step,sign*12]],'#5c615b',3);
+  }
+  e(-4,-15,23,15,'#707b70');e(-6,-18,19,11,'#aaa68a');
+  for(let i=0;i<3;i++)stroke([[-16+i*12,-26],[-10+i*12,-7]],'#7d806f',2);
+  e(19,-12,11,8,'#6b776b');
+  for(const sign of [-1,1])stroke([[23,-9],[32,sign*6],[38,sign*3]],'#9c9786',2.8);
+  e(25,-15,2.5,2.5,'#e1cbb2');eye(26,-15);
  }else if(k==='frog'){
   e(0,-7,14,8,'#5f9b6b');e(-9,-12,9,7,'#77b57d');e(10,-12,9,7,'#77b57d');
   for(const x of [-10,11]){e(x,-18,4.5,4.5,'#d2e9c5');eye(x,-18)}
