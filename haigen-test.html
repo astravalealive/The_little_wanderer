@@ -1130,6 +1130,7 @@ function drawBird(b){
 }
 // Gentle fictional weather cycle; saved alongside Haigen's other world state.
 if(!state.weather||typeof state.weather!=='object')state.weather={mode:'clear',elapsed:0,until:95000,rain:0};
+if(!Number.isFinite(state.weather.wetness))state.weather.wetness=0;
 function updateWeather(dt){
  const w=state.weather;
  w.elapsed+=dt;
@@ -1144,7 +1145,52 @@ function updateWeather(dt){
   }
  }
  const target=w.mode==='rain'?1:0;
+ w.wetness=Math.max(0,Math.min(1,(w.wetness||0)+(target?dt/8000:-dt/100000)));
  w.rain=Math.max(0,Math.min(1,(Number(w.rain)||0)+Math.sign(target-(Number(w.rain)||0))*dt/4500));
+}
+// Subtle aftermath: reflective track puddles, tiny snails and drying droplets.
+function drawWetGround(){
+ const wet=state.weather.wetness||0;
+ if(wet<.025)return;
+ ctx.save();ctx.globalAlpha=wet*.48;
+ for(let i=0;i<75;i++){
+  const x=70+seeded(14000+i*3)*(WORLD-140),y=70+seeded(14001+i*3)*(WORLD-140);
+  if(Math.abs(x-cam.x)>750||Math.abs(y-cam.y)>610||inPond(x,y,20))continue;
+  if(roadDistance(x,y)>95)continue;
+  ellipse(x,y,8+seeded(i+14100)*13,3+seeded(i+14101)*3,'#629bac');
+  ctx.strokeStyle='#d1e8d7';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(x-6,y-1);ctx.lineTo(x+5,y-1);ctx.stroke();
+  if(state.weather.rain>.25&&i%5===0){
+   const t=(time*.012+i*17)%35;ctx.strokeStyle='#d5f2f2';ctx.beginPath();
+   ctx.ellipse(x,y,2+t*.4,1+t*.15,0,0,Math.PI*2);ctx.stroke();
+  }
+ }
+ ctx.restore();
+ // Rain-loving snails wander out, but never become collectible objects.
+ for(let i=0;i<13;i++){
+  const x=180+seeded(i*5+15550)*(WORLD-360),y=180+seeded(i*7+15500)*(WORLD-360);
+  if(Math.abs(x-cam.x)>740||Math.abs(y-cam.y)>610||inPond(x,y,24))continue;
+  const move=Math.sin(time*.00023+i)*7;
+  ctx.save();ctx.globalAlpha=wet*.95;
+  ellipse(x+move,y+4,11,3,'#284a3e55');
+  ellipse(x+move,y,9,4,'#85a278');
+  ellipse(x-2+move,y-5,6,7,'#b18a65');
+  ctx.strokeStyle='#795d4c';ctx.lineWidth=1.5;ctx.beginPath();
+  ctx.arc(x-2+move,y-5,3,0,Math.PI*1.65);ctx.stroke();
+  ctx.strokeStyle='#85a278';ctx.lineWidth=1.2;ctx.beginPath();
+  ctx.moveTo(x+5+move,y-2);ctx.lineTo(x+7+move,y-8);ctx.moveTo(x+7+move,y-2);ctx.lineTo(x+11+move,y-8);ctx.stroke();
+  ctx.restore();
+ }
+}
+function drawPondMist(night){
+ if(night<.15)return;
+ const opacity=(night-.15)*.16*(1-(state.weather.rain||0)*.55);
+ ctx.save();ctx.globalAlpha=opacity;
+ for(let i=0;i<7;i++){
+  const x=pond.x-pond.rx*.67+i*pond.rx*.23+Math.sin(time*.0003+i)*13;
+  const y=pond.y-pond.ry*.12+Math.cos(time*.0004+i)*23;
+  ellipse(x,y,75,10,'#b4c4e1');
+ }
+ ctx.restore();
 }
 function drawRain(){
  const strength=state.weather.rain;
@@ -1206,7 +1252,7 @@ function drawHaigenSnorkelLocal(dir){
  }
  ctx.restore();
 }
-function draw(){const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100';hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=clamp(Math.min(W/1024,H/768),.52,1)*cameraZoom;ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(0,0,WORLD,WORLD);for(let i=0;i<410;i++){let x=seeded(i+950)*WORLD,y=seeded(i+1200)*WORLD;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850)continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ellipse(l.x,l.y,l.kind==='highlands'?620:510,l.kind==='highlands'?400:360,l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564');for(let j=0;j<24;j++){const a=j*2.399,r=Math.sqrt((j+1)/25),px=l.x+Math.cos(a)*r*390,py=l.y+Math.sin(a)*r*245;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],j%3?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,j%2?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,j%2?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();clearingGround(cottage.x,cottage.y);drawCampDecor();if(!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80)){ellipse(firstFire.x,firstFire.y,47,25,'#76674a');for(let j=0;j<8;j++)ellipse(firstFire.x+Math.cos(j*Math.PI/4)*33,firstFire.y+Math.sin(j*Math.PI/4)*17,8,6,'#a7a18c')}lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();lakeShape(.79);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();lakeShape(.48);ctx.fillStyle=mixColour('#236c91','#243c68',nightMix);ctx.fill();ctx.restore();for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');// Fish are below the water's coloured surface; only the rare leap is above it.
+function draw(){const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100';hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=clamp(Math.min(W/1024,H/768),.52,1)*cameraZoom;ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(0,0,WORLD,WORLD);for(let i=0;i<410;i++){let x=seeded(i+950)*WORLD,y=seeded(i+1200)*WORLD;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850)continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ellipse(l.x,l.y,l.kind==='highlands'?620:510,l.kind==='highlands'?400:360,l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564');for(let j=0;j<24;j++){const a=j*2.399,r=Math.sqrt((j+1)/25),px=l.x+Math.cos(a)*r*390,py=l.y+Math.sin(a)*r*245;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],j%3?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,j%2?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,j%2?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();drawWetGround();clearingGround(cottage.x,cottage.y);drawCampDecor();if(!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80)){ellipse(firstFire.x,firstFire.y,47,25,'#76674a');for(let j=0;j<8;j++)ellipse(firstFire.x+Math.cos(j*Math.PI/4)*33,firstFire.y+Math.sin(j*Math.PI/4)*17,8,6,'#a7a18c')}lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();lakeShape(.79);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();lakeShape(.48);ctx.fillStyle=mixColour('#236c91','#243c68',nightMix);ctx.fill();ctx.restore();for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawPondMist(nightMix);// Fish are below the water's coloured surface; only the rare leap is above it.
 for(let i=0;i<17;i++){
  const phase=time*.00032*(.66+seeded(i+301)*.5)+seeded(i+190)*Math.PI*2;
  const fx=pond.x+Math.sin(phase)*(.16+seeded(i+211)*.54)*pond.rx;
@@ -1273,6 +1319,29 @@ for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a
  }
  // The campsite lantern flickers gently in the wind.
  glow(cottage.x-135,cottage.y-75,145,.7,2.4);
+ // Cottage windows and the ancient rune receive distinct light colours.
+ const softGlow=(x,y,r,colour,amount)=>{
+  if(Math.abs(x-cam.x)>W/zoom+r||Math.abs(y-cam.y)>H/zoom+r)return;
+  ctx.save();ctx.globalCompositeOperation='screen';
+  const light=ctx.createRadialGradient(x,y,2,x,y,r);
+  light.addColorStop(0,colour.replace('ALPHA',String(darkness*amount)));
+  light.addColorStop(1,colour.replace('ALPHA','0'));
+  ctx.fillStyle=light;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.restore();
+ };
+ if(state.campTier>=2){
+  const width=state.campTier===2?100:state.campTier===3?145:205;
+  const height=state.campTier===2?95:state.campTier===3?128:165;
+  for(const sign of [-1,1])
+   softGlow(cottage.x+35+sign*(width*.31),cottage.y-10-height+48,100,'rgba(255,194,104,ALPHA)',.42);
+ }
+ if(!state.removed.includes(runeGuardianId))
+  softGlow(ruins.x,ruins.y-39,115,'rgba(145,182,255,ALPHA)',.48+.07*Math.sin(time*.003));
+ // The pond carries a faint animated silver trail from the moon.
+ for(let i=0;i<8;i++){
+  const px=pond.x-45+i*13+Math.sin(time*.0008+i)*5;
+  const py=pond.y-35+i*12;
+  softGlow(px,py,22,'rgba(174,217,255,ALPHA)',.10);
+ }
  // A carried torch illuminates Haigen's immediate surroundings.
  if(state.equipped==='torch'&&state.tools.torch>0)glow(state.x+12,state.y-38,190,.9,7.2);
  // Gentle moonlight around the player prevents pitch-black navigation.
