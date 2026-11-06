@@ -1127,7 +1127,7 @@ function instructionTick(dt){
    if(!wanted){storyTick();return true}
    if(autoDestination&&(autoDestination.type!==wanted||state.removed.includes(autoDestination.id)))autoDestination=null;
    if(!autoDestination){
-    const choices=objects.filter(o=>o.type===wanted&&!state.removed.includes(o.id)&&!inPond(o.x,o.y,40));
+    const choices=objects.filter(o=>o.type===wanted&&!state.removed.includes(o.id)&&!(autoIgnore.get(o.id)>Date.now())&&!inPond(o.x,o.y,40));
     choices.sort((a,b)=>dist(state,a)-dist(state,b));autoDestination=choices[0]||null;
    }
    if(!autoDestination){
@@ -1173,14 +1173,14 @@ function instructionTick(dt){
  const wanted=goal.resource==='berries'?'bush':goal.resource;
  if(autoDestination&&(autoDestination.type!==wanted||state.removed.includes(autoDestination.id)))autoDestination=null;
  if(!autoDestination){
-  const candidates=objects.filter(o=>o.type===wanted&&!state.removed.includes(o.id)&&!inPond(o.x,o.y,40));
+  const candidates=objects.filter(o=>o.type===wanted&&!state.removed.includes(o.id)&&!(autoIgnore.get(o.id)>Date.now())&&flowerHasHabitat(o)&&(wanted!=='bush'||berryReady(o))&&!inPond(o.x,o.y,40));
   candidates.sort((a,b)=>dist(state,a)-dist(state,b));
   autoDestination=candidates[0]||null;
   if(!autoDestination){if(autoBubbleTimer<=0)think('I cannot find any nearby. I will keep looking.',4600,true);return true}
  }
  const d=dist(state,autoDestination);
  if(d>76){autoTravel(autoDestination,dt,76,.12);return true}
- const item=autoDestination;autoDestination=null;if(!harvest(item))return true;
+ const item=autoDestination;autoDestination=null;if(!harvest(item)){autoIgnore.set(item.id,Date.now()+30000);return true;}
  if(item.type==='tree'){gainWood(state.tools.axe?4:2);mindEvent('gather','tree')}
  if(item.type==='rock'){state.stone+=2;mindEvent('gather','rock')}
  if(item.type==='mushroom')gatherMushroom(item);
@@ -1198,7 +1198,7 @@ function tellHaigen(){
   if(plan.type==='cancel'){state.playerInstruction=null;autoDestination=null;setAutonomy(true);feedback.textContent='Haigen will choose his own adventures.';save();return}
   plan.start=goalResourceCount(plan);plan.original=input;state.playerInstruction=plan;
   autoDestination=null;autoPause=0;state.resting=false;
-  setAutonomy(true);think('Got it! '+plan.label+'.',5200,true);
+  setAutonomy(true,true);think('Got it! '+plan.label+'.',5200,true);
   feedback.textContent='✓ Haigen understood: '+plan.label+'. He is on the job!';
   save();
  };
@@ -1394,7 +1394,8 @@ function showReturnReport(){
   const lines=state.returnReport.slice();state.returnReport=[];save();
   open('<h2>🌅 Welcome back!</h2><p><b>Haigen has been busy while you were away.</b></p>'+lines.map(t=>'<p>'+t+'</p>').join('')+'<p>He is ready to adventure together again.</p>');
 }
-function setAutonomy(enabled){
+function setAutonomy(enabled,keepInstruction=false){
+  if(enabled&&!keepInstruction)state.playerInstruction=null;
   state.autonomy=enabled;haigenMind.controlSwitches++;autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';autoPause=enabled?700:0;if(enabled){nextThoughtAt=0;speak(currentThoughtTopic(),4600)}else autoBubbleTimer=0;
   $('modeBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';
   notify(enabled?'🌲 Haigen is exploring on his own.':'🎮 You are in control!');
@@ -3066,7 +3067,7 @@ function storyJournal(){
  $('storyGuideBtn').onclick=()=>{
   close();
   state.playerInstruction={type:'story',label:'Investigate the Silent Pond',original:'Investigate the woodland mystery'};
-  autoDestination=null;autoPause=0;state.resting=false;setAutonomy(true);
+  autoDestination=null;autoPause=0;state.resting=false;setAutonomy(true,true);
   think('On the case! Dillon, Skölli, bring your detective faces.',4600,true);save();
  };
  $('storyMapBtn').onclick=showMap;
