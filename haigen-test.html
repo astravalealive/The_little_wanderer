@@ -31,12 +31,12 @@
 }
  /* No world bubbles may obscure the main menu or any modal panel. */
 body:has(.mobile-menu[open]) .toast,body:has(.overlay.open) .toast{visibility:hidden!important;opacity:0!important}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.112</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v112 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.113</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v113 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
     const el=document.getElementById('worldError');
-    if(el){el.style.display='block';el.textContent='⚠️ Haigen\'s World V.112 could not start: '+message+'. Please send this message to the developer.';}
+    if(el){el.style.display='block';el.textContent='⚠️ Haigen\'s World V.113 could not start: '+message+'. Please send this message to the developer.';}
   }
   window.addEventListener('error',function(e){showStartupError(e.message||'JavaScript error');});
   window.addEventListener('unhandledrejection',function(e){showStartupError(String(e.reason&&e.reason.message||e.reason||'Startup error'));});
@@ -425,6 +425,9 @@ state.vegetables=Math.max(0,Number(state.vegetables)||0);
 state.gardenReadyAt=Math.max(0,Number(state.gardenReadyAt)||0);
 if(state.gardenTier&&!state.gardenReadyAt)state.gardenReadyAt=Date.now()+50000;
 if(oldGardenBuilt)state.structures=state.structures.filter(q=>q.kind!=='garden');
+state.lifeProject=state.lifeProject&&typeof state.lifeProject==='object'&&['coop','garden','woodstore'].includes(state.lifeProject.kind)?state.lifeProject:null;
+if(state.lifeProject){state.lifeProject.stage=clamp(Math.floor(Number(state.lifeProject.stage)||0),0,2);state.lifeProject.work=clamp(Number(state.lifeProject.work)||0,0,2500)}
+state.lifeProjectsDone=Array.isArray(state.lifeProjectsDone)?state.lifeProjectsDone.filter(k=>['coop','garden','woodstore'].includes(k)).slice(0,3):[];
 function gardenGrowthMs(){return [0,105000,70000,45000][state.gardenTier]||105000}
 function gardenRipe(){return !!state.gardenTier&&Date.now()>=state.gardenReadyAt}
 function gardenHarvestAmount(){return [0,3,5,8][state.gardenTier]||0}
@@ -1034,7 +1037,7 @@ function mindEvent(event,details){
   if(haigenMind.actions%5===0){
    const [key,idea]=mindWish();
    if(haigenMind.lastIdea!==key){haigenMind.lastIdea=key;mindWrite(idea,'idea')}
-   else mindWrite('I have collected '+haigenMind.actions+' useful things. Perhaps I should explore a new path next.','plan');
+   else if(haigenMind.actions%40===0)mindWrite('I want to create things with what I find, not just collect endlessly.','plan');
   }
  }else if(event==='hurt'){
   haigenMind.courage=clamp(haigenMind.courage-3,0,100);
@@ -1311,6 +1314,72 @@ function autoExplore(){
  return null;
 }
 
+
+const lifeBlueprints={
+ coop:{name:'Chicken Coop',plot:coopPlot,tier:'coopTier',stages:[{wood:2,stone:1,twigs:0,label:'Foundations'},{wood:3,stone:1,twigs:1,label:'Timber frame'},{wood:1,stone:1,twigs:1,label:'Roof and nesting boxes'}]},
+ garden:{name:'Kitchen Garden',plot:gardenPlot,tier:'gardenTier',stages:[{wood:2,stone:1,twigs:1,label:'Levelling the ground'},{wood:2,stone:0,twigs:1,label:'Raised timber beds'},{wood:2,stone:1,twigs:1,label:'Planting and finishing'}]},
+ woodstore:{name:'Wood Storage',plot:woodPlot,tier:'woodStorageTier',stages:[{wood:2,stone:1,twigs:0,label:'Stone foundations'},{wood:3,stone:1,twigs:0,label:'Structural supports'},{wood:2,stone:1,twigs:0,label:'Weatherproof roof'}]}
+};
+let lifeBuilderBusy=false;
+function lifeBlueprint(){return state.lifeProject?lifeBlueprints[state.lifeProject.kind]:null}
+function lifeProjectSummary(){const p=state.lifeProject,b=lifeBlueprint();return b?b.name+' · '+(p.stage+1)+'/3: '+b.stages[p.stage].label:'No current project'}
+function lifeChoose(){
+ if(state.lifeProject)return state.lifeProject;
+ const kind=!state.coopTier?'coop':!state.gardenTier?'garden':!state.woodStorageTier?'woodstore':null;
+ if(!kind)return null;
+ state.lifeProject={kind,stage:0,work:0};const b=lifeBlueprints[kind];
+ mindWrite('I have decided to build a '+b.name.toLowerCase()+'. I will work out what I need and do it myself.','idea');save();
+ return state.lifeProject;
+}
+function lifeFinish(){
+ const p=state.lifeProject,b=lifeBlueprint();if(!p||!b)return;
+ if(p.kind==='coop'&&!state.coopTier){state.coopTier=1;state.henCount=Math.max(2,state.henCount||0);state.lastEggAt=Date.now();syncChickens()}
+ if(p.kind==='garden'&&!state.gardenTier){state.gardenTier=1;state.gardenReadyAt=Date.now()+gardenGrowthMs()}
+ if(p.kind==='woodstore'&&!state.woodStorageTier)state.woodStorageTier=1;
+ if(!state.lifeProjectsDone.includes(p.kind))state.lifeProjectsDone.push(p.kind);
+ mindEvent('build',b.name);mindWrite('I completed my '+b.name.toLowerCase()+'. I gathered the supplies and made a place of my own.','growth');
+ memory('🏡 Haigen independently built '+b.name+'!');think('I built that '+b.name.toLowerCase()+' myself!',5000,true);
+ state.lifeProject=null;lifeBuilderBusy=false;autoDestination=null;autoWaypoint=null;autoResetNav();autoPause=1600;save();
+}
+function lifeGather(need,dt){
+ const type=need==='stone'?'rock':'tree',o=autoTarget(type);
+ autoPlan('gather '+need+' for '+lifeBlueprint().name,'project-gather:'+need);
+ if(!o){if(!autoWaypoint||dist(state,autoWaypoint)<100)autoWaypoint=autoExplore();if(autoWaypoint)autoTravel(autoWaypoint,dt,100,.12);return}
+ if(dist(state,o)>76){autoTravel(o,dt,76,.13);return}
+ if(!harvest(o)){autoIgnore.set(o.id,Date.now()+30000);return}
+ if(type==='tree'){gainWood(state.tools.axe?4:2);state.twigs++;state.leaves++;mindEvent('gather','tree')}
+ else{state.stone+=2;mindEvent('gather','rock')}
+ state.autoSteps++;autoPause=450;save();
+}
+function lifeProjectTick(dt){
+ if(!state.autonomy||state.playerInstruction)return false;
+ const p=lifeChoose(),b=lifeBlueprint();if(!p||!b)return false;
+ if(state[b.tier]){state.lifeProject=null;save();return false}
+ const debris=remainingCampDebris();
+ if(debris.length){
+  autoPlan('clear the first campsite','project-clear');
+  const target=debris.slice().sort((a,b)=>dist(a,state)-dist(b,state))[0];
+  if(dist(state,target)>88)autoTravel(target,dt,88,.13);
+  else{collectCampDebris(target);state.autoSteps++}
+  return true;
+ }
+ const cost=b.stages[p.stage];
+ const wood=state.wood+(state.woodStorageTier?state.woodStored:0);
+ const missing=wood<cost.wood?'wood':state.stone<cost.stone?'stone':state.twigs<cost.twigs?'twigs':null;
+ if(missing){lifeBuilderBusy=false;lifeGather(missing,dt);return true}
+ const site={id:'build-'+p.kind,x:b.plot.x+88,y:b.plot.y+40};
+ autoPlan('build '+b.name+': '+cost.label,'project-build:'+p.kind+':'+p.stage);
+ if(dist(state,site)>65){lifeBuilderBusy=false;autoTravel(site,dt,65,.12);return true}
+ lifeBuilderBusy=true;p.work=Math.min(2500,p.work+dt);
+ if(p.work<2400)return true;
+ if(availableCampWood()<cost.wood||state.stone<cost.stone||state.twigs<cost.twigs){p.work=0;lifeBuilderBusy=false;return true}
+ if(!spendCampWood(cost.wood)){p.work=0;lifeBuilderBusy=false;return true}
+ state.stone-=cost.stone;state.twigs-=cost.twigs;p.stage++;p.work=0;lifeBuilderBusy=false;state.autoSteps++;
+ mindWrite('I have finished the '+cost.label.toLowerCase()+' for my '+b.name.toLowerCase()+'.','plan');
+ if(p.stage>=3)lifeFinish();else{autoPause=650;save()}
+ return true;
+}
+
 function autonomousTick(dt){
  state.fun=Math.min(100,state.fun+dt*.00018);state.activity=Math.min(100,state.activity+dt*.0003);
  autoBubbleTimer-=dt;
@@ -1336,6 +1405,7 @@ function autonomousTick(dt){
  }
  if(mindRetreat(dt))return;
  if(instructionTick(dt))return;
+ if(lifeProjectTick(dt))return;
  if(autoCampChores(dt))return;
  if(autoPause>0){autoPause=Math.max(0,autoPause-dt);if(autoBubbleTimer<=0)speak(currentThoughtTopic(),4200);return}
  if(autoDestination&&(state.removed.includes(autoDestination.id)||
@@ -3344,7 +3414,7 @@ function frame(now){
  }catch(error){reportWorldError(error);}
  requestAnimationFrame(frame);
 }// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=112;document.getElementById('devVersion').textContent='V.'+GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=113;document.getElementById('devVersion').textContent='V.'+GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
