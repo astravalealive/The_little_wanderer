@@ -1,4 +1,4 @@
 {
-  "build": 80,
-  "notes": "Tell Haigen instruction box: natural phrases interpreted locally into gathering wood/stone/berries/mushrooms/flowers, visiting pond/ruins, returning home, eating/resting, or independent exploration. Saved goals, completion feedback, unknown-instruction messaging. Frogs and Ember unchanged."
+  "build": 81,
+  "notes": "Dynamic duckling flocking, separating, feeding, alarm bunching and rain shelter; occasional saved rain cycle, animated falling rain and pond ripples, bird and chicken weather reactions, in-game weather status. Protected frogs unchanged."
 }
