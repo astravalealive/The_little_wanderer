@@ -1,3 +1,29 @@
+function drawRegionalScenery(o){
+ ctx.save();ctx.translate(o.x,o.y);
+ const t=o.type,v=seeded(o.id*29+4),size=o.size||1;
+ ctx.scale(size*(.85+seeded(o.id*19+5)*.35),size*(.75+v*.9));
+ ctx.lineCap='round';
+ if(t==='cactus'){
+  ellipse(3,7,17,6,'#43584455');
+  ctx.strokeStyle='#367a59';ctx.lineWidth=15;ctx.beginPath();ctx.moveTo(0,4);ctx.lineTo(0,-60);ctx.stroke();
+  ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(-2,-27);ctx.lineTo(-18,-28);ctx.lineTo(-18,-47);ctx.moveTo(3,-19);ctx.lineTo(20,-20);ctx.lineTo(20,-40);ctx.stroke();
+  ctx.strokeStyle='#9cc591';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-4,0);ctx.lineTo(-4,-58);ctx.stroke();
+ }else if(t==='palm'){
+  ellipse(4,10,23,7,'#617b5766');
+  const bend=9+v*12;
+  ctx.strokeStyle='#98734f';ctx.lineWidth=11;ctx.beginPath();ctx.moveTo(0,7);ctx.quadraticCurveTo(bend,-44,bend*.6,-95);ctx.stroke();
+  for(let i=0;i<7;i++){const a=i*Math.PI*2/7,px=bend*.6;ctx.strokeStyle=i%2?'#3f8659':'#549f66';ctx.lineWidth=7;
+   ctx.beginPath();ctx.moveTo(px,-93);ctx.quadraticCurveTo(px+Math.cos(a)*35,-105+Math.sin(a)*14,px+Math.cos(a)*65,-72+Math.sin(a)*27);ctx.stroke()}
+ }else if(t==='fir'){
+  ellipse(2,8,20,7,'#2f514b66');ctx.fillStyle='#826b57';ctx.fillRect(-6,-49,12,57);
+  for(let j=0;j<4;j++){const yy=-18-j*23,ww=32-j*5;poly([[-ww,yy],[0,yy-59],[ww,yy]],j%2?'#476d60':'#5e8972')}
+  if(v>.72)for(let j=1;j<4;j++)poly([[-24+j*4,-18-j*23],[0,-59-j*23],[24-j*4,-18-j*23]],'#d4e3dd96');
+ }else if(t==='bareTree'){
+  ellipse(1,8,15,6,'#494b4966');ctx.strokeStyle='#655d59';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(0,7);ctx.lineTo(-3,-69);ctx.stroke();
+  ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-3,-41);ctx.lineTo(-24,-61);ctx.lineTo(-27,-83);ctx.moveTo(-3,-56);ctx.lineTo(24,-73);ctx.lineTo(27,-94);ctx.moveTo(-24,-61);ctx.lineTo(-34,-67);ctx.stroke();
+ }
+ ctx.restore();
+}
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>The Little Wanderer • Haigen's World</title><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
 .mobile-menu,.stats-toggle{display:none}
 @media(max-width:600px),(pointer:coarse) and (max-height:600px){
@@ -23,7 +49,7 @@
  .hint{display:none}.toast{top:85px;z-index:9}
  .update-banner{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 205px);padding:8px;font-size:12px}
 }
- .dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.95</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v95 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="instructBtn">💬 Tell Haigen</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">📬 Mail</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+ .dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.96</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v96 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="instructBtn">💬 Tell Haigen</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">📬 Mail</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (()=>{'use strict';const cv=document.getElementById('game'),ctx=cv.getContext('2d');let W=0,H=0,dpr=1;function resize(){const bounds=cv.getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);W=bounds.width||innerWidth;H=bounds.height||innerHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(cv.width/W,0,0,cv.height/H,0,0)}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD=7800;let state;const fresh=()=>({x:1250,y:1310,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dillon. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:false,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});try{state=Object.assign(fresh(),JSON.parse(localStorage.getItem('wandererTestSave')||'{}'))}catch{state=fresh()}state.campTier=Math.max(0,Math.min(4,Number(state.campTier)||0));if(state.campTier===0&&state.structures.some(q=>q.kind==='shelter'))state.campTier=1;state.hunger=Math.max(0,Math.min(100,Number.isFinite(state.hunger)?state.hunger:85));state.hungerClock=0;state.energy=Math.max(0,Math.min(100,Number.isFinite(state.energy)?state.energy:85));state.resting=false;state.hairStyle=['waves','curls','short','wild'].includes(state.hairStyle)?state.hairStyle:'waves';state.fun=Math.max(0,Math.min(100,Number.isFinite(state.fun)?state.fun:75));state.activity=Math.max(0,Math.min(100,Number.isFinite(state.activity)?state.activity:65));state.diaryEntries=Array.isArray(state.diaryEntries)?state.diaryEntries:[];state.requests=Array.isArray(state.requests)?state.requests:[];state.health=Math.max(1,Math.min(100,Number.isFinite(state.health)?state.health:100));state.lastHitAt=Number(state.lastHitAt)||0;state.tools=Object.assign({axe:0,torch:0,shovel:0,pickaxe:0},state.tools||{});state.minerals=Object.assign({clay:0,flint:0,iron:0,copper:0,quartz:0,crystal:0},state.minerals||{});state.excavations=state.excavations||{};state.food=Number(state.food)||0;state.autonomy=!!state.autonomy;state.returnReport=Array.isArray(state.returnReport)?state.returnReport:[];state.autoSteps=Number(state.autoSteps)||0;state.harvestedAt=state.harvestedAt||{};state.mushrooms=Number(state.mushrooms)||0;state.herbs=state.herbs||{};state.potions=Number(state.potions)||0;state.flowerFinds=Number(state.flowerFinds)||0;state.fallen=Array.isArray(state.fallen)?state.fallen:[];state.treeHits=state.treeHits||{};state.twigs=Number(state.twigs)||0;state.leaves=Number(state.leaves)||0;state.equipped=state.equipped||'hands';state.memories=state.memories.map(m=>m.replaceAll('Héri','Dillon').replaceAll('Skolli','Skölli'));if(state.worldLayout!==3000){const shift=p=>{if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.y))return;p.x=clamp(1500+(p.x-1420)*.39,55,WORLD-55);p.y=clamp(1500+(p.y-1150)*.39,55,WORLD-55)};shift(state);for(const p of state.structures||[])shift(p);for(const p of state.fallen||[])shift(p);state.worldLayout=3000;try{localStorage.setItem('wandererTestSave',JSON.stringify(state))}catch(e){}}const seeded=n=>{let x=Math.sin(n*127.1+78.233)*43758.5453;return x-Math.floor(x)};
 // The original 4200-unit woodland remains in its exact location for old saves and story quests.
 const expandedRegions=[
@@ -36,80 +62,56 @@ const expandedRegions=[
 ];
 function expandedRegion(x,y){return expandedRegions.find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h)||null}
 const regionWardrobe={downs:'#7b8d51',desert:'#e7c38b',coast:'#6aa9ac',wasteland:'#6f6766',snow:'#d3e5eb',fen:'#586d56'};
-const regionalWildlife=[];for(let i=0;i<140;i++){const r=expandedRegions[i%expandedRegions.length],x=r.x+90+seeded(78000+i*7)*(r.w-180),y=r.y+90+seeded(78001+i*7)*(r.h-180);regionalWildlife.push({x,y,homeX:x,homeY:y,phase:seeded(i*9)*6.28,speed:8+seeded(i*13)*19,animal:r.animals[Math.floor(seeded(78002+i*7)*r.animals.length)]})}
-
-const regionalNightPalette={downs:'#6e856e',desert:'#a58e74',coast:'#a99d83',wasteland:'#777177',snow:'#b3cbd8',fen:'#506d69'};
-const coastRegion=expandedRegions.find(r=>r.id==='coast');
-function coastWaterline(y){return coastRegion.x+coastRegion.w*(.715+.038*Math.sin(y/390)+.016*Math.sin(y/135))}
-function biomeColor(r,night){return mixColour(r.color,regionalNightPalette[r.id]||'#647568',night*.87)}
-function drawExpandedTerrain(night){
- const halfW=W/Math.max(.4,cameraZoom),halfH=H/Math.max(.4,cameraZoom);
- for(const r of expandedRegions){
-  if(r.x>cam.x+halfW||r.x+r.w<cam.x-halfW||r.y>cam.y+halfH||r.y+r.h<cam.y-halfH)continue;
-  ctx.save();ctx.beginPath();ctx.rect(r.x,r.y,r.w,r.h);ctx.clip();
-  const base=biomeColor(r,night);
-  ctx.fillStyle=base;ctx.fillRect(r.x,r.y,r.w,r.h);
-  // Subtle broad terrain grading replaces flat slabs and oversized white ovals.
-  const grade=ctx.createLinearGradient(r.x,r.y,r.x+r.w,r.y+r.h);
-  grade.addColorStop(0,'#fff7d51c');grade.addColorStop(.5,'#ffffff00');grade.addColorStop(1,'#162b3129');
-  ctx.fillStyle=grade;ctx.fillRect(r.x,r.y,r.w,r.h);
-  const tile=160;
-  const loX=Math.max(r.x,Math.floor((cam.x-halfW-180)/tile)*tile),hiX=Math.min(r.x+r.w,cam.x+halfW+180);
-  const loY=Math.max(r.y,Math.floor((cam.y-halfH-180)/tile)*tile),hiY=Math.min(r.y+r.h,cam.y+halfH+180);
-  for(let y=loY;y<hiY;y+=tile)for(let x=loX;x<hiX;x+=tile){
-   const h=seeded(Math.floor(x/tile)*731+Math.floor(y/tile)*191+900);
-   const px=x+24+h*82,py=y+34+seeded(Math.floor(y/tile)*355+Math.floor(x/tile)*97)*68;
-   ctx.lineCap='round';
-   if(r.id==='desert'){
-    ctx.strokeStyle=night>.5?'#d0ad7f80':'#c59d6480';ctx.lineWidth=3;
-    ctx.beginPath();ctx.moveTo(x-24,py+15);ctx.bezierCurveTo(x+40,py-24,x+100,py-24,x+175,py+20);ctx.stroke();
-    ctx.strokeStyle='#f6e5b188';ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(x+12,py+24);ctx.quadraticCurveTo(x+90,py+2,x+145,py+30);ctx.stroke();
-    for(let k=0;k<4;k++)ellipse(x+17+k*29,py+47+(k%2)*9,2.5,1.2,'#a78b6577');
-   }else if(r.id==='coast'){
-    if(px<coastWaterline(py)-40){
-     ctx.strokeStyle='#e9c58d99';ctx.lineWidth=2;
-     for(let k=0;k<3;k++){ctx.beginPath();ctx.moveTo(x+12+k*24,py+k*11);ctx.quadraticCurveTo(x+45+k*23,py-5+k*11,x+67+k*21,py+2+k*11);ctx.stroke()}
-     for(let k=0;k<3;k++)ellipse(x+35+k*31,py+35+(k%2)*14,3,2,'#faf1d3bb');
-    }
-   }else if(r.id==='snow'){
-    ctx.strokeStyle='#f7fbf5bd';ctx.lineWidth=3;
-    ctx.beginPath();ctx.moveTo(x-20,py+8);ctx.quadraticCurveTo(px,py-12,x+170,py+9);ctx.stroke();
-    ctx.strokeStyle='#91b2c883';ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(x+13,py+28);ctx.quadraticCurveTo(x+85,py+13,x+152,py+29);ctx.stroke();
-    for(let k=0;k<9;k++){const sx=x+seeded(h*991+k*37)*155,sy=y+seeded(h*1391+k*73)*150;ellipse(sx,sy,2.2,1.5,'#f8ffffd0')}
-   }else if(r.id==='fen'){
-    ellipse(px,py,24+h*30,9+h*7,night>.6?'#385a5daa':'#447e72a8');
-    ctx.strokeStyle='#365e4e';ctx.lineWidth=2.7;
-    for(let k=0;k<4;k++){ctx.beginPath();ctx.moveTo(px-31+k*17,py+11);ctx.lineTo(px-36+k*17,py-14-seeded(k+h)*11);ctx.stroke()}
-    if(h>.6)ellipse(px+40,py+29,21,7,'#91ae73a8');
-   }else if(r.id==='wasteland'){
-    ctx.strokeStyle='#554c4d9c';ctx.lineWidth=2.5;
-    ctx.beginPath();ctx.moveTo(px-37,py-15);ctx.lineTo(px-5,py+3);ctx.lineTo(px-15,py+26);ctx.moveTo(px-5,py+3);ctx.lineTo(px+31,py+19);ctx.stroke();
-    if(h>.66)ellipse(px+41,py-24,24,9,'#c0b5a083');
-   }else{
-    ctx.strokeStyle='#6e985c80';ctx.lineWidth=2.5;
-    for(let k=0;k<5;k++){const gx=px-36+k*19;ctx.beginPath();ctx.moveTo(gx,py+9);ctx.lineTo(gx+(k%2?3:-3),py-6-h*9);ctx.stroke()}
-    if(h>.68)for(let k=0;k<3;k++)ellipse(px+k*17,py+29+(k%2)*8,3,3,'#efdc8d');
-   }
+const wildlifeSpecies={
+ downs:['bison','hare','fox'],desert:['lizard','scorpion','snake'],
+ coast:['crab','turtle','gull'],wasteland:['raven','rat','lizard'],
+ snow:['stag','hare','goat'],fen:['frog','heron','otter']
+};
+const regionalWildlife=[];
+for(let i=0;i<108;i++){
+ const r=expandedRegions[i%expandedRegions.length],type=wildlifeSpecies[r.id][Math.floor(i/6)%3];
+ let x=r.x+110+seeded(78000+i*7)*(r.w-220),y=r.y+110+seeded(78001+i*7)*(r.h-220);
+ if(r.id==='coast')x=Math.min(x,coastWaterline(y)-115);
+ regionalWildlife.push({id:i,region:r.id,type,x,y,homeX:x,homeY:y,targetX:x,targetY:y,
+  speed:({bison:11,hare:19,fox:18,lizard:15,scorpion:11,snake:12,crab:9,turtle:7,
+   gull:12,raven:13,rat:14,stag:18,goat:14,frog:13,heron:10,otter:16})[type]||12,
+  size:.88+seeded(i*23+3)*.32,phase:seeded(i*11+5)*6.28,face:1,gait:0,
+  pause:1200+seeded(i*17+8)*4500,scaredUntil:0,walking:false
+ });
+}
+function regionalLandPoint(a,x,y){
+ const r=expandedRegions.find(z=>z.id===a.region);
+ if(!r)return {x,y};
+ x=clamp(x,r.x+80,r.x+r.w-80);y=clamp(y,r.y+80,r.y+r.h-80);
+ if(r.id==='coast')x=Math.min(x,coastWaterline(y)-68);
+ return {x,y};
+}
+function updateRegionalWildlife(dt){
+ const step=Math.min(50,dt)/1000;
+ for(const a of regionalWildlife){
+  const pd=Math.hypot(state.x-a.x,state.y-a.y);
+  const skittish=!['bison','scorpion','snake','raven'].includes(a.type);
+  if(skittish&&pd<105&&time>a.scaredUntil-600){
+   const angle=Math.atan2(a.y-state.y,a.x-state.x);
+   const t=regionalLandPoint(a,a.x+Math.cos(angle)*95,a.y+Math.sin(angle)*95);
+   a.targetX=t.x;a.targetY=t.y;a.pause=0;a.scaredUntil=time+1900;
   }
-  if(r.id==='coast'){
-    // A winding shoreline: sand gives way to turquoise water rather than a blue rectangle.
-    ctx.fillStyle=mixColour('#50b1ba','#39758c',night*.82);
-    for(let y=Math.max(r.y,loY-20);y<Math.min(r.y+r.h,hiY+20);y+=8){const edge=coastWaterline(y);ctx.fillRect(edge,y,r.x+r.w-edge,9)}
-    ctx.strokeStyle=night>.6?'#c3dcd9':'#eff8e8';ctx.lineWidth=6;ctx.beginPath();
-    let first=true;
-    for(let y=Math.max(r.y,loY-20);y<=Math.min(r.y+r.h,hiY+20);y+=12){const edge=coastWaterline(y)+Math.sin(time*.001+y*.07)*4;if(first){ctx.moveTo(edge,y);first=false}else ctx.lineTo(edge,y)}
-    ctx.stroke();
-    for(let y=Math.max(r.y,loY-30);y<Math.min(r.y+r.h,hiY+30);y+=115){const edge=coastWaterline(y);ctx.strokeStyle='#d5f3e0a8';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(edge+45,y+Math.sin(time*.001+y)*8);ctx.quadraticCurveTo(edge+90,y-12,edge+125,y+5);ctx.stroke()}
+  if(a.pause>0){a.pause-=dt;a.walking=false;continue}
+  let dx=a.targetX-a.x,dy=a.targetY-a.y,distTo=Math.hypot(dx,dy);
+  if(distTo<5){
+   const turn=seeded(a.id*311+Math.floor(time/3000)*7)*Math.PI*2;
+   const travel=35+seeded(a.id*191+Math.floor(time/2800))*85;
+   const target=regionalLandPoint(a,a.homeX+Math.cos(turn)*travel,a.homeY+Math.sin(turn)*travel);
+   a.targetX=target.x;a.targetY=target.y;a.pause=1400+seeded(a.id*29+Math.floor(time/4200))*4100;
+   a.walking=false;continue;
   }
-  ctx.fillStyle=night>.6?'#e2e7d5':'#415448';ctx.font='bold 29px system-ui';ctx.textAlign='center';
-  ctx.fillText(r.name,r.x+r.w*.5,r.y+150);
-  ctx.restore();
+  const fleeing=time<a.scaredUntil;
+  const pace=a.speed*(fleeing?2:1),move=Math.min(distTo,pace*step);
+  a.x+=dx/distTo*move;a.y+=dy/distTo*move;
+  a.face=dx>=0?1:-1;a.gait+=move*.18;a.walking=move>.06;
  }
 }
-function drawRegionalScenery(o){ctx.save();ctx.translate(o.x,o.y);const t=o.type;ctx.lineCap='round';if(t==='cactus'){ctx.fillStyle='#488a63';ctx.fillRect(-8,-50,16,62);ctx.fillRect(-24,-31,16,9);ctx.fillRect(-24,-44,8,17);ctx.fillRect(8,-25,16,9);ctx.fillRect(17,-39,7,21)}else if(t==='palm'){ctx.strokeStyle='#9d7952';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(0,8);ctx.quadraticCurveTo(12,-33,0,-77);ctx.stroke();for(let i=0;i<7;i++){const a=i*Math.PI*2/7;ctx.strokeStyle='#4c9668';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(0,-77);ctx.quadraticCurveTo(Math.cos(a)*30,-107+Math.sin(a)*15,Math.cos(a)*54,-66+Math.sin(a)*28);ctx.stroke()}}else{ctx.fillStyle=t==='fir'?'#547e71':'#75685d';ctx.fillRect(-6,-30,12,40);if(t==='fir')for(let j=0;j<3;j++)poly([[-29+j*4,-16-j*19],[0,-75-j*7],[29-j*4,-16-j*19]],j%2?'#4b7768':'#6c9485')}ctx.restore()}
-function drawRegionalWildlife(){ctx.save();ctx.font='29px system-ui';ctx.textAlign='center';for(const a of regionalWildlife){const x=a.homeX+Math.cos(time*.0003*a.speed+a.phase)*Math.min(110,a.speed*4),y=a.homeY+Math.sin(time*.00023*a.speed+a.phase)*Math.min(90,a.speed*3);if(Math.abs(x-cam.x)<1100&&Math.abs(y-cam.y)<850){ctx.fillText(a.animal,x,y+Math.sin(time*.003+a.phase)*3)}}ctx.restore()}
+
 const objects=[];for(let i=0;i<1050;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;if(Math.hypot(x-1500,y-1500)<235)continue;const r=seeded(i*3+2);objects.push({id:i,x,y,type:r<.48?'tree':r<.69?'rock':r<.88?'bush':'flower',size:rand(0.85,1.25)})}for(let i=1050;i<1230;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;objects.push({id:i,x,y,type:'mushroom',size:.65+seeded(i*3+2)*.5})}for(let i=1230;i<2030;i++){const x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.42?'flower':v<.73?'bush':v<.92?'mushroom':'tree',size:.7+v*.5})}// New outer woodland ring preserves every original object and existing save coordinate.
 for(let i=2030;i<4400;i++){const x=100+seeded(i*3)*4000,y=100+seeded(i*3+1)*4000;if(x<2990&&y<2990)continue;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.44?'tree':v<.62?'rock':v<.8?'bush':v<.93?'flower':'mushroom',size:.75+v*.55})}
 // Extra scenery uses fresh IDs; existing 0-4399 object IDs remain stable.
@@ -593,22 +595,51 @@ function path(){
  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(roadCanvas,0,0);ctx.restore();
 }
 function ellipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}function poly(points,fill,stroke){ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=3;ctx.stroke()}}function tree(o){
- const size=o.size,n=nightStrength();ctx.save();ctx.translate(o.x,o.y);ctx.scale(size,size);
- ellipse(6,15,39,14,'#1c493355');
- ctx.fillStyle=mixColour('#694a35','#41405c',n);ctx.fillRect(-10,-33,20,48);
- ctx.fillStyle=mixColour('#a27a50','#6f6680',n);ctx.fillRect(-6,-31,3,42);
- for(let i=0;i<3;i++){ctx.strokeStyle='#4e372c';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(1+i*3,-28+i*12);ctx.lineTo(1+i*3,-18+i*12);ctx.stroke()}
- ctx.save();const sway=Math.sin(time*.00065+o.x*.014+o.y*.009)*.034;ctx.translate(0,-28);ctx.rotate(sway);ctx.translate(0,28);
- const lobes=[[-26,-48,37,28,'#3d7749','#222e69'],[25,-53,38,29,'#4d8b51','#30387a'],[1,-79,43,35,'#609f5a','#41458e'],[-12,-77,30,24,'#7db76b','#63519d']];
- for(const [x,y,rx,ry,day,dark] of lobes){
-  ellipse(x+3,y+5,rx,ry,mixColour('#285e3b','#161d4e',n));
-  ellipse(x,y,rx,ry,mixColour(day,dark,n));
-  ctx.save();ctx.globalAlpha=.23;ellipse(x-8,y-9,rx*.44,ry*.28,mixColour('#b6d98a','#aa8bd0',n));ctx.restore();
+ const n=nightStrength(),form=Math.floor(seeded(o.id*91+17)*4),size=o.size||1;
+ const width=.82+seeded(o.id*17+51)*.45,height=.76+seeded(o.id*29+11)*.9;
+ const trunk=['#75583d','#806044','#92745a','#78654a'][form];
+ const darkLeaves=['#2e754b','#326c49','#4b8550','#507c58'];
+ const lightLeaves=['#76ad68','#659d65','#82b966','#94b97c'];
+ ctx.save();ctx.translate(o.x,o.y);ctx.scale(size*width,size*height);
+ ellipse(3,10,29,9,'#25433450');
+ ctx.fillStyle=mixColour(trunk,'#514f5e',n);ctx.fillRect(form===2?-7:-6,-60,form===2?14:12,69);
+ ctx.strokeStyle=mixColour('#b09165','#6b6c7f',n);ctx.lineWidth=2;
+ ctx.beginPath();ctx.moveTo(-2,-49);ctx.lineTo(-2,0);ctx.stroke();
+ const leaf=(x,y,rx,ry,k)=>{ellipse(x+3,y+4,rx,ry,mixColour('#265c40','#25324b',n));ellipse(x,y,rx,ry,mixColour(darkLeaves[(form+k)%4], '#405374',n));ellipse(x-5,y-6,rx*.7,ry*.62,mixColour(lightLeaves[(form+k)%4],'#7786a1',n))};
+ if(form===0){ // Rounded, mature broadleaf.
+  leaf(-23,-70,31,26,0);leaf(24,-74,35,26,1);leaf(0,-99,41,31,2);
+ }else if(form===1){ // Tall, narrow woodland tree.
+  leaf(-12,-63,20,28,1);leaf(13,-73,22,31,0);leaf(-1,-109,26,36,2);
+ }else if(form===2){ // Wide, uneven oak canopy with visible forked limbs.
+  ctx.strokeStyle=mixColour(trunk,'#4c4c5b',n);ctx.lineWidth=8;
+  ctx.beginPath();ctx.moveTo(0,-56);ctx.lineTo(-26,-76);ctx.moveTo(1,-55);ctx.lineTo(32,-79);ctx.stroke();
+  leaf(-37,-76,36,23,1);leaf(36,-76,37,25,2);leaf(2,-97,39,30,0);leaf(-9,-113,23,19,3);
+ }else{ // Small airy birch-like tree.
+  ctx.strokeStyle='#d6ccab';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(1,-56);ctx.lineTo(1,-10);ctx.stroke();
+  leaf(-18,-67,23,24,0);leaf(21,-81,22,26,2);leaf(0,-108,30,27,1);
  }
- for(let i=0;i<7;i++){const x=-30+seeded(o.id*17+i)*63,y=-94+seeded(o.id*23+i)*55;ellipse(x,y,3.5,2,mixColour('#a8d487','#9b8eca',n))}
- ctx.restore();ctx.restore();
+ for(let i=0;i<5;i++){const x=-19+seeded(o.id*13+i*37)*45,y=-92+seeded(o.id*17+i*29)*33;ellipse(x,y,2.8,2,mixColour('#c4db92','#adc3cf',n))}
+ ctx.restore();
 }
-function rock(o){ellipse(o.x+5,o.y+7,26,13,'#21453677');poly([[o.x-27,o.y],[o.x-16,o.y-22],[o.x+13,o.y-25],[o.x+30,o.y-6],[o.x+17,o.y+11],[o.x-13,o.y+11]],'#88938b','#617a76');poly([[o.x-16,o.y-22],[o.x+13,o.y-25],[o.x+3,o.y-5],[o.x-27,o.y]],'#b3b7a4')}function bush(o){const n=nightStrength(),v=Math.abs(Math.floor(o.x*.07+o.y*.03))%3;const tint=(day,dark)=>{if(n<=0)return day;if(n>=1)return dark;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const a=rgb(day),b=rgb(dark);return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*n).toString(16).padStart(2,'0')).join('')};ellipse(o.x,o.y+5,28,12,tint('#1e5b38','#222b57'));ellipse(o.x-14,o.y-12,20,20,tint('#5a994d',['#59618c','#446e81','#6c527c'][v]));ellipse(o.x+13,o.y-13,22,21,tint('#79b25c',['#8580aa','#65939b','#966c9b'][v]));for(let i=0;i<5;i++)ellipse(o.x-19+i*9,o.y-16+(i%2)*8,4,4,tint('#db5570','#d98bad'))}function flower(o){const f=flowerKind(o);ellipse(o.x,o.y,17,8,'#40794c');ctx.strokeStyle='#4c8750';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x,o.y-22);ctx.stroke();for(let j=0;j<6;j++){let a=j*Math.PI/3;ellipse(o.x+Math.cos(a)*9,o.y-22+Math.sin(a)*9,6,6,f.color)}ellipse(o.x,o.y-22,5,5,'#f7e6a4')}function clearingGround(x,y){ellipse(x,y+14,113,49,'#b3a477');ellipse(x,y+12,95,37,'#8f9567');for(let i=0;i<6;i++)ellipse(x-80+i*29,y+23+(i%2)*12,9,5,'#698d50')}function startingClearing(x,y){ctx.strokeStyle='#8b633e';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x-37,y-9);ctx.lineTo(x-37,y-92);ctx.moveTo(x-37,y-92);ctx.lineTo(x+12,y-101);ctx.stroke();ctx.fillStyle='#ead39a';ctx.fillRect(x-36,y-89,57,27);ctx.font='bold 11px system-ui';ctx.fillStyle='#4c4531';ctx.textAlign='center';ctx.fillText('FIRST CAMP',x-7,y-72);for(let i=0;i<3;i++){ctx.fillStyle='#805a38';ctx.fillRect(x+27+i*11,y+7-i*3,31,8)}ctx.font='13px system-ui';ctx.fillStyle='#f7e8b1';ctx.fillText('Build your shelter',x,y-112)}function house(x,y){ellipse(x,y+24,105,43,'#173f32aa');ctx.fillStyle='#a27b4c';ctx.fillRect(x-69,y-85,138,109);poly([[x-91,y-78],[x,y-167],[x+91,y-78]],'#745346','#473e35');poly([[x-76,y-83],[x,y-149],[x+76,y-83]],'#b77b4e');ctx.fillStyle='#543c32';ctx.fillRect(x-17,y-34,34,58);ctx.fillStyle='#f6d18a';ctx.fillRect(x+32,y-50,25,27);ctx.fillStyle='#775139';ctx.fillRect(x+42,y-50,4,27);ctx.fillStyle='#a8b97b';ctx.fillRect(x-65,y-10,30,23);ctx.fillStyle='#dbbd7c';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText('HOME',x,y-177)}function ruin(x,y){ellipse(x,y,70,30,'#304b3c');for(let i=-1;i<=1;i++){ctx.fillStyle='#8d9c91';ctx.fillRect(x+i*44-12,y-54,24,65);ctx.fillStyle='#b8bdab';ctx.fillRect(x+i*44-12,y-54,24,9)}ctx.font='24px serif';ctx.textAlign='center';ctx.fillStyle='#f5d78b';ctx.fillText('ᚠ',x,y-24)}function structure(s){if(s.kind==='shelter'){ellipse(s.x,s.y+15,78,28,'#284a3288');poly([[s.x-70,s.y+5],[s.x,s.y-88],[s.x+70,s.y+5]],'#96794c','#4e5839');poly([[s.x-54,s.y+3],[s.x,s.y-73],[s.x+5,s.y+3]],'#b7a16d');ctx.fillStyle='#453b2c';ctx.fillRect(s.x+5,s.y-28,36,33);ctx.strokeStyle='#755137';ctx.lineWidth=5;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(s.x-55+i*24,s.y+4);ctx.lineTo(s.x,s.y-76);ctx.stroke()}ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3e2ad';ctx.fillText('🌿 Woodland shelter',s.x,s.y-103)}else if(s.kind==='garden'){ellipse(s.x,s.y,67,39,'#76593b');for(let i=0;i<6;i++){ellipse(s.x-38+i*15,s.y-8+(i%2)*15,9,10,'#5fb057')}}else if(s.kind==='campfire'){ellipse(s.x,s.y,43,23,'#4b473d');for(let i=0;i<7;i++)ellipse(s.x+Math.cos(i)*25,s.y+Math.sin(i)*14,9,7,'#9a9c8d');if(s.lit!==false){poly([[s.x-8,s.y],[s.x-4,s.y-36],[s.x+12,s.y-6],[s.x+5,s.y+3]],'#f1aa40');poly([[s.x-2,s.y],[s.x+2,s.y-21],[s.x+8,s.y-3]],'#ffe28c')}else{ctx.fillStyle='#72533d';ctx.fillRect(s.x-18,s.y-8,36,10)}}}const campStages=[
+function rock(o){
+ const v=Math.floor(seeded(o.id*83+7)*4),w=(o.size||1)*(.74+seeded(o.id*41+4)*.57),h=(o.size||1)*(.7+seeded(o.id*23+16)*.55);
+ const palettes=[['#9ca7a4','#ced0c1','#667f84'],['#8e8f92','#b8b6a7','#686a77'],['#9d9d86','#c9c5ae','#777b70'],['#7d9691','#a8bcb3','#637e79']];
+ const [body,face,edge]=palettes[v];
+ const shapes=[
+  [[-29,1],[-22,-18],[-5,-27],[20,-18],[32,-4],[19,11],[-18,10]],
+  [[-33,4],[-14,-24],[2,-19],[13,-31],[29,-10],[23,10],[-15,12]],
+  [[-24,6],[-18,-12],[-5,-18],[8,-16],[22,-5],[29,10],[-12,12]],
+  [[-33,4],[-23,-18],[7,-28],[25,-17],[30,0],[10,13],[-20,10]]
+ ];
+ ctx.save();ctx.translate(o.x,o.y);ctx.scale(w,h);
+ ellipse(3,9,27,9,'#263f3c66');
+ poly(shapes[v],body,edge);
+ poly(v===2?[[-18,-12],[-5,-18],[8,-16],[15,-5],[-9,-4]]:[[-23,-15],[-4,-25],[19,-17],[7,-6],[-27,0]],face);
+ ctx.strokeStyle='#56676665';ctx.lineWidth=2;ctx.beginPath();
+ ctx.moveTo(-6,-5);ctx.lineTo(2,3);ctx.lineTo(7,9);ctx.stroke();
+ ctx.restore();
+}function bush(o){const n=nightStrength(),v=Math.abs(Math.floor(o.x*.07+o.y*.03))%3;const tint=(day,dark)=>{if(n<=0)return day;if(n>=1)return dark;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const a=rgb(day),b=rgb(dark);return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*n).toString(16).padStart(2,'0')).join('')};ellipse(o.x,o.y+5,28,12,tint('#1e5b38','#222b57'));ellipse(o.x-14,o.y-12,20,20,tint('#5a994d',['#59618c','#446e81','#6c527c'][v]));ellipse(o.x+13,o.y-13,22,21,tint('#79b25c',['#8580aa','#65939b','#966c9b'][v]));for(let i=0;i<5;i++)ellipse(o.x-19+i*9,o.y-16+(i%2)*8,4,4,tint('#db5570','#d98bad'))}function flower(o){const f=flowerKind(o);ellipse(o.x,o.y,17,8,'#40794c');ctx.strokeStyle='#4c8750';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x,o.y-22);ctx.stroke();for(let j=0;j<6;j++){let a=j*Math.PI/3;ellipse(o.x+Math.cos(a)*9,o.y-22+Math.sin(a)*9,6,6,f.color)}ellipse(o.x,o.y-22,5,5,'#f7e6a4')}function clearingGround(x,y){ellipse(x,y+14,113,49,'#b3a477');ellipse(x,y+12,95,37,'#8f9567');for(let i=0;i<6;i++)ellipse(x-80+i*29,y+23+(i%2)*12,9,5,'#698d50')}function startingClearing(x,y){ctx.strokeStyle='#8b633e';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x-37,y-9);ctx.lineTo(x-37,y-92);ctx.moveTo(x-37,y-92);ctx.lineTo(x+12,y-101);ctx.stroke();ctx.fillStyle='#ead39a';ctx.fillRect(x-36,y-89,57,27);ctx.font='bold 11px system-ui';ctx.fillStyle='#4c4531';ctx.textAlign='center';ctx.fillText('FIRST CAMP',x-7,y-72);for(let i=0;i<3;i++){ctx.fillStyle='#805a38';ctx.fillRect(x+27+i*11,y+7-i*3,31,8)}ctx.font='13px system-ui';ctx.fillStyle='#f7e8b1';ctx.fillText('Build your shelter',x,y-112)}function house(x,y){ellipse(x,y+24,105,43,'#173f32aa');ctx.fillStyle='#a27b4c';ctx.fillRect(x-69,y-85,138,109);poly([[x-91,y-78],[x,y-167],[x+91,y-78]],'#745346','#473e35');poly([[x-76,y-83],[x,y-149],[x+76,y-83]],'#b77b4e');ctx.fillStyle='#543c32';ctx.fillRect(x-17,y-34,34,58);ctx.fillStyle='#f6d18a';ctx.fillRect(x+32,y-50,25,27);ctx.fillStyle='#775139';ctx.fillRect(x+42,y-50,4,27);ctx.fillStyle='#a8b97b';ctx.fillRect(x-65,y-10,30,23);ctx.fillStyle='#dbbd7c';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText('HOME',x,y-177)}function ruin(x,y){ellipse(x,y,70,30,'#304b3c');for(let i=-1;i<=1;i++){ctx.fillStyle='#8d9c91';ctx.fillRect(x+i*44-12,y-54,24,65);ctx.fillStyle='#b8bdab';ctx.fillRect(x+i*44-12,y-54,24,9)}ctx.font='24px serif';ctx.textAlign='center';ctx.fillStyle='#f5d78b';ctx.fillText('ᚠ',x,y-24)}function structure(s){if(s.kind==='shelter'){ellipse(s.x,s.y+15,78,28,'#284a3288');poly([[s.x-70,s.y+5],[s.x,s.y-88],[s.x+70,s.y+5]],'#96794c','#4e5839');poly([[s.x-54,s.y+3],[s.x,s.y-73],[s.x+5,s.y+3]],'#b7a16d');ctx.fillStyle='#453b2c';ctx.fillRect(s.x+5,s.y-28,36,33);ctx.strokeStyle='#755137';ctx.lineWidth=5;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(s.x-55+i*24,s.y+4);ctx.lineTo(s.x,s.y-76);ctx.stroke()}ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3e2ad';ctx.fillText('🌿 Woodland shelter',s.x,s.y-103)}else if(s.kind==='garden'){ellipse(s.x,s.y,67,39,'#76593b');for(let i=0;i<6;i++){ellipse(s.x-38+i*15,s.y-8+(i%2)*15,9,10,'#5fb057')}}else if(s.kind==='campfire'){ellipse(s.x,s.y,43,23,'#4b473d');for(let i=0;i<7;i++)ellipse(s.x+Math.cos(i)*25,s.y+Math.sin(i)*14,9,7,'#9a9c8d');if(s.lit!==false){poly([[s.x-8,s.y],[s.x-4,s.y-36],[s.x+12,s.y-6],[s.x+5,s.y+3]],'#f1aa40');poly([[s.x-2,s.y],[s.x+2,s.y-21],[s.x+8,s.y-3]],'#ffe28c')}else{ctx.fillStyle='#72533d';ctx.fillRect(s.x-18,s.y-8,36,10)}}}const campStages=[
  {kind:'shelter',name:'🏕️ Leaf-and-log lean-to',wood:6,stone:0,twigs:2,leaves:3,desc:'A first shelter from the weather'},
  {kind:'hut',name:'🛖 Timber hut',wood:24,stone:12,twigs:8,leaves:10,desc:'Replace your lean-to with a cosy wooden hut'},
  {kind:'lodge',name:'🏠 Reinforced woodland lodge',wood:65,stone:45,twigs:15,leaves:15,desc:'Strong walls, solid beams and a proper roof'},
@@ -1611,7 +1642,49 @@ for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a
  moon.addColorStop(0,'rgba(143,185,240,'+(darkness*.15)+')');
  moon.addColorStop(1,'rgba(143,185,240,0)');
  ctx.fillStyle=moon;ctx.fillRect(state.x-155,state.y-155,310,310);ctx.restore();
-} ctx.restore();const regionLabel=$('regionName');if(regionLabel)regionLabel.textContent=expandedRegion(state.x,state.y)?.name||'The Ancient Woodland';const day=1+Math.floor(state.daytime/180),phase=['Morning','Afternoon','Evening','Night'][Math.floor(state.daytime%180/45)];$('day').textContent=`Day ${day} • ${phase} • ${state.weather.mode==='rain'?'🌧️ Showers':'🌤️ Clear'}`;$('resources').textContent=`🪵 ${state.wood}   🪨 ${state.stone}   🍓 ${state.berries}   🪓 ${state.tools.axe}   🔦 ${state.tools.torch}   🍲 ${state.food}   🌿 ${state.twigs}   🍃 ${state.leaves}   🥚 ${state.eggs}   🍄 ${state.mushrooms}   🌼 ${Object.values(state.herbs).reduce((a,b)=>a+b,0)}   🧪 ${state.potions}`;}function controllerMove(){if(!navigator.getGamepads)return {x:0,y:0};const pad=Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);if(!pad)return {x:0,y:0};const axis=i=>Math.abs(pad.axes[i]||0)>.18?pad.axes[i]:0;const down=i=>pad.buttons[i]&&pad.buttons[i].pressed?1:0;let x=axis(0),y=axis(1);if(pad.mapping==='standard'){x+=down(15)-down(14);y+=down(13)-down(12)}return {x,y}}const playerMotion={dir:'down',moving:false,anim:0};function trackMotion(m,x0,y0,x1,y1,dt){const dx=x1-x0,dy=y1-y0,amount=Math.hypot(dx,dy);m.moving=amount>.25;if(m.moving){m.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');m.anim=(m.anim||0)+dt}else m.anim=0}let idleTime=0;function update(dt){state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=98&&state.autonomy){state.resting=false;think('I dreamed Dillon was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);storyTick();updateWoodlandCritters(dt);updateChickens(dt);updateBeasts(dt);const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>90000){idleTime=0;setAutonomy(true);notify('🌲 Haigen is off exploring while you are away.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput)setAutonomy(false);if(state.autonomy){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=lakeLevel(state.x,state.y)<.8;state.x=clamp(state.x+dx*dt*(swim?.115:.19),50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:.19),50,WORLD-50);state.steps+=dt*.19}trackMotion(playerMotion,prevPlayerX,prevPlayerY,state.x,state.y,dt);for(const c of companions){const oldX=c.x,oldY=c.y;c.t-=dt;c.anim=(c.anim||0)+dt;const rabbit=c.kind==='rabbit',distance=dist(c,state);
+} ctx.restore();const regionLabel=$('regionName');if(regionLabel)regionLabel.textContent=expandedRegion(state.x,state.y)?.name||'The Ancient Woodland';const day=1+Math.floor(state.daytime/180),phase=['Morning','Afternoon','Evening','Night'][Math.floor(state.daytime%180/45)];$('day').textContent=`Day ${day} • ${phase} • ${state.weather.mode==='rain'?'🌧️ Showers':'🌤️ Clear'}`;$('resources').textContent=`🪵 ${state.wood}   🪨 ${state.stone}   🍓 ${state.berries}   🪓 ${state.tools.axe}   🔦 ${state.tools.torch}   🍲 ${state.food}   🌿 ${state.twigs}   🍃 ${state.leaves}   🥚 ${state.eggs}   🍄 ${state.mushrooms}   🌼 ${Object.values(state.herbs).reduce((a,b)=>a+b,0)}   🧪 ${state.potions}`;}function controllerMove(){if(!navigator.getGamepads)return {x:0,y:0};const pad=Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);if(!pad)return {x:0,y:0};const axis=i=>Math.abs(pad.axes[i]||0)>.18?pad.axes[i]:0;const down=i=>pad.buttons[i]&&pad.buttons[i].pressed?1:0;let x=axis(0),y=axis(1);if(pad.mapping==='standard'){x+=down(15)-down(14);y+=down(13)-down(12)}return {x,y}}const playerMotion={dir:'down',moving:false,anim:0};function trackMotion(m,x0,y0,x1,y1,dt){const dx=x1-x0,dy=y1-y0,amount=Math.hypot(dx,dy);m.moving=amount>.25;if(m.moving){m.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');m.anim=(m.anim||0)+dt}else m.anim=0}let idleTime=0;// Solid objects use a small spatial hash for efficient iPad collision checks.
+const solidCellSize=128,solidCells=new Map();
+const solidTypes=new Set(['tree','rock','fir','palm','bareTree','cactus']);
+for(const o of objects){
+ if(!solidTypes.has(o.type))continue;
+ const key=Math.floor(o.x/solidCellSize)+','+Math.floor(o.y/solidCellSize);
+ if(!solidCells.has(key))solidCells.set(key,[]);
+ solidCells.get(key).push(o);
+}
+function solidRadius(o){
+ const v=seeded(o.id*31+13),size=o.size||1;
+ if(o.type==='rock')return (18+v*10)*size;
+ if(o.type==='tree')return (12+v*5)*size;
+ if(o.type==='palm'||o.type==='bareTree')return 13*size;
+ if(o.type==='fir')return 16*size;
+ return 11*size;
+}
+function blockedBySolid(x,y){
+ if(expandedRegion(x,y)?.id==='coast'&&x>coastWaterline(y)-18)return true;
+ const cx=Math.floor(x/solidCellSize),cy=Math.floor(y/solidCellSize);
+ for(let ix=cx-1;ix<=cx+1;ix++)for(let iy=cy-1;iy<=cy+1;iy++){
+  const bucket=solidCells.get(ix+','+iy);if(!bucket)continue;
+  for(const o of bucket){
+   if(state.removed.includes(o.id))continue;
+   const dx=x-o.x,dy=(y-o.y)*.92,rad=solidRadius(o)+10;
+   if(dx*dx+dy*dy<rad*rad)return true;
+  }
+ }
+ return false;
+}
+function resolveSolidMovement(startX,startY,endX,endY){
+ if(!blockedBySolid(endX,endY))return {x:endX,y:endY};
+ // Old saves can load inside an obstacle. Allow walking out rather than trapping Haigen.
+ if(blockedBySolid(startX,startY))return {x:endX,y:endY};
+ // Axis-separated movement slides smoothly along trunks and rock faces.
+ let x=startX,y=startY;
+ if(!blockedBySolid(endX,y))x=endX;
+ if(!blockedBySolid(x,endY))y=endY;
+ // When neither single-axis attempt works, stay outside the solid.
+ return {x,y};
+}
+
+function update(dt){state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=98&&state.autonomy){state.resting=false;think('I dreamed Dillon was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);storyTick();updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);updateBeasts(dt);const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>90000){idleTime=0;setAutonomy(true);notify('🌲 Haigen is off exploring while you are away.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput)setAutonomy(false);if(state.autonomy){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=lakeLevel(state.x,state.y)<.8;state.x=clamp(state.x+dx*dt*(swim?.115:.19),50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:.19),50,WORLD-50);state.steps+=dt*.19}const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;trackMotion(playerMotion,prevPlayerX,prevPlayerY,state.x,state.y,dt);for(const c of companions){const oldX=c.x,oldY=c.y;c.t-=dt;c.anim=(c.anim||0)+dt;const rabbit=c.kind==='rabbit',distance=dist(c,state);
 if(c.gift){if(dist(c,state)<85){const gift=c.gift;c.gift=null;c.mode='watching';c.target=null;c.t=rand(2800,5000);if(gift==='leaves')state.leaves+=1;else if(gift==='twigs')state.twigs+=1;else if(gift==='wood')state.wood+=1;else if(gift==='berries')state.berries+=1;notify((rabbit?'🐇 Dillon':'🦊 Skölli')+' brought Haigen '+(gift==='berries'?'some berries':gift==='leaves'?'a handful of leaves':gift==='twigs'?'a twig':'a stick')+'! 🎁');save()}
 else{c.mode='delivering';c.target={x:clamp(state.x+(rabbit?30:-35),60,WORLD-60),y:clamp(state.y+30,60,WORLD-60)};c.t=7000}}
 if(!c.gift&&!c.target&&(c.mode==='nibbling'||c.mode==='sniffing'||c.mode==='watching')&&c.t<=0&&time>(c.nextGiftAt||0)&&Math.random()<.075){c.gift=rabbit?(Math.random()<.7?'leaves':'twigs'):(Math.random()<.6?'wood':'berries');c.nextGiftAt=time+rand(150000,300000);c.mode='delivering';c.target={x:state.x,y:state.y};c.t=7000}
@@ -1972,7 +2045,7 @@ function frame(now){
  }catch(error){reportWorldError(error);}
  requestAnimationFrame(frame);
 }// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=95;document.getElementById('devVersion').textContent='V.'+GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=96;document.getElementById('devVersion').textContent='V.'+GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});

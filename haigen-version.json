@@ -1,4 +1,4 @@
 {
-  "build": 95,
-  "notes": "Visual terrain overhaul: distinct biome colours at night, natural snow and dune textures, curved turquoise shoreline, thinner roads and biome-appropriate vegetation. Player progress preserved."
+  "build": 96,
+  "notes": "Drawn, slow-moving biome animals replace flying emojis; varied tree heights/canopies and rock silhouettes; solid-object collision with sliding; existing game/save preserved."
 }
