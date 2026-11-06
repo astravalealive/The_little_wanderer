@@ -1,0 +1,73 @@
+name: Haigen V102 Pages recovery
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+  pages: write
+
+concurrency:
+  group: haigen-v102-pages-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Inspect live V102 and retry a stuck Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$REPOSITORY" != 'astravalealive/The_little_wanderer' ]]; then exit 0; fi
+          WORKFLOW='haigen-v102-pages-recovery.yml'
+          stop_watch() {
+            gh api -X PUT "repos/${REPOSITORY}/actions/workflows/${WORKFLOW}/disable" || true
+          }
+          source_build=$(gh api "repos/${REPOSITORY}/contents/haigen-version.json" --jq '.content' | base64 --decode | jq -r '.build // 0')
+          if [[ "$source_build" != '102' ]]; then
+            echo "Main is now build ${source_build}; V102 recovery no longer applies."
+            stop_watch
+            exit 0
+          fi
+          live_build=$(curl --fail --silent --show-error --location --max-time 15 -H 'Cache-Control: no-cache' "https://astravalealive.github.io/The_little_wanderer/haigen-version.json?recheck=$(date +%s)" | jq -r '.build // 0' || true)
+          if [[ "$live_build" == '102' ]]; then
+            echo 'Success: V102 is live; disabling temporary recovery workflow.'
+            stop_watch
+            exit 0
+          fi
+          echo "Live version: ${live_build:-unavailable}; main version: ${source_build}"
+          latest=$(gh api "repos/${REPOSITORY}/actions/runs?branch=main&per_page=45" --jq '[.workflow_runs[] | select(.name == "pages build and deployment")] | first // empty')
+          if [[ -z "$latest" ]]; then
+            echo 'No Pages run found; requesting a fresh build.'
+            gh api -X POST "repos/${REPOSITORY}/pages/builds"
+            exit 0
+          fi
+          run_id=$(jq -r '.id' <<< "$latest")
+          status=$(jq -r '.status' <<< "$latest")
+          conclusion=$(jq -r '.conclusion // ""' <<< "$latest")
+          created=$(jq -r '.created_at' <<< "$latest")
+          created_seconds=$(date -u -d "$created" +%s)
+          age=$(( $(date -u +%s) - created_seconds ))
+          echo "Latest Pages run ${run_id}: ${status} / ${conclusion}, age ${age}s"
+          if [[ "$status" == 'queued' && "$age" -ge 1800 ]]; then
+            echo 'Pages run queued for over 30 minutes; attempting cancellation.'
+            if gh api -X POST "repos/${REPOSITORY}/actions/runs/${run_id}/cancel"; then
+              echo 'Cancellation accepted. Requesting one new Pages build.'
+              gh api -X POST "repos/${REPOSITORY}/pages/builds"
+            else
+              echo 'GitHub refused cancellation. No competing build requested.'
+            fi
+          elif [[ "$status" == 'completed' && "$conclusion" != 'success' && "$age" -ge 600 ]]; then
+            echo 'Last Pages deployment failed; requesting one fresh build.'
+            gh api -X POST "repos/${REPOSITORY}/pages/builds"
+          else
+            echo 'Pages is active, recently attempted, or already successful; do not compete.'
+          fi
