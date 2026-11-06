@@ -1,4 +1,4 @@
 {
-  "build": 111,
-  "notes": "V111 UI fix: collection notifications (toasts) and Haigen's in-world thought bubbles are suppressed whenever the mobile menu or any modal (Map, Story, Journal, Build, Cook, Notes and other panels) is open. Any already visible toast disappears on panel open and future notifications resume normally when menus close. No changes to simulation, saves, quests, controllers or Ember."
+  "build": 112,
+  "notes": "V112 menu and keyboard cleanup: removes unreliable free-text Tell Haigen panel and its button; fixes global keyboard handling so typing spaces/letters in inputs works; six primary mobile actions (AI toggle, Backpack, Map, Story, Build, Notes) with infrequent actions under More. Adds a read-only categorized Backpack view showing real carried materials, food, herbs, remedies, gear and stored wood. No carry limits are enforced yet; existing saves, quests, autonomy and Ember remain intact."
 }
