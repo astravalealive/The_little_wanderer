@@ -1,4 +1,4 @@
 {
-  "build": 109,
-  "notes": "V109: Haigen's persistent local AI simulation now learns habits and changing personality through foraging, building, helping companions, injuries, rescues, discoveries and quests. Experience changes goals, favourite jobs, risk-aware autonomous route selection, cautious retreat, temperament and reflections. His notebook shows mood, changing profile and lived experiences. Saves, Silent Pond, Quiet Hands, wildlife, garden and original Ember preserved."
+  "build": 110,
+  "notes": "V110 repairs autonomous routine. Haigen can rest safely away from camp, wake fully recovered, eat when hungry, cure poison, heal with salves, independently collect wildlife-safe resources, deposit wood, collect eggs, harvest garden beds and cook meals at camp. Steering avoids scenery and flags blocked targets; player-assigned objectives also use safer movement. Faster bounded resource target search on iPad and corrected double berry counting. Existing saves, companion/quest story and original Ember preserved."
 }
