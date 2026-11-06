@@ -81,6 +81,11 @@ function updateBeasts(dt){
    }
    continue;
   }
+  // During the story Bristleback is cautious, not hostile: talking to him is possible.
+  if(b.kind==='boar'&&state.story?.stage===4&&!state.story.boarHelp){
+   b.mode='watching';b.t=Math.max(b.t,1700);b.cooldown=30000;
+   continue;
+  }
   const playerDistance=dist(b,state),foxDistance=dist(b,skolli);
   const campDistance=Math.hypot(b.x-cottage.x,b.y-cottage.y);
   // No beast enters the campsite, including during an encounter.
@@ -1569,7 +1574,10 @@ function storyInteract(){
    save();return true;
   }
   if(!state.story.boarArrived){
-   notify('🐗 Bristleback is coming through the woods. Give him a moment.');
+   if(time>=(state.story.nextWaitingAt||0)){
+    notify('🐗 Bristleback is on his way. Watch the woodland path!');
+    state.story.nextWaitingAt=time+4500;
+   }
    return true;
   }
   if(state.wood<4||state.stone<2){notify('🪵 Bring 4 wood and 2 stone to brace the reopened stream.');return true}
@@ -1813,7 +1821,7 @@ function frame(now){
  }catch(error){reportWorldError(error);}
  requestAnimationFrame(frame);
 }// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=87;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=88;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
