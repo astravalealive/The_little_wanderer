@@ -65,6 +65,16 @@ function updateBeasts(dt){
  const dillon=companions[0],skolli=companions[1];
  for(const b of beasts){
   b.anim+=dt;b.t-=dt;b.cooldown=Math.max(0,b.cooldown-dt);
+  // Story escort: Bristleback chooses to help. Never attack while assisting.
+  if(b.kind==='boar'&&state.story?.stage===4&&state.story.boarHelp){
+   const spot={x:storyPlaces.blockage.x+65,y:storyPlaces.blockage.y+7};
+   if(dist(b,spot)>28){
+    b.mode='helping';moveBeast(b,spot.x,spot.y,dt,.18);
+   }else{
+    b.mode='rooting';state.story.boarArrived=true;b.t=1100;
+   }
+   continue;
+  }
   const playerDistance=dist(b,state),foxDistance=dist(b,skolli);
   const campDistance=Math.hypot(b.x-cottage.x,b.y-cottage.y);
   // No beast enters the campsite, including during an encounter.
@@ -1484,6 +1494,9 @@ if(!draggingCamera&&!cameraHolding){
 if(!state.story||typeof state.story!=='object')state.story={chapter:1,stage:0,trust:0,wardenSeen:false};
 state.story.stage=Math.max(0,Math.min(6,Number(state.story.stage)||0));
 state.story.trust=Math.max(0,Number(state.story.trust)||0);
+// Preserve already-completed chapter progress when adding Bristleback's role.
+state.story.boarHelp=state.story.stage>=5||!!state.story.boarHelp;
+state.story.boarArrived=state.story.stage>=5||!!state.story.boarArrived;
 const storyPlaces={
  tracks:{x:1195,y:1605},
  blockage:{x:1135,y:1908},
@@ -1498,7 +1511,15 @@ const storySteps=[
  {title:'A voice beneath the water',objective:'Investigate the glowing heartstone on the eastern bank. Press Collect nearby.',place:storyPlaces.heart},
  {title:'The Silent Pond is restored',objective:'The water flows again. Explore freely; the Warden is watching.',place:storyPlaces.heart}
 ];
-function storyStep(){return storySteps[state.story.stage]||storySteps[6]}
+function storyStep(){
+ if(state.story.stage===4&&!state.story.boarHelp){
+  const boar=beasts.find(b=>b.kind==='boar');
+  return {title:'A friend with tremendous shoulders',objective:'Find Bristleback in Mossfen Marsh and ask him to help move the roots. Press Collect nearby.',place:{x:boar.x,y:boar.y}};
+ }
+ if(state.story.stage===4&&state.story.boarHelp&&!state.story.boarArrived)
+  return {title:'Bristleback is coming!',objective:'Return to the blocked stream and meet Bristleback there.',place:storyPlaces.blockage};
+ return storySteps[state.story.stage]||storySteps[6];
+}
 function storyAdvance(next,speech,entry){
  if(next<=state.story.stage)return;
  state.story.stage=next;
@@ -1511,7 +1532,9 @@ function storyAdvance(next,speech,entry){
 function storyNearbyPoint(){
  const stage=state.story.stage;
  if(stage===1)return {point:storyPlaces.tracks,label:'Dillon’s tracks'};
- if(stage===2||stage===4)return {point:storyPlaces.blockage,label:'tangled inlet'};
+ if(stage===2)return {point:storyPlaces.blockage,label:'tangled inlet'};
+ if(stage===4&&!state.story.boarHelp)return {point:beasts.find(b=>b.kind==='boar'),label:'Bristleback'};
+ if(stage===4)return {point:storyPlaces.blockage,label:'tangled inlet'};
  if(stage===5)return {point:storyPlaces.heart,label:'heartstone'};
  return null;
 }
@@ -1529,16 +1552,33 @@ function storyInteract(){
   return true;
  }
  if(stage===4){
-  if(state.wood<4||state.stone<2){notify('🪵 Bring 4 wood and 2 stone to repair the inlet.');return true}
+  if(!state.story.boarHelp){
+   const boar=beasts.find(b=>b.kind==='boar');
+   if(dist(state,boar)>115)return false;
+   state.story.boarHelp=true;boar.mode='helping';boar.t=16000;boar.cooldown=30000;
+   state.story.trust+=5;
+   think('Bristleback snorts. Then he nods. That is a very large yes!',6200,true);
+   notify('🐗 Bristleback agreed! Meet him at the blocked stream.');
+   if(!state.memories.includes('Bristleback agreed to help open the old stream.'))state.memories.unshift('Bristleback agreed to help open the old stream.');
+   save();return true;
+  }
+  if(!state.story.boarArrived){
+   notify('🐗 Bristleback is coming through the woods. Give him a moment.');
+   return true;
+  }
+  if(state.wood<4||state.stone<2){notify('🪵 Bring 4 wood and 2 stone to brace the reopened stream.');return true}
   state.wood-=4;state.stone-=2;
-  storyAdvance(5,'It worked! Water is flowing again. Something is glowing...',
-   'Haigen worked with his companions to reopen the pond’s forgotten inlet.');
+  state.story.trust+=10;
+  storyAdvance(5,'Bristleback heaves the roots aside! The water is flowing again!',
+   'With Bristleback’s strength, Haigen opened the stream and restored the pond’s water.');
+  const boar=beasts.find(b=>b.kind==='boar');boar.mode='retreating';boar.t=4600;boar.cooldown=27000;
   return true;
  }
  if(stage===5){
   state.story.trust+=15;
   state.story.wardenSeen=true;
   state.story.wardenAt=time;
+  state.story.wardenMessage='Little wanderer. You have undone my work.';
   storyAdvance(6,'The stone whispered: “He who would still the forest has awakened.”',
    'The heartstone revealed the Hollow Warden and the forest’s first warning.');
   return true;
