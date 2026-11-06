@@ -1,4 +1,4 @@
 {
-  "build": 89,
-  "notes": "Fix companion water-boundary crash; compact mobile stats expand on tap, secondary actions in Menu, separated joystick and tools. Existing saves and Silent Pond progress preserved."
+  "build": 93,
+  "notes": "World expansion preview: seven regions, terrain scenery, moving wildlife, regional outfits, accessible Explore World map and v93 indicator; original woodland story and saves kept."
 }
