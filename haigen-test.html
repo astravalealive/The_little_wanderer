@@ -525,8 +525,10 @@ state.rawMeat=Math.max(0,Number(state.rawMeat)||0);
 state.antidotes=Math.max(0,Number(state.antidotes)||0);
 state.medicinalMushrooms=Math.max(0,Number(state.medicinalMushrooms)||0);
 state.poisonMs=Math.max(0,Number(state.poisonMs)||0);
-state.lastHitAt=0;
-let collapseRemaining=0,poisonTick=0;
+state.lastHitAt=-100000;
+state.rescuePending=!!state.rescuePending;
+let collapseRemaining=state.rescuePending?1200:0,poisonTick=0;
+if(state.rescuePending)state.health=0;
 const wildlifeHealth={wolf:7,boar:8,bison:9,stag:5,goat:5,fox:4,hare:2,snake:3,scorpion:2,lizard:2,rat:2,crab:2,turtle:5,otter:4,raven:2,gull:2,heron:3,frog:2,watcher:4,ashCreeper:4,scuttleback:4};
 const wildlifeMeat={wolf:3,boar:5,bison:6,stag:4,goat:3,fox:2,hare:1,snake:1,scorpion:0,lizard:1,rat:0,crab:1,turtle:2,otter:2,raven:1,gull:1,heron:2,frog:0,watcher:0,ashCreeper:0,scuttleback:0};
 const hostileTypes=new Set(['wolf','boar','snake','scorpion']);
@@ -585,6 +587,7 @@ function applyPoison(){
 function rescueHaigen(){
  if(collapseRemaining>0)return;
  state.health=0;state.poisonMs=0;poisonTick=0;collapseRemaining=1900;
+ state.rescuePending=true;
  state.autonomy=false;state.resting=false;autoDestination=null;
  notify('💤 Haigen passed out! Skölli is coming to help…');save();
 }
@@ -592,7 +595,7 @@ function updateSurvival(dt){
  if(collapseRemaining>0){
   collapseRemaining=Math.max(0,collapseRemaining-dt);
   if(collapseRemaining===0){
-   state.x=cottage.x;state.y=cottage.y+85;state.health=22;
+   state.x=cottage.x;state.y=cottage.y+85;state.health=22;state.rescuePending=false;
    state.energy=Math.min(state.energy,30);state.poisonMs=0;
    state.hunger=Math.max(20,state.hunger);state.lastHitAt=time;
    for(const b of beasts){b.mode='retreating';b.cooldown=15000}
