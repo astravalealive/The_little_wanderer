@@ -92,30 +92,57 @@ function regionalLandPoint(a,x,y){
 function updateRegionalWildlife(dt){
  const step=Math.min(50,dt)/1000;
  for(const a of regionalWildlife){
-  const pd=Math.hypot(state.x-a.x,state.y-a.y);
-  const skittish=!['bison','scorpion','snake','raven'].includes(a.type);
-  if(skittish&&pd<105&&time>a.scaredUntil-600){
+  if(!animalAlive(a)){a.walking=false;continue}
+  const pd=dist(state,a);
+  a.attackCooldown=Math.max(0,(a.attackCooldown||0)-dt);
+  const hostile=hostileTypes.has(a.type);
+  const campSafe=Math.hypot(a.x-cottage.x,a.y-cottage.y)<safeRadius+65;
+  if(hostile&&collapseRemaining===0&&!state.resting&&pd<155&&!campSafe){
+   // Telegraph a quick lunge, then back off; enemies can't chase beyond their habitat.
+   if(a.attackCooldown===0&&!a.windupMs&&!a.lungeMs&&pd<100){
+    a.windupMs=a.type==='scorpion'?380:550;a.pause=0;a.walking=false;
+   }
+   if(a.windupMs>0){
+    a.windupMs=Math.max(0,a.windupMs-dt);
+    if(a.windupMs===0)a.lungeMs=420;
+    a.walking=false;continue;
+   }
+   if(a.lungeMs>0){
+    a.lungeMs=Math.max(0,a.lungeMs-dt);
+    const dx=state.x-a.x,dy=state.y-a.y,d=Math.max(1,Math.hypot(dx,dy));
+    const p=regionalLandPoint(a,a.x+dx/d*210*step,a.y+dy/d*210*step);
+    a.x=p.x;a.y=p.y;a.face=dx>=0?1:-1;a.walking=true;a.gait+=dt*.018;
+    if(dist(state,a)<35&&a.attackCooldown===0){
+     takeDamage(a.type==='snake'?9:7,a.type==='snake'?'Snake':'Scorpion',true);
+     a.attackCooldown=4600;a.lungeMs=0;a.pause=1000;
+    }else if(a.lungeMs===0){a.attackCooldown=3100;a.pause=650}
+    continue;
+   }
+   if(a.attackCooldown===0&&pd>85){
+    const dx=state.x-a.x,dy=state.y-a.y,d=Math.max(1,Math.hypot(dx,dy));
+    const p=regionalLandPoint(a,a.x+dx/d*48*step,a.y+dy/d*48*step);
+    a.x=p.x;a.y=p.y;a.face=dx>=0?1:-1;a.walking=true;a.gait+=dt*.006;
+    continue;
+   }
+  }else{a.windupMs=0;a.lungeMs=0}
+  const skittish=!hostile&&a.type!=='raven';
+  if(skittish&&pd<130&&time>a.scaredUntil-600){
    const angle=Math.atan2(a.y-state.y,a.x-state.x);
-   const t=regionalLandPoint(a,a.x+Math.cos(angle)*95,a.y+Math.sin(angle)*95);
-   a.targetX=t.x;a.targetY=t.y;a.pause=0;a.scaredUntil=time+1900;
+   const p=regionalLandPoint(a,a.x+Math.cos(angle)*130,a.y+Math.sin(angle)*130);
+   a.targetX=p.x;a.targetY=p.y;a.pause=0;a.scaredUntil=time+2300;
   }
   if(a.pause>0){a.pause-=dt;a.walking=false;continue}
-  let dx=a.targetX-a.x,dy=a.targetY-a.y,distTo=Math.hypot(dx,dy);
-  if(distTo<5){
+  const dx=a.targetX-a.x,dy=a.targetY-a.y,d=Math.hypot(dx,dy);
+  if(d<5){
    const turn=seeded(a.id*311+Math.floor(time/3000)*7)*Math.PI*2;
    const travel=35+seeded(a.id*191+Math.floor(time/2800))*85;
    const target=regionalLandPoint(a,a.homeX+Math.cos(turn)*travel,a.homeY+Math.sin(turn)*travel);
-   a.targetX=target.x;a.targetY=target.y;a.pause=1400+seeded(a.id*29+Math.floor(time/4200))*4100;
-   a.walking=false;continue;
+   a.targetX=target.x;a.targetY=target.y;a.pause=1400+seeded(a.id*29+Math.floor(time/4200))*4100;a.walking=false;continue;
   }
-  const fleeing=time<a.scaredUntil;
-  const pace=a.speed*(fleeing?2:1),move=Math.min(distTo,pace*step);
-  a.x+=dx/distTo*move;a.y+=dy/distTo*move;
-  a.face=dx>=0?1:-1;a.gait+=move*.18;a.walking=move>.06;
+  const move=Math.min(d,a.speed*(time<a.scaredUntil?2.4:1)*step);
+  a.x+=dx/d*move;a.y+=dy/d*move;a.face=dx>=0?1:-1;a.gait+=move*.18;a.walking=move>.06;
  }
 }
-
-
 function drawRegionalWildlife(){
  for(const a of regionalWildlife){
   if(!animalAlive(a)||Math.abs(a.x-cam.x)>1050||Math.abs(a.y-cam.y)>800)continue;
@@ -228,6 +255,11 @@ function drawWildAnimal(a){
   for(const x of [-10,11]){e(x,-18,4.5,4.5,'#d2e9c5');eye(x,-18)}
   for(const x of [-11,11])stroke([[x,-3],[x*1.7,6],[x*1.9,10]],'#538a63',3.3);
  }
+ if(animalHp(a)<(wildlifeHealth[a.type]||3)){
+  ctx.fillStyle='#2d3839';ctx.fillRect(-21,-56,42,6);
+  ctx.fillStyle='#d58d6b';ctx.fillRect(-20,-55,40*Math.max(0,animalHp(a))/(wildlifeHealth[a.type]||3),4);
+ }
+ if(a.windupMs>0){ctx.fillStyle='#f1d79a';ctx.font='bold 18px system-ui';ctx.fillText('!',0,-43)}
  ctx.restore();
 }
 const regionalNightPalette={downs:'#6e856e',desert:'#a58e74',coast:'#a99d83',wasteland:'#777177',snow:'#b3cbd8',fen:'#506d69'};
