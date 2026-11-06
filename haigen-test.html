@@ -1096,7 +1096,7 @@ function autonomousTick(dt){
  if(found.type==='rock')state.stone+=2;
  if(found.type==='flower')gatherFlower(found);
  if(found.type==='mushroom')gatherMushroom(found);
- state.autoSteps++;mindEvent('gather',found.type);autoPause=rand(3000,6500);speak('success',4700);if(state.autoSteps%4===0)memory('Haigen: '+autoThought());save()}
+ state.autoSteps++;if(found.type!=='bush'&&found.type!=='flower')mindEvent('gather',found.type);autoPause=rand(3000,6500);speak('success',4700);if(state.autoSteps%4===0)memory('Haigen: '+autoThought());save()}
 }
 function offlineProgress(){
   const last=Number(state.lastSavedAt)||0;
