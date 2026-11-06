@@ -7,7 +7,7 @@ state.nestEggs=Number.isFinite(state.nestEggs)?state.nestEggs:2;
 state.lastEggAt=Number.isFinite(state.lastEggAt)?state.lastEggAt:Date.now();
 const chickenNest={x:1420,y:1558};
 const chickens=[{x:1390,y:1540,angle:0,phase:0,t:1800},{x:1460,y:1595,angle:1.5,phase:1,t:2600},{x:1365,y:1605,angle:3,phase:2,t:3400}];
-function updateChickens(dt){const now=Date.now();const laid=Math.min(4,Math.floor(Math.max(0,now-state.lastEggAt)/180000));if(laid){state.nestEggs=Math.min(6,state.nestEggs+laid);state.lastEggAt+=laid*180000;save()}for(const hen of chickens){hen.phase+=dt*.006;hen.t-=dt;if(hen.t<=0){hen.angle=Math.random()*Math.PI*2;hen.t=rand(1600,4300);hen.rest=Math.random()<.45}if(!hen.rest){const nx=hen.x+Math.cos(hen.angle)*dt*.018,ny=hen.y+Math.sin(hen.angle)*dt*.018;if(Math.hypot(nx-1420,ny-1570)<115){hen.x=nx;hen.y=ny}else hen.angle+=Math.PI}}}
+function updateChickens(dt){const now=Date.now();const laid=Math.min(4,Math.floor(Math.max(0,now-state.lastEggAt)/180000));if(laid){state.nestEggs=Math.min(6,state.nestEggs+laid);state.lastEggAt+=laid*180000;save()}for(const hen of chickens){if((state.weather?.rain||0)>.55){hen.rest=true;hen.angle=Math.atan2(1570-hen.y,1420-hen.x)}hen.phase+=dt*.006;hen.t-=dt;if(hen.t<=0){hen.angle=Math.random()*Math.PI*2;hen.t=rand(1600,4300);hen.rest=(state.weather?.rain||0)>.55||Math.random()<.45}if(!hen.rest){const nx=hen.x+Math.cos(hen.angle)*dt*.018,ny=hen.y+Math.sin(hen.angle)*dt*.018;if(Math.hypot(nx-1420,ny-1570)<115){hen.x=nx;hen.y=ny}else hen.angle+=Math.PI}}}
 function drawHen(h){
  const t=time*.006+h.phase,walking=!h.rest;
  const peck=walking&&Math.sin(t*.9)>.55;
@@ -776,20 +776,41 @@ function updateDucks(dt){
    f.eggs=Math.max(0,f.clutch-f.hatchCount);
    if(f.hatchCount>=f.clutch){f.stage='rear';f.elapsed=0}
   }else if(f.stage==='rear'){
-   // The mother leads a loose family line; chicks feed, paddle and grow.
-   const a=time*.00012+familyIndex*2.8;
-   const p=pondPoint(pond.x+Math.cos(a)*pond.rx*.47,pond.y+Math.sin(a)*pond.ry*.45);
-   moveDuckToward(mum,p.x,p.y,step,22);
-   moveDuckToward(dad,mum.x+45,mum.y-28,step,16);
+   // Natural brood: loose wedge behind mother, bunch up when alarmed or during showers.
+   const rain=state.weather?.rain||0;
+   const alert=Math.hypot(mum.x-state.x,mum.y-state.y)<140;
+   const mode=alert?'huddle':rain>.55?'shelter':Math.sin(time*.00043+familyIndex)>-.18?'follow':'forage';
+   f.broodMode=mode;
+   const a=time*(rain>.55?.000055:.00012)+familyIndex*2.8;
+   const centre=mode==='shelter'
+    ?pondPoint(f.nestX+(pond.x-f.nestX)*.30,f.nestY+(pond.y-f.nestY)*.30,.72)
+    :pondPoint(pond.x+Math.cos(a)*pond.rx*.47,pond.y+Math.sin(a)*pond.ry*.45);
+   moveDuckToward(mum,centre.x,centre.y,step,mode==='shelter'?16:mode==='huddle'?30:22);
+   moveDuckToward(dad,mum.x+Math.cos(a+2)*46,mum.y+Math.sin(a+2)*40,step,mode==='shelter'?12:17);
    for(let j=0;j<f.chicks.length;j++){
     const ch=f.chicks[j];ch.age=Math.min(1,ch.age+dt/390000);
-    const behind=23+(j%5)*17,side=(Math.floor(j/5)-.5)*31;
+    const row=Math.floor(j/3),col=j%3-1;
+    // No rigid conga line. Each duckling has a slightly different phase and pace.
+    const spread=mode==='huddle'? .38:mode==='shelter'?.53:mode==='forage'?1.65:1;
+    const behind=(22+row*19+Math.sin(time*.0013+ch.phase)*5)*spread;
+    const side=(col*20+Math.sin(time*.0011+ch.phase*1.7)*8)*spread;
     const tx=mum.x-Math.cos(mum.heading)*behind-Math.sin(mum.heading)*side;
     const ty=mum.y-Math.sin(mum.heading)*behind+Math.cos(mum.heading)*side;
-    const point=pondPoint(tx,ty,.7);
-    const dx=point.x-ch.x,dy=point.y-ch.y,len=Math.max(1,Math.hypot(dx,dy));
-    const speed=ch.age>.55?35:27;
-    ch.x+=dx/len*Math.min(len,step*speed);ch.y+=dy/len*Math.min(len,step*speed);
+    const p=pondPoint(tx,ty,.72);
+    let dx=p.x-ch.x,dy=p.y-ch.y;
+    // Separation prevents siblings piling into a single yellow blob.
+    for(let k=0;k<f.chicks.length;k++){
+     if(k===j)continue;
+     const other=f.chicks[k],ox=ch.x-other.x,oy=ch.y-other.y;
+     const distance=Math.hypot(ox,oy);
+     if(distance>0&&distance<11){dx+=ox/distance*13;dy+=oy/distance*13}
+    }
+    const distance=Math.max(1,Math.hypot(dx,dy));
+    const speed=mode==='huddle'?39:ch.age>.55?33:27;
+    ch.x+=dx/distance*Math.min(distance,step*speed);
+    ch.y+=dy/distance*Math.min(distance,step*speed);
+    ch.foraging=mode==='forage'&&Math.sin(time*.004+ch.phase)>.4;
+    ch.alarmed=alert;
    }
    if(f.elapsed>410000){f.stage='depart';f.elapsed=0;f.parentsLeaving=true}
   }else if(f.stage==='depart'){
@@ -839,7 +860,7 @@ function updateDucks(dt){
    const point=pondPoint(d.x+Math.cos(d.heading)*step*82,d.y+Math.sin(d.heading)*step*82,.76);
    d.x=point.x;d.y=point.y;
   }else{d.air=Math.max(0,d.air-step*1.6);d.wing+=dt*.002}
-  d.foraging=time%11000<2700;
+  d.foraging=time%11000<2700||(state.weather?.rain||0)>.45&&Math.sin(time*.004+d.phase)>.2;
  }
 }
 function drawDuck(d){
@@ -859,7 +880,7 @@ function drawDuck(d){
  ellipse(-10,-11,12,7,male?'#c1a790':'#c7a28d');
  ellipse(-12,-5,7,5,male?'#b2c1a4':'#a17c67');
  ellipse(10,-13,8,12,male?'#ede4c9':'#bea18e');
- const dip=!flying&&d.foraging?7:0;
+ const dip=!flying&&d.foraging?10:0;
  ellipse(15,-21+dip,9,9,male?'#367b62':'#a7896e');
  ellipse(20,-23+dip,2,2,'#1e2c31');
  poly([[21,-17+dip],[34,-15+dip],[21,-12+dip]],'#e7ae47');
@@ -892,7 +913,8 @@ function drawDuckling(ch){
  const growth=Math.min(1,ch.age),scale=.47+growth*.43;
  ctx.save();ctx.translate(ch.x,ch.y-(ch.departAlt||0));
  ctx.scale(scale,scale);
- const bob=Math.sin(time*.012+ch.phase)*1.6;
+ const bob=Math.sin(time*.012+ch.phase)*(ch.alarmed?2.4:1.6);
+ const dip=ch.foraging?4:0;
  ctx.strokeStyle='#c4e9e5';ctx.lineWidth=1.5;ctx.beginPath();
  ctx.ellipse(0,6,14,4,0,0,Math.PI*2);ctx.stroke();
  if(ch.flying){ctx.strokeStyle='#c4ad8b';ctx.lineWidth=6;ctx.lineCap='round';
@@ -901,9 +923,9 @@ function drawDuckling(ch){
   ctx.moveTo(3,-10);ctx.lineTo(17,-18+flap);ctx.stroke()}
  ellipse(-2,-6+bob,16,12,growth>.75?'#b99a76':'#f4d28a');
  ellipse(-11,-7+bob,7,6,growth>.75?'#d2b18c':'#e9b76d');
- ellipse(10,-13+bob,9,9,growth>.75?'#ab8a6c':'#f8dc99');
- ellipse(15,-15+bob,2,2,'#33302b');
- poly([[17,-10+bob],[27,-8+bob],[17,-6+bob]],'#df9c4c');
+ ellipse(10,-13+bob+dip,9,9,growth>.75?'#ab8a6c':'#f8dc99');
+ ellipse(15,-15+bob+dip,2,2,'#33302b');
+ poly([[17,-10+bob+dip],[27,-8+bob+dip],[17,-6+bob+dip]],'#df9c4c');
  ctx.restore();
 }
 const frogs=[];for(let i=0;i<22;i++){const a=i*2.39996,edge=i<15;const x=edge?pond.x+Math.cos(a)*pond.rx*(.82+seeded(9900+i)*.32):2100+Math.cos(a)*240;const y=edge?pond.y+Math.sin(a)*pond.ry*(.82+seeded(9950+i)*.32):2420+Math.sin(a)*150;frogs.push({x,y,homeX:x,homeY:y,phase:i*1.7,hopAt:i*420,hopUntil:0,fromX:x,fromY:y,toX:x,toY:y,colour:i%4===0?'#a18a54':'#63a64b'})}
@@ -1041,6 +1063,7 @@ function updateBirds(dt){
  const step=Math.min(dt,50)/1000;
  for(const b of birds){
   const nearby=Math.hypot(b.x-state.x,b.y-state.y)<145;
+  if((state.weather?.rain||0)>.6&&b.air<.05)b.flightUntil=Math.max(b.flightUntil,time+1700);
   const flockAlert=birds.some(other=>other!==b&&other.flock===b.flock&&other.flightUntil>time&&Math.hypot(other.x-b.x,other.y-b.y)<190);
   if((nearby||flockAlert)&&b.flightUntil<time+1200){b.flightUntil=time+3400+seeded(b.phase)*1700;b.heading=nearby?Math.atan2(b.y-state.y,b.x-state.x):b.heading;b.landAt=b.flightUntil}
   if(time<b.flightUntil){
@@ -1312,7 +1335,7 @@ gameCanvas.addEventListener('pointerup',stopCameraPointer);
 gameCanvas.addEventListener('pointercancel',stopCameraPointer);
 gameCanvas.addEventListener('wheel',e=>{e.preventDefault();cameraZoom=clamp(cameraZoom*Math.exp(-e.deltaY*.001),.7,2.4)},{passive:false});
 function frame(now){let dt=Math.min(now-last,50);last=now;menuController();if(!$('overlay').classList.contains('open'))update(dt);draw();requestAnimationFrame(frame)}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=80;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=81;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
