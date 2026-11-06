@@ -1,4 +1,4 @@
 {
-  "build": 97,
-  "notes": "Corrected, self-diagnosing world startup; retains illustrated wildlife, varied terrain and collision. Displays error on screen if rendering fails. Preserves old saves and original Ember game."
+  "build": 98,
+  "notes": "One seamless procedural island and beaches around its full perimeter, blended biome transitions, habitat-appropriate butterflies, walking lizards, hopping ground birds, animated crabs, clearer wasteland rats. Woodland saves, quests and Ember preserved."
 }
