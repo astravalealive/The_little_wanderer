@@ -1,4 +1,4 @@
 {
-  "build": 104,
-  "notes": "V104 survival: wolves and boars charge, snakes and scorpions lunge and poison, peaceful wildlife flees. Persistent animal health and collectible meat drops, roast meat and medicinal mushroom antidotes, poison warning and slow health drain, collapse and Skölli rescue at camp. Bristleback quest, past saves and Ember preserved."
+  "build": 105,
+  "notes": "V105 reliability update on V104 survival: fixes first-hit damage protection when the game starts and safely resumes a pending Skölli rescue after refreshing the browser. All wildlife behaviour, meat, poison, medicinal mushrooms, past quests, saves, and original Ember remain unchanged."
 }
