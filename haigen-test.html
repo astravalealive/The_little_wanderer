@@ -8,7 +8,44 @@ state.lastEggAt=Number.isFinite(state.lastEggAt)?state.lastEggAt:Date.now();
 const chickenNest={x:1420,y:1558};
 const chickens=[{x:1390,y:1540,angle:0,phase:0,t:1800},{x:1460,y:1595,angle:1.5,phase:1,t:2600},{x:1365,y:1605,angle:3,phase:2,t:3400}];
 function updateChickens(dt){const now=Date.now();const laid=Math.min(4,Math.floor(Math.max(0,now-state.lastEggAt)/180000));if(laid){state.nestEggs=Math.min(6,state.nestEggs+laid);state.lastEggAt+=laid*180000;save()}for(const hen of chickens){hen.phase+=dt*.006;hen.t-=dt;if(hen.t<=0){hen.angle=Math.random()*Math.PI*2;hen.t=rand(1600,4300);hen.rest=Math.random()<.45}if(!hen.rest){const nx=hen.x+Math.cos(hen.angle)*dt*.018,ny=hen.y+Math.sin(hen.angle)*dt*.018;if(Math.hypot(nx-1420,ny-1570)<115){hen.x=nx;hen.y=ny}else hen.angle+=Math.PI}}}
-function drawHen(h){const peck=!h.rest&&Math.sin(time*.005+h.phase)>.65;const bob=h.rest?0:Math.abs(Math.sin(h.phase))*2;ellipse(h.x,h.y+9,16,6,'#375b3a66');ellipse(h.x,h.y-7-bob,17,14,'#fff4db');ellipse(h.x+9,h.y-17-bob+(peck?6:0),10,11,'#fff9e8');ellipse(h.x+14,h.y-19-bob,2,2,'#263e35');poly([[h.x+19,h.y-14-bob],[h.x+29,h.y-11-bob],[h.x+19,h.y-8-bob]],'#e9a53c');ellipse(h.x+7,h.y-29-bob,5,5,'#d95750');ctx.strokeStyle='#c98d3c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(h.x-5,h.y+4);ctx.lineTo(h.x-5,h.y+13);ctx.moveTo(h.x+5,h.y+4);ctx.lineTo(h.x+5,h.y+13);ctx.stroke()}
+function drawHen(h){
+ const t=time*.006+h.phase,walking=!h.rest;
+ const peck=walking&&Math.sin(t*.9)>.55;
+ const scratch=walking&&Math.sin(t*.42)>.8;
+ const bob=walking?Math.abs(Math.sin(t))*3:Math.sin(time*.002+h.phase)*.8;
+ const headDip=peck?7:0;
+ ctx.save();ctx.translate(h.x,h.y);
+ ellipse(0,11,23,7,'#2d4f4166');
+ const bodyShade=Math.sin(h.phase*1.3)>.2?'#fff0ce':'#efe0bd';
+ // Fat pear-shaped silhouette and tail feathers.
+ for(let j=0;j<3;j++){
+  ctx.save();ctx.translate(-16,-15);ctx.rotate(-.45+j*.25);
+  ellipse(-3,-11,7,15,j%2?'#ead3a8':'#f9e9c8');ctx.restore();
+ }
+ ellipse(-3,-9-bob,22,20,bodyShade);
+ ellipse(-6,-6-bob,12,12,'#fff6df');
+ ellipse(-12,-10-bob,10,7,'#e4cba2');ellipse(-9,-10-bob,9,5,'#f8e7bf');
+ // Ridiculous skinny legs, alternating scratches.
+ ctx.strokeStyle='#d3933b';ctx.lineWidth=3;ctx.lineCap='round';
+ for(const sign of [-1,1]){
+  const footX=sign*9+(scratch?Math.sin(t*3+sign)*5:0);
+  ctx.beginPath();ctx.moveTo(sign*8,1);ctx.lineTo(footX,13);
+  ctx.lineTo(footX+8,15);ctx.moveTo(footX,13);ctx.lineTo(footX-6,16);ctx.stroke();
+ }
+ // Animated neck and oversized expressive eyes.
+ ellipse(11,-24-bob+headDip,11,14,'#fff3d9');
+ for(let j=0;j<3;j++)ellipse(5+j*5,-37-bob+headDip,4.2,6,'#df5b52');
+ ellipse(22,-26-bob+headDip,4,5,'#fffdf4');
+ ellipse(23,-26-bob+headDip,2.4,3.2,'#333331');
+ ellipse(23.8,-27-bob+headDip,1,1.4,'#ffffff');
+ poly([[21,-19-bob+headDip],[34,-17-bob+headDip],[22,-13-bob+headDip]],'#e4a34b');
+ ellipse(11,-13-bob+headDip,5,6,'#d95b53');
+ if(scratch){
+  ctx.strokeStyle='#c9a975';ctx.lineWidth=1.2;ctx.beginPath();
+  ctx.moveTo(8,14);ctx.lineTo(14,18);ctx.moveTo(5,15);ctx.lineTo(0,18);ctx.stroke();
+ }
+ ctx.restore();
+}
 function drawChickenNest(){ellipse(chickenNest.x,chickenNest.y+5,38,19,'#8e673d');ellipse(chickenNest.x,chickenNest.y,29,12,'#c6a16c');for(let i=0;i<Math.min(6,state.nestEggs);i++)ellipse(chickenNest.x-17+(i%3)*17,chickenNest.y-4+Math.floor(i/3)*9,7,9,'#fff0cf');ctx.fillStyle='#fff8dc';ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillText('🥚 '+state.nestEggs+' eggs · X to collect',chickenNest.x,chickenNest.y-35);}
 const companions=[{name:'Dillon',kind:'rabbit',x:state.x+65,y:state.y+25,target:null,t:0,mode:'wandering'},{name:'Skölli',kind:'fox',x:1780,y:1660,target:null,t:0,mode:'exploring'}];// Territorial wildlife lives beyond the campsite's protected clearing.
 const safeRadius=355;
@@ -488,46 +525,93 @@ function character(x,y,type,actor,deepWater=false){
   drawHaigenHair(dir,phase,moving);
   if(deepWater)drawHaigenSnorkelLocal(dir);
  }else if(type==='rabbit'){
-  ellipse(-10+gait*3,5,9,6,'#e4d3b7');ellipse(10-gait*3,5,9,6,'#e4d3b7');
-  ellipse(0,-9,19,17,'#c9b99e');
-  if(back){ellipse(0,-2,9,9,'#f1e6d2');ellipse(-10,-35,7,23,'#c8b99d');ellipse(8,-37,7,24,'#c8b99d');ellipse(0,-22,15,15,'#c9b99e')}
-  else if(side){ellipse(-9,-34,7,23,'#c8b99d');ellipse(5,-37,7,25,'#c8b99d');ellipse(0,-22,15,15,'#e4d3b7');ellipse(12,-23,2.5,3,'#263f37');ellipse(15,-16,3,2,'#d58f96')}
-  else{ellipse(-10,-34,7,22,'#c8b99d');ellipse(8,-36,7,24,'#c8b99d');ellipse(-10,-34,3,15,'#d99e9d');ellipse(8,-36,3,17,'#d99e9d');ellipse(0,-22,15,15,'#e4d3b7');ellipse(-5,-24,2.5,3,'#263f37');ellipse(7,-24,2.5,3,'#263f37');ellipse(1,-17,3,2,'#d58f96')}
- }else{
-  // Fox tail is anchored behind the body in every facing direction.
-  // Rear view: tail follows the spine, never projects sideways.
-  const wag=moving?Math.sin(phase*.011)*4:Math.sin(phase*.003)*2;
+  // Dillon: round marshmallow body, expressive ears and twitchy little nose.
+  const twitch=Math.sin(time*.028+phase*.004)*1.4;
+  const earFlick=Math.sin(time*.003+phase*.001)>.96?6:0;
+  const nibble=actor&&(actor.mode==='nibbling'||actor.mode==='foraging');
+  const squish=moving?1-Math.abs(gait)*.075:1;
+  ctx.save();ctx.scale(1,squish);
   if(back){
-   ellipse(wag*.6,7,12,22,'#d97635');
-   ellipse(wag*.8,22,10,10,'#f5e5c8');
-   ellipse(-11+gait*3,5,7,7,'#9d522e');ellipse(11-gait*3,5,7,7,'#9d522e');
-   ellipse(0,-12,22,19,'#d46f35');
-   poly([[-16,-31],[-21,-55],[-3,-40]],'#b85e34');
-   poly([[11,-39],[23,-55],[24,-28]],'#b85e34');
-   ellipse(0,-28,19,16,'#c96c36');
-  }else if(side){
-   // Side view: the tail extends behind the fox's hindquarters.
-   ellipse(-31,-9+wag*.25,20,10,'#d97635');
-   ellipse(-45,-8+wag*.25,9,7,'#f5e5c8');
-   ellipse(-10+gait*4,5,7,7,'#9d522e');ellipse(12-gait*4,5,7,7,'#9d522e');
-   ellipse(-4,-10,25,15,'#d46f35');
-   poly([[5,-35],[1,-55],[19,-41]],'#b85e34');
-   ellipse(13,-28,17,15,'#e98239');
-   ellipse(22,-22,11,7,'#f5e5c8');
-   ellipse(19,-32,3,3,'#24372f');ellipse(28,-23,3,2,'#302b29');
+   ellipse(0,0,10,10,'#fcf3e6');
+   ellipse(-7,-7,18,18,'#c9b9a4');ellipse(9,-7,16,18,'#d8c9b4');
   }else{
-   // Facing camera: tail stays behind and is mostly hidden by the body.
-   ellipse(wag*.4,3,11,14,'#d97635');
-   ellipse(wag*.4,12,9,7,'#f5e5c8');
-   ellipse(-10+gait*4,5,7,7,'#9d522e');ellipse(12-gait*4,5,7,7,'#9d522e');
-   ellipse(0,-9,24,15,'#d46f35');
-   poly([[-16,-31],[-21,-55],[-3,-40]],'#b85e34');
-   poly([[11,-39],[23,-55],[24,-28]],'#b85e34');
-   ellipse(0,-29,20,17,'#e98239');
-   ellipse(0,-20,14,8,'#f5e5c8');
-   ellipse(-8,-32,3,3,'#24372f');ellipse(9,-32,3,3,'#24372f');
-   ellipse(0,-21,3,2,'#302b29');
+   ellipse(-15,-5,13,15,'#d5c4ae');
+   ellipse(0,-9,21,19,'#d6c7b4');ellipse(2,-5,13,11,'#f6e8d5');
+   ellipse(-17,1,9,8,'#f6eee0');
   }
+  for(const sign of [-1,1]){
+   const ex=sign*10;
+   ctx.save();ctx.translate(ex,-38);ctx.rotate(sign*(.13+earFlick*.015)+(moving?gait*.08:0));
+   ellipse(0,-7,8,25,'#c8b49c');ellipse(0,-8,4.5,18,'#d99fa0');
+   ellipse(0,-19,4,7,'#f2dfcd');ctx.restore();
+  }
+  ellipse(0,-25,17,16,'#e6d6bf');
+  ellipse(-9,-22,9,8,'#f3e5d4');ellipse(9,-22,9,8,'#f3e5d4');
+  if(!back){
+   if(side){
+    ellipse(10,-28,4,5,'#fffaf2');ellipse(11,-28,2.4,3.5,'#312b2c');
+    ellipse(17,-19+twitch*.2,3.5,2.8,'#d98b97');
+   }else{
+    for(const eyeX of [-8,8]){ellipse(eyeX,-29,4,5,'#fff8ed');ellipse(eyeX+.6,-29,2.5,3.7,'#30302c');ellipse(eyeX,-30,1,1.4,'#fff')}
+    ellipse(twitch*.3,-19,3.5,2.5,'#d98992');
+    ctx.strokeStyle='#8c6b60';ctx.lineWidth=1.25;ctx.beginPath();
+    ctx.moveTo(0,-17);ctx.lineTo(0,-13);ctx.moveTo(0,-13);ctx.quadraticCurveTo(-4,-10,-6,-14);
+    ctx.moveTo(0,-13);ctx.quadraticCurveTo(4,-10,6,-14);ctx.stroke();
+   }
+   for(const sign of [-1,1]){
+    ctx.strokeStyle='#aa9a87';ctx.lineWidth=.9;ctx.beginPath();
+    ctx.moveTo(sign*8,-17);ctx.lineTo(sign*19,-18);ctx.moveTo(sign*8,-15);ctx.lineTo(sign*18,-12);ctx.stroke();
+   }
+  }
+  ellipse(-13+gait*2,5,10,6,'#b7a58f');ellipse(12-gait*2,5,10,6,'#b7a58f');
+  if(nibble){ellipse(5,-12+twitch,5,3,'#f9ebd8');ellipse(11,-9+twitch,3,2,'#8dab63')}
+  ctx.restore();
+ }else{
+  // Skölli: big fox brush, cream bib, clever eyebrows and triangular fluffy cheeks.
+  const wag=(moving?Math.sin(phase*.012)*9:Math.sin(time*.005)*5);
+  ctx.save();
+  if(back){
+   ctx.save();ctx.translate(wag*.3,-3);ctx.rotate(wag*.015);
+   ellipse(0,8,14,30,'#c96b36');ellipse(0,24,12,11,'#fff0d5');ctx.restore();
+  }else if(side){
+   ctx.save();ctx.translate(-33,-10+wag*.18);ctx.rotate(wag*.012);
+   ellipse(-6,0,27,13,'#ce7038');ellipse(-25,0,12,10,'#fff0d5');ctx.restore();
+  }else{
+   ellipse(wag*.35,6,14,22,'#bf6633');ellipse(wag*.35,18,10,10,'#fff0d5');
+  }
+  ellipse(-13+gait*3,6,9,8,'#8e482f');ellipse(12-gait*3,6,9,8,'#8e482f');
+  ellipse(0,-10,24,21,'#d87539');ellipse(0,-7,15,17,'#f7e5cb');
+  // Thick neck ruff forms a soft scalloped collar.
+  for(const sign of [-1,1]){
+   poly([[sign*11,-18],[sign*25,-23],[sign*18,-10]],'#f5e6ce');
+  }
+  for(const sign of [-1,1]){
+   poly([[sign*8,-36],[sign*18,-58],[sign*24,-35]],'#b95531');
+   poly([[sign*13,-38],[sign*18,-51],[sign*20,-39]],'#edaa85');
+  }
+  ellipse(0,-28,21,18,'#e98141');
+  if(back){ellipse(0,-29,13,10,'#dc793d')}
+  else if(side){
+   ellipse(16,-22,13,8,'#fff0d4');ellipse(27,-22,4,3,'#342c2b');
+   ellipse(12,-32,4.5,5,'#fff1d5');ellipse(14,-32,2.5,3.5,'#2c3130');
+   ctx.strokeStyle='#7b4930';ctx.lineWidth=2;ctx.beginPath();
+   ctx.moveTo(7,-39);ctx.lineTo(16,-38);ctx.stroke();
+  }else{
+   ellipse(0,-19,15,10,'#fff0d8');
+   ellipse(-10,-30,5.5,6,'#fff1df');ellipse(10,-30,5.5,6,'#fff1df');
+   ellipse(-9,-29,3.2,4.2,'#2b3530');ellipse(9,-29,3.2,4.2,'#2b3530');
+   ellipse(-10,-30,1.1,1.4,'#fff');ellipse(8,-30,1.1,1.4,'#fff');
+   ctx.strokeStyle='#9a522f';ctx.lineWidth=2.1;ctx.beginPath();
+   ctx.moveTo(-16,-40);ctx.lineTo(-6,-38);
+   ctx.moveTo(6,-38);ctx.lineTo(16,-40);ctx.stroke();
+   ellipse(0,-19,4,3,'#342e2c');
+   ctx.strokeStyle='#8f5c4a';ctx.lineWidth=1.5;ctx.beginPath();
+   ctx.moveTo(-4,-15);ctx.quadraticCurveTo(0,-11,4,-15);ctx.stroke();
+  }
+  if(actor&&actor.mode==='sniffing'){
+   const sniff=Math.sin(time*.023)*2;ellipse(0,-17+sniff,4,3,'#43352e');
+  }
+  ctx.restore();
  }
  ctx.restore()
 }
@@ -1098,7 +1182,7 @@ gameCanvas.addEventListener('pointerup',stopCameraPointer);
 gameCanvas.addEventListener('pointercancel',stopCameraPointer);
 gameCanvas.addEventListener('wheel',e=>{e.preventDefault();cameraZoom=clamp(cameraZoom*Math.exp(-e.deltaY*.001),.7,2.4)},{passive:false});
 function frame(now){let dt=Math.min(now-last,50);last=now;menuController();if(!$('overlay').classList.contains('open'))update(dt);draw();requestAnimationFrame(frame)}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=78;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=79;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
