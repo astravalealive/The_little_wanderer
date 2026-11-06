@@ -1,4 +1,4 @@
 {
-  "build": 96,
-  "notes": "V96 corrected build: illustrated regional animal sprites with realistic slow roaming, varied tree heights/shapes, rock variation, solid-object collision with sliding; preserves gameplay and saves."
+  "build": 97,
+  "notes": "Corrected, self-diagnosing world startup; retains illustrated wildlife, varied terrain and collision. Displays error on screen if rendering fails. Preserves old saves and original Ember game."
 }
