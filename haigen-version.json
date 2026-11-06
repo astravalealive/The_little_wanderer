@@ -1,4 +1,4 @@
 {
-  "build": 100,
-  "notes": "V100 Homestead: three interactive build plots (coop, expandable wood shed, fishing jetty), two starter hens only after building coop, egg collection/cooking, later rooster/chicks, 14-log carrying limit with persistent storage, rod/fish meals, greener vegetation palettes, preserved saves."
+  "build": 101,
+  "notes": "Depth-order fix: homestead build pads and walkable jetty render beneath Haigen; built chicken coop and wood shed depth-sort at ground contact and block movement; interaction menus, inventory and saved progress preserved."
 }
