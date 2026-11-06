@@ -1,4 +1,4 @@
 {
-  "build": 106,
-  "notes": "V106: Zelda-style flashing for Haigen when hit by an animal or damaged by poison. A dedicated kitchen garden plot replaces the old oval vegetable patch, with three visible raised-bed upgrade levels, harvestable/regrowing vegetables and garden stew. Legacy garden structures migrate to Level 1 free of charge; previous wildlife, Skölli rescue, pond quests, original Ember and saves preserved."
+  "build": 107,
+  "notes": "V107: New opt-in soundscapes for all seven regions. Original synthesized music themes, evolving regional wind and weather ambience, birds/frogs/surf/wasteland calls, harvesting tones and injury sounds. Sound button cycles Off, Ambience, and Music + Ambience, starting muted for iPad Safari. Existing saves, V106 garden, wildlife systems and original Ember untouched."
 }
