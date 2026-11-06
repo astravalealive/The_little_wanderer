@@ -1846,7 +1846,7 @@ function frame(now){
  }catch(error){reportWorldError(error);}
  requestAnimationFrame(frame);
 }// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
-const GAME_BUILD=88;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+const GAME_BUILD=89;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
