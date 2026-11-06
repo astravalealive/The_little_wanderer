@@ -1,4 +1,4 @@
 {
-  "build": 88,
-  "notes": "The Silent Pond Chapter One expanded: visible Dillon tracks and Skölli scent clues, tracked story journal and map marker, 4 wood/2 stone repair, Bristleback must be recruited and physically reach the inlet, persistent flowing water and flourishing habitat, Woodland Trust, Hollow Warden omen and message, local Tell Haigen quest planning. Existing v87 saves and frog art/animations, duck lifecycle, camera and Ember preserved."
+  "build": 89,
+  "notes": "Fix companion water-boundary crash; compact mobile stats expand on tap, secondary actions in Menu, separated joystick and tools. Existing saves and Silent Pond progress preserved."
 }
