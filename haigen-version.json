@@ -1,4 +1,4 @@
 {
-  "build": 86,
-  "notes": "Rendering diagnostics for blank game screens, recover invalid camera coordinates, and keep the animation loop alive if the canvas errors. Direct camera drag, brief pause and gentle recenter preserved. Other wildlife and Ember untouched."
+  "build": 87,
+  "notes": "Playable Chapter I: The Silent Pond. Persistent story journal and map waypoint; Dillon track clue, Skölli scent discovery, gather wood and stone to restore an inlet, woodland trust, heartstone reveal, and fleeting Hollow Warden omen. Tell Haigen can autonomously investigate the mystery. Saved sandbox, camera, frog artwork and original Ember remain intact."
 }
