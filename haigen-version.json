@@ -1,4 +1,4 @@
 {
-  "build": 68,
-  "notes": "Actual midnight-blue terrain and individually purple/violet tree canopies replace uniform purple screen filter. Preserve flower colour, warm lighting and protected frog animations."
+  "build": 69,
+  "notes": "Wildlife personality pass: squirrels nibble and twitch tails, grounded birds peck, butterflies flap wings, hens bob while foraging. Frog code unchanged."
 }
