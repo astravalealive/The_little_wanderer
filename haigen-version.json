@@ -1,4 +1,4 @@
 {
-  "build": 110,
-  "notes": "V110 repairs autonomous routine. Haigen can rest safely away from camp, wake fully recovered, eat when hungry, cure poison, heal with salves, independently collect wildlife-safe resources, deposit wood, collect eggs, harvest garden beds and cook meals at camp. Steering avoids scenery and flags blocked targets; player-assigned objectives also use safer movement. Faster bounded resource target search on iPad and corrected double berry counting. Existing saves, companion/quest story and original Ember preserved."
+  "build": 111,
+  "notes": "V111 UI fix: collection notifications (toasts) and Haigen's in-world thought bubbles are suppressed whenever the mobile menu or any modal (Map, Story, Journal, Build, Cook, Notes and other panels) is open. Any already visible toast disappears on panel open and future notifications resume normally when menus close. No changes to simulation, saves, quests, controllers or Ember."
 }
