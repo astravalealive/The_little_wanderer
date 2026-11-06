@@ -383,8 +383,9 @@ function campsiteProtected(o){return !!state.campClearingDone&&campDistance(o.x,
 const firstFire={x:1615,y:1540};const ruins={x:2170,y:820};const runeGuardianId=9001;for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(o.type==='tree'&&Math.hypot(o.x-ruins.x,o.y-ruins.y)<155)objects.splice(i,1)}objects.push({id:runeGuardianId,x:ruins.x+15,y:ruins.y+37,type:'tree',size:1.18});// V100: opt-in coop. Hens do not exist until the physical plot is built.
 const coopPlot={kind:'coop',x:1295,y:1385,name:'Chicken Coop'},
  woodPlot={kind:'woodstore',x:1770,y:1455,name:'Wood Storage'},
- jettyPlot={kind:'jetty',x:1050,y:1490,name:'Fishing Jetty'};
-const homesteadPlots=[coopPlot,woodPlot,jettyPlot];
+ jettyPlot={kind:'jetty',x:1050,y:1490,name:'Fishing Jetty'},
+ gardenPlot={kind:'garden',x:1355,y:1645,name:'Kitchen Garden'};
+const homesteadPlots=[coopPlot,woodPlot,jettyPlot,gardenPlot];
 // Construction plots remain unobstructed without renumbering surviving resource IDs.
 for(let i=objects.length-1;i>=0;i--)if(homesteadPlots.some(p=>Math.hypot(objects[i].x-p.x,objects[i].y-p.y)<(p.kind==='jetty'?105:125)))objects.splice(i,1);
 state.eggs=Number.isFinite(state.eggs)?state.eggs:0;
@@ -400,6 +401,25 @@ state.incubateUntil=Number(state.incubateUntil)||0;
 state.jettyBuilt=!!state.jettyBuilt;state.fishingRod=!!state.fishingRod;
 state.fish=Math.max(0,Number(state.fish)||0);
 state.castAt=Number(state.castAt)||0;state.biteAt=Number(state.biteAt)||0;
+// Migrate original floating vegetable patch into the permanent homestead garden.
+// Previous garden investments are honoured and no other saved buildings are removed.
+const oldGardenBuilt=state.structures.some(q=>q.kind==='garden');
+state.gardenTier=Math.max(oldGardenBuilt?1:0,Math.min(3,Number(state.gardenTier)||0));
+state.vegetables=Math.max(0,Number(state.vegetables)||0);
+state.gardenReadyAt=Math.max(0,Number(state.gardenReadyAt)||0);
+if(state.gardenTier&&!state.gardenReadyAt)state.gardenReadyAt=Date.now()+50000;
+if(oldGardenBuilt)state.structures=state.structures.filter(q=>q.kind!=='garden');
+function gardenGrowthMs(){return [0,105000,70000,45000][state.gardenTier]||105000}
+function gardenRipe(){return !!state.gardenTier&&Date.now()>=state.gardenReadyAt}
+function gardenHarvestAmount(){return [0,3,5,8][state.gardenTier]||0}
+function harvestGarden(){
+ if(!state.gardenTier){notify('🥕 Build your kitchen garden first.');return false}
+ if(!gardenRipe()){notify('🌱 The vegetables are growing. Come back once the beds are ready.');return false}
+ const amount=gardenHarvestAmount();
+ state.vegetables+=amount;state.gardenReadyAt=Date.now()+gardenGrowthMs();
+ notify('🥕 Picked '+amount+' vegetables! The garden will regrow.');
+ save();return true;
+}
 const woodCarryLimit=14;
 function woodStoreLimit(){return [0,80,170,340][state.woodStorageTier]}
 function availableCampWood(){return state.wood+(state.woodStorageTier&&Math.hypot(state.x-cottage.x,state.y-cottage.y)<510?state.woodStored:0)}
@@ -1208,13 +1228,61 @@ function drawCampDecor(){
 }
 // The build pads are part of the ground, never an occluding foreground sprite.
 function homesteadTier(p){
- return p.kind==='coop'?state.coopTier:p.kind==='woodstore'?state.woodStorageTier:state.jettyBuilt?1:0;
+ if(p.kind==='coop')return state.coopTier;
+ if(p.kind==='woodstore')return state.woodStorageTier;
+ if(p.kind==='garden')return state.gardenTier;
+ return state.jettyBuilt?1:0;
 }
 function drawHomesteadPlotGround(p){
  if(Math.abs(p.x-cam.x)>950||Math.abs(p.y-cam.y)>750)return;
  const tier=homesteadTier(p),x=p.x,y=p.y;
  ctx.save();
- if(p.kind==='jetty'){
+ if(p.kind==='garden'&&tier){
+  // A walkable plot, not an object that can render over Haigen.
+  const w=88+15*tier,h=56+8*tier;
+  ellipse(x,y+9,w+8,h+6,'#345e3850');
+  ctx.fillStyle='#765339';ctx.fillRect(x-w,y-h,2*w,2*h);
+  ctx.fillStyle='#946b43';ctx.fillRect(x-w+7,y-h+7,2*w-14,2*h-14);
+  // Raised planting beds become more substantial each time the garden upgrades.
+  for(let row=0;row<3;row++){
+   const yy=y-h+26+row*(2*h-36)/2;
+   ctx.fillStyle=row%2?'#5e432e':'#694932';
+   ctx.fillRect(x-w+16,yy-12,2*w-32,24);
+   ctx.strokeStyle='#c39a63';ctx.lineWidth=tier>=2?5:3;
+   ctx.strokeRect(x-w+16,yy-12,2*w-32,24);
+   const growth= Math.max(.12,Math.min(1,1-(state.gardenReadyAt-Date.now())/gardenGrowthMs()));
+   for(let c=0;c<6;c++){
+    const xx=x-w+31+c*(2*w-62)/5;
+    const size=3+growth*(tier>=3?12:9);
+    ellipse(xx,yy-4,4+growth*2,3+growth*2,'#4d893f');
+    ellipse(xx-3,yy-9-growth*3,size*.47,size*.55,tier>=2?'#76b74f':'#6aa64d');
+    ellipse(xx+4,yy-8-growth*3,size*.52,size*.53,tier>=2?'#9cc86a':'#83b55a');
+    if(gardenRipe()&&row===1)ellipse(xx,yy,3.8,4,'#e4a04f');
+   }
+  }
+  ctx.strokeStyle='#e1c39a';ctx.lineWidth=3;ctx.setLineDash([7,8]);
+  ctx.strokeRect(x-w-6,y-h-6,2*w+12,2*h+12);ctx.setLineDash([]);
+  if(tier>=2){
+   // Trellis poles and a water butt show the improved garden footprint.
+   for(let sx of [-1,1]){
+    ctx.strokeStyle='#84623d';ctx.lineWidth=5;ctx.beginPath();
+    ctx.moveTo(x+sx*(w-10),y-h+5);ctx.lineTo(x+sx*(w-10),y-h-33);ctx.stroke();
+   }
+   ctx.strokeStyle='#92704b';ctx.lineWidth=4;ctx.beginPath();
+   ctx.moveTo(x-w+10,y-h-30);ctx.lineTo(x+w-10,y-h-30);ctx.stroke();
+   ellipse(x+w-14,y+h-13,13,9,'#557b77');
+  }
+  if(tier>=3){
+   // A light glass cold frame around the north bed, with open walkways.
+   ctx.strokeStyle='#9ab5a5';ctx.lineWidth=4;
+   ctx.strokeRect(x-w+12,y-h+5,2*w-24,39);
+   ctx.strokeStyle='#cce1ca';ctx.lineWidth=2;
+   for(let i=1;i<5;i++){
+    const xx=x-w+12+i*(2*w-24)/5;
+    ctx.beginPath();ctx.moveTo(xx,y-h+5);ctx.lineTo(xx,y-h+44);ctx.stroke();
+   }
+  }
+ }else if(p.kind==='jetty'){
   if(!tier){
    ellipse(x,y+7,58,24,'#d7bf8b');
    ctx.strokeStyle='#efdbaa';ctx.lineWidth=3;
@@ -1274,11 +1342,16 @@ function drawHomesteadPlotForeground(p){
   ctx.textAlign='center';ctx.font='bold 11px system-ui';ctx.fillStyle='#ffebbd';
   ctx.fillText(state.woodStored+'/'+woodStoreLimit(),x,y-14);
  }
- ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillStyle='#ffe9ab';
- ctx.fillText('✋ '+p.name+' · Lv '+tier,x,y-116);
+ if(p.kind==='garden'){
+  ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillStyle='#ffe9ab';
+  ctx.fillText(gardenRipe()?'🥕 Kitchen Garden · Ready!':'🌱 Kitchen Garden · Lv '+tier,x,y-105);
+ }else{
+  ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillStyle='#ffe9ab';
+  ctx.fillText('✋ '+p.name+' · Lv '+tier,x,y-116);
+ }
  ctx.restore();
 }
-function homesteadSortY(p){return p.y+8}
+function homesteadSortY(p){return p.kind==='garden'?p.y-10:p.y+8}
 function homesteadCost(wood,stone=0,twigs=0,berries=0){
  if(availableCampWood()<wood||state.stone<stone||state.twigs<twigs||state.berries<berries){
   notify('🧱 Need '+wood+' wood, '+stone+' stone, '+twigs+' twigs, '+berries+' berries.');return false;
@@ -1374,7 +1447,8 @@ function interactHomestead(){
  if(state.coopTier&&Math.hypot(state.x-chickenNest.x,state.y-chickenNest.y)<56&&state.nestEggs){
   const n=state.nestEggs;state.eggs+=n;state.nestEggs=0;notify('🥚 Collected '+n+' eggs!');save();return true;
  }
- const p=homesteadPlots.filter(p=>Math.hypot(state.x-p.x,state.y-p.y)<108).sort((a,b)=>Math.hypot(state.x-a.x,state.y-a.y)-Math.hypot(state.x-b.x,state.y-b.y))[0];
+ if(state.gardenTier&&gardenRipe()&&Math.hypot(state.x-gardenPlot.x,state.y-gardenPlot.y)<100){harvestGarden();return true}
+ const p=homesteadPlots.filter(p=>Math.hypot(state.x-p.x,state.y-p.y)<(p.kind==='garden'?145:108)).sort((a,b)=>Math.hypot(state.x-a.x,state.y-a.y)-Math.hypot(state.x-b.x,state.y-b.y))[0];
  if(p){homesteadMenu(p.kind);return true}return false;
 }
 
