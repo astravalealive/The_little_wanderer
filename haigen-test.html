@@ -523,6 +523,7 @@ state.defeatedWildlife=state.defeatedWildlife&&typeof state.defeatedWildlife==='
 state.meatDrops=Array.isArray(state.meatDrops)?state.meatDrops:[];
 state.rawMeat=Math.max(0,Number(state.rawMeat)||0);
 state.antidotes=Math.max(0,Number(state.antidotes)||0);
+state.medicinalMushrooms=Math.max(0,Number(state.medicinalMushrooms)||0);
 state.poisonMs=Math.max(0,Number(state.poisonMs)||0);
 state.lastHitAt=0;
 let collapseRemaining=0,poisonTick=0;
@@ -611,7 +612,7 @@ function updateSurvival(dt){
 function curePoison(){
  if(state.poisonMs<=0)return false;
  if(state.antidotes>0){state.antidotes--;state.poisonMs=0;poisonTick=0;notify('🧪 Antidote used! Poison cured.');save();return true}
- notify('🟢 Craft an antidote from herbs and medicinal mushrooms at camp.');return true;
+ notify('🟢 Craft an antidote from herbs and medicinal mushrooms at camp.');return false;
 }
 function drawMeatDrop(o){
  ellipse(o.x,o.y+7,20,7,'#294e3755');
@@ -624,7 +625,7 @@ let dangerWarningCooldown=0;
 function moveBeast(b,tx,ty,dt,speed){const d=Math.hypot(tx-b.x,ty-b.y);if(d>2){b.x+=(tx-b.x)/d*Math.min(d,dt*speed);b.y+=(ty-b.y)/d*Math.min(d,dt*speed);b.dir=Math.abs(tx-b.x)>Math.abs(ty-b.y)?(tx>b.x?'right':'left'):(ty>b.y?'down':'up')}}
 function takeDamage(amount,name,venom=false){if(collapseRemaining>0||time-state.lastHitAt<1500)return false;state.lastHitAt=time;state.health=Math.max(0,state.health-amount);notify('💥 '+name+' lunged! -'+amount+' health');if(venom)applyPoison();if(state.health<=0)rescueHaigen();save();return true}
 function eatFood(){if(state.hunger>=100){notify('🍲 Haigen is already full!');return}let gain=0;if(state.food>0){state.food--;gain=42}else if(state.eggs>=2){state.eggs-=2;gain=24}else if(state.berries>=3){state.berries-=3;gain=16}else{notify('🍓 Gather berries, eggs or prepare a meal to eat.');return}state.hunger=Math.min(100,state.hunger+gain);notify('🍲 Tummy filled! +'+gain+' hunger.');save()}
-function healSelf(){if(curePoison())return true;if(state.health>=100){notify('❤️ No healing needed.');return false}if(state.potions>0){state.potions--;state.health=Math.min(100,state.health+45);notify('🌿 Applied woodland salve! +45 health.');save();return true}notify('🌿 Make a woodland salve at the cooking station to treat injuries.');return false}
+function healSelf(){if(curePoison())return true;if(state.poisonMs>0&&state.potions<=0)return false;if(state.health>=100){notify('❤️ No healing needed.');return false}if(state.potions>0){state.potions--;state.health=Math.min(100,state.health+45);notify('🌿 Applied woodland salve! +45 health.');save();return true}notify('🌿 Make a woodland salve at the cooking station to treat injuries.');return false}
 function toggleRest(){if(state.resting){state.resting=false;notify('🌤️ Haigen wakes up. Apparently the ground is still there.');save();return}if(dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<170)){notify('💤 Find a safe spot by camp or a campfire to rest.');return}state.resting=true;state.autonomy=false;autoDestination=null;notify('💤 Haigen curls up for a nap by the fire.');save()}
 function cookingStation(){if(dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Get near the campfire or campsite to cook.');return}craft('remedies')}
 function updateBeasts(dt){
@@ -780,11 +781,20 @@ function pickBerries(o){
  return true;
 }
 // Forest-floor mushroom clusters are no longer just decorative.
+// Woodland mushrooms have two discoverable varieties, with distinctive caps.
+function medicinalMushroom(o){const key=o.id!==undefined?o.id:o.seed+87000;return seeded(key*41+27)<.28}
+function gatherMushroom(o){
+ if(medicinalMushroom(o)){
+  state.medicinalMushrooms+=1;notify('🩵 Found a medicinal mushroom! Save it for antidotes.');
+ }else{
+  state.mushrooms+=2;notify('🍄 Picked 2 edible mushrooms for cooking.');
+ }
+}
 function woodlandFungiReady(o){const at=Number(state.harvestedAt['fungi:'+o.seed])||0;return !at||Date.now()-at>=regrowMs.mushroom}
 function pickWoodlandFungi(o){
  if(!woodlandFungiReady(o))return false;
  state.harvestedAt['fungi:'+o.seed]=Date.now();
- state.mushrooms+=2;notify('🍄 Picked 2 woodland mushrooms!');
+ gatherMushroom(o);
  return true;
 }
 function harvest(o){if(o.type==='bush')return pickBerries(o);if(!state.removed.includes(o.id))state.removed.push(o.id);state.harvestedAt[o.id]=Date.now();return true}function regenerate(){const now=Date.now();state.removed=state.removed.filter(id=>{const o=objects.find(x=>x.id===id);if(!o)return false;if(o.type==='bush')return false;if(campsiteProtected(o))return true;const delay=regrowMs[o.type];if(!delay)return true;const taken=Number(state.harvestedAt[id])||0;if(!taken)return false;if(now-taken>=delay){delete state.harvestedAt[id];return false}return true})}regenerate();setInterval(regenerate,15000);
@@ -959,7 +969,7 @@ function autonomousTick(dt){
  if(found.type==='tree')gainWood(state.tools.axe?4:2);
  if(found.type==='rock')state.stone+=2;
  if(found.type==='flower')gatherFlower(found);
- if(found.type==='mushroom')state.mushrooms+=2;
+ if(found.type==='mushroom')gatherMushroom(found);
  state.autoSteps++;autoPause=rand(3000,6500);speak('success',4700);if(state.autoSteps%4===0)memory('Haigen: '+autoThought());save()}
 }
 function offlineProgress(){
@@ -1140,13 +1150,13 @@ function rock(o){
 }
 // Pickable resource mushrooms are distinct from flowers and have visible stems/caps.
 function mushroomPatch(o){
- const x=o.x,y=o.y,v=seeded(o.id*21+11),n=nightStrength();
+ const x=o.x,y=o.y,v=seeded(o.id*21+11),n=nightStrength(),medical=medicinalMushroom(o);
  ellipse(x,y+4,23,10,'#315b3f88');
  for(let i=0;i<3;i++){
   const xx=x+(i-1)*12,hh=(i===1?18:11)+v*5,yy=y+3+(i%2)*3;
   ctx.fillStyle=mixColour('#eee0bd','#b3aeac',n);
   ctx.fillRect(xx-3,yy-hh,6,hh);
-  ellipse(xx,yy-hh,7+(i===1?4:1),4.8,i===1?mixColour('#b46e50','#88757b',n):mixColour('#cc9a67','#948b83',n));
+  ellipse(xx,yy-hh,7+(i===1?4:1),4.8,medical?mixColour('#91c6d1','#697f9b',n):(i===1?mixColour('#b46e50','#88757b',n):mixColour('#cc9a67','#948b83',n)));
   ellipse(xx-3,yy-hh-2,2.4,1.3,'#e9c9a1');
  }
 }
@@ -1968,7 +1978,7 @@ for(let i=0;i<235;i++){
 }
 function drawWoodlandDetail(o){const x=o.x,y=o.y;if(o.kind==='moss'){ellipse(x,y,22,9,'#52844b');ellipse(x-8,y-4,13,6,'#7da660');ellipse(x+8,y-2,10,6,'#659652')}
 else if(o.kind==='log'){ellipse(x,y+7,39,11,'#345d39');ctx.save();ctx.translate(x,y);ctx.rotate(.12);ctx.fillStyle='#765337';ctx.fillRect(-31,-8,60,17);ellipse(29,0,9,9,'#c6a57b');ellipse(29,0,5,5,'#98754d');ctx.restore();ellipse(x-12,y-8,15,4,'#74a05c')}
-else if(o.kind==='fungi'){for(let j=0;j<3;j++){const xx=x+j*13-13;ctx.fillStyle='#e4d6b2';ctx.fillRect(xx-2,y-11-(j%2)*5,4,13);ellipse(xx,y-12-(j%2)*5,8,5,j===1?'#b85b44':'#d39a68')}}
+else if(o.kind==='fungi'){for(let j=0;j<3;j++){const xx=x+j*13-13;ctx.fillStyle='#e4d6b2';ctx.fillRect(xx-2,y-11-(j%2)*5,4,13);ellipse(xx,y-12-(j%2)*5,8,5,medicinalMushroom(o)?'#91b9c9':j===1?'#b85b44':'#d39a68')}}
 else if(o.kind==='stump'){ellipse(x,y+6,23,10,'#365e3d');ctx.fillStyle='#79563b';ctx.fillRect(x-14,y-17,28,22);ellipse(x,y-17,15,7,'#b9946a');ellipse(x,y-17,9,4,'#8b6849')}
 else{for(let j=-2;j<=2;j++){ctx.strokeStyle='#4f8c4b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+j*7,y-14,x+j*12,y-25+Math.sin(time*.001+o.seed)*3);ctx.stroke()}}}
 const smoothLight=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
@@ -2709,10 +2719,10 @@ const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,st
  if(foraging){
   if(foraging.kind==='bush')pickBerries(foraging.o);
   else if(foraging.kind==='fungi')pickWoodlandFungi(foraging.o);
-  else{harvest(foraging.o);state.mushrooms+=2;notify('🍄 Picked 2 mushrooms!')}
+  else{harvest(foraging.o);gatherMushroom(foraging.o)}
   save();return;
  }
- if(storyInteract())return;let c=closest();if(c&&c.type==='frog'){c.o.hopAt=0;notify('🐸 Ribbit! The little frog hops away.');return}if(c&&c.type==='critter'){c.o.scaredUntil=time+4500;notify(c.o.kind==='squirrel'?'🐿️ The squirrel darts up a tree!':c.o.kind==='butterfly'?'🦋 The butterfly flutters away!':'✨ The little firefly dances away!');return}if(c&&c.type==='eggs'){if(state.nestEggs>0){const count=state.nestEggs;state.eggs+=count;state.nestEggs=0;notify('🥚 Collected '+count+' fresh egg'+(count===1?'':'s')+'! Total: '+state.eggs);save()}else notify('🐔 No eggs yet. The hens need some time.');return}if(!c){notify('Move closer and press X to gather mushrooms, berries or supplies.');return}if(c.type==='fallen'){const item=c.o;if(item.kind==='log'&&state.wood>woodCarryLimit-2){notify('🪵 You need room for 2 logs. Visit your wood shed first.');return}if(item.kind==='log')gainWood(2);if(item.kind==='twig')state.twigs+=2;if(item.kind==='leaves')state.leaves+=3;state.fallen=state.fallen.filter(o=>o.id!==item.id);notify(item.kind==='log'?'🪵 Collected 2 wood':item.kind==='twig'?'🌿 Collected 2 twigs':'🍃 Collected 3 leaves');save();return}if(c.type==='resource'){let o=c.o;if(['cactus','palm','fir','bareTree'].includes(o.type)){notify('🌿 This is part of the local habitat. Leave it growing!');return}if(o.type==='tree'){notify('🪓 Equip your axe and press RT to chop trees.');return}if(!harvest(o)){save();return}if(o.type==='flower')gatherFlower(o);if(o.type==='mushroom'){state.mushrooms=(Number(state.mushrooms)||0)+2;notify('🍄 Collected 2 mushrooms!')}if(o.type==='tree'){let amount=state.tools.axe?4:2;const received=gainWood(amount);notify('🪵 Collected '+received+' wood!')}if(o.type==='rock'){state.stone+=2;notify('🪨 Collected 2 stone!')}if(o.type==='bush'){/* pickBerries already granted fruit without uprooting the shrub. */}}else if(c.type==='friend'){let f=c.o;if(state.berries>0){state.berries--;state.friends[f.kind==='fox'?'skolli':'heri']=Math.min(100,state.friends[f.kind==='fox'?'skolli':'heri']+8);notify(`🍓 ${f.name} enjoyed a berry! Friendship grew.`)}else{notify(`${f.name} is ${f.mode}. Bring berries to make friends!`)}}else if(c.type==='fire'){let fire=c.o;if(fire.lit===false){if(state.wood<1){notify('Need 1 wood to light this fire.');return}state.wood--;fire.lit=true;fire.fuel=180;notify('🔥 Campfire lit!')}else if(state.berries>=2){state.berries-=2;state.food++;notify('🍲 Cooked a berry meal!')}else if(state.wood>=1){state.wood--;fire.fuel=(fire.fuel||180)+120;notify('🪵 Added fuel to the fire!')}else notify('Bring berries to cook or wood for fuel.')}else if(c.type==='home'){campBuild();return}else if(c.type==='fireSite'){notify('🔥 This is the fire pit. Open Build to make your first campfire.')}else{notify('ᚠ An ancient rune. What secrets does this forest hold?')}save()}$('eatBtn').addEventListener('click',eatFood);$('healBtn').addEventListener('click',healSelf);$('restBtn').addEventListener('click',toggleRest);$('styleBtn').addEventListener('click',hairstyleMenu);$('mailBtn').addEventListener('click',mailbox);$('cookBtn').addEventListener('click',cookingStation);
+ if(storyInteract())return;let c=closest();if(c&&c.type==='frog'){c.o.hopAt=0;notify('🐸 Ribbit! The little frog hops away.');return}if(c&&c.type==='critter'){c.o.scaredUntil=time+4500;notify(c.o.kind==='squirrel'?'🐿️ The squirrel darts up a tree!':c.o.kind==='butterfly'?'🦋 The butterfly flutters away!':'✨ The little firefly dances away!');return}if(c&&c.type==='eggs'){if(state.nestEggs>0){const count=state.nestEggs;state.eggs+=count;state.nestEggs=0;notify('🥚 Collected '+count+' fresh egg'+(count===1?'':'s')+'! Total: '+state.eggs);save()}else notify('🐔 No eggs yet. The hens need some time.');return}if(!c){notify('Move closer and press X to gather mushrooms, berries or supplies.');return}if(c.type==='fallen'){const item=c.o;if(item.kind==='log'&&state.wood>woodCarryLimit-2){notify('🪵 You need room for 2 logs. Visit your wood shed first.');return}if(item.kind==='log')gainWood(2);if(item.kind==='twig')state.twigs+=2;if(item.kind==='leaves')state.leaves+=3;state.fallen=state.fallen.filter(o=>o.id!==item.id);notify(item.kind==='log'?'🪵 Collected 2 wood':item.kind==='twig'?'🌿 Collected 2 twigs':'🍃 Collected 3 leaves');save();return}if(c.type==='resource'){let o=c.o;if(['cactus','palm','fir','bareTree'].includes(o.type)){notify('🌿 This is part of the local habitat. Leave it growing!');return}if(o.type==='tree'){notify('🪓 Equip your axe and press RT to chop trees.');return}if(!harvest(o)){save();return}if(o.type==='flower')gatherFlower(o);if(o.type==='mushroom'){gatherMushroom(o)}if(o.type==='tree'){let amount=state.tools.axe?4:2;const received=gainWood(amount);notify('🪵 Collected '+received+' wood!')}if(o.type==='rock'){state.stone+=2;notify('🪨 Collected 2 stone!')}if(o.type==='bush'){/* pickBerries already granted fruit without uprooting the shrub. */}}else if(c.type==='friend'){let f=c.o;if(state.berries>0){state.berries--;state.friends[f.kind==='fox'?'skolli':'heri']=Math.min(100,state.friends[f.kind==='fox'?'skolli':'heri']+8);notify(`🍓 ${f.name} enjoyed a berry! Friendship grew.`)}else{notify(`${f.name} is ${f.mode}. Bring berries to make friends!`)}}else if(c.type==='fire'){let fire=c.o;if(fire.lit===false){if(state.wood<1){notify('Need 1 wood to light this fire.');return}state.wood--;fire.lit=true;fire.fuel=180;notify('🔥 Campfire lit!')}else if(state.berries>=2){state.berries-=2;state.food++;notify('🍲 Cooked a berry meal!')}else if(state.wood>=1){state.wood--;fire.fuel=(fire.fuel||180)+120;notify('🪵 Added fuel to the fire!')}else notify('Bring berries to cook or wood for fuel.')}else if(c.type==='home'){campBuild();return}else if(c.type==='fireSite'){notify('🔥 This is the fire pit. Open Build to make your first campfire.')}else{notify('ᚠ An ancient rune. What secrets does this forest hold?')}save()}$('eatBtn').addEventListener('click',eatFood);$('healBtn').addEventListener('click',healSelf);$('restBtn').addEventListener('click',toggleRest);$('styleBtn').addEventListener('click',hairstyleMenu);$('mailBtn').addEventListener('click',mailbox);$('cookBtn').addEventListener('click',cookingStation);
 // Terrain follows the existing broad landscape colours; mining sites regrow after a short rest.
 function terrainAt(x,y){const region=expandedRegion(x,y);if(region)return region.id;const high=Math.hypot((x-1540)/620,(y-480)/400),marsh=Math.hypot((x-2100)/510,(y-2420)/360),grove=Math.hypot((x-2470)/510,(y-1280)/360);if(high<1)return 'highlands';if(marsh<1)return 'marsh';if(grove<1)return 'grove';if(inPond(x,y,45))return 'shore';return 'woodland'}
 function digGround(tool){const ground=terrainAt(state.x,state.y),rocky=ground==='highlands',wet=ground==='marsh'||ground==='shore';if(tool==='shovel'&&rocky){notify('⛏️ The highland stone is too hard for a shovel.');return}if(tool==='pickaxe'&&!rocky&&ground!=='grove'){notify('🥄 This soil is soft. Try the shovel here.');return}
