@@ -629,69 +629,74 @@ function toggleRest(){if(state.resting){state.resting=false;notify('🌤️ Haig
 function cookingStation(){if(dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Get near the campfire or campsite to cook.');return}craft('remedies')}
 function updateBeasts(dt){
  dangerWarningCooldown=Math.max(0,dangerWarningCooldown-dt);
- const dillon=companions[0],skolli=companions[1];
+ const dillon=companions[0];
  for(const b of beasts){
+  if(!animalAlive(b))continue;
   b.anim+=dt;b.t-=dt;b.cooldown=Math.max(0,b.cooldown-dt);
-  // Story escort: Bristleback chooses to help. Never attack while assisting.
+  // Preserve Bristleback's original story escort and non-hostile quest dialogue.
   if(b.kind==='boar'&&state.story?.stage===4&&state.story.boarHelp){
    const spot={x:storyPlaces.blockage.x+65,y:storyPlaces.blockage.y+7};
-   if(dist(b,spot)>28){
-    b.mode='helping';moveBeast(b,spot.x,spot.y,dt,.18);
-   }else{
+   if(dist(b,spot)>28){b.mode='helping';moveBeast(b,spot.x,spot.y,dt,.18)}
+   else{
     b.mode='rooting';
-   if(!state.story.boarArrived){
-    state.story.boarArrived=true;
-    notify('🐗 Bristleback has arrived! Press Collect at the blocked stream.');
-    save();
-   }
-   b.t=1100;
+    if(!state.story.boarArrived){
+     state.story.boarArrived=true;
+     notify('🐗 Bristleback has arrived! Press Collect at the blocked stream.');
+     save();
+    }
+    b.t=1100;
    }
    continue;
   }
-  // During the story Bristleback is cautious, not hostile: talking to him is possible.
   if(b.kind==='boar'&&state.story?.stage===4&&!state.story.boarHelp){
-   b.mode='watching';b.t=Math.max(b.t,1700);b.cooldown=30000;
-   continue;
+   b.mode='watching';b.t=Math.max(b.t,1700);b.cooldown=30000;continue;
   }
-  const playerDistance=dist(b,state),foxDistance=dist(b,skolli);
-  const campDistance=Math.hypot(b.x-cottage.x,b.y-cottage.y);
-  // No beast enters the campsite, including during an encounter.
-  if(campDistance<safeRadius+55){b.mode='retreating';b.t=2800}
-  const threat=playerDistance<(b.kind==='wolf'?255:205)&&campDistance>safeRadius;
-  if(threat&&dangerWarningCooldown===0){
-   dangerWarningCooldown=14000;
-   dillon.mode='watching';dillon.target=null;dillon.t=3300;
-   notify('🐇 Dillon warns Haigen! '+(b.kind==='wolf'?'A wolf is watching from the trees!':'A wild boar is snorting nearby!'));
-   if(state.autonomy)think(b.kind==='wolf'?'Dillon says WOLF. Time to be careful!':'That boar looks extremely grumpy!',4800,true)
+  const pd=dist(b,state),campDist=Math.hypot(b.x-cottage.x,b.y-cottage.y);
+  const playerSafe=Math.hypot(state.x-cottage.x,state.y-cottage.y)<safeRadius;
+  if(collapseRemaining>0||campDist<safeRadius+90||playerSafe){
+   b.windupMs=0;b.lungeMs=0;b.mode='retreating';
+   moveBeast(b,b.homeX,b.homeY,dt,.13);continue;
   }
-  if(threat&&foxDistance<420&&b.cooldown===0&&b.mode!=='retreating'){
-   b.mode='confronting';b.t=rand(1500,2800);
-  }
-  if(b.mode==='confronting'){
-   // Skölli moves between Haigen and the beast and drives it away.
-   const d=Math.max(1,playerDistance);
-   const guardX=state.x+(b.x-state.x)/d*90,guardY=state.y+(b.y-state.y)/d*90;
-   skolli.mode='defending';skolli.target={x:guardX,y:guardY};skolli.t=2300;
-   if(foxDistance<175||b.t<=0){b.mode='retreating';b.t=4000;b.cooldown=17000;skolli.mode='defending';skolli.t=1800;skolli.target={x:b.x,y:b.y};if(dangerWarningCooldown<10000){notify('🦊 Skölli barks fiercely and drives '+b.name+' away!');dangerWarningCooldown=12000}}
-  }else if(b.mode==='retreating'){
-   moveBeast(b,b.homeX,b.homeY,dt,b.kind==='boar'?.14:.12);
-   if(Math.hypot(b.x-b.homeX,b.y-b.homeY)<65){b.mode='patrol';b.t=rand(4000,7500)}
+  const sight=b.kind==='wolf'?275:225;
+  if(pd<sight){
+   if(dangerWarningCooldown<=0){
+    dangerWarningCooldown=12000;dillon.mode='watching';
+    dillon.target=null;dillon.t=2800;
+    notify('⚠️ '+b.name+' has spotted Haigen! Be careful.');
+   }
+   if(b.cooldown===0&&pd<115&&!b.windupMs&&!b.lungeMs){
+    b.windupMs=b.kind==='wolf'?550:700;b.mode='watching';
+   }
+   if(b.windupMs>0){
+    b.windupMs=Math.max(0,b.windupMs-dt);
+    if(b.windupMs===0){b.lungeMs=550;b.mode='charging'}
+   }else if(b.lungeMs>0){
+    b.lungeMs=Math.max(0,b.lungeMs-dt);
+    moveBeast(b,state.x,state.y,dt,b.kind==='wolf'?.25:.21);
+    if(dist(b,state)<64&&b.cooldown===0){
+     takeDamage(b.kind==='wolf'?17:22,b.name);
+     b.lungeMs=0;b.cooldown=5200;b.mode='retreating';
+    }else if(b.lungeMs===0){b.cooldown=3900;b.mode='retreating'}
+   }else if(b.cooldown===0){
+    b.mode='charging';moveBeast(b,state.x,state.y,dt,b.kind==='wolf'?.085:.065);
+   }else{
+    b.mode='retreating';moveBeast(b,b.homeX,b.homeY,dt,.10);
+   }
   }else{
-   if(b.t<=0){b.angle=rand(0,Math.PI*2);b.t=rand(2400,5500);b.mode=Math.random()<.35?(b.kind==='boar'?'rooting':'watching'):'patrol'}
-   if(b.mode==='patrol'){const tx=b.homeX+Math.cos(b.angle)*135,ty=b.homeY+Math.sin(b.angle)*125;moveBeast(b,tx,ty,dt,b.kind==='boar'?.035:.046)}
+   b.windupMs=0;b.lungeMs=0;
+   if(Math.hypot(b.x-b.homeX,b.y-b.homeY)>85){
+    b.mode='retreating';moveBeast(b,b.homeX,b.homeY,dt,.09);
+   }else{
+    b.mode='patrol';
+    if(b.t<=0){b.t=rand(2300,5100);b.angle=rand(0,Math.PI*2)}
+    moveBeast(b,b.homeX+Math.cos(b.angle)*110,b.homeY+Math.sin(b.angle)*110,dt,.03);
+   }
   }
-  // Close encounters hurt Haigen; cooldown prevents repeated damage every frame.
-  if(playerDistance<75&&campDistance>safeRadius&&b.mode!=='retreating'){
-   takeDamage(b.kind==='wolf'?18:25,b.name);
-   b.mode='retreating';b.t=4000;b.cooldown=11000;
-  }
-  // Defensive fox movement never pulls enemies into the safe area.
-  if(b.mode==='confronting'&&playerDistance<115&&dangerWarningCooldown<10000){notify('⚠️ '+b.name+' is too close. Head back towards camp!');dangerWarningCooldown=12000}
  }
 }
 function drawBeast(b){
  // Shared directional animal silhouettes: torso, head and eye point the same way.
- const moving=b.mode==='patrol'||b.mode==='retreating'||b.mode==='confronting';
+ const moving=b.mode==='patrol'||b.mode==='retreating'||b.mode==='confronting'||b.mode==='charging';
  const stride=moving?Math.sin(b.anim*.011)*5:0;
  const direction=b.dir||'right',back=direction==='up',front=direction==='down',side=!back&&!front;
  ctx.save();ctx.translate(b.x,b.y);
@@ -755,7 +760,11 @@ function drawBeast(b){
   }
  }
  ctx.font='bold 13px system-ui';ctx.fillStyle='#fce7c3';ctx.textAlign='center';ctx.fillText(b.name,0,-74);
- if(b.mode==='confronting'){ctx.font='20px system-ui';ctx.fillText(b.kind==='wolf'?'🐺':'💢',0,-94)}
+ if(b.mode==='confronting'||b.windupMs>0){ctx.font='20px system-ui';ctx.fillText('!',0,-94)}
+ if(animalHp(b)<(wildlifeHealth[b.kind]||7)){
+  ctx.fillStyle='#273431';ctx.fillRect(-29,-91,58,8);
+  ctx.fillStyle='#df977b';ctx.fillRect(-28,-90,56*animalHp(b)/(wildlifeHealth[b.kind]||7),6);
+ }
  ctx.restore();
 }
 let keys={},joy={x:0,y:0},last=performance.now(),cam={x:state.x,y:state.y},look={x:0,y:0},time=0,toastTimer=0,particles=[];const near=(o,r=95)=>dist(state,o)<r;function notify(s){$('toast').textContent=s;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3000)}function memory(s){if(!state.memories.includes(s)){state.memories.unshift(s);state.memories=state.memories.slice(0,80);notify('📖 '+s)}}const toolSlots=[{id:'hands',icon:'✋',name:'Hands'},{id:'axe',icon:'🪓',name:'Axe'},{id:'torch',icon:'🔦',name:'Torch'},{id:'shovel',icon:'🥄',name:'Shovel'},{id:'pickaxe',icon:'⛏️',name:'Pickaxe'}];function availableTools(){return toolSlots.filter(t=>t.id==='hands'||state.tools[t.id]>0)}function equipTool(id){if(!availableTools().some(t=>t.id===id))return;state.equipped=id;renderHotbar();save()}function cycleTool(direction){const list=availableTools();const i=list.findIndex(t=>t.id===state.equipped);equipTool(list[(i+direction+list.length)%list.length].id)}function renderHotbar(){const bar=$('hotbar');if(!bar)return;bar.innerHTML=toolSlots.map(t=>{const owned=t.id==='hands'||state.tools[t.id]>0;return `<button class="slot ${state.equipped===t.id?'selected':''}" data-equip="${t.id}" ${owned?'':'disabled'} aria-label="Equip ${t.name}">${t.icon}<small>${t.name}</small></button>`}).join('');bar.querySelectorAll('[data-equip]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();equipTool(b.dataset.equip)});b.addEventListener('click',()=>equipTool(b.dataset.equip))})}let shoulderLeft=false,shoulderRight=false;function checkShoulders(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const left=!!(p&&p.buttons&&p.buttons[4]&&p.buttons[4].pressed),right=!!(p&&p.buttons&&p.buttons[5]&&p.buttons[5].pressed);if(left&&!shoulderLeft)cycleTool(-1);if(right&&!shoulderRight)cycleTool(1);shoulderLeft=left;shoulderRight=right}function save(){state.lastSavedAt=Date.now();try{localStorage.setItem('wandererTestSave',JSON.stringify(state))}catch{}}setInterval(save,5000);addEventListener('pagehide',save);
