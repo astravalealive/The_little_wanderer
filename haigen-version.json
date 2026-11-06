@@ -1,4 +1,4 @@
 {
   "build": 96,
-  "notes": "Drawn, slow-moving biome animals replace flying emojis; varied tree heights/canopies and rock silhouettes; solid-object collision with sliding; existing game/save preserved."
+  "notes": "V96 corrected build: illustrated regional animal sprites with realistic slow roaming, varied tree heights/shapes, rock variation, solid-object collision with sliding; preserves gameplay and saves."
 }
