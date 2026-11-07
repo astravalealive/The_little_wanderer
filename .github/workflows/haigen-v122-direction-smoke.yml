@@ -1,0 +1,82 @@
+name: Haigen V122 direction and art regression
+on:
+  push:
+    paths:
+      - haigen-v122-playtest.html
+      - .github/workflows/haigen-v122-direction-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-playtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - name: Check directions, exact left atlas and visual render
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/haigen-http.log 2>&1 &
+          sleep 2
+          node <<'NODE'
+          const {chromium}=require('playwright-core');
+          const qs=()=>({
+            sprite:window.__haigenSpriteProbe,
+            atlas:window.__haigenAtlasQA?.(),
+            motion:window.__haigenMotionQA,
+            environmentReady:window.__haigenEnvironmentReady,
+            ready:window.__haigenWorldReady,
+            version:document.getElementById('devVersion')?.textContent,
+            error:document.getElementById('worldError')?.style.display==='block'?document.getElementById('worldError')?.textContent:null
+          });
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+            for(const view of [{width:390,height:844},{width:1024,height:768}]){
+              const page=await browser.newPage({viewport:view,deviceScaleFactor:2});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+              await page.goto('http://127.0.0.1:8765/haigen-v122-playtest.html?restore=1',{waitUntil:'domcontentloaded'});
+              await page.waitForFunction(()=>window.__haigenWorldReady===true&&window.__haigenAtlasQA?.()?.ready,{timeout:20000});
+              await page.waitForTimeout(800);
+              const initial=await page.evaluate(qs);
+              if(initial.error||!initial.ready||initial.version!=='V122 · LEFT FIX')throw Error('Startup failed '+JSON.stringify(initial));
+              if(!initial.environmentReady)throw Error('Approved environment sprite asset not ready');
+              if(initial.atlas.mismatches!==0||!initial.atlas.bakedLeftMatchesRightMirror)
+                throw Error('Left pixel art is not an exact mirror: '+JSON.stringify(initial.atlas));
+              await page.keyboard.down('ArrowLeft');
+              await page.waitForTimeout(900);
+              const left=await page.evaluate(qs);
+              await page.screenshot({path:'/tmp/haigen-v122-LEFT-'+view.width+'.png'});
+              await page.keyboard.up('ArrowLeft');
+              if(left.sprite.dir!=='left'||left.sprite.row!==3||left.sprite.mirrored||!left.sprite.bakedLeft||
+                 left.motion.dir!=='left'||left.motion.worldX>=initial.motion.worldX)
+                 throw Error('LEFT moonwalk regression '+JSON.stringify({initial,left}));
+              await page.keyboard.down('ArrowRight');await page.waitForTimeout(1000);
+              const right=await page.evaluate(qs);
+              await page.screenshot({path:'/tmp/haigen-v122-RIGHT-'+view.width+'.png'});
+              await page.keyboard.up('ArrowRight');
+              if(right.sprite.dir!=='right'||right.sprite.row!==2||right.motion.dir!=='right'||
+                 right.motion.worldX<=left.motion.worldX)
+                 throw Error('RIGHT facing failed '+JSON.stringify({left,right}));
+              console.log('DIRECTION TEST PASS '+JSON.stringify({view,initial,left,right,errors}));
+              if(errors.length)throw Error('JS browser errors '+JSON.stringify(errors));
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewPond').click();await page.waitForTimeout(900);
+              const pond=await page.evaluate(()=>window.__haigenPondProbe);
+              await page.screenshot({path:'/tmp/haigen-v122-POND-'+view.width+'.png'});
+              if(pond.nearbyFrogs<1||pond.liveFrogs<10)throw Error('Frogs unavailable '+JSON.stringify(pond));
+              console.log('FROGS PASS '+JSON.stringify({view,pond}));
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: haigen-v122-direction-captures
+          path: /tmp/haigen-v122-*.png
