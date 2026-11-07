@@ -62,12 +62,11 @@ jobs:
               await page.locator('#previewPond').click();
               await page.waitForTimeout(1100);
               const pond=await page.evaluate(()=>({
-                player:{x:state.x,y:state.y},pond:{x:pond.x,y:pond.y},
-                liveFrogs:frogs.length,visibleFrogs:frogs.filter(f=>Math.abs(f.x-cam.x)<500&&Math.abs(f.y-cam.y)<420).length,
-                waterDepth:lakeLevel(state.x,state.y),error:document.getElementById('worldError')?.style.display==='block'?document.getElementById('worldError')?.textContent:null
+                ...window.__haigenPondProbe,
+                error:document.getElementById('worldError')?.style.display==='block'?document.getElementById('worldError')?.textContent:null
               }));
               console.log('HAIGEN POND '+JSON.stringify(pond));
-              if(pond.error||pond.waterDepth<1.2||pond.visibleFrogs<1)throw new Error('Pond visit failed '+JSON.stringify(pond));
+              if(pond.error||pond.waterDepth<1.2||pond.nearbyFrogs<1)throw new Error('Pond visit failed '+JSON.stringify(pond));
               await page.close();
             }
             await browser.close();
