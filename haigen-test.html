@@ -2411,9 +2411,84 @@ function homesteadTier(p){
  if(p.kind==='garden')return state.gardenTier;
  return state.jettyBuilt?1:0;
 }
+// Shared timber, stone and foliage vocabulary for real built homestead plots.
+function worldDrawHomestead(p,tier){
+ if(!tier)return false;
+ const x=p.x,y=p.y;
+ ctx.save();ctx.translate(x,y);ctx.imageSmoothingEnabled=false;
+ const f=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))};
+ const roof=(width,height,color)=>{
+  poly([[-width/2-10,-height],[-4,-height-40],[width/2+10,-height]],'#2d3631');
+  poly([[-width/2-5,-height+2],[0,-height-33],[width/2+5,-height+2]],color);
+  for(let i=0;i<9;i++){const yy=-height+4+i*3;const half=8+i*width/18;
+   f(-half,yy,half*2,2,i%2?'#a4845d':'#806447')}
+ };
+ if(p.kind==='coop'){
+  const w=85+tier*12,h=73+tier*12;
+  ellipse(0,12,w*.68,18,'#263e3266');
+  f(-w/2-4,-h+5,w+8,h+14,'#2c3631');
+  f(-w/2,-h+8,w,h+6,'#8c6b4a');
+  for(let i=0;i<8;i++){const xx=-w/2+6+i*w/8;f(xx,-h+8,4,h+4,i%2?'#b48a56':'#684c35')}
+  roof(w,h,'#9a774c');f(-15,-35,30,44,'#2d322f');f(-11,-31,23,37,'#553f2f');
+  f(-8,-27,6,16,'#927048');f(7,-19,3,3,'#e4c58b');
+  for(let i=0;i<6;i++){const px=-w/2+8+i*12;f(px,7,7,5,'#57493a')}
+  if(tier>1){for(let i=0;i<9;i++){const xx=-w/2-13+i*15;f(xx,14,6,18,'#70573e');f(xx-3,12,12,5,'#b39467')}}
+ }else if(p.kind==='woodstore'){
+  const w=98+tier*15,h=81+tier*9;
+  ellipse(0,12,w*.68,16,'#263e3266');
+  f(-w/2,-h,w,13,'#333a32');f(-w/2+3,-h+2,w-6,9,'#956f49');
+  roof(w,h,'#697465');
+  f(-w/2+4,-h+14,8,h+4,'#654c35');f(w/2-12,-h+14,8,h+4,'#654c35');
+  f(-w/2,-2,w,8,'#6e5038');
+  const count=Math.min(18,7+state.woodStored);
+  for(let i=0;i<count;i++){const col=i%6,row=Math.floor(i/6),px=-w/2+14+col*14,py=-7-row*12;
+   f(px-2,py-6,17,11,'#553b2e');f(px,py-6,13,8,'#b68a5c');
+   f(px+3,py-5,7,6,'#d1af79');f(px+4,py-4,5,4,'#88603c')}
+ }else{ctx.restore();return false}
+ ctx.restore();return true;
+}
+function worldDrawGarden(p,tier){
+ const x=p.x,y=p.y,w=89+tier*14,h=48+tier*7;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ctx.fillStyle='#524834';ctx.fillRect(x-w-6,y-h-7,2*w+12,2*h+14);
+ ctx.fillStyle='#8e774b';ctx.fillRect(x-w,y-h,2*w,2*h);
+ for(let row=0;row<3;row++){
+  const yy=y-h+8+row*(2*h-12)/3;
+  ctx.fillStyle='#3d392e';ctx.fillRect(x-w+9,yy,2*w-18,23);
+  ctx.fillStyle='#644e35';ctx.fillRect(x-w+13,yy+3,2*w-26,17);
+  for(let j=0;j<7;j++){
+   const xx=x-w+25+j*(2*w-50)/6;
+   const growth=gardenRipe()?13:Math.max(3,10*(1-(state.gardenReadyAt-Date.now())/gardenGrowthMs()));
+   ctx.fillStyle='#42764d';ctx.fillRect(xx,yy+10-growth,3,growth);
+   ctx.fillStyle=j%2?'#74a85e':'#9dbc70';
+   ctx.fillRect(xx-5,yy+8-growth,10,6);
+   if(gardenRipe()&&row===1){ctx.fillStyle='#d49b57';ctx.fillRect(xx-2,yy+8,5,6)}
+  }
+ }
+ ctx.strokeStyle='#c6a272';ctx.lineWidth=4;ctx.strokeRect(x-w,y-h,2*w,2*h);
+ ctx.restore();
+}
+function worldDrawDock(p){
+ const x=p.x,y=p.y;ctx.save();ctx.imageSmoothingEnabled=false;
+ for(let i=0;i<9;i++){
+  const yy=y-6+i*16;
+  ctx.fillStyle='#493b2d';ctx.fillRect(x-51,yy-2,104,16);
+  ctx.fillStyle=i%2?'#a68156':'#b79569';ctx.fillRect(x-47,yy,96,11);
+  ctx.fillStyle='#dac198';ctx.fillRect(x-45,yy+1,84,2);
+  ctx.fillStyle='#5a4433';ctx.fillRect(x-40,yy+10,83,2);
+ }
+ for(const dx of [-46,46])for(const yy of [y-5,y+112]){
+  ctx.fillStyle='#49392d';ctx.fillRect(x+dx-5,yy-13,10,26);
+  ctx.fillStyle='#b09265';ctx.fillRect(x+dx-2,yy-12,5,23);
+ }
+ ctx.restore();
+}
+
 function drawHomesteadPlotGround(p){
  if(Math.abs(p.x-cam.x)>950||Math.abs(p.y-cam.y)>750)return;
  const tier=homesteadTier(p),x=p.x,y=p.y;
+ if(rbEnabled&&tier&&p.kind==='garden'){worldDrawGarden(p,tier);return}
+ if(rbEnabled&&tier&&p.kind==='jetty'){worldDrawDock(p);return}
  ctx.save();
  if(p.kind==='garden'&&tier){
   // A walkable plot, not an object that can render over Haigen.
@@ -2528,6 +2603,7 @@ function drawHomesteadPlotForeground(p){
  const tier=homesteadTier(p);
  if(!tier||p.kind==='jetty'||Math.abs(p.x-cam.x)>950||Math.abs(p.y-cam.y)>750)return;
  const x=p.x,y=p.y;
+ if(rbEnabled&&worldDrawHomestead(p,tier))return;
  ctx.save();
  if(p.kind==='coop'){
   const w=75+tier*12,h=65+tier*13;
