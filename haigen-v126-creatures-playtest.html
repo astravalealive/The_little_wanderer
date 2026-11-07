@@ -214,7 +214,19 @@ function drawRegionalWildlife(){
 // All biome creatures are drawn in canvas, not font glyphs or emoji.
 // Faces, gait and species-specific body proportions distinguish each animal.
 function drawWildAnimal(a){
- if(rbEnabled&&['snake','scorpion','crab','lizard','frog','hare','gull','raven','heron','bison','stag','goat','turtle','rat','fox','otter','watcher','ashCreeper','scuttleback'].includes(a.type)){
+ // Wetland frogs now use the ORIGINAL funny leg-kick animation.
+ if(a.type==='frog'){
+  const phase=a.walking?((a.gait*.16)%1+1)%1:0;
+  const step=(a.face||1)*10;
+  drawFrog({id:10000+a.id,x:a.x,y:a.y,phase:a.phase||0,
+   colour:a.id%4===0?'#a18a54':'#63a64b',
+   hopUntil:a.walking?time+(1-phase)*430:0,hopDuration:430,
+   fromX:a.x-step*phase,fromY:a.y,toX:a.x+step*(1-phase),toY:a.y,
+   scaredHop:(a.scaredUntil||0)>time});
+  return;
+ }
+ if((illustratedFaunaReady||illustratedExtraReady||skolliAtlasReady)&&
+ ['snake','scorpion','crab','lizard','hare','gull','raven','heron','bison','stag','goat','turtle','rat','fox','otter','watcher','ashCreeper','scuttleback'].includes(a.type)){
   const kind=a.type;
   worldFaunaDraw(kind,a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,Math.max(.65,a.size*.96));
   // Attack tells and health bars remain visible over the illustrated sprites.
@@ -4503,9 +4515,16 @@ function updateDucks(dt){
 }
 function drawDuck(d){
  const flying=d.air>.08,alt=d.air*(42+Math.sin(time*.002+d.phase)*5);
- if(illustratedFaunaReady&&!flying){
-  drawIllustratedFauna('duck',d.x,d.y,Math.cos(d.heading)<0?'left':'right',
-    Math.abs(d.speed||0)>.02,time+d.phase*1000,1.23*d.size);
+ if(illustratedFaunaReady){
+  drawIllustratedFauna('duck',d.x,d.y-alt,Math.cos(d.heading)<0?'left':'right',
+    flying||Math.abs(d.speed||0)>.02,time+d.phase*1000,1.23*d.size);
+  if(flying){
+   ctx.save();ctx.strokeStyle='#a1afa2';ctx.lineWidth=3;ctx.lineCap='square';
+   const flap=Math.sin(d.wing)*12;
+   ctx.beginPath();ctx.moveTo(d.x-8,d.y-alt-17);ctx.lineTo(d.x-25,d.y-alt-28-flap);
+   ctx.moveTo(d.x+6,d.y-alt-17);ctx.lineTo(d.x+21,d.y-alt-27+flap);
+   ctx.stroke();ctx.restore();
+  }
   return;
  }
  const male=d.kind==='mallard',size=d.size;
@@ -4557,8 +4576,8 @@ function drawDuckNest(f){
 }
 function drawDuckling(ch){
  const growth=Math.min(1,ch.age),scale=.47+growth*.43;
- if(illustratedExtraReady&&!ch.flying){
-  // Ducklings remain smaller than adults and still grow and forage normally.
+ if(illustratedExtraReady){
+  // Duckling artwork remains consistent on land, swimming and short flights.
   drawIllustratedExtraFauna('duckling',ch.x,ch.y-(ch.departAlt||0),
     ch.vx<0?'left':'right',ch.alarmed||ch.foraging,
     time+ch.phase*1000,.36+growth*.32);
@@ -4608,7 +4627,7 @@ function mixColour(day,night,amount){
 
 function drawWoodlandCritter(c){
  if(c.hiddenUntil&&time<c.hiddenUntil)return;
- if(rbEnabled&&['squirrel','butterfly'].includes(c.kind)){
+ if(illustratedFaunaReady&&['squirrel','butterfly'].includes(c.kind)){
   worldFaunaDraw(c.kind,c.x,c.y,'right',time<c.scaredUntil,time+c.phase*220,.8);return;
  }
  const scared=time<c.scaredUntil,wiggle=Math.sin(time*.004+c.phase);
