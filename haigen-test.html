@@ -207,8 +207,8 @@ function drawRegionalWildlife(){
 // All biome creatures are drawn in canvas, not font glyphs or emoji.
 // Faces, gait and species-specific body proportions distinguish each animal.
 function drawWildAnimal(a){
- if(rbEnabled&&['snake','scorpion','crab','lizard','frog','hare','gull','raven','heron'].includes(a.type)){
-  const k=a.type==='hare'?'squirrel':['gull','raven','heron'].includes(a.type)?'bird':a.type;
+ if(rbEnabled&&['snake','scorpion','crab','lizard','frog','hare','gull','raven','heron','bison','stag','goat','turtle','rat','fox','otter'].includes(a.type)){
+  const k=['gull','raven','heron'].includes(a.type)?'bird':a.type;
   worldFaunaDraw(k,a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,Math.max(.65,a.size*.96));return;
  }
  const k=a.type,bird=['gull','raven','heron'].includes(k),hopper=k==='hare'||k==='frog';const bounce=a.walking?(bird?Math.abs(Math.sin(a.gait*1.4))*5:hopper?Math.abs(Math.sin(a.gait))*7:Math.sin(a.gait)*1.5):Math.sin(time*.001+a.phase)*.25;const t=-bounce;
@@ -916,7 +916,7 @@ function rbCreatureSprite(kind,dir,frame){
 const worldFaunaCache=new Map();
 function worldFauna(kind,frame=0){
  const key=kind+':'+frame;if(worldFaunaCache.has(key))return worldFaunaCache.get(key);
- const big=['wolf','boar'].includes(kind),w=big?80:60,h=big?63:52;
+ const big=['wolf','boar','bison','stag','goat'].includes(kind),w=big?80:60,h=big?63:52;
  const c=document.createElement('canvas');c.width=w;c.height=h;
  const g=c.getContext('2d');g.imageSmoothingEnabled=false;
  const p=(x,y,ww,hh,col)=>{g.fillStyle=col;g.fillRect(x,y,ww,hh)};
@@ -940,6 +940,67 @@ function worldFauna(kind,frame=0){
    p(63,20,4,3,'#f3dcc3');p(64,21,2,2,dark);p(60,35,8,6,'#e0cda9');
   }
   p(12,55,11,4,'#45514a');p(50,55,11,4,'#45514a');
+ }else if(['bison','stag','goat'].includes(kind)){
+  // Distinct four-legged silhouettes, antlers and horns rather than one generic blob.
+  const bison=kind==='bison',stag=kind==='stag';
+  const col=bison?'#79523d':stag?'#a7744f':'#b1a28a';
+  const shade=bison?'#503c32':stag?'#70513e':'#777065',hi=bison?'#ac7c55':stag?'#d2a477':'#ded1b3';
+  for(let i=0;i<4;i++){
+   const x=[14,29,48,58][i]+(i%2?step:-step);
+   p(x,39,8,21,shade);p(x+1,41,6,14,col);p(x,58,9,4,'#343535');
+  }
+  shape([[9,30],[16,17],[50,17],[61,28],[61,43],[11,43]],dark);
+  shape([[11,29],[19,20],[53,20],[58,31],[54,41],[13,41]],col);
+  p(20,22,30,6,hi);p(20,36,30,4,shade);
+  if(bison){p(9,13,25,29,shade);p(12,12,23,23,col);p(17,15,13,6,hi)}
+  shape([[54,22],[61,12],[70,14],[75,28],[65,37],[53,34]],dark);
+  shape([[56,25],[63,15],[69,18],[72,29],[64,34],[56,31]],col);
+  p(69,27,9,6,hi);p(70,21,3,3,'#efe3c2');p(71,22,2,2,dark);
+  if(stag){
+   // Layered 16-bit antler fork, readable even at half-size.
+   p(59,2,4,19,'#74513a');p(67,0,4,21,'#74513a');
+   p(52,4,11,4,'#74513a');p(69,6,9,4,'#74513a');
+   p(54,0,4,12,'#a0784d');p(73,0,4,13,'#a0784d');
+   p(57,0,5,3,'#cfab7f');p(69,0,5,3,'#cfab7f');
+  }else if(bison){
+   shape([[56,20],[50,9],[52,4],[61,19]],'#d3c299');
+   shape([[66,18],[72,7],[77,9],[72,23]],'#d3c299');
+  }else{
+   shape([[56,20],[53,5],[59,9],[63,20]],'#72644f');
+   shape([[66,21],[70,5],[75,11],[72,23]],'#72644f');
+   p(61,31,9,7,'#dfd2bd');
+  }
+ }else if(['fox','otter','rat','hare','turtle'].includes(kind)){
+  const fox=kind==='fox',otter=kind==='otter',rat=kind==='rat',hare=kind==='hare',turtle=kind==='turtle';
+  const col=fox?'#c17d4a':otter?'#88745a':rat?'#928f88':hare?'#bca78c':'#678360';
+  const shadow=fox?'#694935':otter?'#4e483b':rat?'#62605b':hare?'#79705e':'#415d4b';
+  const hi=fox?'#e9c498':otter?'#c3b49a':rat?'#cfc1b8':hare?'#dfccae':'#99a57b';
+  if(turtle){
+   p(6,30,14,7,col);p(44,30,13,7,col);
+   p(9+step,40,9,8,shadow);p(44-step,40,9,8,shadow);
+   shape([[11,30],[17,15],[41,14],[51,30],[44,42],[16,43]],dark);
+   shape([[14,29],[20,17],[39,17],[48,30],[42,40],[19,40]],col);
+   p(23,19,13,5,hi);p(22,28,13,5,shadow);p(31,33,11,5,'#79916b');
+   p(46,27,11,12,'#789878');p(51,29,3,3,dark);
+  }else{
+   const dY=hare?3:0;
+   p(12+step,34,7,12,shadow);p(38-step,34,7,12,shadow);
+   shape([[10,30+dY],[18,21+dY],[42,23+dY],[50,32+dY],[44,40+dY],[11,40+dY]],dark);
+   shape([[13,28+dY],[20,23+dY],[40,25+dY],[46,31+dY],[42,38+dY],[14,37+dY]],col);
+   p(21,25+dY,17,5,hi);
+   p(45,21+dY,10,14,col);p(49,24+dY,8,6,hi);p(52,22+dY,2,3,dark);
+   if(fox){shape([[43,23],[44,10],[51,16],[54,23]],shadow);
+    shape([[50,24],[56,10],[57,25]],shadow);
+    shape([[9,30],[1,25],[0,17],[16,30]],shadow);p(1,21,6,4,hi)}
+   else if(otter){p(2,28,15,6,shadow);p(1,28,6,4,col);p(47,20,4,4,'#a08b71')}
+   else if(rat){p(0,19,4,4,'#c08f89');p(2,23,11,3,'#ac8a84');
+    p(47,18,7,5,hi);p(44,16,5,5,'#ba9995');p(51,26,5,3,'#c48d91')}
+   else{ // hare
+    p(45,3,5,22,shadow);p(51,0,6,24,shadow);
+    p(47,5,2,17,'#d5afa4');p(53,3,2,17,'#d5afa4');
+    p(9,28,9,11,hi);
+   }
+  }
  }else if(kind==='snake'){
   for(const [x,y] of [[4,30],[11,19],[30,18],[38,29],[22,34]]){
    p(x,y,19,12,dark);p(x+3,y+2,13,8,'#907b50');p(x+6,y+3,6,2,'#c9b278')}
