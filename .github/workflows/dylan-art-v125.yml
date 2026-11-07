@@ -1,0 +1,35 @@
+name: Install approved Dylan sprite artwork
+on:
+  push:
+    paths:
+      - .github/scripts/build_dylan_atlas.py
+      - .github/workflows/dylan-art-v125.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  install-dylan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare image tools
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Verify exact approved artwork and extract animation frames
+        run: python .github/scripts/build_dylan_atlas.py
+      - name: Commit Dylan's transparent art atlas
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/dylan-rabbit-approved-v125.png
+          if git diff --cached --quiet; then
+            echo 'Approved sprite asset already installed'
+          else
+            git commit -m 'Install approved Dylan rabbit sprite atlas for V125'
+            git push origin HEAD:main
+          fi
