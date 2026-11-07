@@ -3709,7 +3709,35 @@ function haigenActiveAction(){
  if(t>=1){haigenVisualAction=null;return null}
  return {...haigenVisualAction,progress:Math.max(0,t)};
 }
+// Order follows the extracted reference sheet. Each outfit has its own four facings.
+const travelKits=['snow','beach','desert','swim','downs','fen','wasteland'];
+const travelKitLabels={woodland:'Woodland · charcoal hoodie',snow:'Highlands · winter parka',
+ beach:'Coast · beach shirt and shorts',desert:'Desert · goggles and dust scarf',
+ swim:'Deep water · snorkel and fins',downs:'Open Downs · green trail shirt',
+ fen:'Deep Fen · reed-green coat',wasteland:'Wasteland · ash-grey wraps'};
+const travelSheet=new Image();
+const travelAtlases=new Map();
+travelSheet.onload=()=>{
+ if(travelSheet.naturalWidth!==192||travelSheet.naturalHeight!==travelKits.length*288)return;
+ travelKits.forEach((kind,index)=>{
+  const c=document.createElement('canvas');c.width=192;c.height=288;
+  c.getContext('2d').drawImage(travelSheet,0,index*288,192,288,0,0,192,288);
+  travelAtlases.set(kind,c);
+ });
+};
+travelSheet.src='./assets/haigen-region-outfits.png';
+function openTravelWardrobe(){
+ open('<h2>Haigen’s outfits</h2><p>Wearing '+travelKitLabels[haigenOutfit()]+'</p>'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px">'+
+  Object.entries(travelKitLabels).map(([kind,label])=>'<div><canvas width="96" height="72" data-kit="'+kind+'" style="width:100%;max-width:160px;image-rendering:pixelated"></canvas><div>'+label+'</div></div>').join('')+'</div>');
+ const paint=()=>document.querySelectorAll('[data-kit]').forEach(c=>{
+  const atlas=travelAtlases.get(c.dataset.kit)||(c.dataset.kit==='woodland'&&haigenMovementReady&&haigenCostumeAtlas(haigenMovementAtlas,'woodland'));
+  if(atlas){const g=c.getContext('2d');g.drawImage(atlas,0,0,48,72,0,0,48,72);g.drawImage(atlas,48,144,48,72,48,0,48,72)}
+ });
+ paint();if(!travelAtlases.size)travelSheet.addEventListener('load',paint,{once:true});
+}
 function haigenOutfit(){
+ if(lakeLevel(state.x,state.y)<.82||islandDepth(state.x,state.y)<0)return 'swim';
  const region=expandedRegion(state.x,state.y)?.id;
  if(region==='snow')return 'snow';
  if(region==='desert')return 'desert';
@@ -3723,6 +3751,7 @@ function haigenOutfit(){
 // approved blonde hair and original thick hoodie/three-quarter outlines remain.
 // Each 48x72 cell keeps the EXACT same draw width and foot baseline.
 function haigenCostumeAtlas(base,kind){
+ if(travelAtlases.has(kind))return travelAtlases.get(kind);
  const newSheet=base===haigenMovementAtlas;
  const rows=newSheet?4:3;
  const sheetHeight=rows*72;
@@ -3957,7 +3986,7 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  if(dirName==='left'){ctx.translate(left+48*scale,top);ctx.scale(-scale,scale)}
  else{ctx.translate(left,top);ctx.scale(scale,scale)}
  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
- const skin='#e7b78e',skinShadow='#ae7b60',sleeve='#35313c',cuff='#56505b';
+ const skin='#e7b78e',skinShadow='#ae7b60',sleeve=({snow:'#b86b36',desert:'#a18665',beach:skin,swim:skin,downs:skin,fen:'#54684d',wasteland:'#706878'})[haigenOutfit()]||'#35313c',cuff=sleeve==='#35313c'?'#56505b':sleeve;
  const shoulder=dirName==='up'?[19,41]:dirName==='down'?[35,42]:[33,43];
  const hand=dirName==='up'?[21,49]:dirName==='down'?[38,48]:[36,48];
  // Wrist moves through a planted, four-phase animation. No floating fist.
@@ -4081,7 +4110,7 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  if(!status.equip&&status.action&&['eat','medicine','cook'].includes(status.action.kind))
   haigenDrawPixelTool('hands',displayDir,frame,status.action,scale,left,top);
  // Snorkel kit only when swimming. The coast itself keeps shorts and trainers.
- if(deepWater){
+ if(deepWater&&!travelAtlases.has(status.outfit)){
   const px=displayDir==='left'?left+16:displayDir==='right'?left+26:left+19,py=top+27*scale;
   ctx.strokeStyle='#5f999f';ctx.lineWidth=3;
   ctx.strokeRect(px,py,17,8);
@@ -4100,6 +4129,12 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  ctx.restore();return true;
 }
 function drawApprovedRestingHaigen(x,y){
+ const kit=travelAtlases.get(haigenOutfit());
+ if(kit){
+  ctx.save();ellipse(x,y+6,43,8,'#173d3466');ctx.translate(x,y);ctx.rotate(-1.43);
+  ctx.imageSmoothingEnabled=false;ctx.drawImage(kit,0,72,48,72,-22,-45,42,88);
+  ctx.restore();return true;
+ }
  if(!haigenApprovedAtlasReady)return false;
  const sx=96,sy=216,sw=96,sh=72,scale=1.15;
  const w=sw*scale,h=sh*scale;
@@ -6071,9 +6106,10 @@ offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Re
    };
   },
   terrain:(x,y)=>islandTerrainRGB(x,y),
+  wardrobe:openTravelWardrobe,
   portrait:()=>haigenMovementAtlas,
   toolCanvas:id=>haigenToolSprite(id),
   refreshTools:()=>renderHotbar()
  };
  requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?(state.autonomy?'Haigen is clearing camp. Move to take control.':'Clear the campsite with Collect, or let Haigen work from the menu.'):state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./v127-ornate-ui.js?v=2"></script></body></html>
+</script><script src="./v127-ornate-ui.js?v=3"></script></body></html>
