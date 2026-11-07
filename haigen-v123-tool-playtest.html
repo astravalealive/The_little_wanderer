@@ -3700,7 +3700,7 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
   axe:[.45,-.72,1.38,.43],
   pickaxe:[.32,-.87,1.43,.31],
   shovel:[.43,-.29,1.16,.42],
-  torch:[.20,.08,-.43,.20],
+  torch:[.20,.25,.65,.20],
   rod:[.45,-.55,1.15,.45],
   net:[.46,-.65,1.30,.44],
   hammer:[.42,-.76,1.37,.43]
@@ -3727,8 +3727,8 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  p(shoulder[0]-2,shoulder[1]-2,5,6,sleeve);
  p(Math.round((shoulder[0]+gripX)/2)-2,Math.round((shoulder[1]+gripY)/2)-2,5,5,sleeve);
  p(gripX-3,gripY-3,6,6,cuff);
- p(gripX-2,gripY-2,5,5,skin);
- p(gripX+1,gripY+1,2,1,skinShadow);
+ p(gripX-2,gripY-2,4,4,skin);
+ p(gripX+1,gripY+1,1,1,skinShadow);
  // Only a subtle assisting fist on heavy-tool impact.
  if(working&&phase===2&&['axe','pickaxe','shovel','hammer'].includes(kind)){
   p(gripX-8,gripY-9,5,5,sleeve);
@@ -3741,7 +3741,7 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  }
  // Diagnostic snapshot allows browser assertions for every equipped item.
  window.__haigenToolProbe={kind,dir:dirName,working,phase,angle,
-  grip:[gripX,gripY],handSize:[5,5],pivot:[20,48],toolScale};
+  grip:[gripX,gripY],handSize:[4,4],pivot:[20,48],toolScale};
  ctx.restore();
 }
 
