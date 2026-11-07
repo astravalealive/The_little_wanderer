@@ -52,7 +52,7 @@ el.innerHTML=[
  '<button class="v127-utility" data-action="mapBtn" aria-label="Map">',icons.map,'</button></nav>',
  '<button class="v127-gear" id="v127Gear" type="button" aria-label="Settings">',icons.gear,'</button>',
  '<aside class="v127-settings v127-framed" id="v127Settings"><h3>Adventure Menu</h3>',
- '<button data-action="modeBtn">Take control / Explore</button>',
+ '<p id="haigenCurrentTask"></p><button data-action="modeBtn">Let Haigen work</button>',
  '<button data-action="storyBtn">The Silent Pond</button>',
  '<button data-action="craftBtn">Craft and Build</button>',
  '<button data-action="artBtn">Change World Style</button>',
@@ -152,6 +152,11 @@ function tick(){
  if(now-lastDraw>180){lastDraw=now;
   try{
    const state=engine.snapshot(),hp=Math.min(100,Math.max(0,Number(state.health)||0));
+   const task=state.autonomy?'Haigen’s plan · '+(state.goal||'look around camp'):'You’re guiding Haigen';
+   if($('haigenCurrentTask').textContent!==task){
+    $('haigenCurrentTask').textContent=task;
+    el.querySelector('[data-action="modeBtn"]').textContent=state.autonomy?'Take control':'Let Haigen work';
+   }
    syncExtraSlots(state);
    if(Math.ceil(hp)!==lastHP){
     lastHP=Math.ceil(hp);

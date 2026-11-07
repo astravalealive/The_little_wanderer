@@ -90,7 +90,7 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
  cv.height=Math.max(1,Math.round(H*dpr));
  ctx.setTransform(cv.width/W,0,0,cv.height/H,0,0);
  ctx.imageSmoothingEnabled=true;
-}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD=7800;let state;const fresh=()=>({x:1250,y:1310,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dylan. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:false,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});// Preview only: initialise from a READ-ONLY copy of the user's V120 save, if present.
+}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD=7800;let state;const fresh=()=>({x:1250,y:1310,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dylan. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:true,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});// Preview only: initialise from a READ-ONLY copy of the user's V120 save, if present.
  // All subsequent writes continue to use the independent preview key.
  try{
   const useLiveSnapshot=new URLSearchParams(location.search).get('restore')==='1';
@@ -1081,7 +1081,7 @@ illustratedFaunaAtlas.onload=()=>{
  window.__v124FaunaAtlasReady=illustratedFaunaReady;
 };
 illustratedFaunaAtlas.onerror=()=>{illustratedFaunaReady=false;window.__v124FaunaAtlasReady=false};
-illustratedFaunaAtlas.src='./assets/haigen-fauna-v124.png?v=1';
+illustratedFaunaAtlas.src='./assets/woodland-fauna-illustrated.png';
 illustratedCompanionAtlas.onload=()=>{
  illustratedCompanionReady=illustratedCompanionAtlas.naturalWidth===256&&illustratedCompanionAtlas.naturalHeight===512;
  window.__v124CompanionAtlasReady=illustratedCompanionReady;
@@ -1103,7 +1103,7 @@ illustratedExtraFauna.onload=()=>{
  window.__v124ExtraFaunaReady=illustratedExtraReady;
 };
 illustratedExtraFauna.onerror=()=>{illustratedExtraReady=false;window.__v124ExtraFaunaReady=false};
-illustratedExtraFauna.src='./assets/haigen-extra-fauna-v124.png?v=2';
+illustratedExtraFauna.src='./assets/regional-fauna-illustrated.png';
 const extraFaunaCells={
  bison:[0,0],stag:[1,0],goat:[2,0],hare:[3,0],
  turtle:[0,1],rat:[1,1],otter:[2,1],gull:[3,1],
@@ -1211,7 +1211,7 @@ skolliAtlas.onload=()=>{
  window.__v126SkolliReady=skolliAtlasReady;
 };
 skolliAtlas.onerror=()=>{skolliAtlasReady=false;window.__v126SkolliReady=false};
-skolliAtlas.src='./assets/skolli-fox-v126.png?v=126';
+skolliAtlas.src='./assets/skolli-fox-illustrated.png';
 function drawApprovedSkolli(x,y,actor){
  if(!skolliAtlasReady)return false;
  const m=actor||playerMotion,dir=m.dir||'down',moving=!!m.moving,anim=m.anim||0;
@@ -1842,12 +1842,43 @@ function autoPlan(label,id){
   haigenMind.lastPlanSaid=time;think('My plan: '+label+'.',3700,true);
  }
 }
-function autoResetNav(){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0}
+// Search around a local obstruction only after direct steering stalls.
+function detourTo(target,reach){
+ const step=40,limit=18,queue=[{i:0,j:0,x:state.x,y:state.y,parent:null}];
+ const seen=new Set(['0,0']);
+ let closest=queue[0];
+ for(let n=0;n<queue.length;n++){
+  const node=queue[n];
+  if(dist(node,target)<dist(closest,target))closest=node;
+  if(dist(node,target)<=reach){closest=node;break}
+  for(const [di,dj] of [[1,0],[0,1],[-1,0],[0,-1]]){
+   const i=node.i+di,j=node.j+dj,key=i+','+j;
+   if(Math.abs(i)>limit||Math.abs(j)>limit||seen.has(key))continue;
+   const x=node.x+di*step,y=node.y+dj*step;
+   if(!autoStand(x,y)||!autoStand((x+node.x)/2,(y+node.y)/2))continue;
+   seen.add(key);queue.push({i,j,x,y,parent:node});
+  }
+ }
+ const route=[];
+ for(let node=closest;node.parent;node=node.parent)route.push(node);
+ return route.reverse();
+}
+function autoResetNav(){autoNav.route=[];autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0}
 function autoStand(x,y){return Number.isFinite(x)&&Number.isFinite(y)&&islandDepth(x,y)>73&&lakeLevel(x,y)>1.045&&!blockedBySolid(x,y)}
 function autoTravel(target,dt,reach=80,speed=.14){
  const d=dist(state,target);if(d<=reach){autoResetNav();return true}
  const key=(target.id===undefined?'place':target.id)+':'+Math.round(target.x/15)+':'+Math.round(target.y/15);
  if(autoNav.key!==key){autoResetNav();autoNav.key=key}
+ if(autoNav.stuck>800&&!autoNav.route.length&&autoNav.failures<5){
+  autoNav.route=detourTo(target,reach);autoNav.stuck=0;autoNav.failures++;
+ }
+ if(autoNav.route.length){
+  const point=autoNav.route[0],length=dist(point,state),step=Math.min(length,dt*speed);
+  if(length<1){autoNav.route.shift();return false}
+  const x=state.x+(point.x-state.x)*step/length,y=state.y+(point.y-state.y)*step/length;
+  if(autoStand(x,y)){state.x=x;state.y=y;if(step>=length)autoNav.route.shift();return false}
+  autoNav.route=[];
+ }
  const step=Math.min(dt,50)*speed,heading=Math.atan2(target.y-state.y,target.x-state.x);
  const offsets=autoNav.side>0?[0,.35,-.35,.73,-.73,1.15,-1.15,1.6,-1.6,2.3,-2.3]:[0,-.35,.35,-.73,.73,-1.15,1.15,-1.6,1.6,-2.3,2.3];
  let best=null,score=Infinity;
@@ -1906,7 +1937,7 @@ function autoCampChores(dt){
  }
  if(state.food<2&&(state.rawMeat>=1||state.vegetables>=3||state.eggs>=2||state.fish>=1||state.mushrooms>=3||state.berries>=6)){
   autoPlan('cook meals at camp','cook');
-  if(dist(state,cottage)>225){autoTravel(autoCampSpot(),dt,175);return true}
+  if(dist(state,cottage)>225){autoTravel(autoCampSpot(),dt,12);return true}
   const options=[['rawMeat',1,'campfire roast'],['vegetables',3,'garden stew'],['eggs',2,'fried eggs'],['fish',1,'grilled fish'],['mushrooms',3,'mushroom stew'],['berries',3,'berry meal']];
   const selected=options.find(([resource,count])=>(state[resource]||0)>=count);
   if(selected){state[selected[0]]-=selected[1];state.food++;startHaigenAction('cook',900);state.autoSteps++;save();notify('🍲 Haigen cooked '+selected[2]+'.')}
@@ -2018,11 +2049,11 @@ function collectLooseWood(o){
 function autoGatherWood(dt){
  if(state.twigs<3&&state.wood>=5){state.wood--;state.twigs+=2;startHaigenAction('craft',500);save();return true}
  if(state.wood>=woodCarryLimit-1)return false;
- const logs=woodlandDetails.filter(o=>looseWoodReady(o)&&canPlaceScenery(o)&&!campsiteProtected(o)&&dist(o,state)<1700)
+ const logs=woodlandDetails.filter(o=>(autoIgnore.get('log-'+o.seed)||0)<=Date.now()&&looseWoodReady(o)&&canPlaceScenery(o)&&!campsiteProtected(o)&&dist(o,state)<1700)
   .sort((a,b)=>dist(a,state)-dist(b,state));
  if(logs.length){
   const log=logs[0];autoPlan('collect fallen wood without cutting living trees','fallen:'+log.seed);
-  if(dist(state,log)>83)autoTravel(log,dt,83,.12);
+  if(dist(state,log)>83)autoTravel({id:'log-'+log.seed,x:log.x,y:log.y},dt,83,.12);
   else{collectLooseWood(log);autoPause=420}
   return true;
  }
@@ -2053,7 +2084,7 @@ function autoMineStone(dt){
   const wood=state.wood+(state.woodStorageTier?state.woodStored:0);
   if(wood<5||state.twigs<3){autoGatherWood(dt);return true}
   autoPlan('make my first pickaxe from wood and flint','craft-pickaxe');
-  if(dist(state,cottage)>185){autoTravel(autoCampSpot(),dt,170,.13);return true}
+  if(dist(state,cottage)>185){autoTravel(autoCampSpot(),dt,12,.13);return true}
   if(spendCampWood(5)){state.twigs-=3;state.tools.pickaxe=1;startHaigenAction('craft',1000);
    mindWrite('I finally made a pickaxe. Now I can break the big boulders and collect the pieces.','growth');
    state.autoSteps++;save();}
@@ -2156,7 +2187,7 @@ function autoFreedomTick(dt){
   const choice=ingredients.find(([name,n])=>state[name]>=n);
   if(!choice)return finish();
   autoPlan('prepare a hot meal','freedom-cooking');
-  if(dist(state,cottage)>190){autoTravel(autoCampSpot(),dt,170,.12);return true}
+  if(dist(state,cottage)>190){autoTravel(autoCampSpot(),dt,12,.12);return true}
   state[choice[0]]-=choice[1];state.food++;startHaigenAction('cook',1100);state.autoSteps++;save();
   return finish('I cooked food instead of just gathering more ingredients.');
  }
@@ -2218,6 +2249,22 @@ function autoFreedomTick(dt){
  return true;
 }
 
+// Hungry Haigen interrupts construction, then resumes the saved project stage.
+function autoFindFood(dt){
+ if(state.nestEggs>=2||gardenRipe()||state.rawMeat||state.fish||state.mushrooms>=3){
+  if(autoCampChores(dt))return true;
+ }
+ if(!autoDestination||autoDestination.type!=='bush'||!berryReady(autoDestination)||
+    (autoIgnore.get(autoDestination.id)||0)>Date.now())autoDestination=autoTarget('bush');
+ if(!autoDestination)return false;
+ autoPlan('pick berries for my next meal','forage:'+autoDestination.id);
+ if(dist(state,autoDestination)>74)autoTravel(autoDestination,dt,74);
+ else{
+  if(pickBerries(autoDestination)){startHaigenAction('gather',550);state.autoSteps++;save()}
+  autoDestination=null;autoPause=550;
+ }
+ return true;
+}
 function autonomousTick(dt){
  state.fun=Math.min(100,state.fun+dt*.00018);state.activity=Math.min(100,state.activity+dt*.0003);
  autoBubbleTimer-=dt;
@@ -2232,7 +2279,7 @@ function autonomousTick(dt){
  if(state.health<58||state.energy<34){
   if(!autoSafeToRest()){
    if(mindRetreat(dt))return;
-   autoPlan('find a safe place to rest','find-safety');autoTravel(autoCampSpot(),dt,160);return;
+   autoPlan('find a safe place to rest','find-safety');autoTravel(autoCampSpot(),dt,12);return;
   }
   state.resting=true;autoDestination=null;autoWaypoint=null;autoResetNav();
   mindEvent('rest');autoPlan('rest and recover','rest');
@@ -2246,6 +2293,7 @@ function autonomousTick(dt){
  // Respect the physical strike / cooking / crafting animation time before
  // choosing another task. Otherwise a boulder shatters in one video frame.
  if(autoPause>0){autoPause=Math.max(0,autoPause-dt);if(autoBubbleTimer<=0)speak(currentThoughtTopic(),4200);return}
+ if(state.hunger<57&&autoFindFood(dt))return;
  if(lifeProjectTick(dt))return;
  if(autoCampChores(dt))return;
  if(autoFreedomTick(dt))return;
@@ -2317,7 +2365,7 @@ function setAutonomy(enabled,keepInstruction=false){
   if(enabled&&!keepInstruction)state.playerInstruction=null;
   state.autonomy=enabled;haigenMind.controlSwitches++;autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';autoPause=enabled?700:0;if(enabled){nextThoughtAt=0;speak(currentThoughtTopic(),4600)}else autoBubbleTimer=0;
   $('modeBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';
-  notify(enabled?'🌲 Haigen is exploring on his own.':'🎮 You are in control!');
+  notify(enabled?'Haigen will gather supplies and carry on with camp. Move to take control.':'🎮 You are in control!');
   save();
 }
 // Roads connect the camp to actual destinations, rather than ending in the woods.
@@ -5183,7 +5231,7 @@ function resolveSolidMovement(startX,startY,endX,endY){
  return {x,y};
 }
 
-function update(dt){updateSurvival(dt);if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>90000){idleTime=0;setAutonomy(true);notify('🌲 Haigen is off exploring while you are away.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput)setAutonomy(false);if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=lakeLevel(state.x,state.y)<.8;state.x=clamp(state.x+dx*dt*(swim?.115:.19),50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:.19),50,WORLD-50);state.steps+=dt*.19}const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;trackMotion(playerMotion,prevPlayerX,prevPlayerY,state.x,state.y,dt);
+function update(dt){updateSurvival(dt);if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>15000){idleTime=0;setAutonomy(true);notify('🌲 Haigen is off exploring while you are away.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput)setAutonomy(false);if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=lakeLevel(state.x,state.y)<.8;state.x=clamp(state.x+dx*dt*(swim?.115:.19),50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:.19),50,WORLD-50);state.steps+=dt*.19}const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;trackMotion(playerMotion,prevPlayerX,prevPlayerY,state.x,state.y,dt);
 // With a joystick/gamepad, face the requested direction, not the axis
 // selected by wall-slide collision. AI walking still follows real motion.
 if(!state.autonomy&&!state.resting&&playerMotion.moving&&mag>.13){
@@ -5472,7 +5520,7 @@ const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,st
  ...objects.filter(o=>(o.type==='mushroom'||o.type==='bush')&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:o.type})),
  ...woodlandDetails.filter(o=>o.kind==='fungi'&&woodlandFungiReady(o)&&!campsiteProtected(o)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:'fungi'}))
  ].sort((a,b)=>a.d-b.d)[0];
- const loose=woodlandDetails.filter(o=>looseWoodReady(o)&&dist(o,state)<95).sort((a,b)=>dist(a,state)-dist(b,state))[0];
+ const loose=woodlandDetails.filter(o=>(autoIgnore.get('log-'+o.seed)||0)<=Date.now()&&looseWoodReady(o)&&dist(o,state)<95).sort((a,b)=>dist(a,state)-dist(b,state))[0];
  if(loose){collectLooseWood(loose);return}
  if(foraging){
   if(foraging.kind==='bush')pickBerries(foraging.o);
@@ -6012,7 +6060,7 @@ offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Re
   snapshot:()=>{
    const t=Math.max(0,Number(state.daytime)||0);
    return {
-    x:state.x,y:state.y,
+    x:state.x,y:state.y,autonomy:state.autonomy,goal:autoJobLabel,
     health:state.health,energy:state.energy,hunger:state.hunger,
     day:1+Math.floor(t/180),
     phase:['Morning','Afternoon','Evening','Night'][Math.floor((t%180)/45)]||'Morning',
@@ -6027,5 +6075,5 @@ offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Re
   toolCanvas:id=>haigenToolSprite(id),
   refreshTools:()=>renderHotbar()
  };
- requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./v127-ornate-ui.js?v=1"></script></body></html>
+ requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?(state.autonomy?'Haigen is clearing camp. Move to take control.':'Clear the campsite with Collect, or let Haigen work from the menu.'):state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
+</script><script src="./v127-ornate-ui.js?v=2"></script></body></html>
