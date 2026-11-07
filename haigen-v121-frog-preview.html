@@ -2514,8 +2514,9 @@ const approvedEnvironmentImage=new Image();
 let approvedEnvironmentReady=false;
 approvedEnvironmentImage.onload=()=>{
  approvedEnvironmentReady=approvedEnvironmentImage.naturalWidth===512&&approvedEnvironmentImage.naturalHeight===416;
+ window.__haigenEnvironmentReady=approvedEnvironmentReady;
 };
-approvedEnvironmentImage.onerror=()=>{approvedEnvironmentReady=false};
+approvedEnvironmentImage.onerror=()=>{approvedEnvironmentReady=false;window.__haigenEnvironmentReady=false};
 approvedEnvironmentImage.src='./assets/haigen-approved-environment-atlas.webp?v=1';
 const approvedEnvironmentFrames={
  tree:[0,0,136,127],fir:[145,0,105,151],bush:[262,0,96,83],
