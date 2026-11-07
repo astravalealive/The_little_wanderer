@@ -4183,6 +4183,70 @@ function drawWoodlandCritter(c){
   ellipse(x,y,5.8,5.8,'#ffe79c55');ellipse(x,y,2.7,2.7,c.phase%3<1?'#d7ffb1':'#fff0a3');ctx.restore();
  }
 }
+
+ // V121: original V65 pond frogs get pixel-sharp art without losing funny kicks.
+ const frogPixelCache=new Map();
+ function pixelFrog(colour,hop,frame,blink){
+  const brown=colour==='#a18a54',key=[brown,hop,frame,blink].join(':');
+  if(frogPixelCache.has(key))return frogPixelCache.get(key);
+  const c=document.createElement('canvas');c.width=112;c.height=64;
+  const g=c.getContext('2d');if(!g)return null;g.imageSmoothingEnabled=false;
+  const ink='#29332b',body=brown?'#a18a54':'#63a64b';
+  const limb=brown?'#857347':'#4b873c',toe=brown?'#c2ad6c':'#a1ce74';
+  const shine=brown?'#dfcf9c':'#b5de83',shade=brown?'#77643d':'#367442';
+  const p=hop?frame/11:0,kick=hop?Math.sin(Math.PI*Math.min(1,p*1.12)):0;
+  const crouch=hop?(p<.13?(1-p/.13)*3:p>.84?(p-.84)/.16*3:0):0;
+  const oval=(x,y,rx,ry,color)=>{
+   g.fillStyle=color;
+   for(let j=-Math.ceil(ry);j<=Math.ceil(ry);j++){
+    const t=j/ry;if(Math.abs(t)>1)continue;
+    const dx=rx*Math.sqrt(1-t*t);
+    g.fillRect(Math.round(x-dx),Math.round(y+j),Math.max(1,Math.round(dx*2)),1);
+   }
+  };
+  function limbLine(ax,ay,bx,by,color,width){
+   g.beginPath();g.moveTo(Math.round(ax),Math.round(ay));g.lineTo(Math.round(bx),Math.round(by));
+   g.lineCap='square';g.lineWidth=width+2;g.strokeStyle=ink;g.stroke();
+   g.lineWidth=width;g.strokeStyle=color;g.stroke();
+  }
+  g.save();g.translate(56,31+Math.round(crouch));
+  const stretch=hop?Math.sin(Math.PI*p)*.12:0;g.scale(1+stretch,1-stretch*.45);
+  // The same exaggerated V65 knee-and-foot arcs: three flicking toes per foot.
+  for(const side of [-1,1]){
+   const kx=side*(13+kick*10),ky=3+kick*5;
+   const fx=side*(18+kick*22),fy=5+kick*9;
+   limbLine(side*7,0,kx,ky,limb,5);limbLine(kx,ky,fx,fy,limb,4);
+   for(let t=-1;t<=1;t++)limbLine(fx,fy,fx+side*5,fy+t*3+2,toe,1.5);
+  }
+  oval(0,-4,13,10,ink);oval(0,-5,11,8,body);
+  oval(0,-1,7,4,brown?'#c5b782':'#a3cd77');oval(-3,-9,6,2,shine);oval(6,-7,3,2,shade);
+  for(const side of [-1,1]){
+   limbLine(side*7,-2,side*10,6,limb,3);limbLine(side*10,6,side*14,7,limb,2);
+   for(let t=-1;t<=1;t++)limbLine(side*14,7,side*(17+t),9,toe,1);
+   oval(side*7,-10,6,6,ink);oval(side*7,-11,4.5,4.5,body);
+   if(blink){g.fillStyle=ink;g.fillRect(side*7-3,-12,6,2)}
+   else{oval(side*7,-11,3,3,'#e5e4ba');oval(side*7+.7,-11,1.8,2,ink)}
+  }
+  g.restore();frogPixelCache.set(key,c);return c;
+ }
+ function drawPixelFrog(f,x,y,bodyY,facing,p,arc,jumping){
+  ctx.save();ctx.imageSmoothingEnabled=false;ctx.globalAlpha=.38-arc*.18;
+  ellipse(x,y+6,12-arc*4,4-arc,'#274a39');ctx.globalAlpha=1;
+  if(!jumping&&f.landedAt&&time-f.landedAt<440){
+   const t=(time-f.landedAt)/440;ctx.globalAlpha=(1-t)*.55;
+   ctx.strokeStyle='#d9f0c0';ctx.lineWidth=1.4;ctx.beginPath();
+   ctx.ellipse(x,y+5,8+t*17,3+t*6,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
+  }
+  const frame=jumping?Math.min(11,Math.floor(p*12)):0;
+  const blink=!jumping&&Math.sin(time*.0011+f.phase)>.992;
+  const sprite=pixelFrog(f.colour,jumping,frame,blink);
+  if(sprite){
+   const size=.86,dy=jumping?0:Math.sin(time*.002+f.phase)*.5;
+   ctx.translate(Math.round(x),Math.round(bodyY+dy));ctx.scale(facing,1);
+   ctx.drawImage(sprite,-56*size,-31*size,112*size,64*size);
+  }
+  ctx.restore();
+ }
 function drawFrog(f){
  if(state.carriedFrogId===f.id)return;
  const jumping=f.hopUntil>time;
@@ -4195,9 +4259,7 @@ function drawFrog(f){
  const dx=(f.toX||gx)-(f.fromX||gx),dy=(f.toY||gy)-(f.fromY||gy);
  const facing=Math.abs(dx)>1?(dx>=0?1:-1):1;
  const bodyY=gy-rise;
- if(rbEnabled&&rbWoodland(gx,gy)){
-  rbDrawCreature('frog',gx,bodyY,facing>=0?'right':'left',jumping,time,1.7);return;
- }
+ if(rbEnabled){drawPixelFrog(f,gx,gy,bodyY,facing,p,arc,jumping);return}
  ctx.save();
  // Ground shadow stays put as the frog springs up; it shrinks in midair.
  ctx.globalAlpha=.38-arc*.18;
