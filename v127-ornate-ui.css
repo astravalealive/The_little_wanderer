@@ -153,3 +153,15 @@ body.v127-rpg #v127Root .v127-quest-toggle{display:none}
 /* Suppress V126's large diagnostic helper in normal V127 gameplay. */
 body.v127-rpg #v121PreviewTools{display:none!important}
 body.v127-rpg.v127-show-test #v121PreviewTools{display:flex!important}
+
+/* All modals contain absolutely-positioned canvases inherited from the game's
+   full-screen canvas rule. Reset map/crafting canvases to their modal flow. */
+body.v127-rpg .overlay .modal{position:relative}
+body.v127-rpg .overlay .modal canvas{
+ position:relative!important;inset:auto!important;
+ width:100%!important;height:auto!important;max-width:100%;z-index:0;
+}
+body.v127-rpg .overlay .modal .close{
+ position:sticky;top:0;float:right;z-index:5;
+ min-width:39px;min-height:37px
+}
