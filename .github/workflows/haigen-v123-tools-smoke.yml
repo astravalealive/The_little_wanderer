@@ -1,0 +1,72 @@
+name: Haigen V123 hand, tool and swing visual test
+on:
+  push:
+    paths:
+      - haigen-v123-tool-playtest.html
+      - .github/workflows/haigen-v123-tools-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-held-items:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - name: Screenshot all seven items and check grip and swing
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/haigen-v123-http.log 2>&1 &
+          sleep 2
+          node <<'NODE'
+          const {chromium}=require('playwright-core');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+            const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:2});
+            const errors=[];
+            page.on('pageerror',e=>errors.push(e.message));
+            page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+            await page.goto('http://127.0.0.1:8765/haigen-v123-tool-playtest.html?toolQA=1&restore=1',{waitUntil:'domcontentloaded'});
+            await page.waitForFunction(()=>window.__haigenWorldReady===true&&window.__haigenToolTest&&window.__haigenAtlasQA?.()?.ready,{timeout:20000});
+            await page.waitForTimeout(400);
+            const kinds=['axe','pickaxe','shovel','torch','rod','net','hammer'];
+            for(const kind of kinds){
+              for(const [name,phase] of [['idle',-1],['windup',.17],['strike',.67],['recover',.91]]){
+                await page.evaluate(([k,p])=>window.__haigenToolTest(k,p,'right'),[kind,phase]);
+                await page.waitForTimeout(110);
+                const snapshot=await page.evaluate(()=>({
+                  tool:window.__haigenToolProbe,sprite:window.__haigenSpriteProbe,
+                  error:document.getElementById('worldError')?.style.display==='block'?document.getElementById('worldError')?.textContent:null
+                }));
+                console.log('TOOL TEST '+JSON.stringify({kind,name,snapshot}));
+                if(snapshot.error||!snapshot.tool||snapshot.tool.kind!==kind||
+                  snapshot.tool.handSize[0]>6||snapshot.tool.handSize[1]>6||
+                  snapshot.sprite.dir!=='right')throw Error('Bad tool '+JSON.stringify({kind,name,snapshot}));
+                if(phase>=0&&!snapshot.tool.working)throw Error('No swing registered for '+kind+' '+name);
+                if(name==='idle'&&snapshot.tool.working)throw Error('Idle animating '+kind);
+                if(name==='strike'&&snapshot.tool.phase!==2)throw Error('Missing impact animation '+kind);
+                if(name==='idle'||name==='strike')
+                  await page.screenshot({path:'/tmp/tool-'+kind+'-'+name+'.png',clip:{x:60,y:260,width:275,height:300}});
+              }
+            }
+            // A left-facing wrist and tool must mirror as one unit.
+            await page.evaluate(()=>window.__haigenToolTest('axe',.67,'left'));
+            await page.waitForTimeout(110);
+            const left=await page.evaluate(()=>({tool:window.__haigenToolProbe,sprite:window.__haigenSpriteProbe}));
+            await page.screenshot({path:'/tmp/tool-axe-left-strike.png',clip:{x:60,y:260,width:275,height:300}});
+            if(left.sprite.dir!=='left'||left.tool.dir!=='left'||left.tool.phase!==2)
+              throw Error('Left-hand strike bug '+JSON.stringify(left));
+            if(errors.length)throw Error('Browser JS errors '+JSON.stringify(errors));
+            console.log('V123 TOOL RIG PASSED: seven tools, four poses, both horizontal directions');
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: haigen-v123-tool-rig-images
+          path: /tmp/tool-*.png
