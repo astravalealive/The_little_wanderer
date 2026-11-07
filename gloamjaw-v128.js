@@ -4,7 +4,7 @@
 const P=window.__gloamPort;
 if(!P){console.error('Gloamjaw: game port unavailable');return}
 const {state,objects,woodlandDetails,ctx}=P;
-const x=1495,y=2700,rx=300,ry=243,MAX=180;
+const x=930,y=2710,rx=300,ry=243,MAX=180;
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),bossPos={x,y};
 const arena=(px,py,pad=0)=>((px-x)/(rx+pad))**2+((py-y)/(ry+pad))**2<1;
 for(const list of [objects,woodlandDetails])for(let i=list.length-1;i>=0;i--)if(arena(list[i].x,list[i].y,36))list.splice(i,1);
@@ -152,43 +152,161 @@ function update(dt){
  }
 }
 function drawGround(){
- const screen=P.snapshot();if(Math.abs(x-screen.cameraX)>1100||Math.abs(y-screen.cameraY)>900)return;
- ctx.save();ell(x,y,rx+20,ry+16,'#38543b');ell(x,y,rx,ry,'#64724f');
- ell(x,y+15,246,182,'#4b5e43');ctx.lineCap='round';
- for(let i=0;i<16;i++){
-  const a=i*Math.PI/8;ctx.strokeStyle=i%2?'#324b37':'#84694d';ctx.lineWidth=5+i%4;
-  ctx.beginPath();ctx.moveTo(x+Math.cos(a)*30,y+Math.sin(a)*22);
-  ctx.quadraticCurveTo(x+Math.cos(a+.2)*145,y+Math.sin(a+.2)*104,
-   x+Math.cos(a)*263,y+Math.sin(a)*189);ctx.stroke();
+ const now=P.snapshot();
+ if(Math.abs(x-now.cameraX)>1200||Math.abs(y-now.cameraY)>920)return;
+ ctx.save();
+ const halo=ctx.createRadialGradient(x,y,80,x,y,rx+50);
+ halo.addColorStop(0,'#403a3a');halo.addColorStop(.4,'#4a5040');halo.addColorStop(.78,'#536246');
+ halo.addColorStop(1,'#243b30');
+ ell(x,y,rx+27,ry+22,'#293e31');ell(x,y,rx+13,ry+8,'#43593d');
+ ctx.save();ctx.translate(x,y);ctx.scale(1,.81);ctx.fillStyle=halo;ctx.beginPath();ctx.arc(0,0,rx,0,Math.PI*2);ctx.fill();ctx.restore();
+ ell(x,y+18,213,137,'#393d34');
+ // Deep root-scars and hand-placed fungus form a readable arena without a road.
+ ctx.lineCap='round';ctx.lineJoin='round';
+ for(let i=0;i<21;i++){
+  const a=i*2.399,r=.19+(i%6)*.12;
+  const xx=x+Math.cos(a)*r*rx,yy=y+Math.sin(a)*r*ry;
+  ctx.strokeStyle=i%3?'#273b32':'#80745a';ctx.lineWidth=5+i%4;
+  ctx.beginPath();ctx.moveTo(x+Math.cos(a)*44,y+Math.sin(a)*30);
+  ctx.quadraticCurveTo(x+Math.cos(a+.28)*145,y+Math.sin(a+.28)*88,xx,yy);ctx.stroke();
  }
- for(let i=0;i<16;i++){const a=i*2.399,r=.3+(i%5)*.15;ell(x+Math.cos(a)*r*279,y+Math.sin(a)*r*210,7+i%5*3,4+i%3,'#796b58')}
- ctx.fillStyle='#ead9ab';ctx.font='bold 18px Georgia,serif';ctx.textAlign='center';
- ctx.fillText('GLOAMJAW HOLLOW',x,y+215);ctx.restore();
+ for(let i=0;i<26;i++){
+  const a=i*2.399,rad=.3+(i%6)*.12,px=x+Math.cos(a)*rx*rad,py=y+Math.sin(a)*ry*rad;
+  ell(px,py,3+(i%5)*2,2+(i%3),'#97846d');
+  if(i%4===0){
+   ell(px,py-10,11,6,'#83687b');ell(px,py-12,8,3,'#c6b2ad');
+   ctx.strokeStyle='#ddd0b4';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px,py-5);ctx.lineTo(px,py+5);ctx.stroke();
+  }
+ }
+ for(let i=0;i<9;i++){
+  const a=i*Math.PI*2/9,px=x+Math.cos(a)*(rx-16),py=y+Math.sin(a)*(ry-24);
+  ell(px,py+4,13,7,'#2e3934');
+  ctx.strokeStyle='#66634b';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px-4,py-19-(i%3)*6);ctx.stroke();
+  ell(px-4,py-23-(i%3)*6,10,6,i%2?'#6c536b':'#726c63');
+ }
+ ctx.fillStyle='#dec6a3';ctx.textAlign='center';ctx.font='bold 17px Georgia,serif';
+ ctx.shadowColor='#202524';ctx.shadowBlur=5;ctx.fillText('GLOAMJAW HOLLOW',x,y+ry-19);
+ ctx.restore();
 }
 function drawBoss(){
  const now=P.snapshot();
  if(Math.abs(x-now.cameraX)>1150||Math.abs(y-now.cameraY)>900)return;
- ctx.save();ctx.translate(x,y);ell(0,21,111,27,'#1e2f2677');
- if(data.defeated){ell(0,-15,75,26,'#53465a');ell(0,-19,43,10,'#191a28');ctx.restore();return}
- const sway=Math.sin(now.time*.0025)*8,angry=data.hp<90;
- for(let i=0;i<6;i++){
-  const side=i%2?-1:1,r=Math.floor(i/2),wave=Math.sin(now.time*.003+i)*16;
-  ctx.strokeStyle=r%2?'#5d704a':'#466245';ctx.lineWidth=19-r*3;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(side*(23+r*8),-36);
-  ctx.bezierCurveTo(side*(70+r*22),-113+wave,side*(137+r*16),-58-wave,side*(161+r*13),-7);ctx.stroke();
-  for(let j=0;j<3;j++){const px=side*(78+r*14+j*24),py=-66+Math.sin(now.time*.003+i+j)*6;
-   poly([[px,py],[px-side*10,py-16],[px+side*12,py-2]],'#a9aa70')}
+ ctx.save();ctx.translate(x,y);ctx.imageSmoothingEnabled=false;
+ const tick=now.time,breath=Math.sin(tick*.0028),sway=Math.sin(tick*.0018)*7,
+  furious=data.hp<MAX*.5,biting=combat.attack==='bite'&&['warning','strike'].includes(combat.mode),
+  mouthStretch=biting?(combat.mode==='strike'?1.46:1.2):1+breath*.045,
+  sporing=combat.attack==='spores'&&['warning','strike'].includes(combat.mode);
+ ell(2,21,119,31,'#192a2595');
+ // Heavy, entwined lower roots with bone-coloured thorn growth.
+ ctx.lineCap='round';ctx.lineJoin='round';
+ for(let i=0;i<9;i++){
+  const a=Math.PI*(i/8),side=i%2?-1:1,reach=68+(i%4)*17;
+  ctx.strokeStyle='#253d34';ctx.lineWidth=19-i%3*3;ctx.beginPath();
+  ctx.moveTo((i-4)*9,-6);ctx.bezierCurveTo(side*30,26,Math.cos(a)*reach,18+Math.sin(a)*17,
+   Math.cos(a)*(118+i%3*14),18+Math.sin(a)*11);ctx.stroke();
+  ctx.strokeStyle='#66744c';ctx.lineWidth=3;ctx.beginPath();
+  ctx.moveTo((i-4)*9,-9);ctx.quadraticCurveTo(Math.cos(a)*reach,8,
+   Math.cos(a)*(118+i%3*14),18+Math.sin(a)*11);ctx.stroke();
  }
- ctx.lineWidth=37;ctx.strokeStyle='#405e43';ctx.beginPath();ctx.moveTo(0,8);ctx.quadraticCurveTo(-23,-64,sway,-118);ctx.stroke();
- ctx.save();ctx.translate(sway,-122);
- for(let i=0;i<8;i++){ctx.save();ctx.rotate(i*Math.PI/4);
-  poly([[-17,-19],[-31,-68],[0,-98],[31,-68],[17,-19]],i%2?'#744a70':'#88516a','#302e36');ctx.restore()}
- ell(0,0,86,69,angry?'#ae5b72':'#89516e');ell(0,7,72,50,'#3a273b');ell(0,12,59,36,'#160f21');ell(0,29,34,11,'#ac5877');
- for(let i=0;i<9;i++){const px=-57+i*14,k=Math.sin((i+.5)*Math.PI/9);
-  poly([[px-6,-18-15*k],[px+6,-18-15*k],[px,1-10*k]],'#f0dfbc','#8c7675');
-  poly([[px-6,30+8*k],[px+6,30+8*k],[px,14+8*k]],'#e8d6b6','#8c7675')}
- ell(-49,-38,17,18,'#c3bd87');ell(49,-38,17,18,'#c3bd87');
- ell(-49,-40,8,10,'#2c2930');ell(49,-40,8,10,'#2c2930');ell(-52,-45,3,3,'#f6f2d8');ell(46,-45,3,3,'#f6f2d8');
+ // Ribbed root-heart and jointed living stalk; layered shading creates volume.
+ const bulb=ctx.createLinearGradient(-72,-65,83,13);
+ bulb.addColorStop(0,'#27392d');bulb.addColorStop(.35,'#556c42');bulb.addColorStop(.7,'#6a6b46');bulb.addColorStop(1,'#263b33');
+ ell(0,-22,72,63,bulb);ell(-20,-37,25,40,'#88905950');
+ ctx.strokeStyle='#24372f';ctx.lineWidth=47;ctx.beginPath();ctx.moveTo(2,-8);
+ ctx.bezierCurveTo(30,-51,-33,-92,sway,-136);ctx.stroke();
+ ctx.strokeStyle='#4d764c';ctx.lineWidth=31;ctx.beginPath();ctx.moveTo(-7,-16);
+ ctx.bezierCurveTo(16,-64,-28,-97,sway-5,-139);ctx.stroke();
+ ctx.strokeStyle='#9aae6d';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-19,-17);
+ ctx.bezierCurveTo(8,-67,-39,-98,sway-16,-140);ctx.stroke();
+ // Breathing spore pods, textured stalk scales, and small serrated leaves.
+ for(let i=0;i<11;i++){
+  const px=Math.sin(i*1.91)*32,py=-12-i*9;
+  ell(px,py,7+(i%3)*2,6,'#233c34');
+  ell(px-2,py-2,4+(i%3),3,i%3?'#9ba86c':'#b29885');
+ }
+ for(let i=0;i<8;i++){
+  const side=i%2?-1:1,yy=-30-(i%4)*26,xx=side*(25+(i%3)*9);
+  poly([[xx,yy],[xx+side*31,yy-33],[xx+side*23,yy-4],[xx+side*11,yy+7]],i%3?'#536e4a':'#77905d','#304c36');
+ }
+ // Animated vine arms. They remain visually separate from their attack tell.
+ for(let i=0;i<8;i++){
+  const side=i%2?-1:1,row=Math.floor(i/2),ripple=Math.sin(tick*.0025+i*1.7)*16;
+  const wind=combat.attack==='vine'&&combat.mode==='strike'?side*30:0;
+  const startX=side*(25+row*9),tipX=side*(120+row*18)+wind,tipY=-16-row*14+ripple*.18;
+  ctx.strokeStyle='#213f34';ctx.lineWidth=24-row*3;ctx.beginPath();ctx.moveTo(startX,-45);
+  ctx.bezierCurveTo(side*(66+row*10),-130+ripple,side*(139+row*6),-88-ripple,tipX,tipY);ctx.stroke();
+  ctx.strokeStyle=row%2?'#72905d':'#8ca167';ctx.lineWidth=7-row*.8;ctx.beginPath();
+  ctx.moveTo(startX-3*side,-51);ctx.bezierCurveTo(side*(60+row*11),-126+ripple,
+  side*(133+row*8),-92-ripple,tipX-side*2,tipY-5);ctx.stroke();
+  // Thorn clusters and leaf spikes track the winding arm.
+  for(let j=0;j<3;j++){
+   const tx=side*(84+row*10+j*15)+wind*(j/4),ty=-86-row*9+ripple*.5+j*10;
+   poly([[tx,ty],[tx+side*15,ty-20],[tx+side*10,ty+10]],j%2?'#a4b37c':'#4a6b4e','#2a4539');
+   poly([[tx-side*8,ty+6],[tx-side*14,ty-1],[tx+side*3,ty]],'#d0ba83');
+  }
+ }
+ // Shield petals behind the central bloom, each with its own rim and vein.
+ ctx.save();ctx.translate(sway,-149);
+ for(let i=0;i<12;i++){
+  const a=i*Math.PI/6+Math.PI/12;
+  ctx.save();ctx.rotate(a);ctx.translate(0,-14);
+  const rim=ctx.createLinearGradient(-30,-105,28,-17);
+  rim.addColorStop(0,i%2?'#352d40':'#403246');
+  rim.addColorStop(.54,i%2?'#87566d':'#704b78');
+  rim.addColorStop(1,'#bc8a91');
+  ctx.beginPath();ctx.moveTo(-26,-9);ctx.bezierCurveTo(-47,-54,-15,-106,0,-113);
+  ctx.bezierCurveTo(22,-99,46,-49,26,-9);ctx.closePath();
+  ctx.fillStyle=rim;ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#352a3e';ctx.stroke();
+  ctx.strokeStyle='#d6a5a1';ctx.lineWidth=2;ctx.beginPath();
+  ctx.moveTo(0,-100);ctx.quadraticCurveTo(-5,-53,0,-16);ctx.stroke();
+  poly([[0,-101],[-8,-90],[0,-110],[8,-90]],'#dec1ae');
+  ctx.restore();
+ }
+ // Outer pitcher head, hard rim, dark recessed mouth and bioluminescent throat.
+ const head=ctx.createRadialGradient(-28,-38,12,8,10,116);
+ head.addColorStop(0,furious?'#d47b87':'#c1828b');
+ head.addColorStop(.35,furious?'#a4536d':'#98657c');
+ head.addColorStop(.77,'#5d405d');head.addColorStop(1,'#2b2e39');
+ ell(0,2,111,88,head);
+ ell(0,9,96,74,'#342b42');
+ ell(0,12,88,66,'#92616f');
+ ell(0,13,77,56,'#352439');
+ ctx.save();ctx.translate(0,12);ctx.scale(1,mouthStretch);
+ const throat=ctx.createRadialGradient(5,19,5,0,0,84);
+ throat.addColorStop(0,'#8d3d59');throat.addColorStop(.25,'#50213f');throat.addColorStop(.69,'#220f28');throat.addColorStop(1,'#110e22');
+ ell(0,0,77,49,throat);
+ ell(3,24,39,11,'#a85f7a');ell(3,27,25,5,'#d08b9b');
+ ell(0,-25,49,10,'#111325');
+ for(let i=0;i<10;i++){
+  const px=-62+i*14,t=Math.sin((i+.5)*Math.PI/10);
+  poly([[px-7,-33*t-5],[px+7,-33*t-5],[px,6-14*t]],i%2?'#efdbba':'#fbebcb','#8f7980');
+  poly([[px-7,35*t+7],[px+7,35*t+7],[px,-6+14*t]],i%2?'#e4d0b3':'#f1ddbe','#8f7980');
+ }
+ for(let i=0;i<5;i++){const px=-28+i*15,py=-7+Math.sin(tick*.004+i)*4;
+  ell(px,py,2+i%2,3,'#e6b6a966')}
+ ctx.restore();
+ // Armoured side cheeks and recessed light-catching eyes.
+ for(const side of [-1,1]){
+  ctx.save();ctx.scale(side,1);
+  const cheek=ctx.createLinearGradient(65,-55,113,-4);
+  cheek.addColorStop(0,'#3c4f45');cheek.addColorStop(.55,'#729271');cheek.addColorStop(1,'#283f3e');
+  ctx.beginPath();ctx.moveTo(70,-48);ctx.quadraticCurveTo(113,-79,119,-35);
+  ctx.quadraticCurveTo(110,7,85,24);ctx.quadraticCurveTo(111,-18,70,-48);
+  ctx.fillStyle=cheek;ctx.fill();ctx.strokeStyle='#2b373a';ctx.lineWidth=3;ctx.stroke();
+  ell(93,-51,19,20,'#2a383a');ell(95,-51,13,15,sporing?'#f2cf94':'#d5bc75');
+  ell(98,-50,6,9,'#272d35');ell(92,-58,3,4,'#fff0c8');
+  ctx.restore();
+ }
+ // Embossed mouth highlights, translucent sap and twitching antennae.
+ ctx.strokeStyle='#edc4b0';ctx.lineWidth=4;ctx.beginPath();
+ ctx.ellipse(0,12,91,65,0,Math.PI*.2,Math.PI*.83);ctx.stroke();
+ ctx.strokeStyle='#304b3d';ctx.lineWidth=6;
+ for(let i=-1;i<=1;i++){
+  ctx.beginPath();ctx.moveTo(i*32,-58);
+  ctx.quadraticCurveTo(i*46+Math.sin(tick*.003+i)*10,-115,i*58,-138);ctx.stroke();
+  ell(i*58,-139,9,12,sporing?'#eadba6':'#a97c86');
+  ell(i*58-3,-144,3,4,'#f6e4bf');
+ }
  ctx.restore();ctx.restore();
 }
 function drawEffects(){

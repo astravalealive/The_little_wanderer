@@ -146,7 +146,7 @@ function minimap(state,now){
  const hx=56+(1500-state.x)/radius*56,hy=56+(1500-state.y)/radius*56;
  if(hx>0&&hy>0&&hx<112&&hy<112){g.fillStyle='#211c18';g.fillRect(hx-4,hy-4,8,8);g.fillStyle='#ffdb8e';g.fillRect(hx-3,hy-3,6,6)}
  const discovered=window.__gloamQA?.();
- if(discovered?.discovered){const bx=56+(1495-state.x)/radius*56,by=56+(2700-state.y)/radius*56;
+ if(discovered?.discovered){const bx=56+(discovered.position.x-state.x)/radius*56,by=56+(discovered.position.y-state.y)/radius*56;
   if(bx>3&&bx<109&&by>3&&by<109){g.beginPath();g.arc(bx,by,4,0,Math.PI*2);g.fillStyle=discovered.defeated?'#667b62':'#ab5484';g.fill();g.strokeStyle='#f4deb6';g.lineWidth=1;g.stroke();}}
  g.beginPath();g.moveTo(56,45);g.lineTo(48,64);g.lineTo(56,60);g.lineTo(64,64);g.closePath();g.fillStyle='#fff4da';g.fill();g.strokeStyle='#21211d';g.lineWidth=1.5;g.stroke();
 }
