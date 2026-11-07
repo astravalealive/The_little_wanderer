@@ -149,3 +149,7 @@ body.v127-rpg #v127Root .v127-quest-toggle{display:none}
  .v127-gear{bottom:calc(env(safe-area-inset-bottom,0px) + 73px)}
  body.v127-rpg .bottom{bottom:calc(env(safe-area-inset-bottom,0px) + 72px)}
 }
+
+/* Suppress V126's large diagnostic helper in normal V127 gameplay. */
+body.v127-rpg #v121PreviewTools{display:none!important}
+body.v127-rpg.v127-show-test #v121PreviewTools{display:flex!important}
