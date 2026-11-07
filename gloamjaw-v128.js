@@ -30,8 +30,9 @@ P.renderHotbar();
 const style=document.createElement('style');
 style.textContent='#gloamBossHud{display:none;position:fixed;z-index:27;top:calc(env(safe-area-inset-top,0px) + 114px);left:50%;transform:translateX(-50%);width:min(520px,83vw);background:#221a2def;color:#f5dec8;border:2px solid #af7c91;border-radius:12px;padding:8px 11px;font:700 13px Georgia,serif;pointer-events:none;text-shadow:0 1px 2px #000;box-shadow:0 5px 18px #0008}#gloamBossHud .title-line{display:flex;justify-content:space-between;gap:7px}#gloamBossHud .track{background:#211b28;border:2px solid #a9848c;border-radius:7px;overflow:hidden;height:15px;margin-top:6px}#gloamBossFill{height:100%;background:linear-gradient(90deg,#783653,#c65b7e,#e3a1a3);width:100%;transition:width .15s}@media(max-width:600px){#gloamBossHud{top:calc(env(safe-area-inset-top,0px) + 86px);font-size:10px;width:79vw;padding:5px 8px}}';
 document.head.append(style);
+style.textContent+='#gloamAmmo{position:fixed;z-index:23;right:calc(env(safe-area-inset-right,0px) + 7px);bottom:calc(env(safe-area-inset-bottom,0px) + 25px);padding:2px 7px;background:#251d29e8;border:1px solid #a4875c;border-radius:6px;font:700 11px Georgia,serif;color:#efd7ab;pointer-events:none;display:none}';
 const bar=document.createElement('div');bar.id='gloamBossHud';bar.setAttribute('role','progressbar');bar.setAttribute('aria-label','Gloamjaw boss health');bar.setAttribute('aria-valuemin','0');bar.setAttribute('aria-valuemax',String(MAX));
-bar.innerHTML='<div class="title-line"><span>GLOAMJAW · HUNGRY BLOOM</span><span id="gloamBossValue">180 / 180</span></div><div class="track"><div id="gloamBossFill"></div></div>';document.body.append(bar);
+bar.innerHTML='<div class="title-line"><span>GLOAMJAW · HUNGRY BLOOM</span><span id="gloamBossValue">180 / 180</span></div><div class="track"><div id="gloamBossFill"></div></div>';document.body.append(bar);const ammo=document.createElement('div');ammo.id='gloamAmmo';ammo.setAttribute('aria-live','off');document.body.append(ammo);
 const combat={mode:'idle',timer:1350,turn:0,attack:'',aim:{x,y},angle:0,hit:false,arrows:[],spores:[],lastShot:-1e6,lastMelee:-1e6};
 const ell=(px,py,a,b,colour)=>{ctx.fillStyle=colour;ctx.beginPath();ctx.ellipse(px,py,a,b,0,0,Math.PI*2);ctx.fill()};
 const poly=(pts,fill,stroke)=>{ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.lineWidth=2;ctx.strokeStyle=stroke;ctx.stroke()}};
@@ -104,6 +105,8 @@ function update(dt){
   if(Math.hypot(sp.x-state.x,sp.y-(state.y-34))<25){P.takeDamage(9,'Gloamjaw spore',true,bossPos);sp.life=0}
  }
  combat.spores=combat.spores.filter(a=>a.life>0);
+ ammo.style.display=['bow','crossbow'].includes(state.equipped)?'block':'none';
+ if(ammo.style.display==='block')ammo.textContent='ARROWS '+state.arrows+' · LV '+state.tools[state.equipped];
  bar.style.display=!data.defeated&&r<530?'block':'none';
  if(bar.style.display==='block'){
   bar.setAttribute('aria-valuenow',String(Math.ceil(data.hp)));
@@ -149,6 +152,7 @@ function update(dt){
  }
 }
 function drawGround(){
+ const screen=P.snapshot();if(Math.abs(x-screen.cameraX)>1100||Math.abs(y-screen.cameraY)>900)return;
  ctx.save();ell(x,y,rx+20,ry+16,'#38543b');ell(x,y,rx,ry,'#64724f');
  ell(x,y+15,246,182,'#4b5e43');ctx.lineCap='round';
  for(let i=0;i<16;i++){
@@ -188,7 +192,7 @@ function drawBoss(){
  ctx.restore();ctx.restore();
 }
 function drawEffects(){
- const a=combat;
+ ctx.save();const a=combat;
  if(a.mode==='warning'&&!data.defeated){
   ctx.strokeStyle='#ef9eae';ctx.lineWidth=5;ctx.beginPath();
   if(a.attack==='roots')ctx.arc(a.aim.x,a.aim.y,93,0,Math.PI*2);
@@ -220,8 +224,9 @@ function drawEffects(){
   if(state.equipped==='crossbow'){ctx.strokeStyle='#986f48';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-7,0);ctx.lineTo(22,0);ctx.stroke()}
   ctx.restore();
  }
+ ctx.restore();
 }
 window.__gloamAddon={y:y+10,arena,update,drawGround,drawBoss,drawEffects,craftLocked,crafted,useTool,
- snapshot:()=>({build:128,hp:data.hp,defeated:data.defeated,arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length})};
+ snapshot:()=>({build:128,hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length})};
 window.__gloamQA=window.__gloamAddon.snapshot;
 })();
