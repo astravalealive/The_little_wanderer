@@ -5237,6 +5237,13 @@ function frame(now){
   state.x=bank.x;state.y=bank.y;state.resting=false;state.autonomy=false;
   state.playerInstruction=null;look.x=0;look.y=0;cameraZoom=1;
   cam.x=bank.x;cam.y=bank.y;cameraReleaseAt=-1e9;
+  // Read-only snapshot for the preview's automated movement and frog tests.
+  window.__haigenPondProbe={
+   player:{x:state.x,y:state.y},
+   liveFrogs:frogs.length,
+   nearbyFrogs:frogs.filter(f=>Math.abs(f.x-cam.x)<500&&Math.abs(f.y-cam.y)<420).length,
+   waterDepth:lakeLevel(state.x,state.y)
+  };
   save();notify('🐸 Visiting the frog pond!');
  };
  $('previewCopySave').onclick=()=>{
