@@ -1,0 +1,35 @@
+name: Install approved Gloamjaw V133 artwork
+on:
+  push:
+    paths:
+      - .github/scripts/build_gloamjaw_v133.py
+      - .github/workflows/install-gloamjaw-v133.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  approved-gloamjaw:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare artwork compositor
+        run: python -m pip install --disable-pip-version-check pillow numpy
+      - name: Download and verify both user-approved original sprite sheets
+        run: python .github/scripts/build_gloamjaw_v133.py
+      - name: Commit Gloamjaw art into the one live game
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/gloamjaw-approved-v133.png
+          if git diff --cached --quiet; then
+            echo 'Approved 28-pose image already present'
+          else
+            git commit -m 'Install creator-approved Gloamjaw 28-pose atlas V133'
+            git push origin HEAD:main
+          fi
