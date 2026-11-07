@@ -42,7 +42,7 @@ body.rebirth-art .slot.selected{background:#b9caaa}
 body.rebirth-art .toast{background:#203a33f2;border-color:#baba91}
 
 /* Virtual SNES framebuffer is enlarged with hard pixels, UI stays native-resolution. */
-body.rebirth-art canvas#game{image-rendering:pixelated;image-rendering:crisp-edges}
+body.rebirth-art canvas#game{image-rendering:crisp-edges;image-rendering:pixelated}
 body:not(.rebirth-art) canvas#game{image-rendering:auto}
 .dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.114</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v114 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
@@ -1589,23 +1589,27 @@ function foliageVisibility(o){
 // The first art slice covers Haigen's home woodland and the Silent Pond.
 const rbTileCache={grass:null,tree:new Map(),rock:new Map()};
 function rbWoodland(x,y){return x>=0&&x<3500&&y>=0&&y<3100&&!expandedRegion(x,y)}
+// Repeating 8x8 atlas of 16x16 ground tiles, with sub-tile 8x8 details.
 function rbGrass(){
  if(rbTileCache.grass)return rbTileCache.grass;
- const tile=document.createElement('canvas');tile.width=256;tile.height=256;const g=tile.getContext('2d');
- g.fillStyle='#638a73';g.fillRect(0,0,256,256);
+ const tile=document.createElement('canvas');tile.width=128;tile.height=128;
+ const g=tile.getContext('2d');g.imageSmoothingEnabled=false;
  let seed=83517;const rng=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
- for(let i=0;i<170;i++){
-  const x=Math.floor(rng()*62)*4,y=Math.floor(rng()*62)*4;
-  rbPixel(g,x,y,8+i%4*4,4+i%2*4,i%5===0?'#9da88a':i%3===0?'#497665':'#74947b');
- }
- for(let i=0;i<120;i++){
-  const x=Math.floor(rng()*62)*4,y=Math.floor(rng()*62)*4;
-  rbPixel(g,x+4,y,3,7,i%5===0?'#b6ae8b':i%2?'#46745f':'#8eaa88');
-  rbPixel(g,x,y+4,4,3,'#3f6c5a');
- }
- for(let i=0;i<10;i++){
-  const x=Math.floor(rng()*61)*4,y=Math.floor(rng()*61)*4;
-  rbPixel(g,x,y+3,4,4,'#bc8e9a');rbPixel(g,x+4,y,4,4,'#e4c4b1');
+ const bases=['#658a73','#668c75','#638771','#6b9179','#60856f','#6c8e75'];
+ for(let ty=0;ty<8;ty++)for(let tx=0;tx<8;tx++){
+  const x=tx*16,y=ty*16,variation=Math.floor(rng()*bases.length);
+  rbPixel(g,x,y,16,16,bases[variation]);
+  // Original hand-coded 8x8 subtiles within each 16x16 terrain tile.
+  if(variation%2===0){rbPixel(g,x+1,y+1,7,7,'#6f9379');rbPixel(g,x+8,y+8,8,8,'#61846f')}
+  else {rbPixel(g,x+8,y,8,8,'#73937c');rbPixel(g,x,y+8,8,8,'#618470')}
+  const tufts=variation===4?4:2;
+  for(let i=0;i<tufts;i++){
+   const gx=x+2+Math.floor(rng()*12),gy=y+3+Math.floor(rng()*11);
+   rbPixel(g,gx,gy,1,3,i%2?'#a1ac84':'#3e735e');
+   rbPixel(g,gx-1,gy+2,2,1,'#517e67');
+   if(variation===4&&i===0){rbPixel(g,gx+2,gy-2,2,2,'#c1aa9f')}
+  }
+  if(variation===2){rbPixel(g,x+4,y+12,5,2,'#8a9d7d');rbPixel(g,x+8,y+10,3,2,'#72876c')}
  }
  rbTileCache.grass=ctx.createPattern(tile,'repeat');return rbTileCache.grass;
 }
@@ -1681,9 +1685,34 @@ function rbDrawBush(o){
  ctx.restore();
 }
 
+// Matching detailed 16-bit-style wildflowers and mushroom patches.
+function rbDrawFlower(o){
+ const f=flowerKind(o),x=Math.round(o.x),y=Math.round(o.y);
+ ctx.save();ellipse(x,y+3,12,4,'#2e604e7a');
+ const p=(xx,yy,w,h,c)=>rbPixel(ctx,xx,yy,w,h,c);
+ p(x-1,y-17,2,17,'#396d53');p(x-7,y-10,7,3,'#4c865e');p(x+1,y-7,8,3,'#528a69');
+ p(x-7,y-24,14,12,'#294f46');p(x-5,y-25,10,10,f.color);
+ p(x-8,y-22,5,5,f.color);p(x+5,y-22,5,5,f.color);p(x-2,y-28,5,5,f.color);
+ p(x-2,y-21,4,4,'#e9cf8a');p(x-1,y-20,2,2,'#fff3c8');
+ ctx.restore();
+}
+function rbDrawMushroom(o){
+ const x=Math.round(o.x),y=Math.round(o.y),id=o.id||0;
+ const cold=medicinalMushroom(o),cap=cold?'#799eaa':'#a6644f',light=cold?'#b0c6c6':'#cc9a73';
+ ctx.save();ellipse(x,y+3,18,5,'#345d4b73');
+ const p=(xx,yy,w,h,c)=>rbPixel(ctx,xx,yy,w,h,c);
+ for(let i=0;i<3;i++){
+  const px=x+(i-1)*11,py=y+(i%2)*2,hh=i===1?13:9;
+  p(px-2,py-hh,4,hh,'#d8ccaa');
+  p(px-5,py-hh-4,10,5,'#644d42');p(px-5,py-hh-6,10,5,cap);
+  p(px-2,py-hh-7,5,2,light);p(px+3,py-hh-4,2,2,'#ddbc93');
+ }
+ ctx.restore();
+}
+
 function drawSceneryNearHaigen(o){
  const woodland=rbEnabled&&rbWoodland(o.x,o.y);
- const renderer={tree:woodland?rbDrawTree:tree,rock:woodland?rbDrawRock:rock,bush:woodland?rbDrawBush:bush,flower,mushroom:mushroomPatch,
+ const renderer={tree:woodland?rbDrawTree:tree,rock:woodland?rbDrawRock:rock,bush:woodland?rbDrawBush:bush,flower:woodland?rbDrawFlower:flower,mushroom:woodland?rbDrawMushroom:mushroomPatch,
   cactus:drawRegionalScenery,palm:drawRegionalScenery,
   fir:drawRegionalScenery,bareTree:drawRegionalScenery}[o.type];
  if(!renderer)return;
