@@ -93,6 +93,7 @@ jobs:
               const friends=await page.evaluate(()=>window.__v126SkolliStatus().lastFrame);
               if(!friends)throw Error('Skölli not visible after Meet Friends');
               await page.locator('#v127ZoomIn').click();
+              await page.waitForFunction(()=>window.__v127UISnapshot?.miniRadius<550,{timeout:4000});
               const radius=await page.evaluate(()=>window.__v127UISnapshot?.miniRadius);
               if(!(radius<550))throw Error('Minimap zoom did not change');
               if(errors.length)throw Error('Browser errors '+JSON.stringify(errors));
