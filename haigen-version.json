@@ -1,4 +1,4 @@
 {
-  "build": 113,
-  "notes": "V113 Haigen's Life Builder Chapter One. In autonomous mode he independently decides which missing homestead structure to build (coop, kitchen garden or wood shed), clears camp debris, gathers real wood/stone/twigs, spends resources in three work stages, and completes functioning buildings. Earthy timber-and-stone scaffolding, moving hammer and dust, visible project status in his notebook, and fewer repetitive collection notes. Existing saves and completed buildings, player control, companion stories, original Ember and Silent Pond are preserved. AI remains a bounded local simulation."
+  "build": 114,
+  "notes": "V114 visual rebirth vertical slice: original 16-bit inspired directional pixel sprites for Haigen, Dillon and Skölli, three walk poses each; faster direction-aware axe/pick/shovel strikes; new woodland grass-tile texture, oak/pine trees, rocks and bushes, pixelate pond edge and tier 2/3 cottage; atmospheric forest palette for UI. Reversible Rebirth / Classic art switch under More, style stored independently using haigenVisualStyle. New HAIGEN_VISUAL_REBIRTH.md art bible and subsequent phases. AI, old saves, story, controls and original Ember preserved. Requires visual iPad Safari playtest."
 }
