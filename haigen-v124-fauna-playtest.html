@@ -5520,7 +5520,7 @@ function frame(now){
  previewTools.id='v121PreviewTools';
  previewTools.setAttribute('aria-label','Haigen preview troubleshooting');
  previewTools.style.cssText='position:fixed;z-index:8;left:9px;top:calc(env(safe-area-inset-top,0px) + 93px);display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:min(90vw,300px);pointer-events:auto';
- previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>V124 · Preview help</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
+ previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>V124 · Preview help</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewFriends" class="btn" style="font-size:11px;padding:5px">🐇 Meet Dillon &amp; Skölli</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
  document.body.appendChild(previewTools);
  $('previewFind').onclick=()=>{
    // Keep the live V120 save and Haigen's world objects intact.
@@ -5529,6 +5529,19 @@ function frame(now){
    notify('🔎 Camera centred on Haigen.');
  };
  $('previewLook').onclick=()=>toggleRebirthArt();
+ $('previewFriends').onclick=()=>{
+  // Companion art showcase is opt-in, preview only. Never alters quest or save data.
+  for(const c of companions){
+   if(c.kind!=='rabbit'&&c.kind!=='fox')continue;
+   c.x=state.x+(c.kind==='rabbit'?-65:66);
+   c.y=state.y+33;
+   c.mode='watching';c.target=null;c.t=5000;
+   c.anim=0;c.dir='down';
+  }
+  cam.x=state.x;cam.y=state.y;look.x=0;look.y=0;cameraReleaseAt=-1e9;
+  const panel=previewTools.querySelector('details');if(panel)panel.open=false;
+  notify('🐇 Dillon and Skölli are here!');
+ };
  $('previewPond').onclick=()=>{
   // Dry bank of the original pond; only the V121 preview save is updated.
   const candidates=[
@@ -5595,6 +5608,18 @@ function frame(now){
   sourceAnimals:Object.keys(illustratedFaunaCells).filter(k=>k!=='frog'),
   companionsSheet:'Dillon + Skölli / 4 directions / 4 frames'
  });
+ window.__v124PreviewQA=()=>{
+  const companionsInView=companions.filter(c=>Math.abs(c.x-cam.x)<380&&Math.abs(c.y-cam.y)<370);
+  return {
+   art:window.__v124ArtStatus(),
+   lastCompanion:window.__v124LastCompanion||null,
+   lastFauna:window.__v124LastFauna||null,
+   nearbyCompanions:companionsInView.map(c=>({kind:c.kind,x:c.x,y:c.y,mode:c.mode})),
+   originalPondFrogs:frogs.length,
+   player:{x:state.x,y:state.y},
+   engineReady:window.__haigenWorldReady
+  };
+ };
  const GAME_BUILD=124;document.getElementById('devVersion').textContent='V124 · WILDLIFE';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
