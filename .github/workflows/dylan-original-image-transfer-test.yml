@@ -1,0 +1,41 @@
+name: Dylan source art transfer check
+on:
+  push:
+    paths: ['.github/workflows/dylan-original-image-transfer-test.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check available original-resolution render URLs
+        shell: bash
+        run: |
+          echo "candidate 0"
+          curl -L --max-time 35 -sS -w 'http:%{http_code} bytes:%{size_download}\n' -o /tmp/dylan-0.png 'https://media.canva.com/v2/image-resize/format:PNG/height:150/quality:100/uri:ifs%3A%2F%2FM%2F605510b2-c5e0-4465-acbc-a9ea50009ff4/watermark:F/width:200?csig=AAAAAAAAAAAAAAAAAAAAAPmlvTzB2B9iK5A8aqmntJKFChi-XqqssYEWhWRSCGQ_&exp=1794090304&osig=AAAAAAAAAAAAAAAAAAAAABbb_xt_gpALEyKQedRqPo2AdkU6VlFMCJ651VD4Utg7&signer=media-rpc&token=AAIAAU0AJDYwNTUxMGIyLWM1ZTAtNDQ2NS1hY2JjLWE5ZWE1MDAwOWZmNAAAAAABobgdggADsK7o_2a4zyBsraPGBPH6HF_m26aoQsYYXPFLSDHXpA&x-canva-quality=thumbnail' || true
+          file /tmp/dylan-0.png || true
+          echo "candidate 1"
+          curl -L --max-time 35 -sS -w 'http:%{http_code} bytes:%{size_download}\n' -o /tmp/dylan-1.png 'https://media.canva.com/v2/image-resize/format:PNG/height:1086/quality:100/uri:ifs%3A%2F%2FM%2F605510b2-c5e0-4465-acbc-a9ea50009ff4/watermark:F/width:1448?csig=AAAAAAAAAAAAAAAAAAAAAPmlvTzB2B9iK5A8aqmntJKFChi-XqqssYEWhWRSCGQ_&exp=1794090304&osig=AAAAAAAAAAAAAAAAAAAAABbb_xt_gpALEyKQedRqPo2AdkU6VlFMCJ651VD4Utg7&signer=media-rpc&token=AAIAAU0AJDYwNTUxMGIyLWM1ZTAtNDQ2NS1hY2JjLWE5ZWE1MDAwOWZmNAAAAAABobgdggADsK7o_2a4zyBsraPGBPH6HF_m26aoQsYYXPFLSDHXpA&x-canva-quality=thumbnail' || true
+          file /tmp/dylan-1.png || true
+          echo "candidate 2"
+          curl -L --max-time 35 -sS -w 'http:%{http_code} bytes:%{size_download}\n' -o /tmp/dylan-2.png 'https://media.canva.com/v2/image-resize/format:PNG/height:1086/quality:100/uri:ifs%3A%2F%2FM%2F605510b2-c5e0-4465-acbc-a9ea50009ff4/watermark:F/width:1448' || true
+          file /tmp/dylan-2.png || true
+          echo "candidate 3"
+          curl -L --max-time 35 -sS -w 'http:%{http_code} bytes:%{size_download}\n' -o /tmp/dylan-3.png 'https://media.canva.com/v2/image-resize/format:PNG/height:800/quality:100/uri:ifs%3A%2F%2FM%2F605510b2-c5e0-4465-acbc-a9ea50009ff4/watermark:F/width:1000?csig=AAAAAAAAAAAAAAAAAAAAAPmlvTzB2B9iK5A8aqmntJKFChi-XqqssYEWhWRSCGQ_&exp=1794090304&osig=AAAAAAAAAAAAAAAAAAAAABbb_xt_gpALEyKQedRqPo2AdkU6VlFMCJ651VD4Utg7&signer=media-rpc&token=AAIAAU0AJDYwNTUxMGIyLWM1ZTAtNDQ2NS1hY2JjLWE5ZWE1MDAwOWZmNAAAAAABobgdggADsK7o_2a4zyBsraPGBPH6HF_m26aoQsYYXPFLSDHXpA&x-canva-quality=thumbnail' || true
+          file /tmp/dylan-3.png || true
+          echo "candidate 4"
+          curl -L --max-time 35 -sS -w 'http:%{http_code} bytes:%{size_download}\n' -o /tmp/dylan-4.png 'https://media.canva.com/v2/image-resize/format:PNG/height:600/quality:100/uri:ifs%3A%2F%2FM%2F605510b2-c5e0-4465-acbc-a9ea50009ff4/watermark:F/width:800?csig=AAAAAAAAAAAAAAAAAAAAAPmlvTzB2B9iK5A8aqmntJKFChi-XqqssYEWhWRSCGQ_&exp=1794090304&osig=AAAAAAAAAAAAAAAAAAAAABbb_xt_gpALEyKQedRqPo2AdkU6VlFMCJ651VD4Utg7&signer=media-rpc&token=AAIAAU0AJDYwNTUxMGIyLWM1ZTAtNDQ2NS1hY2JjLWE5ZWE1MDAwOWZmNAAAAAABobgdggADsK7o_2a4zyBsraPGBPH6HF_m26aoQsYYXPFLSDHXpA&x-canva-quality=thumbnail' || true
+          file /tmp/dylan-4.png || true
+      - name: Report image dimensions without exposing image bytes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob,struct
+          for p in sorted(glob.glob('/tmp/dylan-*.png')):
+           b=open(p,'rb').read()
+           if b[:8]==b'\x89PNG\r\n\x1a\n' and len(b)>=24:
+            w,h=struct.unpack('>II',b[16:24])
+            print(p, w,h,len(b))
+           else: print(p,'NOT PNG',len(b),repr(b[:80]))
+          PY
