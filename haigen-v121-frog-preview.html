@@ -2154,9 +2154,10 @@ function foliageVisibility(o){
  const dx=(state.x-o.x)/Math.max(1,radiusX);
  const dy=(state.y-46-canopyY)/Math.max(1,radiusY);
  const distance=Math.hypot(dx,dy);
- const overlap=o.y>=state.y-7&&distance<1;
- const blend=overlap?Math.min(1,(1-distance)*2.7):0;
- const target=1-blend*.72;
+ // Near-field foliage fades so Haigen and companions remain readable underneath.
+ const overlap=o.y>=state.y-35&&distance<1.32;
+ const blend=overlap?Math.min(1,Math.max(.3,(1.32-distance)*2.3)):0;
+ const target=1-blend*.82;
  const old=obscuringTreeAlpha.get(o.id);
  const current=old&&time-old.last<420?old.alpha:1;
  const next=current+(target-current)*.19;
@@ -2437,18 +2438,61 @@ function worldPaint(kind,variant=0){
    p(20,13,34,3,'#e2bd85');p(55,16,7,5,'#6d503b')}
  }else if(kind==='tent'||kind==='cottage'){
   if(kind==='tent'){
-   poly([[7,105],[86,6],[169,105]],outline);poly([[13,104],[86,15],[162,104]],'#d2b88a');
-   poly([[85,17],[85,100],[160,102]],'#e6d4ab');poly([[85,61],[53,105],[85,105]],'#5a4534');
-   p(26,105,134,5,wood);p(81,8,8,103,'#917450');
+   // Warm canvas, angular top-down outline, folded flaps, proper seam details.
+   poly([[5,105],[87,5],[173,105],[164,113],[14,113]],outline);
+   poly([[13,104],[87,14],[163,104]],'#c9a777');
+   poly([[27,99],[87,22],[148,99]],'#edd4a5');
+   poly([[87,23],[89,103],[155,103]],'#d3b284');
+   poly([[28,100],[61,62],[86,28],[72,78]],'#f9e2b5');
+   poly([[87,52],[58,104],[90,104]],'#544536');
+   poly([[61,102],[86,60],[84,104]],'#282f2b');
+   p(85,10,6,99,'#866647');
+   p(89,27,3,53,'#b28b62');
+   // Rolled blanket near the open entrance.
+   p(99,91,27,10,'#736b61');p(101,92,22,7,'#bca06b');
+   for(let i=0;i<7;i++){const x=26+i*19;p(x,106,7,4,i%2?'#806346':'#977351')}
+   // Guy ropes and wooden pegs give the shelter depth.
+   for(const [x1,x2] of [[22,4],[155,176]]){
+    poly([[x1,77],[x2,114],[x2+2,114],[x1+2,79]],'#786548');
+    p(x2-2,110,6,8,'#79563a');
+   }
   }else{
-   p(13,60,154,56,outline);p(18,64,145,51,'#8c7d63');
-   for(let i=0;i<14;i++)p(21+i*10,71,4,43,i%2?'#a79577':'#675647');
-   poly([[4,70],[91,8],[177,70]],outline);poly([[9,65],[91,15],[171,65]],'#987647');
-   for(let i=0;i<10;i++){const px=30+i*11,py=52-i%3*7;p(px,py,18,6,i%2?'#b99356':'#765c3c')}
-   p(81,73,32,44,outline);p(85,77,24,40,'#574437');p(98,95,3,4,'#d7af73');
-   for(const x of [32,135]){p(x-10,77,24,26,outline);p(x-6,80,17,20,'#e0b56a');p(x-6,88,17,3,'#8f5e41')}
-   p(122,4,16,35,'#888d84');p(119,0,22,6,'#aaa99a');
-  }
+   // Timber-and-stone cottage with distinct dark outline and warm hearth light.
+   p(12,58,156,60,outline);p(18,63,144,50,'#9e8c70');
+   for(let i=0;i<11;i++){
+    const x=22+i*13;
+    p(x,68,4,43,i%2?'#574b3b':'#b4a17c');
+    p(x+5,68,5,4,'#c3b08a');
+   }
+   p(16,108,148,9,'#625749');
+   poly([[3,71],[91,7],[178,71],[166,76],[91,28],[13,76]],outline);
+   poly([[11,67],[91,14],[170,67]],'#ab784a');
+   poly([[24,62],[91,19],[159,63]],'#d1a468');
+   // Three tiers of shingle-like thatch with broken, natural-looking edges.
+   for(let tier=0;tier<5;tier++){
+    const y=27+tier*8,left=78-tier*12,right=104+tier*12;
+    for(let i=0;i<Math.ceil((right-left)/12);i++){
+     const x=left+i*12+(tier%2)*5;
+     p(x,y,10,5,i%3?'#c89959':'#e5bd7d');
+     p(x+2,y+4,7,2,'#805e3f');
+    }
+   }
+   // Central timber framing and arched front door.
+   p(20,68,8,45,'#684b37');p(149,68,8,45,'#684b37');
+   p(72,77,47,39,outline);p(76,78,39,38,'#5c4233');
+   disc(95,79,18,14,'#5b4438');p(78,83,34,32,'#785641');
+   p(93,82,3,31,'#9a704b');p(105,98,4,4,'#dabb75');
+   for(const x of [32,135]){
+    p(x-10,77,23,27,outline);p(x-6,80,16,20,'#ecc079');
+    p(x-6,86,16,4,'#e9a24c');p(x,80,3,20,'#78543c');
+    p(x-6,90,16,3,'#92613b');
+   }
+   // Chimney, masonry blocks, cottage greenery.
+   p(122,2,17,31,'#596467');p(119,0,22,6,'#9e9e90');
+   for(const [xx,yy] of [[21,108],[45,111],[142,109],[154,106]]){
+    disc(xx,yy,11,7,'#375d43');disc(xx-2,yy-2,8,4,'#77975b');
+   }
+    }
  }else if(kind==='lantern'||kind==='campfire'){
   if(kind==='lantern'){p(27,11,26,50,outline);p(30,16,20,38,'#766a55');p(33,24,14,27,'#db9c39');
    p(36,29,8,19,'#ffdc6a');p(28,10,24,7,'#535452');p(31,5,18,6,'#97968a');
@@ -2477,7 +2521,7 @@ function worldArtScenery(o){
  const name=map[type];if(!name)return false;
  const size=o.size||1;
  const dimensions={
-  tree:[118,153],fir:[108,148],palm:[123,148],bareTree:[110,132],cactus:[75,90],
+  tree:[102,136],fir:[98,137],palm:[112,139],bareTree:[100,124],cactus:[75,90],
   rock:[76,57],bush:[72,52],flower:[36,36],mushroom:[39,31]
  };
  const [w,h]=dimensions[name],v=Math.abs(Math.floor(o.id||0))%6;
@@ -4531,9 +4575,9 @@ function drawRain(){
  const zoom=worldZoom();
  const left=cam.x-W/(2*zoom),top=cam.y-H/(2*zoom),width=W/zoom,height=H/zoom;
  ctx.save();
- ctx.strokeStyle='rgba(190,220,248,'+(strength*.54)+')';
+ ctx.strokeStyle='rgba(190,220,248,'+(strength*.35)+')';
  ctx.lineWidth=1.4;ctx.lineCap='round';
- const count=Math.floor(100*strength);
+ const count=Math.floor(72*strength);
  const drift=time*.42;
  for(let i=0;i<count;i++){
   const x=left+((seeded(i*3+1840)*width+drift*.21)%width);
@@ -5268,7 +5312,7 @@ function frame(now){
  previewTools.id='v121PreviewTools';
  previewTools.setAttribute('aria-label','Haigen preview troubleshooting');
  previewTools.style.cssText='position:fixed;z-index:8;left:9px;top:calc(env(safe-area-inset-top,0px) + 93px);display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:min(90vw,300px);pointer-events:auto';
- previewTools.innerHTML='<div style="display:flex;gap:5px;flex-wrap:wrap"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:6px 9px;min-height:36px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:6px 9px;min-height:36px">🎨 Change look</button></div><details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>Preview help</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
+ previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>Preview help</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
  document.body.appendChild(previewTools);
  $('previewFind').onclick=()=>{
    // Keep the live V120 save and Haigen's world objects intact.
