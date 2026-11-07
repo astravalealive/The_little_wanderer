@@ -61,12 +61,21 @@ jobs:
               // both side views are captured at gameplay scale and kept as artifacts.
               await page.keyboard.down('ArrowLeft');
               await page.waitForTimeout(550);
+              const leftPose=await page.evaluate(()=>window.__haigenSpriteProbe);
               await page.screenshot({path:'/tmp/haigen-preview-left-'+vp.width+'.png'});
               await page.keyboard.up('ArrowLeft');
               await page.keyboard.down('ArrowRight');
               await page.waitForTimeout(550);
+              const rightPose=await page.evaluate(()=>window.__haigenSpriteProbe);
               await page.screenshot({path:'/tmp/haigen-preview-right-'+vp.width+'.png'});
               await page.keyboard.up('ArrowRight');
+              const atlasLoaded=await page.evaluate(()=>window.__haigenEnvironmentReady);
+              console.log('HAIGEN ART REGRESSION '+JSON.stringify({viewport:vp,leftPose,rightPose,atlasLoaded}));
+              if(!leftPose||leftPose.dir!=='left'||leftPose.row!==2||!leftPose.mirrored)
+                throw new Error('LEFT sprite failed true-mirror check: '+JSON.stringify(leftPose));
+              if(!rightPose||rightPose.dir!=='right'||rightPose.row!==2||rightPose.mirrored)
+                throw new Error('RIGHT sprite failed facing check: '+JSON.stringify(rightPose));
+              if(!atlasLoaded)throw new Error('Approved artwork atlas did NOT load');
                             // Confirm the user-facing frog shortcut actually reaches the living pond.
               await page.locator('summary').filter({hasText:'Preview help'}).click();
               await page.locator('#previewPond').click();
