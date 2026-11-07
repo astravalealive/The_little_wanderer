@@ -5345,6 +5345,11 @@ function frame(now){
   ];
   const bank=candidates.find(q=>lakeLevel(q.x,q.y)>1.25&&islandDepth(q.x,q.y)>130&&!blockedBySolid(q.x,q.y))||candidates[0];
   state.x=bank.x;state.y=bank.y;state.resting=false;state.autonomy=false;
+  // Showcase the classic V65 leap sequence in the isolated preview without
+  // changing the original frog lifecycle or saving temporary hop state.
+  const nearby=frogs.filter(q=>Math.abs(q.x-bank.x)<500&&Math.abs(q.y-bank.y)<420);
+  nearby.slice(0,5).forEach((q,i)=>{if(q.hopUntil<=time)q.hopAt=time+180+i*190});
+  const helpPanel=previewTools.querySelector('details');if(helpPanel)helpPanel.open=false;
   state.playerInstruction=null;look.x=0;look.y=0;cameraZoom=1;
   cam.x=bank.x;cam.y=bank.y;cameraReleaseAt=-1e9;
   // Read-only snapshot for the preview's automated movement and frog tests.
