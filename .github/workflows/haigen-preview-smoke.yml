@@ -57,6 +57,17 @@ jobs:
               if(before.canvas.colors<20)throw new Error('Canvas almost blank '+JSON.stringify(before.canvas));
               const m1=before.stats?.match(/Haigen (\d+),(\d+)/),m2=after.match(/Haigen (\d+),(\d+)/);
               if(!m1||!m2||m1[1]===m2[1]&&m1[2]===m2[2])throw new Error('Haigen has not moved '+before.stats+' vs '+after);
+              // Confirm the user-facing frog shortcut actually reaches the living pond.
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewPond').click();
+              await page.waitForTimeout(1100);
+              const pond=await page.evaluate(()=>({
+                player:{x:state.x,y:state.y},pond:{x:pond.x,y:pond.y},
+                liveFrogs:frogs.length,visibleFrogs:frogs.filter(f=>Math.abs(f.x-cam.x)<500&&Math.abs(f.y-cam.y)<420).length,
+                waterDepth:lakeLevel(state.x,state.y),error:document.getElementById('worldError')?.style.display==='block'?document.getElementById('worldError')?.textContent:null
+              }));
+              console.log('HAIGEN POND '+JSON.stringify(pond));
+              if(pond.error||pond.waterDepth<1.2||pond.visibleFrogs<1)throw new Error('Pond visit failed '+JSON.stringify(pond));
               await page.close();
             }
             await browser.close();
