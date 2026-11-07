@@ -34,6 +34,41 @@ style.textContent+='#gloamAmmo{position:fixed;z-index:23;right:calc(env(safe-are
 const bar=document.createElement('div');bar.id='gloamBossHud';bar.setAttribute('role','progressbar');bar.setAttribute('aria-label','Gloamjaw boss health');bar.setAttribute('aria-valuemin','0');bar.setAttribute('aria-valuemax',String(MAX));
 bar.innerHTML='<div class="title-line"><span>GLOAMJAW · HUNGRY BLOOM</span><span id="gloamBossValue">180 / 180</span></div><div class="track"><div id="gloamBossFill"></div></div>';document.body.append(bar);const ammo=document.createElement('div');ammo.id='gloamAmmo';ammo.setAttribute('aria-live','off');document.body.append(ammo);
 const combat={mode:'idle',timer:1350,turn:0,attack:'',aim:{x,y},angle:0,hit:false,arrows:[],spores:[],lastShot:-1e6,lastMelee:-1e6};
+
+// Illustrated 16-bit sprite atlas. Each pose is rasterized once at 192px to
+// match Haigen's crisp animation. This affects artwork only, not encounter logic.
+const GLOAM_ART_CELL=192;
+let gloamIllustratedAtlas=null,gloamArtLoaded=false,gloamArtError='';
+const gloamArtImage=new Image();
+gloamArtImage.decoding='async';
+gloamArtImage.onload=()=>{
+ if(gloamArtImage.naturalWidth!==960||gloamArtImage.naturalHeight!==640){
+  gloamArtError='Unexpected atlas dimensions';return;
+ }
+ try{
+  const canvas=document.createElement('canvas');
+  canvas.width=GLOAM_ART_CELL*3;canvas.height=GLOAM_ART_CELL*2;
+  const art=canvas.getContext('2d');
+  if(!art){gloamArtError='No illustration canvas';return}
+  art.imageSmoothingEnabled=true;
+  art.imageSmoothingQuality='high';
+  for(let i=0;i<6;i++){
+   art.drawImage(gloamArtImage,(i%3)*320,Math.floor(i/3)*320,320,320,
+    (i%3)*GLOAM_ART_CELL,Math.floor(i/3)*GLOAM_ART_CELL,GLOAM_ART_CELL,GLOAM_ART_CELL);
+  }
+  gloamIllustratedAtlas=canvas;gloamArtLoaded=true;
+ }catch(error){gloamArtError=String(error)}
+};
+gloamArtImage.onerror=()=>{gloamArtError='Boss illustration unavailable'};
+gloamArtImage.src='./assets/gloamjaw-illustrated-v129.svg?v=2';
+function gloamPose(){
+ if(combat.mode==='strike'||combat.mode==='warning'){
+  return {vine:2,bite:3,spores:4,roots:5}[combat.attack]??0;
+ }
+ if(data.hp<MAX*.5)return Math.floor(P.snapshot().time/820)%2?5:0;
+ return Math.floor(P.snapshot().time/780)%2;
+}
+
 const ell=(px,py,a,b,colour)=>{ctx.fillStyle=colour;ctx.beginPath();ctx.ellipse(px,py,a,b,0,0,Math.PI*2);ctx.fill()};
 const poly=(pts,fill,stroke)=>{ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.lineWidth=2;ctx.strokeStyle=stroke;ctx.stroke()}};
 function finish(){
@@ -191,6 +226,15 @@ function drawGround(){
 function drawBoss(){
  const now=P.snapshot();
  if(Math.abs(x-now.cameraX)>1150||Math.abs(y-now.cameraY)>900)return;
+ if(!data.defeated&&gloamArtLoaded&&gloamIllustratedAtlas){
+  const frame=gloamPose(),size=GLOAM_ART_CELL;
+  ctx.save();
+  ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(gloamIllustratedAtlas,(frame%3)*size,Math.floor(frame/3)*size,size,size,
+    Math.round(x-181),Math.round(y-312),362,362);
+  ctx.restore();
+  return;
+ }
  ctx.save();ctx.translate(x,y);ctx.imageSmoothingEnabled=false;
  const tick=now.time,breath=Math.sin(tick*.0028),sway=Math.sin(tick*.0018)*7,
   furious=data.hp<MAX*.5,biting=combat.attack==='bite'&&['warning','strike'].includes(combat.mode),
@@ -345,6 +389,6 @@ function drawEffects(){
  ctx.restore();
 }
 window.__gloamAddon={y:y+10,arena,update,drawGround,drawBoss,drawEffects,craftLocked,crafted,useTool,
- snapshot:()=>({build:128,hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length})};
+ snapshot:()=>({build:'128.2',hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length,artReady:gloamArtLoaded,artError:gloamArtError,artPose:gloamPose()})};
 window.__gloamQA=window.__gloamAddon.snapshot;
 })();
