@@ -1185,8 +1185,49 @@ window.__v125DylanStatus=()=>({loaded:approvedDylanReady,
  sourceWidth:approvedDylanAtlas.naturalWidth,sourceHeight:approvedDylanAtlas.naturalHeight,
  lastFrame:window.__v125DylanLastFrame||null});
 
+// Skölli: dedicated 20-pose fox atlas. The V125 Dylan sprite/animation is LOCKED.
+const skolliAtlas=new Image();
+let skolliAtlasReady=false;
+skolliAtlas.onload=()=>{
+ skolliAtlasReady=skolliAtlas.naturalWidth===384&&skolliAtlas.naturalHeight===480;
+ window.__v126SkolliReady=skolliAtlasReady;
+};
+skolliAtlas.onerror=()=>{skolliAtlasReady=false;window.__v126SkolliReady=false};
+skolliAtlas.src='./assets/skolli-fox-v126.png?v=126';
+function drawApprovedSkolli(x,y,actor){
+ if(!skolliAtlasReady)return false;
+ const m=actor||playerMotion,dir=m.dir||'down',moving=!!m.moving,anim=m.anim||0;
+ const mode=actor?.mode||'exploring';
+ const rest=['resting','sleeping'].includes(mode);
+ const sniff=['sniffing','foraging','searching'].includes(mode);
+ const alert=['watching','alert','investigating','guarding'].includes(mode);
+ const pounce=mode==='pouncing'||mode==='chasing';
+ const row=rest||sniff||alert||pounce?4:dir==='up'?1:dir==='right'?2:dir==='left'?3:0;
+ const col=rest?0:sniff?2:alert?1:pounce?3:moving?Math.floor(anim/138)%4:0;
+ const stride=moving?Math.sin(anim*.013):0;
+ const bounce=moving?Math.abs(stride)*(pounce?12:4.5):0;
+ const leap=pounce?Math.sin(Math.max(0,Math.min(1,1-(actor?.t||0)/650))*Math.PI)*15:0;
+ const breathing=!moving?Math.sin(time*.0025)*.008:0;
+ const width=88,height=90;
+ const drawX=Math.round(x-width/2),drawY=Math.round(y-height+8-bounce-leap);
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ellipse(x+1,y+6,24,5,'#203b3259');
+ ctx.translate(drawX+width/2,drawY+height);
+ ctx.rotate(moving?stride*.018:0);
+ ctx.scale(1+breathing,1-breathing);
+ ctx.drawImage(skolliAtlas,col*96,row*96,96,96,-width/2,-height,width,height);
+ ctx.restore();
+ window.__v126SkolliLastFrame={dir,mode,row,col,moving,rest,sniff,alert,pounce};
+ return true;
+}
+window.__v126SkolliStatus=()=>({
+ loaded:skolliAtlasReady,width:skolliAtlas.naturalWidth,height:skolliAtlas.naturalHeight,
+ lastFrame:window.__v126SkolliLastFrame||null
+});
+
 function drawIllustratedCompanion(x,y,type,actor){
  if(type==='rabbit'&&drawApprovedDylan(x,y,actor))return true;
+ if(type==='fox'&&drawApprovedSkolli(x,y,actor))return true;
  if(!illustratedCompanionReady)return false;
  if(type!=='rabbit'&&type!=='fox')return false;
  const m=actor||playerMotion,dir=m.dir||'down',moving=!!m.moving;
