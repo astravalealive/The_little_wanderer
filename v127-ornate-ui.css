@@ -165,3 +165,11 @@ body.v127-rpg .overlay .modal .close{
  position:sticky;top:0;float:right;z-index:5;
  min-width:39px;min-height:37px
 }
+
+/* V127 declutter: retain Collect and Use where thumbs need them; keep all
+   other old commands wired and accessible in the custom Adventure Menu. */
+body.v127-rpg .bottom .actions .action:not(#interactBtn):not(#useBtn){display:none!important}
+body.v127-rpg .hotbar .v127-item-slot .rpg-count{
+ position:absolute;right:3px;bottom:1px;color:#f6dbb0;
+ font:bold 10px Georgia,serif;text-shadow:1px 1px 2px #000
+}
