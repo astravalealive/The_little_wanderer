@@ -1,0 +1,110 @@
+name: Haigen V127 playable HUD and regression test
+on:
+  push:
+    paths:
+      - haigen-v127-ornate-playtest.html
+      - v127-ornate-ui.css
+      - v127-ornate-ui.js
+      - .github/workflows/haigen-v127-ornate-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser dependency
+        run: npm install --no-save playwright-core@1.56.1
+      - name: Prove Dylan remains locked and V127 is independent
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          old=Path('haigen-v125-dylan-playtest.html').read_text()
+          new=Path('haigen-v127-ornate-playtest.html').read_text()
+          def between(s,a,b):
+            x=s.index(a);y=s.index(b,x);return s[x:y]
+          assert between(old,'function drawApprovedDylan(','window.__v125DylanStatus=') == between(new,'function drawApprovedDylan(','window.__v125DylanStatus=')
+          assert 'wandererV127PreviewSave' in new
+          assert "localStorage.setItem('wandererV126PreviewSave'" not in new
+          assert "if(type==='fox'&&drawApprovedSkolli(" in new
+          assert 'V127 · ILLUSTRATED HUD' in new
+          print('DYLAN LOCKED, SKOLLI FOX, OLD SAVES READ-ONLY')
+          PY
+      - name: Play-test ornate HUD at iPhone and desktop sizes
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/v127-server.log 2>&1 &
+          sleep 2
+          node <<'NODE'
+          const {chromium}=require('playwright-core');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+            for(const vp of [{width:390,height:844},{width:1280,height:720}]){
+              const page=await browser.newPage({viewport:vp,deviceScaleFactor:2});
+              const errors=[];
+              page.on('pageerror',e=>errors.push('JS: '+e.message));
+              page.on('console',msg=>{if(msg.type()==='error')errors.push('console: '+msg.text())});
+              await page.goto('http://127.0.0.1:8765/haigen-v127-ornate-playtest.html?v=qa',{waitUntil:'domcontentloaded'});
+              await page.waitForFunction(()=>window.__haigenWorldReady&&window.__v127UIReady&&window.__v125DylanStatus?.().loaded&&window.__v126SkolliStatus?.().loaded,{timeout:25000});
+              await page.waitForTimeout(900);
+              const details=await page.evaluate(()=>{
+                const root=document.getElementById('v127Root'),bar=document.getElementById('hotbar');
+                const mini=document.getElementById('v127MiniCanvas');
+                const mapPixels=mini.getContext('2d').getImageData(0,0,112,112).data;
+                let colors=new Set();for(let i=0;i<mapPixels.length;i+=4)colors.add(mapPixels[i]+','+mapPixels[i+1]+','+mapPixels[i+2]);
+                return {
+                  ready:window.__v127UIReady,uiError:window.__v127UIError||null,
+                  version:window.__v127UISnapshot?.version,
+                  quest:document.querySelectorAll('#v127QuestList li').length,
+                  hearts:document.querySelectorAll('.v127-heart').length,
+                  equippedButtons:bar.querySelectorAll('[data-equip]').length,
+                  iconButtons:bar.querySelectorAll('.slot svg,.slot img').length,
+                  miniColors:colors.size,
+                  oldHudHidden:getComputedStyle(document.querySelector('.hud')).display==='none',
+                  oldHelperHidden:getComputedStyle(document.getElementById('v121PreviewTools')).display==='none',
+                  oldSaveWritten:localStorage.getItem('wandererV126PreviewSave')!==null,
+                  dylan:window.__v125DylanStatus().loaded,fox:window.__v126SkolliStatus().loaded,
+                  gameError:document.getElementById('worldError').style.display==='block'?document.getElementById('worldError').textContent:null
+                }
+              });
+              console.log('V127 UI DETAILS '+JSON.stringify({viewport:vp,details}));
+              if(!details.ready||details.uiError||details.gameError||details.version!==127||
+                 details.quest!==3||details.hearts!==7||details.equippedButtons<7||
+                 details.iconButtons<7||details.miniColors<8||!details.oldHudHidden||!details.oldHelperHidden||
+                 !details.dylan||!details.fox)throw Error('HUD verification '+JSON.stringify(details));
+              await page.screenshot({path:'/tmp/v127-game-'+vp.width+'.png'});
+              await page.locator('.v127-utility[data-action="packBtn"]').click();
+              await page.waitForTimeout(300);
+              if(!await page.locator('#overlay').evaluate(e=>e.classList.contains('open')))throw Error('Backpack shortcut failed');
+              await page.locator('#closeBtn').click();
+              await page.locator('.v127-utility[data-action="mapBtn"]').click();
+              await page.waitForTimeout(250);
+              if(!await page.locator('#worldMap').count())throw Error('Map shortcut failed');
+              await page.locator('#closeBtn').click();
+              await page.locator('#v127Gear').click();
+              if(!await page.locator('#v127Settings').evaluate(e=>e.classList.contains('open')))throw Error('Settings failed');
+              await page.locator('#v127MeetFriends').click();
+              await page.waitForTimeout(400);
+              if(!window){} // noop for code coverage
+              const friends=await page.evaluate(()=>window.__v126SkolliStatus().lastFrame);
+              if(!friends)throw Error('Skölli not visible after Meet Friends');
+              await page.locator('#v127ZoomIn').click();
+              const radius=await page.evaluate(()=>window.__v127UISnapshot?.miniRadius);
+              if(!(radius<550))throw Error('Minimap zoom did not change');
+              if(errors.length)throw Error('Browser errors '+JSON.stringify(errors));
+              console.log('V127 MOBILE/DESKTOP PASS '+JSON.stringify({viewport:vp,icons:details.iconButtons,colors:details.miniColors,zoom:radius}));
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: haigen-v127-gameplay-screens
+          path: /tmp/v127-game-*.png
