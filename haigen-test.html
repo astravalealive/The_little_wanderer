@@ -2441,7 +2441,7 @@ function worldArtScenery(o){
 }
 
 function drawSceneryNearHaigen(o){
- if(rbEnabled&&worldArtScenery(o))return;
+ if(rbEnabled){const alpha=foliageVisibility(o);ctx.save();ctx.globalAlpha*=alpha;const rendered=worldArtScenery(o);ctx.restore();if(rendered)return;}
  const woodland=rbEnabled&&rbWoodland(o.x,o.y);
  const renderer={tree:woodland?rbDrawTree:tree,rock:woodland?rbDrawRock:rock,bush:woodland?rbDrawBush:bush,flower:woodland?rbDrawFlower:flower,mushroom:woodland?rbDrawMushroom:mushroomPatch,
   cactus:drawRegionalScenery,palm:drawRegionalScenery,
