@@ -31,7 +31,7 @@
 }
  /* No world bubbles may obscure the main menu or any modal panel. */
 body:has(.mobile-menu[open]) .toast,body:has(.overlay.open) .toast{visibility:hidden!important;opacity:0!important}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.113</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v113 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.113</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v113 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -1965,8 +1965,8 @@ function drawCampHome(){const tier=state.campTier;if(tier<1)return;const x=cotta
  ctx.fillStyle='#fff0c5';ctx.textAlign='center';ctx.font='bold 15px system-ui';ctx.fillText(tier===2?'TIMBER HUT':tier===3?'WOODLAND LODGE':'WOODLAND CASTLE',x,y-h-(tier===4?112:72))
 }
 let toolSwing=null;
-function startToolSwing(kind){toolSwing={kind,started:performance.now(),duration:kind==='axe'?390:kind==='pickaxe'?480:kind==='shovel'?530:420}}
-function drawToolSwing(){if(!toolSwing)return;const progress=Math.min(1,(performance.now()-toolSwing.started)/toolSwing.duration);if(progress>=1){toolSwing=null;return}
+function startToolSwing(kind){toolSwing={kind,started:performance.now(),duration:rbEnabled?(kind==='axe'?290:kind==='pickaxe'?350:370):kind==='axe'?390:kind==='pickaxe'?480:kind==='shovel'?530:420}}
+function drawToolSwing(){if(rbEnabled){rbToolSwing();return}if(!toolSwing)return;const progress=Math.min(1,(performance.now()-toolSwing.started)/toolSwing.duration);if(progress>=1){toolSwing=null;return}
  const kind=toolSwing.kind,dir=playerMotion.dir||'down',side=dir==='left'||dir==='right';
  const angle=-1.35+progress*2.65,reach=kind==='shovel'?39:kind==='pickaxe'?34:37;
  ctx.save();ctx.translate(state.x,state.y-23);if(dir==='left')ctx.scale(-1,1);
@@ -1980,6 +1980,36 @@ function drawToolSwing(){if(!toolSwing)return;const progress=Math.min(1,(perform
  // Dust or wood-chip burst at the end of a strike.
  if(progress>.62&&progress<.94){for(let i=0;i<4;i++){const a=i*1.6+progress*4;ellipse(state.x+Math.cos(a)*(18+progress*20),state.y+8+Math.sin(a)*9,3,2,kind==='axe'?'#b78c55':'#c9bda2')}}
 }
+
+function rbToolSwing(){
+ if(!toolSwing)return;
+ const progress=Math.min(1,(performance.now()-toolSwing.started)/toolSwing.duration);
+ if(progress>=1){toolSwing=null;return}
+ const kind=toolSwing.kind,dir=playerMotion.dir||'down';
+ const stage=progress<.29?0:progress<.56?1:progress<.83?2:3;
+ const poses=[-1.02,-.38,.22,.6];
+ const heading=dir==='up'?-Math.PI/2:dir==='down'?Math.PI/2:dir==='left'?Math.PI:0;
+ const impact=stage>=2,reach=stage===0?30:stage===1?35:33;
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(state.x),Math.round(state.y-34));
+ ctx.rotate(heading+poses[stage]*(dir==='left'?-1:1));
+ ctx.fillStyle='#d4b18a';ctx.fillRect(-4,0,8,8);
+ ctx.fillStyle='#73553b';ctx.fillRect(2,-2,reach,5);
+ ctx.fillStyle='#b0bbb2';ctx.fillRect(reach-2,-9,9,18);
+ if(kind==='axe'){ctx.fillStyle='#d4d5c6';ctx.fillRect(reach+5,-11,9,5);ctx.fillRect(reach+5,7,9,5)}
+ else if(kind==='pickaxe'){ctx.fillRect(reach-8,-13,26,5);ctx.fillRect(reach+12,-8,6,8)}
+ else if(kind==='shovel'){ctx.fillStyle='#a6ae9f';ctx.fillRect(reach+1,-8,13,16)}
+ else if(kind==='torch'){ctx.fillStyle='#e8ad58';ctx.fillRect(reach+2,-9,8,8)}
+ ctx.restore();
+ if(impact){
+  const ox=dir==='left'?-37:dir==='right'?37:0,oy=dir==='up'?-73:dir==='down'?17:-20;
+  const tint=kind==='axe'?'#bca273':kind==='pickaxe'?'#c2c5ba':'#9e9785';
+  for(let i=0;i<5;i++){
+   const a=(i*2.399+progress)*1.2,r=10+(progress-.53)*28;
+   ctx.fillStyle=tint;ctx.fillRect(Math.round(state.x+ox+Math.cos(a)*r),Math.round(state.y+oy+Math.sin(a)*r*.48),3,3);
+  }
+ }
+}
+
 function drawHaigenHair(dir,phase,moving){
  // Approved storybook design: soft wavy blonde silhouette, layered feathered locks.
  const back=dir==='up',side=dir==='left'||dir==='right';
@@ -2052,7 +2082,124 @@ function drawHaigenHair(dir,phase,moving){
  ctx.restore();
 }
 function drawSleepingHaigen(x,y){ctx.save();ctx.translate(x,y);ellipse(0,8,53,15,'#254d3977');ctx.save();ctx.translate(0,-7);ctx.rotate(-.09);ellipse(0,0,43,12,'#713e40');ellipse(36,-5,16,15,'#f3c69e');ellipse(35,-17,16,9,'#d7ae79');ctx.strokeStyle='#b88c5a';ctx.lineWidth=1;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(23+i*6,-19);ctx.lineTo(26+i*6,-13);ctx.stroke()}ctx.strokeStyle='#54483c';ctx.lineWidth=2;ctx.beginPath();ctx.arc(41,-5,4,.1,Math.PI-.1);ctx.stroke();ellipse(-33,2,12,6,'#514b35');ctx.restore();const breath=Math.sin(time*.003)*2;ctx.fillStyle='#e9e5d3';ctx.font='bold 16px system-ui';ctx.fillText('z',54,-24+breath);ctx.font='bold 11px system-ui';ctx.fillText('z',65,-37+breath);ctx.restore()}
+
+// V114 original pixel-art vertical slice. No third-party tiles or licensing dependency.
+// Deterministic sprite canvases are generated once, then drawn nearest-neighbour on the main canvas.
+let rbEnabled=true;
+try{rbEnabled=localStorage.getItem('haigenVisualStyle')!=='classic'}catch(_){}
+document.body.classList.toggle('rebirth-art',rbEnabled);
+function toggleRebirthArt(){
+ rbEnabled=!rbEnabled;document.body.classList.toggle('rebirth-art',rbEnabled);
+ try{localStorage.setItem('haigenVisualStyle',rbEnabled?'rebirth':'classic')}catch(_){}
+ $('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Rebirth look';
+ notify(rbEnabled?'🌲 Rebirth art enabled.':'🎨 Classic art enabled.');
+}
+const rbSpriteCache=new Map();
+function rbPixel(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function rbSprite(kind,dir,frame,coat){
+ const key=[kind,dir,frame,coat||''].join(':');
+ if(rbSpriteCache.has(key))return rbSpriteCache.get(key);
+ const canvas=document.createElement('canvas');canvas.width=30;canvas.height=40;
+ const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;
+ const p=(x,y,w,h,c)=>rbPixel(g,x,y,w,h,c);
+ const dark='#28312f',edge='#333c38',shadow='#202b2b',light='#e5c594';
+ const step=frame===1?-2:frame===2?2:0,side=dir==='left'||dir==='right',back=dir==='up';
+ if(kind==='boy'){
+  const coatColor=coat||'#40565a',coatLight=coat?'#8a9b8c':'#65777b';
+  // Two independently moving boots. Feet stay grounded: no toy-like bouncing.
+  p(7+step,32,7,5,shadow);p(17-step,32,7,5,shadow);
+  p(8+step,32,5,2,'#7a7770');p(18-step,32,5,2,'#7a7770');
+  p(8+step,25,5,8,'#49434a');p(18-step,25,5,8,'#49434a');
+  if(side){p(9,24,12,5,dark)}else{p(8,24,16,5,dark);p(15,25,2,5,'#272d33')}
+  // Compact tunic with dark outline and light catching shoulders.
+  p(6,15,20,12,edge);p(8,16,16,9,coatColor);
+  p(9,17,4,3,coatLight);p(8,24,16,2,'#27373c');
+  const arm=frame===1?-2:frame===2?2:0;
+  if(side){
+   p(7,17+arm,4,10,'#344749');p(23,17-arm,4,10,'#344749');
+   p(6,25+arm,5,3,'#d6a788');p(23,25-arm,4,3,'#d6a788');
+  }else{
+   p(3,17+arm,5,9,coatColor);p(24,17-arm,5,9,coatColor);
+   p(4,25+arm,4,3,'#d6a788');p(24,25-arm,4,3,'#d6a788');
+  }
+  // Head shapes are truly direction-specific, rather than one face drifting sideways.
+  if(side){
+   // Built facing right. Left is mirrored at display time.
+   p(10,2,13,3,'#b18a52');p(8,5,17,12,'#c79b5e');
+   p(11,9,13,9,'#e7b793');p(23,12,4,4,'#e7b793');
+   p(21,11,2,3,'#2e393d');p(25,15,2,2,'#b98275');
+   p(8,5,5,7,'#d5ab67');p(13,3,10,4,'#e4bf77');
+   p(10,16,4,5,'#b18a52');
+  }else if(back){
+   p(8,3,17,15,'#ac7b47');p(5,7,22,12,'#b68850');
+   p(8,4,16,5,'#e4c17e');p(10,11,12,6,'#bf995c');
+   p(8,14,4,5,'#c9975d');p(23,13,3,6,'#b68850');
+   p(9,18,14,3,'#26343a');
+  }else{
+   p(8,3,17,4,'#b78b50');p(6,7,21,11,'#be9254');
+   p(10,8,15,11,'#ecc19e');p(6,12,4,5,'#d9a78b');
+   p(8,5,18,5,'#e2b66c');p(7,7,4,7,'#b58954');
+   p(10,12,3,3,'#394547');p(21,12,3,3,'#394547');
+   p(15,15,3,2,'#c59180');p(14,18,5,1,'#936d63');
+   p(7,3,5,4,'#d4a45e');p(21,4,5,5,'#c59656');
+  }
+  // Small travel satchel with a diagonal strap, visible on back and side.
+  if(back){p(9,17,3,9,'#b69461');p(16,20,9,7,'#765b42')}
+  else if(side){p(9,21,6,6,'#765a41');p(11,18,3,6,'#bd9a63')}
+ }else if(kind==='rabbit'){
+  // Natural cream rabbit, distinct back/side/front views, independently animated paws.
+  p(9,30,7,3,'#8a8374');p(19,30,6,3,'#8a8374');
+  p(7,21,19,11,'#9b9487');p(10,19,15,11,'#d3cbb9');
+  if(side){
+   p(9,3,5,17,'#918b81');p(18,1,5,18,'#a29a8d');
+   p(11,5,2,11,'#c8918f');p(20,4,2,12,'#c8918f');
+   p(10,15,17,13,'#d3cbb9');p(22,21,6,4,'#ede2d0');
+   p(22,18,2,3,'#3b3a37');p(27,22,2,2,'#ab797a');
+   p(7,26,5,6,'#f1e7d6');
+  }else{
+   p(8,2,6,18,'#958b7f');p(19,2,6,18,'#a49a8e');
+   if(!back){p(10,5,2,12,'#d79f9b');p(21,5,2,12,'#d79f9b')}
+   p(8,16,18,14,'#d8cbbc');
+   if(!back){p(12,21,2,3,'#393d38');p(21,21,2,3,'#393d38');p(17,26,3,2,'#c9898e')}
+   else p(13,20,10,7,'#b9ac99');
+  }
+ }else if(kind==='fox'){
+  // Fox has long sloping muzzle and large tail; no rounded plush-toy anatomy.
+  p(4,24,10,9,'#9a5837');p(20,24,7,9,'#814a36');
+  p(10,20,16,12,'#b6673d');
+  if(side){
+   p(3,21,12,6,'#9b5339');p(0,20,6,5,'#f0d3a3');
+   p(11,11,12,13,'#b96b3e');p(18,15,10,9,'#d2864c');
+   p(25,19,5,4,'#efe0b7');p(27,18,2,2,shadow);
+   p(9,6,6,11,'#995436');p(18,6,6,10,'#995436');
+   p(14,14,3,3,'#e8c98d');p(21,15,2,3,shadow);
+  }else{
+   p(8,8,7,10,'#915136');p(20,8,6,10,'#95543a');
+   p(10,13,15,12,'#c37a45');p(13,21,10,7,'#f0dcad');
+   if(!back){p(12,18,3,3,shadow);p(21,18,3,3,shadow);p(17,24,3,2,shadow)}
+   else p(15,19,6,10,'#ad663d');
+   p(24,27,5,5,'#f4dcc1');
+  }
+ }
+ rbSpriteCache.set(key,canvas);return canvas;
+}
+function rbDrawActor(x,y,type,actor,deepWater){
+ const moving=!!(actor||playerMotion).moving,motion=actor||playerMotion;
+ const dir=motion.dir||'down',frame=moving?1+Math.floor((motion.anim||0)/150)%2:0;
+ const coat=type==='boy'?(regionWardrobe[expandedRegion(state.x,state.y)?.id]||null):null;
+ const sprite=rbSprite(type,dir,frame,coat);
+ const scale=type==='boy'?2.15:type==='rabbit'?1.9:2.15;
+ const sx=Math.round(x-sprite.width*scale*.5),sy=Math.round(y-sprite.height*scale+6);
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ellipse(x+2,y+7,type==='boy'?20:21,6,'#203b3370');
+ if(dir==='left'){ctx.translate(sx+sprite.width*scale,0);ctx.scale(-1,1);ctx.drawImage(sprite,0,sy,sprite.width*scale,sprite.height*scale)}
+ else ctx.drawImage(sprite,sx,sy,sprite.width*scale,sprite.height*scale);
+ if(deepWater&&type==='boy'){ellipse(x,y-47,5,3,'#c3e0d6')}
+ ctx.restore();
+}
+
 function character(x,y,type,actor,deepWater=false){
+ if(rbEnabled&&(type==='boy'||type==='rabbit'||type==='fox')){rbDrawActor(x,y,type,actor,deepWater);return}
  const motion=actor||playerMotion,dir=motion.dir||'down',moving=!!motion.moving,phase=motion.anim||0;
  const gait=moving?Math.sin(phase*(type==='rabbit'?.018:type==='fox'?.014:.012)):0;
  const hop=moving?(type==='rabbit'?Math.abs(gait)*8:type==='fox'?Math.abs(gait)*3:Math.abs(gait)*2):0;
@@ -3380,8 +3527,8 @@ addEventListener('keydown',e=>{
  if(e.key==='Escape'&&$('overlay').classList.contains('open'))close();
  if(e.key.toLowerCase()==='m'&&!e.repeat){if($('overlay').classList.contains('open'))close();else showMap()}
 });
-addEventListener('keyup',e=>{if(!typingInField(e.target))keys[e.key]=false});$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('storyBtn').onclick=storyJournal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('packBtn').onclick=backpack;$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
-for(const [id,fn] of [['modeBtn',()=>setAutonomy(!state.autonomy)],['packBtn',backpack],['mapBtn',showMap],['journalBtn',journal],['storyBtn',storyJournal],['craftBtn',craft],['helpBtn',help]]){const el=$(id);let handled=0;el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();e.stopPropagation();handled=Date.now();const drawer=document.querySelector('.mobile-menu');if(drawer)drawer.open=false;fn()}},true);el.addEventListener('click',e=>{if(Date.now()-handled<800){e.preventDefault();e.stopImmediatePropagation()}},true)}$('closeBtn').onclick=close;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))close()});// iPad camera: one finger pans, two fingers pinch to zoom; controls remain separate.
+addEventListener('keyup',e=>{if(!typingInField(e.target))keys[e.key]=false});$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('storyBtn').onclick=storyJournal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('packBtn').onclick=backpack;$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('artBtn').onclick=toggleRebirthArt;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
+for(const [id,fn] of [['modeBtn',()=>setAutonomy(!state.autonomy)],['packBtn',backpack],['mapBtn',showMap],['journalBtn',journal],['storyBtn',storyJournal],['craftBtn',craft],['artBtn',toggleRebirthArt],['helpBtn',help]]){const el=$(id);let handled=0;el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();e.stopPropagation();handled=Date.now();const drawer=document.querySelector('.mobile-menu');if(drawer)drawer.open=false;fn()}},true);el.addEventListener('click',e=>{if(Date.now()-handled<800){e.preventDefault();e.stopImmediatePropagation()}},true)}$('closeBtn').onclick=close;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))close()});// iPad camera: one finger pans, two fingers pinch to zoom; controls remain separate.
 let cameraZoom=1;
 let cameraReleaseAt=-1e9;
 const cameraTouches=new Map();
@@ -3608,5 +3755,5 @@ addEventListener('keydown',e=>{if(e.key==='Escape')mobileMenu.open=false;});
 function updateCompactStats(){statsToggle.textContent=`🌲 Haigen · ❤️ ${Math.round(state.health)} · 💤 ${Math.round(state.energy)} · 🍲 ${Math.round(state.hunger)} ▾`;}
 updateCompactStats();setInterval(updateCompactStats,500);
 
-offlineProgress();renderHotbar();$('modeBtn').textContent=state.autonomy?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=$('modeBtn').textContent;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
+offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Rebirth look';renderHotbar();$('modeBtn').textContent=state.autonomy?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=$('modeBtn').textContent;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
 </script></body></html>
