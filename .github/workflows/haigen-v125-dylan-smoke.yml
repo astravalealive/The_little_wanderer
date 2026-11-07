@@ -1,0 +1,87 @@
+name: Haigen V125 approved Dylan art and animation test
+on:
+  push:
+    paths:
+      - haigen-v125-dylan-playtest.html
+      - assets/dylan-rabbit-approved-v125.png
+      - .github/workflows/haigen-v125-dylan-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - name: Inspect Dylan's installed art, living animation and frogs
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/haigen-dylan-http.log 2>&1 &
+          sleep 2
+          node <<'NODE'
+          const {chromium}=require('playwright-core');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+            for(const vp of [{width:390,height:844},{width:1024,height:768}]){
+              const page=await browser.newPage({viewport:vp,deviceScaleFactor:2});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+              await page.goto('http://127.0.0.1:8765/haigen-v125-dylan-playtest.html?v=qa&restore=1',{waitUntil:'domcontentloaded'});
+              await page.waitForFunction(()=>window.__haigenWorldReady===true&&window.__v125DylanStatus?.().loaded&&window.__v124ArtStatus?.().companions,{timeout:20000});
+              await page.waitForTimeout(900);
+              const art=await page.evaluate(()=>{
+                const i=new Image();i.src='./assets/dylan-rabbit-approved-v125.png';
+                const d=window.__v125DylanStatus();
+                return {d};
+              });
+              if(art.d.sourceWidth!==384||art.d.sourceHeight!==480)
+                throw Error('Approved 4x5 Dylan sprite atlas not loaded '+JSON.stringify(art));
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewFriends').click();
+              await page.waitForTimeout(700);
+              const comp=await page.evaluate(()=>({
+                rabbit:window.__v125DylanStatus(),
+                original:window.__v124PreviewQA(),
+                version:document.getElementById('devVersion')?.textContent,
+                error:document.getElementById('worldError')?.style.display==='block'?document.getElementById('worldError')?.textContent:null
+              }));
+              await page.screenshot({path:'/tmp/haigen-v125-dylan-'+vp.width+'.png',fullPage:false});
+              if(comp.error||!comp.rabbit.lastFrame||comp.version!=='V125 · DYLAN 🐰'||comp.original.originalPondFrogs!==22)
+                throw Error('Dylan or old frogs missing '+JSON.stringify(comp));
+              const cells=await page.evaluate(async()=>{
+                const im=new Image();
+                await new Promise((resolve,reject)=>{im.onload=resolve;im.onerror=reject;im.src='./assets/dylan-rabbit-approved-v125.png'});
+                const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;
+                const g=c.getContext('2d');g.drawImage(im,0,0);
+                const a=g.getImageData(0,0,c.width,c.height).data;
+                const counts=[];
+                for(let row=0;row<5;row++)for(let col=0;col<4;col++){
+                  let n=0;for(let y=row*96;y<(row+1)*96;y++)for(let x=col*96;x<(col+1)*96;x++)
+                    if(a[(y*384+x)*4+3]>64)n++;
+                  counts.push(n);
+                }
+                return counts;
+              });
+              if(cells.length!==20||Math.min(...cells.slice(0,19))<80||cells[19]!==0)
+                throw Error('Approved art has empty/clipped cells '+JSON.stringify(cells));
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewPond').click();await page.waitForTimeout(550);
+              const pond=await page.evaluate(()=>window.__haigenPondProbe);
+              if(pond.liveFrogs!==22||pond.nearbyFrogs<1)throw Error('Old funny frogs damaged '+JSON.stringify(pond));
+              if(errors.length)throw Error('Runtime JS errors '+JSON.stringify(errors));
+              console.log('DYLAN V125 TEST PASSED '+JSON.stringify({vp,comp:comp.rabbit,cells:cells.length,pond,art}));
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: haigen-v125-dylan-gameplay-screenshots
+          path: /tmp/haigen-v125-dylan-*.png
