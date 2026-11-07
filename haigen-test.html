@@ -2670,18 +2670,29 @@ function haigenCostumeAtlas(base,kind){
   const feet=side?(frame===1?[[12,67],[33,65]]:frame===3?[[13,65],[34,67]]:[[17,67],[31,67]]):
    (walk?[[12,66],[30,68]]:[[12,68],[30,68]]);
   if(!newSheet)for(const [fx,fy] of feet){
-   const sx=ox+fx-5,sy=oy+fy;
+   const sx=ox+fx-5,sy=oy+66;
    p(sx,sy,11,3,'#27262c');
    p(sx-1,sy+3,13,2,'#e0d7ca');
    p(sx+1,sy-1,8,2,'#62646a');
   }
   // Region outfits are accessories on the SAME character, not a new body.
   if(kind==='snow'){
-   p(ox+6,oy+32,5,13,'#ab592e');p(ox+38,oy+32,5,13,'#ab592e');
-   p(ox+8,oy+24,4,10,'#e39b4d');p(ox+37,oy+24,4,10,'#d28436');
-   p(ox+14,oy+37,20,3,'#db9450');p(ox+15,oy+40,18,2,'#5e4434');
-   if(row===1){p(ox+10,oy+16,29,8,'#cf792e');p(ox+15,oy+20,20,3,'#e8a75a')}
-   else{p(ox+10,oy+24,4,9,'#c4752f');p(ox+35,oy+24,4,9,'#c4752f')}
+   // Substantial padded winter coat, outlined hood and cuffed sleeves.
+   // Leave the centre of the hair/face untouched so Haigen stays recognisable.
+   p(ox+5,oy+33,7,21,'#a4552d');p(ox+37,oy+33,7,21,'#974b2b');
+   p(ox+7,oy+35,6,18,'#ec9a42');p(ox+35,oy+35,6,18,'#d47936');
+   p(ox+11,oy+40,27,17,'#dc8238');p(ox+13,oy+42,23,12,'#ed9e4d');
+   p(ox+13,oy+54,24,3,'#674a3b');p(ox+14,oy+44,2,13,'#855735');
+   // Insulated boots sit on the already shared shoe baseline.
+   p(ox+10,oy+62,12,4,'#51433a');p(ox+28,oy+62,12,4,'#51433a');
+   // Orange hood curves around his blonde hair in every facing direction.
+   p(ox+7,oy+18,5,18,'#a85730');p(ox+38,oy+18,5,18,'#934824');
+   p(ox+9,oy+14,4,15,'#e58d37');p(ox+36,oy+14,4,15,'#d0782c');
+   p(ox+11,oy+10,7,5,'#ba672f');p(ox+31,oy+10,7,5,'#b4612e');
+   p(ox+13,oy+13,3,13,'#f0ba78');p(ox+33,oy+13,3,13,'#f0ba78');
+   if(row===1){p(ox+10,oy+17,29,9,'#c36e2f');p(ox+13,oy+21,22,3,'#f0aa61')}
+   // A glimpse of dark fur lining protects the cheeks and neck.
+   else{p(ox+12,oy+29,4,4,'#4b403e');p(ox+34,oy+29,4,4,'#4b403e')}
   }else if(kind==='desert'){
    p(ox+11,oy+36,27,5,'#cfb27f');p(ox+10,oy+41,6,8,'#85724f');
    p(ox+33,oy+41,6,8,'#85724f');p(ox+13,oy+13,23,4,'#cfba88');
@@ -2773,7 +2784,7 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
 }
 
 function drawApprovedHaigen(x,y,actor,deepWater=false){
- if(!haigenApprovedAtlasReady)return false;
+ if(!haigenApprovedAtlasReady&&!haigenMovementReady)return false;
  const status=haigenSpriteStatus();
  const newSheet=haigenMovementReady;
  const base=newSheet?haigenMovementAtlas:haigenApprovedWalkAtlas||haigenApprovedAtlas;
