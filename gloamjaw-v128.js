@@ -14,6 +14,7 @@ if(data.defeated)data.hp=0;else if(data.hp===0)data.hp=MAX;
 state.arrows=Math.max(0,Math.floor(Number(state.arrows)||0));
 state.tools.bow=Math.min(3,Math.max(0,Number(state.tools.bow)||0));
 state.tools.crossbow=Math.min(3,Math.max(0,Number(state.tools.crossbow)||0));
+if(state.devKitEnabled){state.tools.bow=3;state.tools.crossbow=3;state.arrows=Math.max(240,state.arrows)}
 P.toolSlots.push({id:'bow',name:'Bow',icon:'🏹'},{id:'crossbow',name:'Crossbow',icon:'⚙️'});
 P.recipes.push(
  {kind:'bow',name:'🏹 Woodland bow',wood:4,stone:0,twigs:4,leaves:2,desc:'A lightweight ranged weapon. Equip and press Use Tool.'},
@@ -85,6 +86,7 @@ function damageBoss(dmg){
  if(!data.hp)finish();return true;
 }
 function craftLocked(r){
+ if(state.devKitEnabled)return false;
  if(!['bow','arrowPack','bowUpgrade','crossbow','crossbowUpgrade'].includes(r.kind))return false;
  const invalid=(message)=>{P.notify(message);return true};
  if(r.kind==='bow'&&state.tools.bow)return invalid('🏹 You already have a bow. Upgrade it instead.');

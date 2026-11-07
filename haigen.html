@@ -66,7 +66,7 @@ body:not(.rebirth-art) canvas#game{image-rendering:auto}
 body:has(.mobile-menu[open]) .haigen-speech,
 body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 @media (max-width:410px){.haigen-speech{font-size:14px;max-width:min(288px,calc(100vw - 22px));padding:9px 11px}}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=129"></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V133</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v128 boss playtest</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=129"></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V134</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v128 boss playtest</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -503,6 +503,8 @@ state.incubateUntil=Number(state.incubateUntil)||0;
 state.incubateStartAt=state.incubateUntil?(Number(state.incubateStartAt)||state.incubateUntil-120000):0;
 state.coopHatchedAt=Number(state.coopHatchedAt)||0;
 state.jettyBuilt=!!state.jettyBuilt;state.fishingRod=!!state.fishingRod;
+state.devKitEnabled=state.devKitEnabled!==false; // Development builds: access weapons and inventory immediately.
+state.devKitWelcomeGranted=!!state.devKitWelcomeGranted;
 state.fish=Math.max(0,Number(state.fish)||0);
 state.castAt=Number(state.castAt)||0;state.biteAt=Number(state.biteAt)||0;
 // Migrate original floating vegetable patch into the permanent homestead garden.
@@ -2254,25 +2256,35 @@ function autoFreedomTick(dt){
  if(!state.autonomy||state.playerInstruction)return false;
  const now=Date.now();
  let job=state.autoFreeJob;
- if(job&&(!['mine','fish','cook','explore','forge','wood','garden','net','build'].includes(job.kind)||now-(job.startedAt||now)>85000)){
+ if(job&&(!['mine','fish','cook','explore','forge','wood','garden','net','build','craft','observe','friends','story'].includes(job.kind)||now-(job.startedAt||now)>85000)){
   state.autoFreeJob=null;job=null;
  }
  if(!job){
   const choices=[];
-  if(state.stone<8)choices.push('mine','mine');
-  if(!state.tools.pickaxe)choices.push('forge');
-  if(state.food<4&&(state.fish||state.rawMeat||state.eggs>=2||state.mushrooms>=3||state.berries>=3))choices.push('cook');
-  if(state.fishingRod&&state.jettyBuilt&&state.fish<4)choices.push('fish');
-  if(state.gardenTier&&gardenRipe())choices.push('garden');
-  if(state.wood<8&&state.tools.axe)choices.push('wood');
-  if(nextHaigenTrailProject()&&state.wood>=3&&state.stone>=2&&state.twigs>=1)choices.push('build','build');
-  if(state.tools.net&&state.carriedFrogId>=0)choices.push('net');
-  if(state.tools.net&&state.frogsReleased<4&&state.energy>65)choices.push('net');
-  choices.push('explore','explore');
-  const index=(state.autoSteps+Math.floor(state.daytime/70)+haigenMind.visited.length)%choices.length;
-  job={kind:choices[index],startedAt:now,steps:0};
+  const add=(kind,weight)=>{if(weight>0)choices.push({kind,weight})};
+  if(state.stone<8)add('mine',3);
+  if(!state.tools.pickaxe)add('forge',2);
+  if(state.food<4&&(state.fish||state.rawMeat||state.eggs>=2||state.mushrooms>=3||state.berries>=3))add('cook',3);
+  if(state.fishingRod&&state.jettyBuilt&&state.fish<4)add('fish',2.7);
+  if(state.gardenTier&&gardenRipe())add('garden',2.1);
+  if(state.wood<8&&state.tools.axe)add('wood',2.5);
+  if(nextHaigenTrailProject()&&state.wood>=3&&state.stone>=2&&state.twigs>=1)add('build',2.6);
+  if(state.tools.net&&state.carriedFrogId>=0)add('net',4);
+  else if(state.tools.net&&state.frogsReleased<4&&state.energy>65)add('net',1.4);
+  if(Object.values(state.tools).some(q=>!q))add('craft',1.9);
+  if(state.story?.stage<6&&state.energy>47)add('story',1.6+haigenMind.curiosity/65);
+  if(state.energy>45)add('observe',1.8+haigenMind.curiosity/65);
+  add('friends',1.6+haigenMind.kindness/70);
+  add('explore',2.4+haigenMind.curiosity/46);
+  const history=Array.isArray(haigenMind.recentJobs)?haigenMind.recentJobs:[];
+  const weighted=choices.map(choice=>({...choice,weight:choice.weight*(history.includes(choice.kind)?.25:1)}));
+  let pick=Math.random()*weighted.reduce((total,choice)=>total+choice.weight,0);
+  let selected=weighted[weighted.length-1]?.kind||'explore';
+  for(const choice of weighted){pick-=choice.weight;if(pick<=0){selected=choice.kind;break}}
+  haigenMind.recentJobs=[selected,...history].slice(0,3);
+  job={kind:selected,startedAt:now,steps:0};
   state.autoFreeJob=job;
-  const labels={mine:'mining stone for new projects',forge:'making a useful pickaxe',fish:'catching food with my rod',cook:'cooking a proper meal',explore:'finding somewhere new',wood:'chopping firewood',garden:'tending my vegetables',net:'studying frogs and releasing them',build:'building lanterns and signs along the trails'};
+  const labels={mine:'mining stone for new projects',forge:'making a useful pickaxe',fish:'catching food with my rod',cook:'cooking a proper meal',explore:'finding somewhere new',wood:'chopping firewood',garden:'tending my vegetables',net:'studying frogs and releasing them',build:'building lanterns and signs along the trails',craft:'inventing useful equipment',observe:'learning about the wildlife',friends:'spending time with Dylan and Skölli',story:'investigating the Silent Pond mystery'};
   mindWrite('My next job is '+labels[job.kind]+'. I want to accomplish something useful.','plan');
   autoDestination=null;autoWaypoint=null;autoResetNav();save();
  }
@@ -2281,6 +2293,60 @@ function autoFreedomTick(dt){
   if(message)mindWrite(message,'achievement');
   state.autoFreeJob=null;autoDestination=null;autoWaypoint=null;autoPause=800;save();return true;
  };
+ if(job.kind==='friends'){
+  const friend=companions[(Math.floor(haigenMind.actions)+state.autoSteps)%companions.length];
+  if(!friend)return finish();
+  autoPlan('check on '+friend.name,'friend:'+friend.name);
+  if(dist(state,friend)>100){autoTravel(friend,dt,96,.11);return true}
+  if(!job.startedLooking)job.startedLooking=now;
+  if(now-job.startedLooking<1800){autoPause=150;return true}
+  haigenMind.habits.companionship++;
+  const lines=friend.kind==='rabbit'?'Dylan is always curious. I think he likes discovering things with me.':'Skölli watches over us. I am glad he is here.';
+  mindWrite(lines,'reflection');think('Good to spend some time with '+friend.name+'!',3400,true);
+  state.autoSteps++;return finish('I checked on '+friend.name+' and spent time with my friend.');
+ }
+ if(job.kind==='observe'){
+  const nearby=[
+   ...regionalWildlife.filter(a=>animalAlive(a)&&!hostileTypes.has(a.type)&&
+    !['watcher','ashCreeper','scuttleback'].includes(a.type)&&dist(a,state)<900).map(a=>({x:a.x,y:a.y,type:a.type||'animal'})),
+   ...woodlandCritters.filter(a=>['squirrel','butterfly'].includes(a.kind)&&dist(a,state)<650).map(a=>({x:a.x,y:a.y,type:a.kind})),
+   ...birds.filter(a=>dist(a,state)<550).map(a=>({x:a.x,y:a.y,type:'bird'}))
+  ].sort((a,b)=>dist(a,state)-dist(b,state));
+  const animal=nearby[0];
+  if(!animal)return finish('I looked for wildlife but did not find any nearby.');
+  autoPlan('observe a '+animal.type+' without disturbing it','observe:'+animal.type);
+  if(dist(state,animal)>145){autoTravel(animal,dt,145,.10);return true}
+  if(!job.startedLooking)job.startedLooking=now;
+  if(now-job.startedLooking<2500){autoPause=150;return true}
+  haigenMind.curiosity=clamp(haigenMind.curiosity+.35,0,100);
+  mindWrite('I watched a '+animal.type+' in its natural home. It is amazing how much the forest does without me.','discovery');
+  state.autoSteps++;return finish('I watched a '+animal.type+' and learned something new.');
+ }
+ if(job.kind==='story'){
+  const step=storyStep(),place=step?.place;
+  if(!place||!Number.isFinite(place.x)||!Number.isFinite(place.y))return finish();
+  autoPlan('investigate '+step.title.toLowerCase(),'story-explore:'+state.story.stage);
+  const d=dist(state,place);
+  if(d>95){autoTravel(place,dt,92,.12);return true}
+  const previous=state.story.stage;
+  if(storyInteract()&&state.story.stage!==previous){
+   state.autoSteps++;return finish('I investigated the mystery and made progress myself.');
+  }
+  mindWrite('I reached '+step.title.toLowerCase()+'. I need to decide what to do next.','mystery');
+  return finish();
+ }
+ if(job.kind==='craft'){
+  const kinds=[['axe',2,2,0],['net',2,0,3],['torch',2,1,0],['shovel',4,0,2]];
+  const entry=kinds.find(([kind])=>!(state.tools[kind]>0));
+  if(!entry)return finish();
+  const [kind,wood,stone,twigs]=entry;
+  autoPlan('make my own '+kind,'freedom-craft:'+kind);
+  if(state.wood<wood||state.stone<stone||state.twigs<twigs)return finish('I need to gather more materials before making my '+kind+'.');
+  if(dist(state,cottage)>190){autoTravel(autoCampSpot(),dt,170,.12);return true}
+  state.wood-=wood;state.stone-=stone;state.twigs-=twigs;state.tools[kind]=1;
+  startHaigenAction('craft',1000);mindEvent('build','a '+kind);state.autoSteps++;
+  return finish('I made my own '+kind+' with resources I found.');
+ }
  if(job.kind==='forge'||job.kind==='mine'){
   if(job.kind==='mine'&&state.stone>=8)return finish('The stone supply is ready for my next building idea.');
   autoMineStone(dt);
@@ -2355,6 +2421,43 @@ function autoFreedomTick(dt){
  return true;
 }
 
+// V134 · Independent decisions are based on needs, personality and recent actions.
+const independentAgenda={kind:'',remaining:0,recent:[]};
+function independentChoiceTick(dt){
+ independentAgenda.remaining-=dt;
+ if(independentAgenda.remaining<=0){
+  const inCamp=dist(state,cottage)<510;
+  const chores=inCamp&&(
+   state.woodStorageTier&&state.wood>=9&&state.woodStored<woodStoreLimit()||
+   state.coopTier&&state.nestEggs>=2||
+   state.gardenTier&&gardenRipe()||
+   state.food<2&&(state.rawMeat||state.vegetables>=3||state.eggs>=2||state.fish||state.mushrooms>=3||state.berries>=6));
+  const unbuilt=!state.coopTier||!state.gardenTier||!state.woodStorageTier;
+  const weights=[
+   ['build',unbuilt?1.5+haigenMind.patience/75:0],
+   ['chores',chores?1.7+(state.hunger<75?0.5:0):0],
+   ['adventure',2.3+haigenMind.curiosity/38+(state.energy>65?.8:0)]
+  ].map(([kind,weight])=>({kind,weight:Math.max(0,weight)*(independentAgenda.recent.includes(kind)?0.45:1)}));
+  let total=weights.reduce((a,b)=>a+b.weight,0),pick=Math.random()*total,chosen='adventure';
+  for(const option of weights){pick-=option.weight;if(pick<=0){chosen=option.kind;break}}
+  independentAgenda.kind=chosen;
+  independentAgenda.remaining=chosen==='build'?29000:chosen==='adventure'?24000:14000;
+  independentAgenda.recent=[chosen,...independentAgenda.recent].slice(0,2);
+  const motivations={build:'work on the homestead',chores:'look after camp',adventure:'follow my curiosity'};
+  haigenMind.lastGoal=motivations[chosen];
+  if(time>(haigenMind.lastIndependentNoteAt||0)+13000){
+   haigenMind.lastIndependentNoteAt=time;
+   mindWrite('I chose to '+motivations[chosen]+' because it feels important to me.','plan');
+  }
+  autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';
+ }
+ const kind=independentAgenda.kind;
+ const acted=kind==='build'?lifeProjectTick(dt):kind==='chores'?autoCampChores(dt):autoFreedomTick(dt);
+ if(acted)return true;
+ independentAgenda.remaining=0;
+ return autoFreedomTick(dt);
+}
+window.__independentHaigen=()=>({agenda:independentAgenda.kind,remaining:Math.round(independentAgenda.remaining),recent:independentAgenda.recent.slice(),freedomJob:state.autoFreeJob?.kind||null,curiosity:haigenMind.curiosity});
 function autonomousTick(dt){
  state.fun=Math.min(100,state.fun+dt*.00018);state.activity=Math.min(100,state.activity+dt*.0003);
  autoBubbleTimer-=dt;
@@ -2383,9 +2486,7 @@ function autonomousTick(dt){
  // Respect the physical strike / cooking / crafting animation time before
  // choosing another task. Otherwise a boulder shatters in one video frame.
  if(autoPause>0){autoPause=Math.max(0,autoPause-dt);if(autoBubbleTimer<=0)speak(currentThoughtTopic(),4200);return}
- if(lifeProjectTick(dt))return;
- if(autoCampChores(dt))return;
- if(autoFreedomTick(dt))return;
+ if(independentChoiceTick(dt))return;
  if(autoDestination&&(state.removed.includes(autoDestination.id)||
  (autoDestination.type==='bush'&&!berryReady(autoDestination))||
  (autoIgnore.get(autoDestination.id)||0)>Date.now()))autoDestination=null;
@@ -2452,7 +2553,7 @@ function showReturnReport(){
 }
 function setAutonomy(enabled,keepInstruction=false){
   if(enabled&&!keepInstruction)state.playerInstruction=null;
-  state.autonomy=enabled;haigenMind.controlSwitches++;autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';autoPause=enabled?700:0;if(enabled){nextThoughtAt=0;speak(currentThoughtTopic(),4600)}else autoBubbleTimer=0;
+  state.autonomy=enabled;haigenMind.controlSwitches++;independentAgenda.remaining=0;autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';autoPause=enabled?700:0;if(enabled){nextThoughtAt=0;speak(currentThoughtTopic(),4600)}else autoBubbleTimer=0;
   $('modeBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';
   notify(enabled?'🌲 Haigen is exploring on his own.':'🎮 You are in control!');
   save();
@@ -5759,6 +5860,90 @@ function changeMapZoom(delta){if(!mapBase||!$('worldMap'))return;mapZoom=clamp(m
 function mood(){if(state.health<35)return 'hurt';if(state.energy<25)return 'sleepy';if(state.hunger<25)return 'hungry';if(state.fun<25)return 'bored';if(state.health>75&&state.energy>55&&state.hunger>45&&state.fun>55)return 'happy';return 'thoughtful'}
 function hairstyleMenu(){const styles=[['waves','🌾 Soft waves'],['curls','🌀 Bouncy curls'],['short','✂️ Short & tousled'],['wild','🌪️ Wild bedhead']];open('<h2>💇 Haigen\'s hair</h2><p>Pick a style. It stays until you choose another.</p>'+styles.map(([id,name])=>'<div class="item"><b>'+name+'</b><button class="btn" data-hair="'+id+'">'+(state.hairStyle===id?'Wearing ✓':'Choose')+'</button></div>').join(''));document.querySelectorAll('[data-hair]').forEach(b=>b.onclick=()=>{state.hairStyle=b.dataset.hair;save();hairstyleMenu()})}
 // V112 Backpack preview: real inventory, no enforced capacity until progression rules are agreed.
+// V134 · Development tools only. Does NOT unlock story stages or defeat Gloamjaw.
+const devStock=[
+ ['wood','🪵 Wood',14,14],['stone','🪨 Stone',40,20],['twigs','🌿 Twigs',40,20],
+ ['leaves','🍃 Leaves',40,20],['berries','🍓 Berries',30,15],
+ ['mushrooms','🍄 Mushrooms',20,10],['medicinalMushrooms','🩵 Medicinal fungi',12,6],
+ ['eggs','🥚 Eggs',16,8],['vegetables','🥕 Vegetables',18,9],
+ ['fish','🐟 Fish',12,6],['rawMeat','🥩 Meat',16,8],
+ ['food','🍲 Meals',16,8],['potions','🌿 Healing salves',12,6],
+ ['antidotes','🧪 Antidotes',12,6],['arrows','🏹 Arrows',240,120]
+];
+const devMinerals=['clay','flint','iron','copper','quartz','crystal'];
+function devProvisionEquipment(){
+ for(const kind of ['axe','torch','shovel','pickaxe','net'])state.tools[kind]=Math.max(1,Number(state.tools[kind])||0);
+ state.fishingRod=true;
+ for(const kind of ['bow','crossbow'])state.tools[kind]=3;
+ state.arrows=Math.max(240,Number(state.arrows)||0);
+ renderHotbar();save();
+}
+function devRefillStock(firstTime=false){
+ for(const [kind,,target,increment] of devStock){
+  const current=Math.max(0,Number(state[kind])||0),limit=kind==='wood'?woodCarryLimit:9999;
+  state[kind]=Math.min(limit,firstTime?Math.max(current,target):Math.min(9999,current+increment));
+ }
+ for(const mineral of devMinerals)state.minerals[mineral]=Math.max(Number(state.minerals[mineral])||0,firstTime?8:(Number(state.minerals[mineral])||0)+8);
+ for(const herb of flowerKinds.map(f=>f.name))state.herbs[herb]=Math.max(Number(state.herbs[herb])||0,firstTime?6:(Number(state.herbs[herb])||0)+6);
+ save();
+}
+function devKit(){
+ const safe=typeof safeText==='function'?safeText:(v=>String(v));
+ const items=devStock.map(([kind,label,,qty])=>'<div class="item"><span>'+label+' <b>× '+Math.max(0,Math.floor(Number(state[kind])||0))+'</b></span><button class="btn" data-dev-item="'+kind+'">+'+qty+'</button></div>').join('');
+ const minerals=devMinerals.map(k=>'<div class="item"><span>'+safe(k)+' × '+Math.max(0,Number(state.minerals[k])||0)+'</span><button class="btn" data-dev-mineral="'+k+'">+8</button></div>').join('');
+ const gear=toolSlots.map(t=>'<button class="btn" style="margin:3px;min-width:102px" data-dev-equip="'+t.id+'">'+safe(t.name)+(state.equipped===t.id?' ✓':'')+'</button>').join('');
+ open('<h2>🧰 DEV KIT · V134</h2><p class="small">Development sandbox: every weapon and item is available immediately. Progress and boss defeat are not changed.</p>'+
+ '<p><b>Access:</b> '+(state.devKitEnabled?'Enabled':'Disabled')+'</p>'+
+ '<button class="btn" data-dev-action="toggle">'+(state.devKitEnabled?'Disable new developer grants':'Enable developer access')+'</button> '+
+ '<button class="btn" data-dev-action="everything">Unlock all tools + refill items</button>'+
+ '<h3>⚔️ Weapons & tools</h3><div style="display:flex;flex-wrap:wrap;gap:4px">'+gear+'</div>'+
+ '<p class="small">Bow and crossbow are upgraded to level 3. No boss defeat is required while developing.</p>'+
+ '<h3>🎒 Add inventory items</h3>'+items+'<h3>⛏️ Minerals</h3>'+minerals+
+ '<button class="btn" data-dev-action="herbs">+6 of each herb</button> '+
+ '<button class="btn" data-dev-action="heal">Restore Haigen’s health, hunger and energy</button>'+
+ '<p class="small">The existing story, quest, companions and saves are preserved. Turn off grants when testing normal progression.</p>');
+ const body=$('modalBody');
+ body.querySelectorAll('[data-dev-equip]').forEach(btn=>btn.onclick=()=>{
+  const id=btn.dataset.devEquip;
+  if(!state.devKitEnabled){notify('Enable the DEV KIT to unlock equipment.');return}
+  devProvisionEquipment();equipTool(id);devKit();
+ });
+ body.querySelectorAll('[data-dev-item]').forEach(btn=>btn.onclick=()=>{
+  if(!state.devKitEnabled)return;
+  const entry=devStock.find(item=>item[0]===btn.dataset.devItem);if(!entry)return;
+  const field=entry[0],limit=field==='wood'?woodCarryLimit:9999;
+  state[field]=Math.min(limit,Math.max(0,Number(state[field])||0)+entry[3]);save();devKit();
+ });
+ body.querySelectorAll('[data-dev-mineral]').forEach(btn=>btn.onclick=()=>{
+  if(!state.devKitEnabled)return;
+  const mineral=btn.dataset.devMineral;if(!devMinerals.includes(mineral))return;
+  state.minerals[mineral]=(Number(state.minerals[mineral])||0)+8;save();devKit();
+ });
+ body.querySelectorAll('[data-dev-action]').forEach(btn=>btn.onclick=()=>{
+  const action=btn.dataset.devAction;
+  if(action==='toggle'){
+   state.devKitEnabled=!state.devKitEnabled;
+   if(state.devKitEnabled)devProvisionEquipment();
+  }else if(!state.devKitEnabled)return;
+  else if(action==='everything'){devProvisionEquipment();devRefillStock();}
+  else if(action==='herbs'){for(const f of flowerKinds)state.herbs[f.name]=(Number(state.herbs[f.name])||0)+6;}
+  else if(action==='heal'){state.health=100;state.energy=100;state.hunger=100;state.poisonMs=0;state.resting=false;}
+  save();devKit();
+ });
+}
+function devInitialAccess(){
+ if(!state.devKitEnabled)return;
+ devProvisionEquipment();
+ if(!state.devKitWelcomeGranted){
+  state.devKitWelcomeGranted=true;devRefillStock(true);
+ }
+}
+window.__haigenDeveloper=()=>({
+ active:state.devKitEnabled,
+ tools:Object.fromEntries(toolSlots.map(t=>[t.id,t.id==='rod'?state.fishingRod:(t.id==='hands'||state.tools[t.id]>0)])),
+ inventory:Object.fromEntries(devStock.map(([k])=>[k,Number(state[k])||0])),
+ goal:haigenMind.lastGoal
+});
 function backpack(){
  const n=v=>Math.max(0,Math.floor(Number(v)||0));
  const groups=[
@@ -5776,7 +5961,7 @@ function backpack(){
   ].concat(Object.entries(state.herbs||{}).map(([name,count])=>['🌸 '+name,count]))},
   {title:'🧰 Equipment',items:[
    ['🪓 Axes',state.tools?.axe],['🔦 Torches',state.tools?.torch],
-   ['🥄 Shovels',state.tools?.shovel],['⛏️ Pickaxes',state.tools?.pickaxe]
+   ['🥄 Shovels',state.tools?.shovel],['⛏️ Pickaxes',state.tools?.pickaxe],['🦋 Nets',state.tools?.net],['🎣 Fishing rods',state.fishingRod?1:0],['🏹 Bows · level',state.tools?.bow],['⚙️ Crossbows · level',state.tools?.crossbow],['🏹 Arrows',state.arrows]
   ]}
  ];
  const contents=groups.map(group=>{
@@ -5816,7 +6001,7 @@ addEventListener('keydown',e=>{
  if(e.key==='Escape'&&$('overlay').classList.contains('open'))close();
  if(e.key.toLowerCase()==='m'&&!e.repeat){if($('overlay').classList.contains('open'))close();else showMap()}
 });
-addEventListener('keyup',e=>{if(!typingInField(e.target))keys[e.key]=false});$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('storyBtn').onclick=storyJournal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('packBtn').onclick=backpack;$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('artBtn').onclick=toggleRebirthArt;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
+addEventListener('keyup',e=>{if(!typingInField(e.target))keys[e.key]=false});$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('storyBtn').onclick=storyJournal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('packBtn').onclick=backpack;$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('devKitBtn').onclick=devKit;$('artBtn').onclick=toggleRebirthArt;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
 for(const [id,fn] of [['modeBtn',()=>setAutonomy(!state.autonomy)],['packBtn',backpack],['mapBtn',showMap],['journalBtn',journal],['storyBtn',storyJournal],['craftBtn',craft],['artBtn',toggleRebirthArt],['helpBtn',help]]){const el=$(id);let handled=0;el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();e.stopPropagation();handled=Date.now();const drawer=document.querySelector('.mobile-menu');if(drawer)drawer.open=false;fn()}},true);el.addEventListener('click',e=>{if(Date.now()-handled<800){e.preventDefault();e.stopImmediatePropagation()}},true)}$('closeBtn').onclick=close;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))close()});// iPad camera: one finger pans, two fingers pinch to zoom; controls remain separate.
 let cameraZoom=1;
 function worldZoom(){return clamp(Math.min(W/1024,H/768),.52,1)*cameraZoom*(rbEnabled?1.18:1)}
@@ -6068,7 +6253,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=133;document.getElementById('devVersion').textContent='V133';document.getElementById('devVersion').title='V133 · Approved Gloamjaw, 28 poses';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=134;document.getElementById('devVersion').textContent='V134';document.getElementById('devVersion').title='V134 · independent decisions and full development inventory';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
@@ -6226,7 +6411,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape')mobileMenu.open=false;});
 function updateCompactStats(){statsToggle.textContent=`🌲 Haigen · ❤️ ${Math.round(state.health)} · 💤 ${Math.round(state.energy)} · 🍲 ${Math.round(state.hunger)} ▾`;}
 updateCompactStats();setInterval(updateCompactStats,500);
 
-offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Rebirth look';renderHotbar();$('modeBtn').textContent=state.autonomy?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=$('modeBtn').textContent;// V127 read-only interface bridge. All gameplay, character drawing and old saves remain isolated.
+offlineProgress();devInitialAccess();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Rebirth look';renderHotbar();$('modeBtn').textContent=state.autonomy?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=$('modeBtn').textContent;// V127 read-only interface bridge. All gameplay, character drawing and old saves remain isolated.
  window.__gloamPort={state,objects,woodlandDetails,toolSlots,recipes,craftCategories,beasts,regionalWildlife,ctx,
  snapshot:()=>({time,x:state.x,y:state.y,worldZoom:worldZoom(),cameraX:cam.x,cameraY:cam.y,width:W,height:H,dir:playerMotion.dir,collapsed:collapseRemaining>0}),
  animalAlive,hurtAnimal,takeDamage,notify,memory,save,equipTool,renderHotbar,startHaigenAction,soundEffect,close};
@@ -6250,4 +6435,4 @@ offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Re
   refreshTools:()=>renderHotbar()
  };
  requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./v127-ornate-ui.js?v=1"></script><script src="./gloamjaw-v128.js?v=133"></script></body></html>
+</script><script src="./v127-ornate-ui.js?v=1"></script><script src="./gloamjaw-v128.js?v=134"></script></body></html>

@@ -55,6 +55,7 @@ el.innerHTML=[
  '<button data-action="modeBtn">Take control / Explore</button>',
  '<button data-action="storyBtn">The Silent Pond</button>',
  '<button data-action="craftBtn">Craft and Build</button>',
+ '<button data-action="devKitBtn">🧰 DEV KIT · Weapons & Items</button>',
  '<button data-action="artBtn">Change World Style</button>',
  '<button data-action="helpBtn">Controls and Help</button>',
  '<button data-action="eatBtn">Eat / Use Food</button>',
