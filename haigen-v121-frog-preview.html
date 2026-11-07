@@ -2305,29 +2305,59 @@ function worldPaint(kind,variant=0){
  const poly=(pts,c)=>{g.fillStyle=c;g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(...pts[i]);g.closePath();g.fill()};
  const outline='#293331',wood='#76543e',bark='#4c3c33',woodHi='#b48b5b',moss='#557d57',leaves='#567e50',light='#96aa68',rock='#748181',rockHi='#bec2af';
  let seed=variant*271+kind.length*113+37;const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+ // Hand-pixelled rounded shapes: no 20-pixel square canopy blocks.
+ // Two-pixel horizontal runs retain a consistent 16-bit outline density.
+ const disc=(cx,cy,rx,ry,color)=>{
+  for(let yy=-Math.floor(ry);yy<=Math.floor(ry);yy+=2){
+   const k=yy/ry;if(Math.abs(k)>1)continue;
+   const half=Math.floor(rx*Math.sqrt(1-k*k));
+   p(cx-half,cy+yy,half*2+1,2,color);
+  }
+ };
+
  if(['tree','fir','snowFir','palm','bareTree'].includes(kind)){
   const cx=w/2;
   p(cx-10,h-61,20,58,bark);p(cx-6,h-60,12,58,wood);
   for(let y=h-56;y<h-8;y+=13){p(cx+2,y,3,8,woodHi);p(cx-8,y+7,3,4,'#604736')}
   p(cx-17,h-10,15,6,bark);p(cx+3,h-10,21,7,bark);
   if(kind==='tree'){
-   const blobs=[[31,59,42,38],[59,42,44,42],[20,37,36,41],[65,67,35,29],[41,20,43,36],[3,72,30,27]];
-   for(const [x,y,bw,bh] of blobs){
-    p(x-3,y+5,bw+5,bh+1,outline);p(x,y,bw,bh-6,'#31583e');
-    p(x+4,y+3,bw-9,bh-12,variant%2?leaves:'#628b54');
-    p(x+5,y+5,bw-19,8,'#a1b477');
-    p(x+8,y+bh-13,bw-17,4,'#395f48');
+   // Branches and roots are visible beneath the soft lobed crown.
+   for(const dx of [-17,15])poly([[cx-5,h-55],[cx+dx,h-85],[cx+dx+6,h-83],[cx+8,h-43]],wood);
+   const gold=variant%5===0;
+   const blobs=[
+    [25,66,25,23],[80,66,25,22],[53,61,32,29],
+    [21,45,21,24],[86,47,22,22],[40,37,29,28],
+    [68,31,28,25],[54,17,24,19]
+   ];
+   for(let i=0;i<blobs.length;i++){
+    const [bx,by,rx,ry]=blobs[i];
+    disc(bx,by+3,rx+3,ry+4,outline);
+    disc(bx,by,rx,ry,'#345b40');
+    disc(bx-2,by-3,rx-3,ry-4,gold?'#65824c':'#4d7851');
+    disc(bx-4,by-7,Math.max(6,rx-9),Math.max(5,ry-10),gold?'#9fb76c':'#739a61');
+    disc(bx+rx*.29,by+ry*.46,rx*.53,ry*.26,'#315944');
    }
-   for(let i=0;i<18;i++){const x=12+Math.floor(rng()*84),y=24+Math.floor(rng()*74);p(x,y,4,2,i%4===0?'#d2c796':'#b6c083')}
-  }else if(kind==='fir'||kind==='snowFir'){
+   // Dithered leaf tips and warm sunlit leaves, clipped to existing canopy pixels.
+   for(let i=0;i<190;i++){
+    const xx=9+Math.floor(rng()*94),yy=10+Math.floor(rng()*84);
+    const a=g.getImageData(xx,yy,1,1).data;
+    if(a[3]<240)continue;
+    const n=rng();
+    p(xx,yy,rng()>.65?3:2,rng()>.72?2:1,
+      n>.8?(gold?'#d2cd8e':'#b9c58a'):n>.36?'#91af70':'#406e4c');
+   }
+    }else if(kind==='fir'||kind==='snowFir'){
    const cold=kind==='snowFir';
-   for(let n=0;n<6;n++){
-    const y=7+n*15,half=9+n*8;
-    poly([[cx,y-4],[cx-half-3,y+24],[cx+half+3,y+24]],outline);
-    poly([[cx,y],[cx-half,y+20],[cx+half,y+20]],cold?'#4b6d63':'#285a53');
-    poly([[cx-2,y+3],[cx-half+6,y+18],[cx+half-7,y+18]],cold?'#64887b':'#467e6e');
-    if(cold){p(cx-half+5,y+13,half*.72,5,'#e3e9df');p(cx-6,y+9,17,4,'#f6f4df')}
-    else p(cx-7,y+9,14,3,'#84a99b');
+   for(let layer=0;layer<5;layer++){
+    const yy=7+layer*17,half=11+layer*10;
+    poly([[cx,yy-2],[cx-half-4,yy+26],[cx-half+5,yy+23],[cx-half+11,yy+29],
+      [cx,yy+26],[cx+half-11,yy+29],[cx+half-5,yy+23],[cx+half+4,yy+26]],outline);
+    poly([[cx,yy+2],[cx-half,yy+22],[cx-half+7,yy+20],[cx,yy+24],[cx+half-7,yy+20],[cx+half,yy+22]],
+      cold?'#3b666a':'#285b4f');
+    poly([[cx-3,yy+3],[cx-half+8,yy+18],[cx+2,yy+19],[cx+half-12,yy+17]],
+      cold?'#628b89':'#578e6a');
+    p(cx-half+13,yy+16,10+layer*4,2,cold?'#dce8e8':'#9cbb83');
+    if(cold){p(cx-half+11,yy+15,10+layer*4,3,'#e9f1eb');p(cx-5,yy+6,10,3,'#f9f8e7')}
    }
   }else if(kind==='palm'){
    poly([[cx-8,71],[cx,28],[cx+10,35],[cx+6,75]],wood);
@@ -2348,16 +2378,31 @@ function worldPaint(kind,variant=0){
   poly([[cx-aa,yy],[cx-aa+6,yy-rh*.55],[cx-10,yy-rh],[cx+aa*.5,yy-rh*.82],[cx+aa,yy-rh*.26],[cx+aa-4,yy+2]],outline);
   poly([[cx-aa+4,yy-3],[cx-aa+10,yy-rh*.58],[cx-10,yy-rh+5],[cx+aa*.5,yy-rh*.8],[cx+aa-4,yy-rh*.23]],rock);
   poly([[cx-aa+12,yy-rh*.54],[cx-10,yy-rh+6],[cx+12,yy-rh*.78],[cx+4,yy-rh*.42]],rockHi);
-  p(cx+11,yy-18,19,4,'#566867');p(cx-25,yy-7,18,3,'#4d6a54');
+  // Small fractured facets and moss patches give rocks the same lighting language.
+  poly([[cx-27,yy-7],[cx-20,yy-18],[cx-12,yy-17],[cx-5,yy-6]],'#526d5d');
+  poly([[cx+10,yy-34],[cx+25,yy-28],[cx+17,yy-23]],'#c9c7b1');
+  p(cx+11,yy-18,15,3,'#566867');p(cx-25,yy-7,14,3,'#42694e');
+  for(let j=0;j<9;j++){
+   const px=cx-28+Math.floor(rng()*57),py=yy-10-Math.floor(rng()*24);
+   if(g.getImageData(px,py,1,1).data[3]>0)p(px,py,2,2,j%3?'#9fae98':'#55785e');
+  }
   if(kind==='ore'){for(let i=0;i<6;i++)p(cx-28+(i*11)%56,yy-21-(i%3)*8,6,5,i%2?'#f7cf70':'#d89b40')}
   if(kind==='snowRock'){p(cx-23,yy-rh*.65,27,8,'#f4f4ea');p(cx+2,yy-rh*.45,20,6,'#d5e1e7')}
  }else if(kind==='bush'||kind==='flower'||kind==='mushroom'||kind==='reeds'||kind==='grass'||kind==='dryShrub'){
   if(kind==='bush'){
-   for(const [x,y,bw,bh] of [[6,32,33,28],[34,19,36,38],[40,37,36,23],[15,17,37,29]]){
-    p(x,y+4,bw,bh,outline);p(x+3,y+2,bw-5,bh-8,'#3d6f51');p(x+6,y+4,bw-14,6,'#98b377')
+   // Layered rounded evergreen shrub rather than blocks, matching the trees.
+   for(const [bx,by,rx,ry] of [[23,45,19,17],[40,35,24,24],[60,47,19,17],[52,25,20,20]]){
+    disc(bx,by+2,rx+2,ry+3,outline);
+    disc(bx,by,rx,ry,'#376f4c');
+    disc(bx-3,by-5,rx-5,ry-7,'#649656');
+    disc(bx-6,by-8,Math.max(3,rx-10),5,'#a6bc76');
    }
-   for(let i=0;i<5;i++)p(14+i*10,34+i%2*10,5,5,'#b95f52');
-  }else if(kind==='mushroom'){
+   for(let i=0;i<22;i++){
+    const x=15+Math.floor(rng()*51),y=25+Math.floor(rng()*27);
+    if(g.getImageData(x,y,1,1).data[3]>0)p(x,y,2,2,i%3?'#83ab69':'#416e4c');
+   }
+   for(let i=0;i<5;i++)p(15+i*11,40+(i%2)*10,4,4,'#ba6a5b');
+    }else if(kind==='mushroom'){
    for(let i=0;i<3;i++){const x=13+i*20,y=h-12-(i%2)*8;
     p(x+6,y-22,8,23,'#e3cbb1');p(x,y-28,23,13,outline);p(x+2,y-30,19,12,i%2?'#b77252':'#b84d46');p(x+5,y-29,6,4,'#f3d5ae');
    }
