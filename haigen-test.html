@@ -2311,6 +2311,7 @@ function drawToolSwing(){if(rbEnabled){rbToolSwing();return}if(!toolSwing)return
 }
 
 function rbToolSwing(){
+ if(haigenApprovedAtlasReady){if(toolSwing&&(performance.now()-toolSwing.started)>=toolSwing.duration)toolSwing=null;return}
  if(!toolSwing)return;
  const progress=Math.min(1,(performance.now()-toolSwing.started)/toolSwing.duration);
  if(progress>=1){toolSwing=null;return}
@@ -2561,9 +2562,177 @@ haigenApprovedAtlas.onload=()=>{
 };
 haigenApprovedAtlas.onerror=()=>{haigenApprovedAtlasReady=false;haigenApprovedWalkAtlas=null};
 haigenApprovedAtlas.src='./assets/haigen-approved-atlas.png?v=117';
+
+// V119 Haigen animation contract: 4-facing body, 3/4 side frames, outfit,
+// held item and timed action are independent, and all share a planted baseline.
+let haigenVisualAction=null,haigenKnock=null;
+const haigenCostumeAtlases=new Map();
+function startHaigenAction(kind,duration=650){
+ haigenVisualAction={kind,start:performance.now(),duration};
+}
+function haigenActiveAction(){
+ if(!haigenVisualAction)return null;
+ const t=(performance.now()-haigenVisualAction.start)/haigenVisualAction.duration;
+ if(t>=1){haigenVisualAction=null;return null}
+ return {...haigenVisualAction,progress:Math.max(0,t)};
+}
+function haigenOutfit(){
+ const region=expandedRegion(state.x,state.y)?.id;
+ if(region==='snow')return 'snow';
+ if(region==='desert')return 'desert';
+ if(region==='coast')return 'beach';
+ if(region==='fen')return 'fen';
+ if(region==='wasteland')return 'wasteland';
+ if(region==='downs')return 'downs';
+ return 'woodland';
+}
+// Repaint only the cloth pixels in a cached sprite sheet. Facial features,
+// approved blonde hair and original thick hoodie/three-quarter outlines remain.
+// Each 48x72 cell keeps the EXACT same draw width and foot baseline.
+function haigenCostumeAtlas(base,kind){
+ const key=kind+(base===haigenApprovedWalkAtlas?':chunky':':original');
+ if(haigenCostumeAtlases.has(key))return haigenCostumeAtlases.get(key);
+ const c=document.createElement('canvas');c.width=192;c.height=216;
+ const g=c.getContext('2d',{willReadFrequently:true});if(!g)return base;
+ g.imageSmoothingEnabled=false;
+ g.drawImage(base,0,0,192,216,0,0,192,216);
+ const palette={
+  snow:[[71,48,37],[180,93,40],[229,146,65]],
+  desert:[[67,58,42],[157,130,85],[210,181,125]],
+  beach:[[41,58,65],[72,120,134],[124,173,178]],
+  fen:[[37,56,41],[77,108,73],[128,152,99]],
+  downs:[[40,59,44],[83,113,77],[142,156,98]],
+  wasteland:[[45,45,50],[87,82,82],[136,129,126]]
+ };
+ if(palette[kind]){
+  const data=g.getImageData(0,0,192,216);
+  for(let y=0;y<216;y++){
+   const cy=y%72;if(cy<36||cy>60)continue;
+   for(let x=0;x<192;x++){
+    const p=(y*192+x)*4,r=data.data[p],gg=data.data[p+1],b=data.data[p+2],a=data.data[p+3];
+    if(a<60)continue;
+    // Recolour charcoal cloth, never warm skin or golden blonde hair.
+    if(r>153||r>gg+28||gg>b+29||b<r-16)continue;
+    const bright=(r+gg+b)/3;
+    const colours=palette[kind],t=bright<48?0:bright<88?1:2,col=colours[t];
+    for(let c0=0;c0<3;c0++)data.data[p+c0]=col[c0];
+   }
+  }
+  g.putImageData(data,0,0);
+ }
+ const p=(x,y,w,h,color)=>{g.fillStyle=color;g.fillRect(x,y,w,h)};
+ for(let row=0;row<3;row++)for(let frame=0;frame<4;frame++){
+  const ox=frame*48,oy=row*72,side=row===2,walk=frame%2;
+  // Full black-and-cream trainers, explicitly finished on every pose.
+  const feet=side?(frame===1?[[12,67],[33,65]]:frame===3?[[13,65],[34,67]]:[[17,67],[31,67]]):
+   (walk?[[12,66],[30,68]]:[[12,68],[30,68]]);
+  for(const [fx,fy] of feet){
+   const sx=ox+fx-5,sy=oy+fy;
+   p(sx,sy,11,3,'#27262c');
+   p(sx-1,sy+3,13,2,'#e0d7ca');
+   p(sx+1,sy-1,8,2,'#62646a');
+  }
+  // Region outfits are accessories on the SAME character, not a new body.
+  if(kind==='snow'){
+   p(ox+6,oy+32,5,13,'#ab592e');p(ox+38,oy+32,5,13,'#ab592e');
+   p(ox+8,oy+24,4,10,'#e39b4d');p(ox+37,oy+24,4,10,'#d28436');
+   p(ox+14,oy+37,20,3,'#db9450');p(ox+15,oy+40,18,2,'#5e4434');
+   if(row===1){p(ox+10,oy+16,29,8,'#cf792e');p(ox+15,oy+20,20,3,'#e8a75a')}
+   else{p(ox+10,oy+24,4,9,'#c4752f');p(ox+35,oy+24,4,9,'#c4752f')}
+  }else if(kind==='desert'){
+   p(ox+11,oy+36,27,5,'#cfb27f');p(ox+10,oy+41,6,8,'#85724f');
+   p(ox+33,oy+41,6,8,'#85724f');p(ox+13,oy+13,23,4,'#cfba88');
+   if(row!==1)p(ox+11,oy+29,10,3,'#ead1a0');
+  }else if(kind==='beach'){
+   p(ox+10,oy+45,28,4,'#4c858d');p(ox+13,oy+54,21,4,'#2b5363');
+   p(ox+11,oy+58,11,3,'#323b45');p(ox+28,oy+58,10,3,'#323b45');
+  }else if(kind==='fen'){p(ox+13,oy+36,24,3,'#8d9671')}
+  else if(kind==='wasteland'){p(ox+9,oy+40,30,3,'#a29481')}
+ }
+ haigenCostumeAtlases.set(key,c);return c;
+}
+function haigenSpriteStatus(){
+ const action=haigenActiveAction();
+ const knock=haigenKnock&&haigenKnock.remaining>0?haigenKnock:null;
+ const equip=state.equipped==='hands'?'':state.equipped;
+ return {action,knock,equip:state.carriedFrogId>=0?'frog':equip,outfit:haigenOutfit()};
+}
+function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
+ if(!kind)return;
+ const isLeft=dir==='left',back=dir==='up';
+ const progress=action?.progress||0;
+ const key=action?.kind||'';
+ let working=['axe','shovel','pickaxe','torch','net','rod'].includes(kind)&&key===kind;
+ if(kind==='rod'&&['cast','reel','land'].includes(key))working=true;
+ if(kind==='net'&&['net','catch','release'].includes(key))working=true;
+ const phase=working?Math.min(3,Math.floor(progress*4)):0;
+ const upSwing=working&&(phase===1||phase===2);
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ if(isLeft){ctx.translate(left+48*scale,top);ctx.scale(-scale,scale)}
+ else{ctx.translate(left,top);ctx.scale(scale,scale)}
+ // Pixel construction in unscaled 48x72 sprite coordinates.
+ const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+ const handX=dir==='right'||dir==='left'?35:38;
+ const handY=dir==='up'?46:48;
+ if(['eat','medicine','cook'].includes(key)){
+  const rising=Math.sin(Math.PI*progress);
+  const hy=handY-rising*17;
+  p(handX-3,hy,7,7,'#edba93');
+  if(key==='eat'){p(handX-2,hy-5,8,6,'#bc8551');p(handX,hy-5,3,2,'#e9c08b')}
+  else if(key==='medicine'){p(handX,hy-8,6,9,'#b9dacc');p(handX+1,hy-10,4,3,'#568878');p(handX+2,hy-4,2,3,'#d8f0e5')}
+  else{p(handX+1,hy-17,3,16,'#b3a68a');p(handX-2,hy-20,10,5,'#b5b8a7')}
+  ctx.restore();return;
+ }
+ if(kind==='frog'){
+  p(handX-6,handY-5,12,6,'#e7be91');
+  p(handX-6,handY-11,12,8,'#558653');
+  p(handX-7,handY-14,6,6,'#77a763');p(handX+3,handY-14,6,6,'#77a763');
+  p(handX-5,handY-13,2,2,'#ebddb4');p(handX+5,handY-13,2,2,'#ebddb4');
+  ctx.restore();return;
+ }
+ const cx=handX+1,cy=handY-2;
+ // Whole tool rotates around the hand; animation positions follow direction.
+ let a=working?[ -.45,-1.4,.22,.53][phase]:-.22;
+ if(back)a-=.20;
+ if(kind==='torch')a=working?[-.3,-.5,-.8,-.35][phase]:-.18;
+ if(kind==='rod')a=working?[-.65,-1.1,-.35,-.15][phase]:-.35;
+ if(kind==='net')a=working?[-.45,-1.05,.45,-.1][phase]:-.2;
+ ctx.translate(cx,cy);ctx.rotate(a);
+ // Scale is handled by the parent transform, so every tool keeps a coherent size.
+ p(-2,-2,7,7,'#eab78f');
+ const len=kind==='torch'?23:kind==='rod'?39:kind==='net'?29:28;
+ p(1,-len,3,len,'#73553a');p(2,-len+2,1,len-3,'#bc9970');
+ if(kind==='axe'){
+  p(-5,-len-3,15,5,'#8b9899');p(-8,-len+1,20,7,'#c8d0cc');p(-9,-len+3,4,9,'#d5ded8');p(8,-len+2,4,5,'#5a696b');
+ }else if(kind==='pickaxe'){
+  p(-15,-len-3,32,4,'#879594');p(-13,-len-5,7,2,'#d4d9d2');p(12,-len+2,4,5,'#596864');
+ }else if(kind==='shovel'){
+  p(-5,-len-7,14,12,'#9ca8a7');p(-3,-len-8,10,3,'#d8d6c6');p(-3,-len,10,4,'#778787');
+ }else if(kind==='torch'){
+  p(-3,-len-4,13,5,'#544537');
+  const flame=4+((Math.floor(performance.now()/120)%3));
+  p(0,-len-4-flame,7,flame+4,'#e89b39');
+  p(2,-len-1-flame,4,flame+1,'#ffdf76');
+ }else if(kind==='rod'){
+  p(2,-len-5,2,7,'#b8a485');
+  ctx.strokeStyle='#d4dccc';ctx.lineWidth=.8;ctx.beginPath();
+  ctx.moveTo(4,-len-4);ctx.lineTo(15,-len+20);ctx.stroke();
+  if(key==='land'){p(10,-len+17,10,5,'#9cb3ae');p(16,-len+16,5,3,'#d5e4e1')}
+ }else if(kind==='net'){
+  ctx.strokeStyle='#b3aaa1';ctx.lineWidth=2;
+  ctx.beginPath();ctx.ellipse(2,-len-7,10,8,0,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='#d8e1d6';ctx.lineWidth=.6;
+  for(let j=-5;j<=5;j+=5){ctx.beginPath();ctx.moveTo(j,-len-14);ctx.lineTo(j,-len);ctx.stroke()}
+  ctx.beginPath();ctx.moveTo(-8,-len-7);ctx.lineTo(11,-len-7);ctx.stroke();
+ }
+ ctx.restore();
+}
+
 function drawApprovedHaigen(x,y,actor,deepWater=false){
  if(!haigenApprovedAtlasReady)return false;
- const spriteAtlas=haigenApprovedWalkAtlas||haigenApprovedAtlas;
+ const status=haigenSpriteStatus();
+ const base=haigenApprovedWalkAtlas||haigenApprovedAtlas;
+ const spriteAtlas=haigenCostumeAtlas(base,status.outfit);
  const motion=actor||playerMotion,dir=motion.dir||'down',moving=!!motion.moving;
  const frame=moving?Math.floor((motion.anim||0)/150)%4:0;
  const row=dir==='up'?1:(dir==='left'||dir==='right'?2:0);
@@ -2571,15 +2740,36 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  const left=Math.round(x-w/2),top=Math.round(y-h+7);
  ctx.save();ctx.imageSmoothingEnabled=false;
  ellipse(x+1,y+7,20,6,'#1a312b67');
+ // Keep 3/4 right/left artwork, complete feet, and constant 48x72 sprite box.
+ if(dir==='up'&&status.equip)haigenDrawPixelTool(status.equip,dir,frame,status.action,scale,left,top);
  if(dir==='left'){
   ctx.translate(left+w,0);ctx.scale(-1,1);
   ctx.drawImage(spriteAtlas,frame*48,row*72,48,72,0,top,w,h);
+  ctx.restore();ctx.save();ctx.imageSmoothingEnabled=false;
  }else{
   ctx.drawImage(spriteAtlas,frame*48,row*72,48,72,left,top,w,h);
  }
- if(deepWater)ellipse(x,y-46,5,3,'#c1dfd1');
- ctx.restore();
- return true;
+ if(dir!=='up'&&status.equip)haigenDrawPixelTool(status.equip,dir,frame,status.action,scale,left,top);
+ if(!status.equip&&status.action&&['eat','medicine','cook'].includes(status.action.kind))
+  haigenDrawPixelTool('hands',dir,frame,status.action,scale,left,top);
+ // Snorkel kit only when swimming. The coast itself keeps shorts and trainers.
+ if(deepWater){
+  const px=dir==='left'?left+16:dir==='right'?left+26:left+19,py=top+27*scale;
+  ctx.strokeStyle='#5f999f';ctx.lineWidth=3;
+  ctx.strokeRect(px,py,17,8);
+  ctx.beginPath();ctx.moveTo(px+17,py+3);ctx.lineTo(px+23,py+3);ctx.lineTo(px+23,py-18);ctx.stroke();
+  ctx.fillStyle='#dfb966';ctx.fillRect(px+20,py-19,7,3);
+  ellipse(x,y-46,5,3,'#c1dfd1');
+ }
+ if(status.knock){
+  ctx.fillStyle='#fff4ad';
+  for(let i=0;i<3;i++){
+   const a=i*Math.PI*2/3+(performance.now()-status.knock.started)*.016;
+   const sx=x+Math.cos(a)*25,sy=top+12+Math.sin(a)*11;
+   ctx.fillRect(sx,sy,5,5);
+  }
+ }
+ ctx.restore();return true;
 }
 function drawApprovedRestingHaigen(x,y){
  if(!haigenApprovedAtlasReady)return false;
