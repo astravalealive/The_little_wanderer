@@ -61,61 +61,61 @@
  </g></g>
  
  <g transform="translate(0 0)">
- <g transform="translate(0 -200.4) rotate(5)">
+ <g transform="translate(0 -200.4) rotate(5) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -190.01) rotate(30)">
+ </g><g transform="translate(47.02 -190.01) rotate(30) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -162.81) rotate(77)">
+ </g><g transform="translate(76.08 -162.81) rotate(77) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -129.19) rotate(102)">
+ </g><g transform="translate(76.08 -129.19) rotate(102) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -101.99) rotate(149)">
+ </g><g transform="translate(47.02 -101.99) rotate(149) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(0 -91.6) rotate(174)">
+ </g><g transform="translate(0 -91.6) rotate(174) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -101.99) rotate(221)">
+ </g><g transform="translate(-47.02 -101.99) rotate(221) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -129.19) rotate(246)">
+ </g><g transform="translate(-76.08 -129.19) rotate(246) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -162.81) rotate(293)">
+ </g><g transform="translate(-76.08 -162.81) rotate(293) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -190.01) rotate(318)">
+ </g><g transform="translate(-47.02 -190.01) rotate(318) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
@@ -250,61 +250,61 @@
  </g></g>
  
  <g transform="translate(6 0)">
- <g transform="translate(0 -200.4) rotate(5)">
+ <g transform="translate(0 -200.4) rotate(5) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -190.01) rotate(30)">
+ </g><g transform="translate(47.02 -190.01) rotate(30) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -162.81) rotate(77)">
+ </g><g transform="translate(76.08 -162.81) rotate(77) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -129.19) rotate(102)">
+ </g><g transform="translate(76.08 -129.19) rotate(102) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -101.99) rotate(149)">
+ </g><g transform="translate(47.02 -101.99) rotate(149) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(0 -91.6) rotate(174)">
+ </g><g transform="translate(0 -91.6) rotate(174) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -101.99) rotate(221)">
+ </g><g transform="translate(-47.02 -101.99) rotate(221) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -129.19) rotate(246)">
+ </g><g transform="translate(-76.08 -129.19) rotate(246) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -162.81) rotate(293)">
+ </g><g transform="translate(-76.08 -162.81) rotate(293) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -190.01) rotate(318)">
+ </g><g transform="translate(-47.02 -190.01) rotate(318) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
@@ -439,61 +439,61 @@
  </g></g>
  
  <g transform="translate(-5 0)">
- <g transform="translate(0 -200.4) rotate(5)">
+ <g transform="translate(0 -200.4) rotate(5) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -190.01) rotate(30)">
+ </g><g transform="translate(47.02 -190.01) rotate(30) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -162.81) rotate(77)">
+ </g><g transform="translate(76.08 -162.81) rotate(77) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -129.19) rotate(102)">
+ </g><g transform="translate(76.08 -129.19) rotate(102) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -101.99) rotate(149)">
+ </g><g transform="translate(47.02 -101.99) rotate(149) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(0 -91.6) rotate(174)">
+ </g><g transform="translate(0 -91.6) rotate(174) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -101.99) rotate(221)">
+ </g><g transform="translate(-47.02 -101.99) rotate(221) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -129.19) rotate(246)">
+ </g><g transform="translate(-76.08 -129.19) rotate(246) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -162.81) rotate(293)">
+ </g><g transform="translate(-76.08 -162.81) rotate(293) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -190.01) rotate(318)">
+ </g><g transform="translate(-47.02 -190.01) rotate(318) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
@@ -628,61 +628,61 @@
  </g></g>
  
  <g transform="translate(0 0)">
- <g transform="translate(0 -199.04) rotate(5)">
+ <g transform="translate(0 -199.04) rotate(5) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(45.85 -188.91) rotate(30)">
+ </g><g transform="translate(45.85 -188.91) rotate(30) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(74.18 -162.39) rotate(77)">
+ </g><g transform="translate(74.18 -162.39) rotate(77) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(74.18 -129.61) rotate(102)">
+ </g><g transform="translate(74.18 -129.61) rotate(102) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(45.85 -103.09) rotate(149)">
+ </g><g transform="translate(45.85 -103.09) rotate(149) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(0 -92.96) rotate(174)">
+ </g><g transform="translate(0 -92.96) rotate(174) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-45.85 -103.09) rotate(221)">
+ </g><g transform="translate(-45.85 -103.09) rotate(221) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-74.18 -129.61) rotate(246)">
+ </g><g transform="translate(-74.18 -129.61) rotate(246) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-74.18 -162.39) rotate(293)">
+ </g><g transform="translate(-74.18 -162.39) rotate(293) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-45.85 -188.91) rotate(318)">
+ </g><g transform="translate(-45.85 -188.91) rotate(318) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
@@ -822,61 +822,61 @@
  <circle cx="-145" cy="-189" r="5" fill="#f4e9b5"/><circle cx="144" cy="-195" r="5" fill="#f4e9b5"/>
  </g>
  <g transform="translate(0 0)">
- <g transform="translate(0 -200.4) rotate(5)">
+ <g transform="translate(0 -200.4) rotate(5) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -190.01) rotate(30)">
+ </g><g transform="translate(47.02 -190.01) rotate(30) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -162.81) rotate(77)">
+ </g><g transform="translate(76.08 -162.81) rotate(77) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -129.19) rotate(102)">
+ </g><g transform="translate(76.08 -129.19) rotate(102) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -101.99) rotate(149)">
+ </g><g transform="translate(47.02 -101.99) rotate(149) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(0 -91.6) rotate(174)">
+ </g><g transform="translate(0 -91.6) rotate(174) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -101.99) rotate(221)">
+ </g><g transform="translate(-47.02 -101.99) rotate(221) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -129.19) rotate(246)">
+ </g><g transform="translate(-76.08 -129.19) rotate(246) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -162.81) rotate(293)">
+ </g><g transform="translate(-76.08 -162.81) rotate(293) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -190.01) rotate(318)">
+ </g><g transform="translate(-47.02 -190.01) rotate(318) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
@@ -1011,61 +1011,61 @@
  </g></g>
  
  <g transform="translate(8 0)">
- <g transform="translate(0 -200.4) rotate(5)">
+ <g transform="translate(0 -200.4) rotate(5) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -190.01) rotate(30)">
+ </g><g transform="translate(47.02 -190.01) rotate(30) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -162.81) rotate(77)">
+ </g><g transform="translate(76.08 -162.81) rotate(77) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(76.08 -129.19) rotate(102)">
+ </g><g transform="translate(76.08 -129.19) rotate(102) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(47.02 -101.99) rotate(149)">
+ </g><g transform="translate(47.02 -101.99) rotate(149) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(0 -91.6) rotate(174)">
+ </g><g transform="translate(0 -91.6) rotate(174) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -101.99) rotate(221)">
+ </g><g transform="translate(-47.02 -101.99) rotate(221) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -129.19) rotate(246)">
+ </g><g transform="translate(-76.08 -129.19) rotate(246) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalB)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-76.08 -162.81) rotate(293)">
+ </g><g transform="translate(-76.08 -162.81) rotate(293) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalC)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
  <path d="M -2 -92 L 3 -106 L 6 -92 Z" fill="#f2d5b7"/>
  <path d="M -17 -49 L -12 -58 L -10 -48 Z M 12 -29 L 16 -39 L 19 -27 Z" fill="#f2adbf" opacity=".83"/>
- </g><g transform="translate(-47.02 -190.01) rotate(318)">
+ </g><g transform="translate(-47.02 -190.01) rotate(318) scale(1 .65)">
  <path d="M -22 25 Q -54 -12 -18 -73 Q -3 -100 1 -110 Q 39 -61 28 13 Z" fill="url(#petalA)" stroke="#302c3a" stroke-width="5"/>
  <path d="M -6 14 Q -19 -41 0 -94" stroke="#d798a9" stroke-width="3" opacity=".8" fill="none"/>
  <path d="M 14 12 Q 21 -29 6 -74 M -20 -19 L -9 -37 M 20 -28 L 5 -44" stroke="#542d53" stroke-width="2" opacity=".7" fill="none"/>
