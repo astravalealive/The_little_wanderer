@@ -5715,7 +5715,7 @@ function frame(now){
   g.fillStyle='#89a978';g.fillRect(0,0,300,170);
   g.fillStyle='#739466';g.fillRect(0,130,300,40);
   const draw=(im,sx,sy,sw,sh)=>{
-   if(!im||!im.complete||!im.naturalWidth)return false;
+   if(!im||('complete' in im&&!im.complete)||!(im.naturalWidth||im.width))return false;
    const large=kind==='bison'||kind==='stag'||kind==='goat';
    const h=large?130:kind==='butterfly'?115:135,w=large?166:kind==='butterfly'?125:147;
    g.drawImage(im,sx,sy,sw,sh,Math.round((300-w)/2),Math.round(133-h),w,h);
