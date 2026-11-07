@@ -37,36 +37,37 @@ const combat={mode:'idle',timer:1350,turn:0,attack:'',aim:{x,y},angle:0,hit:fals
 
 // Illustrated 16-bit sprite atlas. Each pose is rasterized once at 192px to
 // match Haigen's crisp animation. This affects artwork only, not encounter logic.
-const GLOAM_ART_CELL=192;
+// V133. Approved 28-pose original Gloamjaw atlas: four columns and seven rows.
+// If the approved PNG is absent, the existing illustrated fallback remains.
+const GLOAM_ART_CELL=128;
 let gloamIllustratedAtlas=null,gloamArtLoaded=false,gloamArtError='';
 const gloamArtImage=new Image();
 gloamArtImage.decoding='async';
 gloamArtImage.onload=()=>{
- if(gloamArtImage.naturalWidth!==960||gloamArtImage.naturalHeight!==640){
-  gloamArtError='Unexpected atlas dimensions';return;
+ if(gloamArtImage.naturalWidth!==512||gloamArtImage.naturalHeight!==896){
+  gloamArtError='Unexpected approved atlas dimensions';return;
  }
- try{
-  const canvas=document.createElement('canvas');
-  canvas.width=GLOAM_ART_CELL*3;canvas.height=GLOAM_ART_CELL*2;
-  const art=canvas.getContext('2d');
-  if(!art){gloamArtError='No illustration canvas';return}
-  art.imageSmoothingEnabled=true;
-  art.imageSmoothingQuality='high';
-  for(let i=0;i<6;i++){
-   art.drawImage(gloamArtImage,(i%3)*320,Math.floor(i/3)*320,320,320,
-    (i%3)*GLOAM_ART_CELL,Math.floor(i/3)*GLOAM_ART_CELL,GLOAM_ART_CELL,GLOAM_ART_CELL);
-  }
-  gloamIllustratedAtlas=canvas;gloamArtLoaded=true;
- }catch(error){gloamArtError=String(error)}
+ gloamIllustratedAtlas=gloamArtImage;gloamArtLoaded=true;
 };
-gloamArtImage.onerror=()=>{gloamArtError='Boss illustration unavailable'};
-gloamArtImage.src='./assets/gloamjaw-illustrated-v129.svg?v=2';
+gloamArtImage.onerror=()=>{gloamArtError='Approved atlas not uploaded yet'};
+gloamArtImage.src='./assets/gloamjaw-approved-v133.png?v=133';
+function gloamFacing(){
+ const dx=state.x-x,dy=state.y-y;
+ if(Math.abs(dx)>Math.abs(dy)*.94)return dx<0?1:2;
+ return dy < -70?3:0;
+}
 function gloamPose(){
- if(combat.mode==='strike'||combat.mode==='warning'){
-  return {vine:2,bite:3,spores:4,roots:5}[combat.attack]??0;
- }
- if(data.hp<MAX*.5)return Math.floor(P.snapshot().time/820)%2?5:0;
- return Math.floor(P.snapshot().time/780)%2;
+ const t=P.snapshot().time,side=gloamFacing(),phase=Math.floor(t/320);
+ if(data.defeated)return 27;
+ if(t-lastGloamHitAt<220)return phase%2?25:24;
+ if(combat.mode==='warning')return {vine:side===1?12:13,bite:18,spores:20,roots:22}[combat.attack]??8;
+ if(combat.mode==='strike')return {vine:side===1?14:15,bite:19,spores:21,roots:23}[combat.attack]??9;
+ if(combat.mode==='recover')return combat.attack==='bite'?17:9;
+ if(data.hp<MAX*.5)return phase%3===0?11:phase%3===1?20:8;
+ if(side===3)return phase%4===0?7:3;
+ if(side===1)return phase%2?4:1;
+ if(side===2)return phase%2?5:2;
+ return phase%5===0?8:phase%5===1?9:0;
 }
 
 const ell=(px,py,a,b,colour)=>{ctx.fillStyle=colour;ctx.beginPath();ctx.ellipse(px,py,a,b,0,0,Math.PI*2);ctx.fill()};
@@ -228,19 +229,19 @@ function drawGround(){
 function drawBoss(){
  const now=P.snapshot();
  if(Math.abs(x-now.cameraX)>1150||Math.abs(y-now.cameraY)>900)return;
- if(!data.defeated&&gloamArtLoaded&&gloamIllustratedAtlas){
+ if(gloamArtLoaded&&gloamIllustratedAtlas){
   const frame=gloamPose(),size=GLOAM_ART_CELL,t=now.time;
   const warning=combat.mode==='warning',striking=combat.mode==='strike';
-  const recoil=striking?Math.sin((700-combat.timer)/700*Math.PI)*.085:0;
-  const breath=Math.sin(t*.0031)*.017,sway=Math.sin(t*.0016)*.017;
+  const recoil=striking?Math.sin((700-combat.timer)/700*Math.PI)*.06:0;
+  const breath=Math.sin(t*.0031)*.012,sway=Math.sin(t*.0016)*.016;
   const flash=t-lastGloamHitAt<210;
   ctx.save();ctx.imageSmoothingEnabled=false;
   ctx.translate(Math.round(x),Math.round(y+24));
-  ctx.rotate(sway+(striking&&combat.attack==='vine'?Math.sin(t*.023)*.055:0));
-  ctx.scale(1+breath+recoil,1-breath-(warning?Math.sin(t*.018)*.03:0));
+  ctx.rotate(sway+(striking&&combat.attack==='vine'?Math.sin(t*.023)*.03:0));
+  ctx.scale(1+breath+recoil,1-breath-(warning?Math.sin(t*.018)*.02:0));
   if(flash)ctx.globalAlpha=Math.floor(t/70)%2===0?.57:1;
   if(warning&&combat.attack==='spores'){ctx.shadowColor='#d4d78e';ctx.shadowBlur=14+Math.sin(t*.017)*6}
-  ctx.drawImage(gloamIllustratedAtlas,(frame%3)*size,Math.floor(frame/3)*size,size,size,-181,-336,362,362);
+  ctx.drawImage(gloamIllustratedAtlas,(frame%4)*size,Math.floor(frame/4)*size,size,size,-181,-336,362,362);
   ctx.restore();return;
  }
  ctx.save();ctx.translate(x,y);ctx.imageSmoothingEnabled=false;
