@@ -1,4 +1,4 @@
 {
-  "build": 116,
-  "notes": "V116 visual stability and dialogue fix based on iPad user recording: remove the 256x224 full-screen virtual pixel framebuffer and return both Rebirth and Classic to native high-DPI rendering; retain original 16x16 asset detail and per-sprite nearest-neighbour pixels. Native HTML speech bubble follows Haigen in screen coordinates, wraps long thoughts, remains 14px readable at any world zoom, and hides behind menus. Preserve existing animal sprites, player AI, saves and Ember. Full-browser visual playtest still pending."
+  "build": 117,
+  "notes": "V117 character identity update: the exact family-approved Haigen 16-bit visual design is extracted to original transparent 192x288 sprite atlas at assets/haigen-approved-atlas.png. Haigen now renders the approved full-colour sandy-blond fringe, charcoal oversized hoodie, dark shorts and shoes, front/back/4-frame right and mirrored left walking animations. Actual resting pose uses the approved curled-up mustard blanket sheet. Sprite loads asynchronously with old procedural actor as fallback, preserving all movement, AI, saves, quest, iPad controls, companions, V116 readable dialogue and original Ember. Device visual playtest recommended."
 }
