@@ -66,7 +66,7 @@ body:not(.rebirth-art) canvas#game{image-rendering:auto}
 body:has(.mobile-menu[open]) .haigen-speech,
 body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 @media (max-width:410px){.haigen-speech{font-size:14px;max-width:min(288px,calc(100vw - 22px));padding:9px 11px}}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=1"></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V.122 VISUAL TEST</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v121 preview 🐸</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=3"></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V127</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v121 preview 🐸</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -90,7 +90,7 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
  cv.height=Math.max(1,Math.round(H*dpr));
  ctx.setTransform(cv.width/W,0,0,cv.height/H,0,0);
  ctx.imageSmoothingEnabled=true;
-}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD=7800;let state;const fresh=()=>({x:1250,y:1310,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dylan. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:false,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});// Preview only: initialise from a READ-ONLY copy of the user's V120 save, if present.
+}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD=7800;let state;const fresh=()=>({x:1250,y:1310,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dylan. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:true,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});// Preview only: initialise from a READ-ONLY copy of the user's V120 save, if present.
  // All subsequent writes continue to use the independent preview key.
  try{
   const useLiveSnapshot=new URLSearchParams(location.search).get('restore')==='1';
@@ -155,13 +155,14 @@ function updateRegionalWildlife(dt){
  const step=Math.min(50,dt)/1000;
  for(const a of regionalWildlife){
   if(!animalAlive(a)){a.walking=false;continue}
-  const pd=dist(state,a);
+  const victim=companions.reduce((best,c)=>dist(c,a)<dist(best,a)&&dist(c,companionBed(c))>80?c:best,state);
+  const pd=dist(state,a),vd=dist(victim,a);
   a.attackCooldown=Math.max(0,(a.attackCooldown||0)-dt);
   const hostile=hostileTypes.has(a.type);
   const campSafe=Math.hypot(a.x-cottage.x,a.y-cottage.y)<safeRadius+65;
-  if(hostile&&collapseRemaining===0&&!state.resting&&pd<155&&!campSafe){
+  if(hostile&&collapseRemaining===0&&(victim!==state||!state.resting)&&vd<155&&!campSafe){
    // Telegraph a quick lunge, then back off; enemies can't chase beyond their habitat.
-   if(a.attackCooldown===0&&!a.windupMs&&!a.lungeMs&&pd<100){
+   if(a.attackCooldown===0&&!a.windupMs&&!a.lungeMs&&vd<100){
     a.windupMs=a.type==='scorpion'?380:550;a.pause=0;a.walking=false;
    }
    if(a.windupMs>0){
@@ -171,17 +172,18 @@ function updateRegionalWildlife(dt){
    }
    if(a.lungeMs>0){
     a.lungeMs=Math.max(0,a.lungeMs-dt);
-    const dx=state.x-a.x,dy=state.y-a.y,d=Math.max(1,Math.hypot(dx,dy));
+    const dx=victim.x-a.x,dy=victim.y-a.y,d=Math.max(1,Math.hypot(dx,dy));
     const p=regionalLandPoint(a,a.x+dx/d*210*step,a.y+dy/d*210*step);
     a.x=p.x;a.y=p.y;a.face=dx>=0?1:-1;a.walking=true;a.gait+=dt*.018;
-    if(dist(state,a)<35&&a.attackCooldown===0){
-     takeDamage(a.type==='snake'?9:7,a.type==='snake'?'Snake':'Scorpion',true,a);
+    if(dist(victim,a)<35&&a.attackCooldown===0){
+     if(victim!==state)hurtFriend(victim,a.type==='snake'?14:11,true);
+     else takeDamage(a.type==='snake'?9:7,a.type==='snake'?'Snake':'Scorpion',true,a);
      a.attackCooldown=4600;a.lungeMs=0;a.pause=1000;
     }else if(a.lungeMs===0){a.attackCooldown=3100;a.pause=650}
     continue;
    }
-   if(a.attackCooldown===0&&pd>85){
-    const dx=state.x-a.x,dy=state.y-a.y,d=Math.max(1,Math.hypot(dx,dy));
+   if(a.attackCooldown===0&&vd>85){
+    const dx=victim.x-a.x,dy=victim.y-a.y,d=Math.max(1,Math.hypot(dx,dy));
     const p=regionalLandPoint(a,a.x+dx/d*48*step,a.y+dy/d*48*step);
     a.x=p.x;a.y=p.y;a.face=dx>=0?1:-1;a.walking=true;a.gait+=dt*.006;
     continue;
@@ -635,6 +637,169 @@ function drawChickenNest(){
  }
 }
 const companions=[{name:'Dylan',kind:'rabbit',x:state.x+65,y:state.y+25,target:null,t:0,mode:'wandering'},{name:'Skölli',kind:'fox',x:1780,y:1660,target:null,t:0,mode:'exploring'}];// Territorial wildlife lives beyond the campsite's protected clearing.
+state.companionCare=state.companionCare||{};
+for(const c of companions){
+ const previous=state.companionCare[c.kind]||{};
+ const hp=Number.isFinite(previous.hp)?clamp(previous.hp,0,100):100;
+ c.life=state.companionCare[c.kind]={hp,poison:clamp(Number(previous.poison)||0,0,60000),recovering:hp<100||!!previous.poison};
+ for(const k of ['x','y'])if(Number.isFinite(previous[k]))c[k]=clamp(previous[k],50,WORLD-50);
+ c.life.x=c.x;c.life.y=c.y;
+ c.gift=['berries','twigs','leaves','wood','mushrooms','medicinalMushrooms','herb','stone'].includes(previous.gift)?previous.gift:null;
+ c.life.gift=c.gift;c.life.herb=previous.herb||null;
+}
+const companionBed=c=>({x:firstFire.x+(c.kind==='fox'?48:-48),y:firstFire.y+28});
+function hurtFriend(c,amount,venom=false){
+ if((c.safeUntil||0)>time||dist(c,companionBed(c))<75)return false;
+ c.life.hp=Math.max(0,c.life.hp-amount);c.life.poison=venom?60000:c.life.poison;
+ c.life.recovering=true;c.safeUntil=time+3600;c.target=null;c.guard=null;c.route=null;
+ notify(c.name+(venom?' was poisoned. Give an antidote or meet him at camp.':' was hurt and is heading to the fire.'));
+ save();return true;
+}
+function friendTreatment(c,kind){
+ if(dist(c,state)>140)return false;
+ const life=c.life,herb=Object.keys(state.herbs).find(k=>state.herbs[k]>=1);
+ if(kind==='antidote'&&life.poison>0&&state.antidotes>0){state.antidotes--;life.poison=0}
+ else if(kind==='herb'&&life.hp<100&&herb){state.herbs[herb]--;life.hp=Math.min(100,life.hp+20)}
+ else if(kind==='meal'&&life.hp<100&&state.food>=1){state.food--;life.hp=Math.min(100,life.hp+35)}
+ else return false;
+ life.recovering=life.hp<100||life.poison>0;
+ startHaigenAction(kind==='meal'?'eat':'medicine',750);notify(c.name+(kind==='antidote'?' is free of poison.':' feels better.'));save();return true;
+}
+function friendStep(c,target,dt,speed){
+ const d=dist(c,target);if(d<1)return;
+ const step=Math.min(d,dt*speed),a=Math.atan2(target.y-c.y,target.x-c.x);
+ c.x+=Math.cos(a)*step;c.y+=Math.sin(a)*step;
+}
+function updateFriendRole(c,dt){
+ const life=c.life;
+ if(life.recovering){
+  if(state.autonomy&&dist(c,state)<115&&time>(c.nextCare||0)){
+   c.nextCare=time+9000;
+   if(life.poison&&state.antidotes)friendTreatment(c,'antidote');
+   else if(life.hp<75){if(!friendTreatment(c,'herb')&&state.food>1)friendTreatment(c,'meal')}
+   if(!life.recovering)return false;
+  }
+  const bed=companionBed(c),home=dist(c,bed)<12;
+  if(life.poison>0){life.poison=Math.max(0,life.poison-dt);life.hp=Math.max(0,life.hp-dt*.00035)}
+  if(home){
+   c.mode='resting';if(!life.poison)life.hp=Math.min(100,life.hp+dt*.004);
+   if(life.hp===100&&!life.poison){life.recovering=false;c.mode='watching';c.t=800;notify(c.name+' is ready to travel again.');save()}
+  }else{
+   c.mode='returning';
+   // Go around the woodland pond on the way home.
+   const limit=c.kind==='rabbit'?1.06:.85;
+   let target=bed;
+   for(let i=1;i<=20;i++){
+    const f=i/20;if(lakeLevel(c.x+(bed.x-c.x)*f,c.y+(bed.y-c.y)*f)>=limit)continue;
+    const side=c.y>=pond.y?1:-1;target={x:pond.x,y:pond.y+side*pond.ry*1.55};break;
+   }
+   friendStep(c,target,dt,.19);
+  }
+  c.target=null;return true;
+ }
+ if(c.guard){
+  const wolf=c.guard;
+  if(!animalAlive(wolf)||(wolf.fleeUntil&&time>wolf.fleeUntil-5500&&time<wolf.fleeUntil)||((wolf.fleeUntil||0)<=time&&wolf.mode!=='charging'&&!wolf.windupMs&&!wolf.lungeMs)){
+   c.guard=null;c.mode='watching';c.t=400;return false;
+  }
+  c.mode='defending';friendStep(c,wolf,dt,.28);return true;
+ }
+ if(c.kind==='rabbit')return dylanScout(c,dt);
+ return false;
+}
+const stashItems={berries:'berries',mushrooms:'mushrooms',medicinalMushrooms:'medicinal fungi',wood:'wood',twigs:'twigs',leaves:'leaves',stone:'loose stone',herb:'herbs'};
+state.dylanCamp=state.dylanCamp||{};
+state.dylanHerbs=state.dylanHerbs||{};
+function scoutWalk(c,target,dt){
+ const dx=target.x-c.x,dy=target.y-c.y,d=Math.hypot(dx,dy);
+ if(d<18)return true;
+ const step=Math.min(dt*.21,d),heading=Math.atan2(dy,dx);
+ for(const offset of [0,.45,-.45,.9,-.9,1.5,-1.5]){
+  const x=c.x+Math.cos(heading+offset)*step,y=c.y+Math.sin(heading+offset)*step;
+  if(lakeLevel(x,y)>1.045&&islandDepth(x,y)>24){c.x=x;c.y=y;return false}
+ }
+ // Walk tangentially around the pond until the destination is on the same bank.
+ const tangent=Math.atan2(c.y-pond.y,c.x-pond.x)+(c.y>=pond.y?-1:1)*Math.PI/2;
+ c.x+=Math.cos(tangent)*step;c.y+=Math.sin(tangent)*step;return false;
+}
+function dylanScout(c,dt){
+ if(c.gift){
+  c.mode='delivering';
+  if(scoutWalk(c,companionBed(c),dt)){
+   const item=c.gift;state.dylanCamp[item]=(state.dylanCamp[item]||0)+1;
+   if(item==='herb'){const name=c.life.herb||'Sunpetal';state.dylanHerbs[name]=(state.dylanHerbs[name]||0)+1;c.life.herb=null}
+   c.life.gift=c.gift=null;c.target=null;c.t=800;c.scoutAt=time+6500;
+   c.life.x=c.x;c.life.y=c.y;save();notify('Dylan left '+stashItems[item]+' beside the campfire.');
+  }
+  return true;
+ }
+ if(!c.find&&time>=(c.scoutAt||2400)){
+  c.scoutAt=time+8000;
+  const project=lifeBlueprint(),cost=project?.stages[state.lifeProject?.stage];
+  const request=state.dylanRequest||state.playerInstruction?.resource||autoDestination?.type||
+   (state.hunger<65?'berries':cost&&availableCampWood()<cost.wood?'wood':cost&&state.stone<cost.stone?'stone':'');
+  const want=({bush:'berries',tree:'wood',rock:'stone',flower:'herb',mushroom:'mushrooms'})[request]||request;
+  const choices=[];
+  function add(o,item,source){
+   const d=dist(c,o);if(d>780||inPond(o.x,o.y,12)||islandDepth(o.x,o.y)<30)return;
+   choices.push({o,item,source,score:d-(want===item?1000:0)});
+  }
+  for(const o of state.fallen)add(o,({log:'wood',twig:'twigs',leaves:'leaves'})[o.kind],'fallen');
+  for(const o of state.stoneDrops)add(o,'stone','stone');
+  for(const o of objects){
+   if(state.removed.includes(o.id)||campsiteProtected(o))continue;
+   if(o.type==='bush'&&berryReady(o))add(o,'berries','bush');
+   else if(o.type==='mushroom')add(o,medicinalMushroom(o)?'medicinalMushrooms':'mushrooms','plant');
+   else if(o.type==='flower'&&flowerHasHabitat(o))add(o,'herb','plant');
+  }
+  for(const o of woodlandDetails)if(looseWoodReady(o)&&!campsiteProtected(o))add(o,'wood','log');
+  c.find=choices.filter(q=>q.item).sort((a,b)=>a.score-b.score)[0];
+  if(c.find){c.target=null;c.find.until=time+20000;c.clue={id:c.find.o.id,until:time+8000};}
+ }
+ if(!c.find)return false;
+ const {o,item,source,until}=c.find;c.mode='foraging';
+ if(time>until){c.find=null;return false}
+ if(!scoutWalk(c,o,dt))return true;
+ c.find=null;
+ if(source==='stone'||source==='fallen'){
+  const list=source==='stone'?state.stoneDrops:state.fallen,index=list.indexOf(o);
+  if(index<0)return false;
+  list.splice(index,1);
+ }else if(source==='log'){if(!looseWoodReady(o))return false;state.looseWoodTaken[o.seed]=Date.now()}
+ else if(source==='bush'){if(!berryReady(o))return false;state.harvestedAt[o.id]=Date.now()}
+ else{if(state.removed.includes(o.id)||!harvest(o))return false}
+ if(item==='herb')c.life.herb=flowerKind(o).name;
+ c.life.gift=c.gift=item;c.life.x=c.x;c.life.y=c.y;c.target=null;c.mode='delivering';save();
+ notify('Dylan found '+stashItems[item]+' and is taking it to camp.');return true;
+}
+function scoutSuppliesMenu(){
+ const nearCamp=dist(state,firstFire)<165;
+ const goods=Object.entries(stashItems).filter(([k])=>state.dylanCamp[k]>0);
+ open('<h2>Dylan’s camp supplies</h2><p>'+ (goods.map(([k,label])=>state.dylanCamp[k]+' '+label).join(' · ')||'His basket by the fire is empty.')+'</p><button class="btn" id="takeDylanSupplies" '+(!nearCamp||!goods.length?'disabled':'')+'>Collect at campfire</button><h3>Look for</h3><select id="dylanWanted"><option value="">Anything useful</option>'+Object.entries(stashItems).map(([k,label])=>'<option value="'+k+'">'+label+'</option>').join('')+'</select>');
+ $('dylanWanted').value=state.dylanRequest||'';
+ $('dylanWanted').onchange=e=>{state.dylanRequest=e.target.value;const c=companions[0];c.find=null;c.scoutAt=0;save()};
+ $('takeDylanSupplies').onclick=()=>{
+  if(dist(state,firstFire)>=165)return;
+  for(const [key] of goods){const n=state.dylanCamp[key]||0;
+   if(key==='wood'){state.dylanCamp[key]-=gainWood(n);continue}
+   if(key==='herb'){for(const [name,count] of Object.entries(state.dylanHerbs))state.herbs[name]=(state.herbs[name]||0)+count;state.dylanHerbs={}}
+   else state[key]=(state[key]||0)+n;
+   state.dylanCamp[key]=0;
+  }
+  save();scoutSuppliesMenu();
+ };
+}
+function companionCareMenu(){
+ const cards=companions.map(c=>{
+  const l=c.life,near=dist(c,state)<=140,herbs=Object.values(state.herbs).reduce((a,b)=>a+b,0);
+  const status=l.poison?'Poisoned':l.recovering?(dist(c,companionBed(c))<12?'Sleeping by the fire':'Returning to camp'):c.kind==='fox'?'Protecting Haigen':'Scouting for supplies';
+  const controls=[['herb','Give herb (+20)',herbs&&l.hp<100],['meal','Share meal (+35)',state.food&&l.hp<100],['antidote','Give antidote',state.antidotes&&l.poison]];
+  return '<div class="item"><div><b>'+c.name+'</b> · '+Math.ceil(l.hp)+'/100<br>'+status+'<br><progress max="100" value="'+l.hp+'"></progress><p>'+(!near?'Move closer to treat him.':'')+'</p>'+controls.map(([id,label,ok])=>'<button class="btn" data-friend="'+c.kind+'" data-treatment="'+id+'" '+(near&&ok?'':'disabled')+'>'+label+'</button>').join(' ')+'</div></div>';
+ }).join('');
+ open('<h2>Companion care</h2>'+cards);
+ document.querySelectorAll('[data-treatment]').forEach(b=>b.onclick=()=>{const c=companions.find(c=>c.kind===b.dataset.friend);friendTreatment(c,b.dataset.treatment);companionCareMenu()});
+}
+
 const safeRadius=355;
 const beasts=[
  {kind:'wolf',name:'Greyfang',homeX:2180,homeY:1090,x:2180,y:1090,angle:1.2,t:1800,mode:'patrol',cooldown:0,anim:0},
@@ -814,6 +979,20 @@ function updateBeasts(dt){
    moveBeast(b,b.homeX,b.homeY,dt,.13);continue;
   }
   const sight=b.kind==='wolf'?275:225;
+  const fox=companions[1];
+  if(b.kind==='wolf'&&time<(b.fleeUntil||0)){
+   const angle=Math.atan2(b.y-fox.y,b.x-fox.x);
+   b.mode='retreating';moveBeast(b,clamp(b.x+140*Math.cos(angle),60,WORLD-60),clamp(b.y+140*Math.sin(angle),60,WORLD-60),dt,.17);
+   continue;
+  }
+  if(b.kind==='wolf'&&pd<sight&&!b.cooldown&&!fox.life.recovering&&dist(fox,state)<310&&dist(fox,b)<360){
+   fox.guard=b;fox.target=null;
+   if(dist(fox,b)<80){
+    if(b.lungeMs>0&&dist(fox,b)<60)hurtFriend(fox,15);
+    b.fleeUntil=time+7000;b.windupMs=0;b.lungeMs=0;b.cooldown=9200;b.mode='retreating';
+    notify('Skölli chased Greyfang away!');continue;
+   }
+  }
   if(pd<sight){
    if(dangerWarningCooldown<=0){
     dangerWarningCooldown=12000;dylan.mode='watching';
@@ -829,7 +1008,9 @@ function updateBeasts(dt){
    }else if(b.lungeMs>0){
     b.lungeMs=Math.max(0,b.lungeMs-dt);
     moveBeast(b,state.x,state.y,dt,b.kind==='wolf'?.25:.21);
-    if(dist(b,state)<64&&b.cooldown===0){
+    const friend=companions.find(c=>dist(c,b)<52&&dist(c,b)<dist(state,b)&&hurtFriend(c,b.kind==='wolf'?17:22));
+    if(friend){b.lungeMs=0;b.cooldown=5200;b.mode='retreating'}
+    else if(dist(b,state)<64&&b.cooldown===0){
      takeDamage(b.kind==='wolf'?17:22,b.name,false,b);
      b.lungeMs=0;b.cooldown=5200;b.mode='retreating';
     }else if(b.lungeMs===0){b.cooldown=3900;b.mode='retreating'}
@@ -1081,7 +1262,7 @@ illustratedFaunaAtlas.onload=()=>{
  window.__v124FaunaAtlasReady=illustratedFaunaReady;
 };
 illustratedFaunaAtlas.onerror=()=>{illustratedFaunaReady=false;window.__v124FaunaAtlasReady=false};
-illustratedFaunaAtlas.src='./assets/haigen-fauna-v124.png?v=1';
+illustratedFaunaAtlas.src='./assets/woodland-fauna-illustrated.png';
 illustratedCompanionAtlas.onload=()=>{
  illustratedCompanionReady=illustratedCompanionAtlas.naturalWidth===256&&illustratedCompanionAtlas.naturalHeight===512;
  window.__v124CompanionAtlasReady=illustratedCompanionReady;
@@ -1103,7 +1284,7 @@ illustratedExtraFauna.onload=()=>{
  window.__v124ExtraFaunaReady=illustratedExtraReady;
 };
 illustratedExtraFauna.onerror=()=>{illustratedExtraReady=false;window.__v124ExtraFaunaReady=false};
-illustratedExtraFauna.src='./assets/haigen-extra-fauna-v124.png?v=2';
+illustratedExtraFauna.src='./assets/regional-fauna-illustrated.png';
 const extraFaunaCells={
  bison:[0,0],stag:[1,0],goat:[2,0],hare:[3,0],
  turtle:[0,1],rat:[1,1],otter:[2,1],gull:[3,1],
@@ -1112,6 +1293,9 @@ const extraFaunaCells={
 };
 // V126: unified motion, palette and pixel density for every existing biome
 // species, using the approved transparent animal atlases (no emoji stand-ins).
+const wildlifeMotionSheet=new Image();
+wildlifeMotionSheet.src='./assets/haigen-wildlife-motion.webp';
+const motionSpecies='frog butterfly squirrel bird duck fish wolf boar scorpion snake crab lizard bison stag goat hare turtle rat otter gull raven heron watcher ashCreeper scuttleback chicken duckling'.split(' ');
 function drawUnifiedCreatureArt(sheet,cell,kind,x,y,dir,walking,anim,scale,sizeScale=1){
  const size=sizeScale*Math.max(kind==='duckling'?.25:.62,Math.min(scale,1.5));
  const width=96*size,height=76*size;
@@ -1132,10 +1316,13 @@ function drawUnifiedCreatureArt(sheet,cell,kind,x,y,dir,walking,anim,scale,sizeS
  ctx.scale(flip,1);
  ctx.rotate(tilt);
  ctx.scale(1+squash,1-squash*.65);
- ctx.drawImage(sheet,cell[0]*96,cell[1]*76,96,76,
+ const speciesRow=motionSpecies.indexOf(kind);
+ const animated=walking&&speciesRow>=0&&wildlifeMotionSheet.naturalWidth===576;
+ const pose=walking?Math.abs(Math.floor(anim/112))%6:0;
+ ctx.drawImage(animated?wildlifeMotionSheet:sheet,animated?pose*96:cell[0]*96,animated?speciesRow*76:cell[1]*76,96,76,
   Math.round(-width/2),Math.round(-height),width,height);
  ctx.restore();
- window.__v126LastCreature={kind,dir,walking,pose:walking?Math.floor(anim/120)%4:0,
+ window.__v126LastCreature={kind,dir,walking,pose,
   hop,tilt,scale:size,flying,crawling,jumping,big};
  window.__v124LastFauna={kind,dir,moving:walking,scale:size,extra:sheet===illustratedExtraFauna};
  return true;
@@ -1211,7 +1398,7 @@ skolliAtlas.onload=()=>{
  window.__v126SkolliReady=skolliAtlasReady;
 };
 skolliAtlas.onerror=()=>{skolliAtlasReady=false;window.__v126SkolliReady=false};
-skolliAtlas.src='./assets/skolli-fox-v126.png?v=126';
+skolliAtlas.src='./assets/skolli-fox-illustrated.png';
 function drawApprovedSkolli(x,y,actor){
  if(!skolliAtlasReady)return false;
  const m=actor||playerMotion,dir=m.dir||'down',moving=!!m.moving,anim=m.anim||0;
@@ -1842,12 +2029,43 @@ function autoPlan(label,id){
   haigenMind.lastPlanSaid=time;think('My plan: '+label+'.',3700,true);
  }
 }
-function autoResetNav(){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0}
+// Search around a local obstruction only after direct steering stalls.
+function detourTo(target,reach){
+ const step=40,limit=18,queue=[{i:0,j:0,x:state.x,y:state.y,parent:null}];
+ const seen=new Set(['0,0']);
+ let closest=queue[0];
+ for(let n=0;n<queue.length;n++){
+  const node=queue[n];
+  if(dist(node,target)<dist(closest,target))closest=node;
+  if(dist(node,target)<=reach){closest=node;break}
+  for(const [di,dj] of [[1,0],[0,1],[-1,0],[0,-1]]){
+   const i=node.i+di,j=node.j+dj,key=i+','+j;
+   if(Math.abs(i)>limit||Math.abs(j)>limit||seen.has(key))continue;
+   const x=node.x+di*step,y=node.y+dj*step;
+   if(!autoStand(x,y)||!autoStand((x+node.x)/2,(y+node.y)/2))continue;
+   seen.add(key);queue.push({i,j,x,y,parent:node});
+  }
+ }
+ const route=[];
+ for(let node=closest;node.parent;node=node.parent)route.push(node);
+ return route.reverse();
+}
+function autoResetNav(){autoNav.route=[];autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0}
 function autoStand(x,y){return Number.isFinite(x)&&Number.isFinite(y)&&islandDepth(x,y)>73&&lakeLevel(x,y)>1.045&&!blockedBySolid(x,y)}
 function autoTravel(target,dt,reach=80,speed=.14){
  const d=dist(state,target);if(d<=reach){autoResetNav();return true}
  const key=(target.id===undefined?'place':target.id)+':'+Math.round(target.x/15)+':'+Math.round(target.y/15);
  if(autoNav.key!==key){autoResetNav();autoNav.key=key}
+ if(autoNav.stuck>800&&!autoNav.route.length&&autoNav.failures<5){
+  autoNav.route=detourTo(target,reach);autoNav.stuck=0;autoNav.failures++;
+ }
+ if(autoNav.route.length){
+  const point=autoNav.route[0],length=dist(point,state),step=Math.min(length,dt*speed);
+  if(length<1){autoNav.route.shift();return false}
+  const x=state.x+(point.x-state.x)*step/length,y=state.y+(point.y-state.y)*step/length;
+  if(autoStand(x,y)){state.x=x;state.y=y;if(step>=length)autoNav.route.shift();return false}
+  autoNav.route=[];
+ }
  const step=Math.min(dt,50)*speed,heading=Math.atan2(target.y-state.y,target.x-state.x);
  const offsets=autoNav.side>0?[0,.35,-.35,.73,-.73,1.15,-1.15,1.6,-1.6,2.3,-2.3]:[0,-.35,.35,-.73,.73,-1.15,1.15,-1.6,1.6,-2.3,2.3];
  let best=null,score=Infinity;
@@ -1906,7 +2124,7 @@ function autoCampChores(dt){
  }
  if(state.food<2&&(state.rawMeat>=1||state.vegetables>=3||state.eggs>=2||state.fish>=1||state.mushrooms>=3||state.berries>=6)){
   autoPlan('cook meals at camp','cook');
-  if(dist(state,cottage)>225){autoTravel(autoCampSpot(),dt,175);return true}
+  if(dist(state,cottage)>225){autoTravel(autoCampSpot(),dt,12);return true}
   const options=[['rawMeat',1,'campfire roast'],['vegetables',3,'garden stew'],['eggs',2,'fried eggs'],['fish',1,'grilled fish'],['mushrooms',3,'mushroom stew'],['berries',3,'berry meal']];
   const selected=options.find(([resource,count])=>(state[resource]||0)>=count);
   if(selected){state[selected[0]]-=selected[1];state.food++;startHaigenAction('cook',900);state.autoSteps++;save();notify('🍲 Haigen cooked '+selected[2]+'.')}
@@ -2018,11 +2236,11 @@ function collectLooseWood(o){
 function autoGatherWood(dt){
  if(state.twigs<3&&state.wood>=5){state.wood--;state.twigs+=2;startHaigenAction('craft',500);save();return true}
  if(state.wood>=woodCarryLimit-1)return false;
- const logs=woodlandDetails.filter(o=>looseWoodReady(o)&&canPlaceScenery(o)&&!campsiteProtected(o)&&dist(o,state)<1700)
+ const logs=woodlandDetails.filter(o=>(autoIgnore.get('log-'+o.seed)||0)<=Date.now()&&looseWoodReady(o)&&canPlaceScenery(o)&&!campsiteProtected(o)&&dist(o,state)<1700)
   .sort((a,b)=>dist(a,state)-dist(b,state));
  if(logs.length){
   const log=logs[0];autoPlan('collect fallen wood without cutting living trees','fallen:'+log.seed);
-  if(dist(state,log)>83)autoTravel(log,dt,83,.12);
+  if(dist(state,log)>83)autoTravel({id:'log-'+log.seed,x:log.x,y:log.y},dt,83,.12);
   else{collectLooseWood(log);autoPause=420}
   return true;
  }
@@ -2053,7 +2271,7 @@ function autoMineStone(dt){
   const wood=state.wood+(state.woodStorageTier?state.woodStored:0);
   if(wood<5||state.twigs<3){autoGatherWood(dt);return true}
   autoPlan('make my first pickaxe from wood and flint','craft-pickaxe');
-  if(dist(state,cottage)>185){autoTravel(autoCampSpot(),dt,170,.13);return true}
+  if(dist(state,cottage)>185){autoTravel(autoCampSpot(),dt,12,.13);return true}
   if(spendCampWood(5)){state.twigs-=3;state.tools.pickaxe=1;startHaigenAction('craft',1000);
    mindWrite('I finally made a pickaxe. Now I can break the big boulders and collect the pieces.','growth');
    state.autoSteps++;save();}
@@ -2156,7 +2374,7 @@ function autoFreedomTick(dt){
   const choice=ingredients.find(([name,n])=>state[name]>=n);
   if(!choice)return finish();
   autoPlan('prepare a hot meal','freedom-cooking');
-  if(dist(state,cottage)>190){autoTravel(autoCampSpot(),dt,170,.12);return true}
+  if(dist(state,cottage)>190){autoTravel(autoCampSpot(),dt,12,.12);return true}
   state[choice[0]]-=choice[1];state.food++;startHaigenAction('cook',1100);state.autoSteps++;save();
   return finish('I cooked food instead of just gathering more ingredients.');
  }
@@ -2218,6 +2436,22 @@ function autoFreedomTick(dt){
  return true;
 }
 
+// Hungry Haigen interrupts construction, then resumes the saved project stage.
+function autoFindFood(dt){
+ if(state.nestEggs>=2||gardenRipe()||state.rawMeat||state.fish||state.mushrooms>=3){
+  if(autoCampChores(dt))return true;
+ }
+ if(!autoDestination||autoDestination.type!=='bush'||!berryReady(autoDestination)||
+    (autoIgnore.get(autoDestination.id)||0)>Date.now())autoDestination=autoTarget('bush');
+ if(!autoDestination)return false;
+ autoPlan('pick berries for my next meal','forage:'+autoDestination.id);
+ if(dist(state,autoDestination)>74)autoTravel(autoDestination,dt,74);
+ else{
+  if(pickBerries(autoDestination)){startHaigenAction('gather',550);state.autoSteps++;save()}
+  autoDestination=null;autoPause=550;
+ }
+ return true;
+}
 function autonomousTick(dt){
  state.fun=Math.min(100,state.fun+dt*.00018);state.activity=Math.min(100,state.activity+dt*.0003);
  autoBubbleTimer-=dt;
@@ -2232,7 +2466,7 @@ function autonomousTick(dt){
  if(state.health<58||state.energy<34){
   if(!autoSafeToRest()){
    if(mindRetreat(dt))return;
-   autoPlan('find a safe place to rest','find-safety');autoTravel(autoCampSpot(),dt,160);return;
+   autoPlan('find a safe place to rest','find-safety');autoTravel(autoCampSpot(),dt,12);return;
   }
   state.resting=true;autoDestination=null;autoWaypoint=null;autoResetNav();
   mindEvent('rest');autoPlan('rest and recover','rest');
@@ -2246,6 +2480,7 @@ function autonomousTick(dt){
  // Respect the physical strike / cooking / crafting animation time before
  // choosing another task. Otherwise a boulder shatters in one video frame.
  if(autoPause>0){autoPause=Math.max(0,autoPause-dt);if(autoBubbleTimer<=0)speak(currentThoughtTopic(),4200);return}
+ if(state.hunger<57&&autoFindFood(dt))return;
  if(lifeProjectTick(dt))return;
  if(autoCampChores(dt))return;
  if(autoFreedomTick(dt))return;
@@ -2317,7 +2552,7 @@ function setAutonomy(enabled,keepInstruction=false){
   if(enabled&&!keepInstruction)state.playerInstruction=null;
   state.autonomy=enabled;haigenMind.controlSwitches++;autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';autoPause=enabled?700:0;if(enabled){nextThoughtAt=0;speak(currentThoughtTopic(),4600)}else autoBubbleTimer=0;
   $('modeBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';
-  notify(enabled?'🌲 Haigen is exploring on his own.':'🎮 You are in control!');
+  notify(enabled?'Haigen will gather supplies and carry on with camp. Move to take control.':'🎮 You are in control!');
   save();
 }
 // Roads connect the camp to actual destinations, rather than ending in the woods.
@@ -2356,7 +2591,12 @@ function roadTrace(g,route){
  }
  const last=route[route.length-1];g.lineTo(last.x,last.y);
 }
+const paintedTrails=new Image();
+paintedTrails.src='./assets/haigen-trails.webp';
 function path(){
+ if(paintedTrails.naturalWidth===2600){
+  ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();return;
+ }
  // Draw full road network one material layer at a time so the junctions merge.
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
  const bands=[{pad:22,c:'#55674748'},{pad:14,c:'#91836e90'},{pad:5,c:'#b19a76'},{pad:-7,c:'#d2bb91'}];
@@ -2906,6 +3146,15 @@ function bush(o){const n=nightStrength(),v=Math.abs(Math.floor(o.x*.07+o.y*.03))
 ];
 // Campsite details are decorative only: no save changes or invisible obstacles.
 function drawCampDecor(){
+ const basketX=firstFire.x-48,basketY=firstFire.y+28;
+ ctx.save();ctx.translate(basketX,basketY);ellipse(0,4,18,5,'#44372466');
+ poly([[-17,-10],[17,-10],[12,4],[-12,4]],'#986437','#5d422c');
+ ctx.strokeStyle='#d7a363';ctx.lineWidth=2;
+ for(let n=-10;n<=10;n+=5){ctx.beginPath();ctx.moveTo(n,-9);ctx.lineTo(n*.76,2);ctx.stroke()}
+ for(const y of [-7,-3]){ctx.beginPath();ctx.moveTo(-14,y);ctx.lineTo(14,y);ctx.stroke()}
+ ctx.beginPath();ctx.arc(0,-10,11,Math.PI,Math.PI*2);ctx.stroke();
+ if(Object.values(state.dylanCamp).some(n=>n>0)){ellipse(-5,-10,4,3,'#7b9152');ellipse(2,-10,3,2,'#c99865')}
+ ctx.restore();
  const x=cottage.x,y=cottage.y;
  ctx.save();
  // Well-trodden, soft-edged campsite clearing and stepping stones.
@@ -3661,7 +3910,35 @@ function haigenActiveAction(){
  if(t>=1){haigenVisualAction=null;return null}
  return {...haigenVisualAction,progress:Math.max(0,t)};
 }
+// Order follows the extracted reference sheet. Each outfit has its own four facings.
+const travelKits=['snow','beach','desert','swim','downs','fen','wasteland'];
+const travelKitLabels={woodland:'Woodland · charcoal hoodie',snow:'Highlands · winter parka',
+ beach:'Coast · beach shirt and shorts',desert:'Desert · goggles and dust scarf',
+ swim:'Deep water · snorkel and fins',downs:'Open Downs · green trail shirt',
+ fen:'Deep Fen · reed-green coat',wasteland:'Wasteland · ash-grey wraps'};
+const travelSheet=new Image();
+const travelAtlases=new Map();
+travelSheet.onload=()=>{
+ if(travelSheet.naturalWidth!==192||travelSheet.naturalHeight!==travelKits.length*288)return;
+ travelKits.forEach((kind,index)=>{
+  const c=document.createElement('canvas');c.width=192;c.height=288;
+  c.getContext('2d').drawImage(travelSheet,0,index*288,192,288,0,0,192,288);
+  travelAtlases.set(kind,c);
+ });
+};
+travelSheet.src='./assets/haigen-region-outfits.png';
+function openTravelWardrobe(){
+ open('<h2>Haigen’s outfits</h2><p>Wearing '+travelKitLabels[haigenOutfit()]+'</p>'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px">'+
+  Object.entries(travelKitLabels).map(([kind,label])=>'<div><canvas width="96" height="72" data-kit="'+kind+'" style="width:100%;max-width:160px;image-rendering:pixelated"></canvas><div>'+label+'</div></div>').join('')+'</div>');
+ const paint=()=>document.querySelectorAll('[data-kit]').forEach(c=>{
+  const atlas=travelAtlases.get(c.dataset.kit)||(c.dataset.kit==='woodland'&&haigenMovementReady&&haigenCostumeAtlas(haigenMovementAtlas,'woodland'));
+  if(atlas){const g=c.getContext('2d');g.drawImage(atlas,0,0,48,72,0,0,48,72);g.drawImage(atlas,48,144,48,72,48,0,48,72)}
+ });
+ paint();if(!travelAtlases.size)travelSheet.addEventListener('load',paint,{once:true});
+}
 function haigenOutfit(){
+ if(lakeLevel(state.x,state.y)<.82||islandDepth(state.x,state.y)<0)return 'swim';
  const region=expandedRegion(state.x,state.y)?.id;
  if(region==='snow')return 'snow';
  if(region==='desert')return 'desert';
@@ -3675,6 +3952,7 @@ function haigenOutfit(){
 // approved blonde hair and original thick hoodie/three-quarter outlines remain.
 // Each 48x72 cell keeps the EXACT same draw width and foot baseline.
 function haigenCostumeAtlas(base,kind){
+ if(travelAtlases.has(kind))return travelAtlases.get(kind);
  const newSheet=base===haigenMovementAtlas;
  const rows=newSheet?4:3;
  const sheetHeight=rows*72;
@@ -3909,7 +4187,7 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  if(dirName==='left'){ctx.translate(left+48*scale,top);ctx.scale(-scale,scale)}
  else{ctx.translate(left,top);ctx.scale(scale,scale)}
  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
- const skin='#e7b78e',skinShadow='#ae7b60',sleeve='#35313c',cuff='#56505b';
+ const skin='#e7b78e',skinShadow='#ae7b60',sleeve=({snow:'#b86b36',desert:'#a18665',beach:skin,swim:skin,downs:skin,fen:'#54684d',wasteland:'#706878'})[haigenOutfit()]||'#35313c',cuff=sleeve==='#35313c'?'#56505b':sleeve;
  const shoulder=dirName==='up'?[19,41]:dirName==='down'?[35,42]:[33,43];
  const hand=dirName==='up'?[21,49]:dirName==='down'?[38,48]:[36,48];
  // Wrist moves through a planted, four-phase animation. No floating fist.
@@ -4033,7 +4311,7 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  if(!status.equip&&status.action&&['eat','medicine','cook'].includes(status.action.kind))
   haigenDrawPixelTool('hands',displayDir,frame,status.action,scale,left,top);
  // Snorkel kit only when swimming. The coast itself keeps shorts and trainers.
- if(deepWater){
+ if(deepWater&&!travelAtlases.has(status.outfit)){
   const px=displayDir==='left'?left+16:displayDir==='right'?left+26:left+19,py=top+27*scale;
   ctx.strokeStyle='#5f999f';ctx.lineWidth=3;
   ctx.strokeRect(px,py,17,8);
@@ -4052,6 +4330,12 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  ctx.restore();return true;
 }
 function drawApprovedRestingHaigen(x,y){
+ const kit=travelAtlases.get(haigenOutfit());
+ if(kit){
+  ctx.save();ellipse(x,y+6,43,8,'#173d3466');ctx.translate(x,y);ctx.rotate(-1.43);
+  ctx.imageSmoothingEnabled=false;ctx.drawImage(kit,0,72,48,72,-22,-45,42,88);
+  ctx.restore();return true;
+ }
  if(!haigenApprovedAtlasReady)return false;
  const sx=96,sy=216,sw=96,sh=72,scale=1.15;
  const w=sw*scale,h=sh*scale;
@@ -5070,7 +5354,8 @@ for(let i=0;i<11;i++){
 }
 for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();const visible=objects.filter(o=>!state.removed.includes(o.id)&&canPlaceScenery(o)&&flowerHasHabitat(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);homesteadPlots.forEach(p=>{drawHomesteadPlotGround(p);drawLifeConstruction(p,false)});const drawables=[...homesteadPlots.filter(p=>homesteadTier(p)>0&&p.kind!=='jetty').map(p=>({y:homesteadSortY(p),draw:()=>drawHomesteadPlotForeground(p)})),...homesteadPlots.filter(p=>state.lifeProject?.kind===p.kind&&homesteadTier(p)===0).map(p=>({y:homesteadSortY(p),draw:()=>drawLifeConstruction(p,true)})),...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.meatDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawMeatDrop(o)})),...state.stoneDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawStonePiece(o)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.fillStyle='#8d603d';ctx.fillRect(o.x-22,o.y-8,44,17);ellipse(o.x+22,o.y,8,9,'#c9a67b')}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>drawSceneryNearHaigen(o)})),...woodlandDetails.filter(o=>(o.kind!=='fungi'||woodlandFungiReady(o))&&canPlaceScenery(o)&&!campsiteProtected(o)&&!homesteadPlots.some(p=>Math.hypot(o.x-p.x,o.y-p.y)<120)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),{y:state.y,draw:()=>{ctx.save();
  if(collapseRemaining<=0&&time<damageFlashUntil)ctx.globalAlpha*=Math.floor(time/95)%2===0?.34:1;
- const depth=lakeLevel(state.x,state.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+ const depth=lakeLevel(state.x,state.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-84);ctx.fillStyle='#332c27';ctx.fillRect(c.x-21,c.y-80,42,6);ctx.fillStyle=c.life.poison?'#b391d4':c.life.hp<40?'#ef946e':'#95c678';ctx.fillRect(c.x-20,c.y-79,40*c.life.hp/100,4);
+ if(c.clue&&time<c.clue.until){const o=objects.find(o=>o.id===c.clue.id);if(o&&!state.removed.includes(o.id)){ctx.fillStyle='#ffe4a0';ctx.fillText('◆',o.x,o.y-55)}}}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
@@ -5183,7 +5468,7 @@ function resolveSolidMovement(startX,startY,endX,endY){
  return {x,y};
 }
 
-function update(dt){updateSurvival(dt);if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>90000){idleTime=0;setAutonomy(true);notify('🌲 Haigen is off exploring while you are away.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput)setAutonomy(false);if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=lakeLevel(state.x,state.y)<.8;state.x=clamp(state.x+dx*dt*(swim?.115:.19),50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:.19),50,WORLD-50);state.steps+=dt*.19}const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;trackMotion(playerMotion,prevPlayerX,prevPlayerY,state.x,state.y,dt);
+function update(dt){updateSurvival(dt);if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>15000){idleTime=0;setAutonomy(true);notify('🌲 Haigen is off exploring while you are away.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput)setAutonomy(false);if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=lakeLevel(state.x,state.y)<.8;state.x=clamp(state.x+dx*dt*(swim?.115:.19),50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:.19),50,WORLD-50);state.steps+=dt*.19}const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;trackMotion(playerMotion,prevPlayerX,prevPlayerY,state.x,state.y,dt);
 // With a joystick/gamepad, face the requested direction, not the axis
 // selected by wall-slide collision. AI walking still follows real motion.
 if(!state.autonomy&&!state.resting&&playerMotion.moving&&mag>.13){
@@ -5194,10 +5479,7 @@ window.__haigenMotionQA={
  dir:playerMotion.dir,moving:playerMotion.moving,auto:state.autonomy
 };
 for(const c of companions){const oldX=c.x,oldY=c.y;c.t-=dt;c.anim=(c.anim||0)+dt;const rabbit=c.kind==='rabbit',distance=dist(c,state);
-if(c.gift){if(dist(c,state)<85){const gift=c.gift;c.gift=null;c.mode='watching';c.target=null;c.t=rand(2800,5000);if(gift==='leaves')state.leaves+=1;else if(gift==='twigs')state.twigs+=1;else if(gift==='wood')gainWood(1);else if(gift==='berries')state.berries+=1;mindEvent('gift',rabbit?'Dylan':'Skölli');notify((rabbit?'🐇 Dylan':'🦊 Skölli')+' brought Haigen '+(gift==='berries'?'some berries':gift==='leaves'?'a handful of leaves':gift==='twigs'?'a twig':'a stick')+'! 🎁');save()}
-else{c.mode='delivering';c.target={x:clamp(state.x+(rabbit?30:-35),60,WORLD-60),y:clamp(state.y+30,60,WORLD-60)};c.t=7000}}
-if(!c.gift&&!c.target&&(c.mode==='nibbling'||c.mode==='sniffing'||c.mode==='watching')&&c.t<=0&&time>(c.nextGiftAt||0)&&Math.random()<.075){c.gift=rabbit?(Math.random()<.7?'leaves':'twigs'):(Math.random()<.6?'wood':'berries');c.nextGiftAt=time+rand(150000,300000);c.mode='delivering';c.target={x:state.x,y:state.y};c.t=7000}
-
+if(updateFriendRole(c,dt)){trackMotion(c,oldX,oldY,c.x,c.y,dt);c.life.x=c.x;c.life.y=c.y;continue}
 if(c.mode==='called'&&c.target&&dist(c,c.target)<38){c.mode='watching';c.t=rand(1600,3200);c.target=null}
 if(!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&distance>(rabbit?330:570)){c.mode='returning';c.target={x:clamp(state.x+(rabbit?42:-70),60,WORLD-60),y:clamp(state.y+55,60,WORLD-60)};c.t=6000}
 if(c.mode==='returning'&&distance<105){c.mode='watching';c.target=null;c.t=rand(1300,3000)}
@@ -5218,7 +5500,7 @@ else{c.mode='investigating';c.target={x:clamp(c.x+rand(-110,110),60,WORLD-60),y:
 if(c.mode==='pouncing'&&c.t<=0){c.mode='watching';c.t=rand(2500,5000)}
 if(c.target){const d=dist(c,c.target);if(d>3){const speed=c.mode==='called'?.105:c.mode==='defending'?.16:c.mode==='delivering'?.065:c.mode==='returning'?.09:c.mode==='stalking'?.027:rabbit?.044:.039;const step=Math.min(d,dt*speed);const nx=c.x+(c.target.x-c.x)/d*step,ny=c.y+(c.target.y-c.y)/d*step;const limit=rabbit?1.025:.76;if(lakeLevel(nx,ny)>=limit){c.facing=c.target.x>=c.x?1:-1;c.x=nx;c.y=ny;c.moving=true}else{c.target=null;c.mode='watching';c.t=rand(1800,3500);c.moving=false}}else c.moving=false}else c.moving=false;
 if(c.mode==='pouncing'){const nx=c.x+(c.pounceX-c.x)*Math.min(1,dt*.004),ny=c.y+(c.pounceY-c.y)*Math.min(1,dt*.004);if(lakeLevel(nx,ny)> (rabbit?1.025:.76)){c.x=nx;c.y=ny}else{c.mode='watching';c.t=2500}}
-trackMotion(c,oldX,oldY,c.x,c.y,dt);
+trackMotion(c,oldX,oldY,c.x,c.y,dt);c.life.x=c.x;c.life.y=c.y;
 }const activePad=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const rightX=activePad&&Math.abs(activePad.axes[2]||0)>.2?activePad.axes[2]:0,rightY=activePad&&Math.abs(activePad.axes[3]||0)>.2?activePad.axes[3]:0;const smoothing=Math.min(1,dt*((rightX||rightY)? .008 : .005));look.x+=(rightX*270-look.x)*smoothing;look.y+=(rightY*210-look.y)*smoothing;// Follow the player, but honour active finger pans. Once released, return smoothly.
 // Pan feels direct under the finger. Release holds the view briefly before a gentle recenter.
 // Direct pan: no following force while fingers are on the canvas.
@@ -5468,11 +5750,11 @@ function drawWardenOmen(){
 }
 function closest(){// Nearby mushrooms take priority over ambient wildlife when gathering.
 const mushroom=objects.filter(o=>o.type==='mushroom'&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<75).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(mushroom)return {o:mushroom,d:dist(mushroom,state),type:'resource'};
-const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,state),type:'frog'};const critter=woodlandCritters.filter(o=>dist(o,state)<70).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(critter)return {o:critter,d:dist(critter,state),type:'critter'};if(state.coopTier&&dist(state,chickenNest)<58&&state.nestEggs>0)return {o:chickenNest,d:dist(state,chickenNest),type:'eggs'};let candidates=state.fallen.filter(o=>near(o,100)).map(o=>({o,d:dist(o,state)-20,type:'fallen'}));candidates.push(...objects.filter(o=>!campsiteProtected(o)&&flowerHasHabitat(o)&&!state.removed.includes(o.id)&&near(o,90)).map(o=>({o,d:dist(o,state),type:'resource'})));for(let c of companions)if(near(c,110))candidates.push({o:c,d:dist(c,state),type:'friend'});for(let f of state.structures)if(f.kind==='campfire'&&near(f,100))candidates.push({o:f,d:dist(f,state),type:'fire'});if(near(cottage,125))candidates.push({o:cottage,d:dist(cottage,state),type:'home'});if(near(firstFire,90)&&!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80))candidates.push({o:firstFire,d:dist(firstFire,state),type:'fireSite'});if(near(ruins,100))candidates.push({o:ruins,d:dist(ruins,state),type:'ruins'});return candidates.sort((a,b)=>a.d-b.d)[0]}function interact(){if(collapseRemaining>0)return;if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
+const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,state),type:'frog'};const critter=woodlandCritters.filter(o=>dist(o,state)<70).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(critter)return {o:critter,d:dist(critter,state),type:'critter'};if(state.coopTier&&dist(state,chickenNest)<58&&state.nestEggs>0)return {o:chickenNest,d:dist(state,chickenNest),type:'eggs'};let candidates=state.fallen.filter(o=>near(o,100)).map(o=>({o,d:dist(o,state)-20,type:'fallen'}));candidates.push(...objects.filter(o=>!campsiteProtected(o)&&flowerHasHabitat(o)&&!state.removed.includes(o.id)&&near(o,90)).map(o=>({o,d:dist(o,state),type:'resource'})));for(let c of companions)if(near(c,110))candidates.push({o:c,d:dist(c,state),type:'friend'});for(let f of state.structures)if(f.kind==='campfire'&&near(f,100))candidates.push({o:f,d:dist(f,state),type:'fire'});if(near(cottage,125))candidates.push({o:cottage,d:dist(cottage,state),type:'home'});if(near(firstFire,90)&&!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80))candidates.push({o:firstFire,d:dist(firstFire,state),type:'fireSite'});if(near(ruins,100))candidates.push({o:ruins,d:dist(ruins,state),type:'ruins'});return candidates.sort((a,b)=>a.d-b.d)[0]}function interact(){if(collapseRemaining>0)return;if(dist(state,companionBed(companions[0]))<45&&Object.values(state.dylanCamp).some(n=>n>0)){scoutSuppliesMenu();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
  ...objects.filter(o=>(o.type==='mushroom'||o.type==='bush')&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:o.type})),
  ...woodlandDetails.filter(o=>o.kind==='fungi'&&woodlandFungiReady(o)&&!campsiteProtected(o)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:'fungi'}))
  ].sort((a,b)=>a.d-b.d)[0];
- const loose=woodlandDetails.filter(o=>looseWoodReady(o)&&dist(o,state)<95).sort((a,b)=>dist(a,state)-dist(b,state))[0];
+ const loose=woodlandDetails.filter(o=>(autoIgnore.get('log-'+o.seed)||0)<=Date.now()&&looseWoodReady(o)&&dist(o,state)<95).sort((a,b)=>dist(a,state)-dist(b,state))[0];
  if(loose){collectLooseWood(loose);return}
  if(foraging){
   if(foraging.kind==='bush')pickBerries(foraging.o);
@@ -5480,7 +5762,7 @@ const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,st
   else{harvest(foraging.o);gatherMushroom(foraging.o)}
   save();return;
  }
- if(storyInteract())return;let c=closest();if(c&&c.type==='frog'){c.o.hopAt=0;notify('🐸 Ribbit! The little frog hops away.');return}if(c&&c.type==='critter'){c.o.scaredUntil=time+4500;notify(c.o.kind==='squirrel'?'🐿️ The squirrel darts up a tree!':c.o.kind==='butterfly'?'🦋 The butterfly flutters away!':'✨ The little firefly dances away!');return}if(c&&c.type==='eggs'){if(state.nestEggs>0){const count=state.nestEggs;state.eggs+=count;state.nestEggs=0;notify('🥚 Collected '+count+' fresh egg'+(count===1?'':'s')+'! Total: '+state.eggs);save()}else notify('🐔 No eggs yet. The hens need some time.');return}if(!c){notify('Move closer and press X to gather mushrooms, berries or supplies.');return}if(c.type==='fallen'){const item=c.o;if(item.kind==='log'&&state.wood>woodCarryLimit-2){notify('🪵 You need room for 2 logs. Visit your wood shed first.');return}if(item.kind==='log')gainWood(2);if(item.kind==='twig')state.twigs+=2;if(item.kind==='leaves')state.leaves+=3;state.fallen=state.fallen.filter(o=>o.id!==item.id);notify(item.kind==='log'?'🪵 Collected 2 wood':item.kind==='twig'?'🌿 Collected 2 twigs':'🍃 Collected 3 leaves');save();return}if(c.type==='resource'){let o=c.o;if(['cactus','palm','fir','bareTree'].includes(o.type)){notify('🌿 This is part of the local habitat. Leave it growing!');return}if(o.type==='tree'){notify('🪓 Equip your axe and press RT to chop trees.');return}if(o.type==='rock'){notify('⛏️ Too large to carry. Break this boulder with your pickaxe, then collect the pieces.');return}if(!harvest(o)){save();return}if(o.type==='flower')gatherFlower(o);if(o.type==='mushroom'){gatherMushroom(o)}if(o.type==='tree'){let amount=state.tools.axe?4:2;const received=gainWood(amount);notify('🪵 Collected '+received+' wood!')}if(o.type==='bush'){/* pickBerries already granted fruit without uprooting the shrub. */}}else if(c.type==='friend'){let f=c.o;if(state.berries>0){state.berries--;state.friends[f.kind==='fox'?'skolli':'heri']=Math.min(100,state.friends[f.kind==='fox'?'skolli':'heri']+8);mindEvent('gift',f.name);notify(`🍓 ${f.name} enjoyed a berry! Friendship grew.`)}else{notify(`${f.name} is ${f.mode}. Bring berries to make friends!`)}}else if(c.type==='fire'){let fire=c.o;if(fire.lit===false){if(state.wood<1){notify('Need 1 wood to light this fire.');return}state.wood--;fire.lit=true;fire.fuel=180;notify('🔥 Campfire lit!')}else if(state.berries>=2){state.berries-=2;state.food++;notify('🍲 Cooked a berry meal!')}else if(state.wood>=1){state.wood--;fire.fuel=(fire.fuel||180)+120;notify('🪵 Added fuel to the fire!')}else notify('Bring berries to cook or wood for fuel.')}else if(c.type==='home'){campBuild();return}else if(c.type==='fireSite'){notify('🔥 This is the fire pit. Open Build to make your first campfire.')}else{notify('ᚠ An ancient rune. What secrets does this forest hold?')}save()}$('eatBtn').addEventListener('click',eatFood);$('healBtn').addEventListener('click',healSelf);$('restBtn').addEventListener('click',toggleRest);$('styleBtn').addEventListener('click',hairstyleMenu);$('mailBtn').addEventListener('click',haigenNotes);$('cookBtn').addEventListener('click',cookingStation);
+ if(storyInteract())return;let c=closest();if(c&&c.type==='frog'){c.o.hopAt=0;notify('🐸 Ribbit! The little frog hops away.');return}if(c&&c.type==='critter'){c.o.scaredUntil=time+4500;notify(c.o.kind==='squirrel'?'🐿️ The squirrel darts up a tree!':c.o.kind==='butterfly'?'🦋 The butterfly flutters away!':'✨ The little firefly dances away!');return}if(c&&c.type==='eggs'){if(state.nestEggs>0){const count=state.nestEggs;state.eggs+=count;state.nestEggs=0;notify('🥚 Collected '+count+' fresh egg'+(count===1?'':'s')+'! Total: '+state.eggs);save()}else notify('🐔 No eggs yet. The hens need some time.');return}if(!c){notify('Move closer and press X to gather mushrooms, berries or supplies.');return}if(c.type==='fallen'){const item=c.o;if(item.kind==='log'&&state.wood>woodCarryLimit-2){notify('🪵 You need room for 2 logs. Visit your wood shed first.');return}if(item.kind==='log')gainWood(2);if(item.kind==='twig')state.twigs+=2;if(item.kind==='leaves')state.leaves+=3;state.fallen=state.fallen.filter(o=>o.id!==item.id);notify(item.kind==='log'?'🪵 Collected 2 wood':item.kind==='twig'?'🌿 Collected 2 twigs':'🍃 Collected 3 leaves');save();return}if(c.type==='resource'){let o=c.o;if(['cactus','palm','fir','bareTree'].includes(o.type)){notify('🌿 This is part of the local habitat. Leave it growing!');return}if(o.type==='tree'){notify('🪓 Equip your axe and press RT to chop trees.');return}if(o.type==='rock'){notify('⛏️ Too large to carry. Break this boulder with your pickaxe, then collect the pieces.');return}if(!harvest(o)){save();return}if(o.type==='flower')gatherFlower(o);if(o.type==='mushroom'){gatherMushroom(o)}if(o.type==='tree'){let amount=state.tools.axe?4:2;const received=gainWood(amount);notify('🪵 Collected '+received+' wood!')}if(o.type==='bush'){/* pickBerries already granted fruit without uprooting the shrub. */}}else if(c.type==='friend'){let f=c.o;if(f.life.recovering){companionCareMenu();return}if(state.berries>0){state.berries--;state.friends[f.kind==='fox'?'skolli':'heri']=Math.min(100,state.friends[f.kind==='fox'?'skolli':'heri']+8);mindEvent('gift',f.name);notify(`🍓 ${f.name} enjoyed a berry! Friendship grew.`)}else{notify(`${f.name} is ${f.mode}. Bring berries to make friends!`)}}else if(c.type==='fire'){let fire=c.o;if(fire.lit===false){if(state.wood<1){notify('Need 1 wood to light this fire.');return}state.wood--;fire.lit=true;fire.fuel=180;notify('🔥 Campfire lit!')}else if(state.berries>=2){state.berries-=2;state.food++;notify('🍲 Cooked a berry meal!')}else if(state.wood>=1){state.wood--;fire.fuel=(fire.fuel||180)+120;notify('🪵 Added fuel to the fire!')}else notify('Bring berries to cook or wood for fuel.')}else if(c.type==='home'){campBuild();return}else if(c.type==='fireSite'){notify('🔥 This is the fire pit. Open Build to make your first campfire.')}else{notify('ᚠ An ancient rune. What secrets does this forest hold?')}save()}$('eatBtn').addEventListener('click',eatFood);$('healBtn').addEventListener('click',healSelf);$('restBtn').addEventListener('click',toggleRest);$('styleBtn').addEventListener('click',hairstyleMenu);$('mailBtn').addEventListener('click',haigenNotes);$('cookBtn').addEventListener('click',cookingStation);
 // Terrain follows the existing broad landscape colours; mining sites regrow after a short rest.
 function terrainAt(x,y){const region=expandedRegion(x,y);if(region)return region.id;const high=Math.hypot((x-1540)/620,(y-480)/400),marsh=Math.hypot((x-2100)/510,(y-2420)/360),grove=Math.hypot((x-2470)/510,(y-1280)/360);if(high<1)return 'highlands';if(marsh<1)return 'marsh';if(grove<1)return 'grove';if(inPond(x,y,45))return 'shore';return 'woodland'}
 function digGround(tool){const ground=terrainAt(state.x,state.y),rocky=ground==='highlands',wet=ground==='marsh'||ground==='shore';if(tool==='shovel'&&rocky){soundEffect('swing');notify('⛏️ The highland stone is too hard for a shovel.');return}if(tool==='pickaxe'&&!rocky&&ground!=='grove'){soundEffect('swing');notify('🥄 This soil is soft. Try the shovel here.');return}
@@ -5553,7 +5835,7 @@ function haigenUseRod(){
  startHaigenAction('land',1400);
  notify('🐟 Haigen landed '+qty+' fish!');save();return true;
 }
-function useTool(){if(collapseRemaining>0)return;if(state.autonomy)setAutonomy(false);if(state.equipped==='net'){haigenUseNet();return}if(state.equipped==='rod'){haigenUseRod();return}if(hitWildlife()){if(state.equipped!=='hands')startToolSwing(state.equipped);return}if(state.equipped!=='hands'&&state.tools[state.equipped])startToolSwing(state.equipped);if(state.equipped==='pickaxe'&&state.tools.pickaxe){const rock=objects.filter(o=>o.type==='rock'&&!state.removed.includes(o.id)&&!campsiteProtected(o)&&dist(o,state)<130).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(rock){breakBoulder(rock);return}digGround('pickaxe');return}if(state.equipped==='shovel'&&state.tools.shovel){digGround('shovel');return}if(state.equipped==='axe'&&state.tools.axe){const tree=objects.filter(o=>o.type==='tree'&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&near(o,145)).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(tree){soundEffect('chop',tree);const hits=(state.treeHits[tree.id]||0)+1;state.treeHits[tree.id]=hits;if(hits>=3){harvest(tree);mindEvent('gather','tree');delete state.treeHits[tree.id];if(tree.id===runeGuardianId)memory('ᚠ Haigen cleared the guardian tree and uncovered the ancient rune stone!');const base=Date.now()+'-'+tree.id;for(const [i,kind] of ['log','log','twig','leaves'].entries())state.fallen.push({id:base+'-'+i,x:clamp(tree.x+(i-1.5)*23,50,WORLD-50),y:clamp(tree.y+20+(i%2)*25,50,WORLD-50),kind});notify('🌲 TIMBER! Collect logs, twigs and leaves with X.')}else notify('🪓 Chop! '+hits+'/3 hits.');save()}else{soundEffect('swing');notify('🪓 Swing! Move closer to a tree.')}}else if(state.equipped==='torch'&&state.tools.torch){soundEffect('swing');notify('🔦 Haigen raises his torch.')}else notify('✋ Equip a tool using LB/RB or the hotbar.')}let gamepadXHeld=false,gamepadRTHeld=false;let gamepadStartHeld=false,gamepadBHeld=false;function menuController(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const start=!!(p&&p.buttons[9]&&p.buttons[9].pressed),b=!!(p&&p.buttons[1]&&p.buttons[1].pressed);if(start&&!gamepadStartHeld){if($('overlay').classList.contains('open'))close();else showMap()}if(b&&!gamepadBHeld&&$('overlay').classList.contains('open'))close();if(p&&$('worldMap')&&$('overlay').classList.contains('open')){const y=p.axes[3]||0,now=performance.now();if(Math.abs(y)>.35&&now-mapZoomLast>90){changeMapZoom(-y*.28);mapZoomLast=now}}gamepadStartHeld=start;gamepadBHeld=b}function checkActions(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const x=!!(p&&p.buttons&&p.buttons[2]&&p.buttons[2].pressed),rt=!!(p&&p.buttons&&p.buttons[7]&&(p.buttons[7].pressed||p.buttons[7].value>.55));if(x&&!gamepadXHeld){if(state.autonomy)setAutonomy(false);interact()}if(rt&&!gamepadRTHeld)useTool();gamepadXHeld=x;gamepadRTHeld=rt}function call(){for(let c of companions){c.target={x:clamp(state.x+rand(-60,60),60,WORLD-60),y:clamp(state.y+rand(-60,60),60,WORLD-60)};c.mode='called';c.t=7000}notify('📣 You called Dylan and Skölli! Skölli may take his time...')}let mapZoom=1,mapBase=null;function showMap(){mapZoom=1;open('<h2>🗺️ Haigen’s World</h2><p class="small">Right stick up/down zooms. Press Xbox B to exit.</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin:10px 0"><button class="btn" id="mapCloseBtn" type="button">✕ Close map (B)</button><div><button class="btn" id="mapZoomOut" type="button">−</button> <span id="mapZoomLabel">1.0×</span> <button class="btn" id="mapZoomIn" type="button">+</button></div></div><canvas id="worldMap" width="560" height="560" style="width:100%;height:auto;aspect-ratio:1;background:#93b47b;border:2px solid #e8d4a1;border-radius:12px"></canvas><p class="small">🏕️ First Clearing · 🐟 Lake · ᚠ Rune stone · ⛰️ Highlands · 🌳 Grove · 🌿 Marsh</p><h3>🌍 Explore the expanded world</h3><p class="small">Choose a region to preview its scenery, wildlife and outfit. Return to the woodland whenever you like.</p><div id="regionTravel" style="display:flex;flex-wrap:wrap;gap:7px"></div>');$('mapCloseBtn').onclick=close;const canvas=$('worldMap'),g=canvas.getContext('2d'),sc=canvas.width/WORLD;const mini=document.createElement('canvas');mini.width=mini.height=280;const mg=mini.getContext('2d'),pixels=mg.createImageData(280,280);let i=0;
+function useTool(){if(collapseRemaining>0)return;idleTime=0;state.resting=false;if(state.autonomy&&state.equipped!=='pickaxe')setAutonomy(false);if(state.autonomy)autoPause=500;if(state.equipped==='net'){haigenUseNet();return}if(state.equipped==='rod'){haigenUseRod();return}if(hitWildlife()){if(state.equipped!=='hands')startToolSwing(state.equipped);return}if(state.equipped!=='hands'&&state.equipped!=='pickaxe'&&state.tools[state.equipped])startToolSwing(state.equipped);if(state.equipped==='pickaxe'&&state.tools.pickaxe){const rock=objects.filter(o=>o.type==='rock'&&!state.removed.includes(o.id)&&!campsiteProtected(o)&&dist(o,state)<130).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(rock){breakBoulder(rock);return}startToolSwing('pickaxe');digGround('pickaxe');return}if(state.equipped==='shovel'&&state.tools.shovel){digGround('shovel');return}if(state.equipped==='axe'&&state.tools.axe){const tree=objects.filter(o=>o.type==='tree'&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&near(o,145)).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(tree){soundEffect('chop',tree);const hits=(state.treeHits[tree.id]||0)+1;state.treeHits[tree.id]=hits;if(hits>=3){harvest(tree);mindEvent('gather','tree');delete state.treeHits[tree.id];if(tree.id===runeGuardianId)memory('ᚠ Haigen cleared the guardian tree and uncovered the ancient rune stone!');const base=Date.now()+'-'+tree.id;for(const [i,kind] of ['log','log','twig','leaves'].entries())state.fallen.push({id:base+'-'+i,x:clamp(tree.x+(i-1.5)*23,50,WORLD-50),y:clamp(tree.y+20+(i%2)*25,50,WORLD-50),kind});notify('🌲 TIMBER! Collect logs, twigs and leaves with X.')}else notify('🪓 Chop! '+hits+'/3 hits.');save()}else{soundEffect('swing');notify('🪓 Swing! Move closer to a tree.')}}else if(state.equipped==='torch'&&state.tools.torch){soundEffect('swing');notify('🔦 Haigen raises his torch.')}else notify('✋ Equip a tool using LB/RB or the hotbar.')}let gamepadXHeld=false,gamepadRTHeld=false;let gamepadStartHeld=false,gamepadBHeld=false;function menuController(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const start=!!(p&&p.buttons[9]&&p.buttons[9].pressed),b=!!(p&&p.buttons[1]&&p.buttons[1].pressed);if(start&&!gamepadStartHeld){if($('overlay').classList.contains('open'))close();else showMap()}if(b&&!gamepadBHeld&&$('overlay').classList.contains('open'))close();if(p&&$('worldMap')&&$('overlay').classList.contains('open')){const y=p.axes[3]||0,now=performance.now();if(Math.abs(y)>.35&&now-mapZoomLast>90){changeMapZoom(-y*.28);mapZoomLast=now}}gamepadStartHeld=start;gamepadBHeld=b}function checkActions(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const x=!!(p&&p.buttons&&p.buttons[2]&&p.buttons[2].pressed),rt=!!(p&&p.buttons&&p.buttons[7]&&(p.buttons[7].pressed||p.buttons[7].value>.55));if(x&&!gamepadXHeld){if(state.autonomy)setAutonomy(false);interact()}if(rt&&!gamepadRTHeld)useTool();gamepadXHeld=x;gamepadRTHeld=rt}function call(){for(let c of companions){if(c.life.recovering)continue;c.target={x:clamp(state.x+rand(-60,60),60,WORLD-60),y:clamp(state.y+rand(-60,60),60,WORLD-60)};c.mode='called';c.t=7000}notify('📣 You called Dylan and Skölli! Skölli may take his time...')}let mapZoom=1,mapBase=null;function showMap(){mapZoom=1;open('<h2>🗺️ Haigen’s World</h2><p class="small">Right stick up/down zooms. Press Xbox B to exit.</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin:10px 0"><button class="btn" id="mapCloseBtn" type="button">✕ Close map (B)</button><div><button class="btn" id="mapZoomOut" type="button">−</button> <span id="mapZoomLabel">1.0×</span> <button class="btn" id="mapZoomIn" type="button">+</button></div></div><canvas id="worldMap" width="560" height="560" style="width:100%;height:auto;aspect-ratio:1;background:#93b47b;border:2px solid #e8d4a1;border-radius:12px"></canvas><p class="small">🏕️ First Clearing · 🐟 Lake · ᚠ Rune stone · ⛰️ Highlands · 🌳 Grove · 🌿 Marsh</p><h3>🌍 Explore the expanded world</h3><p class="small">Choose a region to preview its scenery, wildlife and outfit. Return to the woodland whenever you like.</p><div id="regionTravel" style="display:flex;flex-wrap:wrap;gap:7px"></div>');$('mapCloseBtn').onclick=close;const canvas=$('worldMap'),g=canvas.getContext('2d'),sc=canvas.width/WORLD;const mini=document.createElement('canvas');mini.width=mini.height=280;const mg=mini.getContext('2d'),pixels=mg.createImageData(280,280);let i=0;
 for(let y=0;y<280;y++)for(let x=0;x<280;x++){const rgb=islandTerrainRGB((x+.5)*WORLD/280,(y+.5)*WORLD/280);pixels.data[i++]=rgb[0];pixels.data[i++]=rgb[1];pixels.data[i++]=rgb[2];pixels.data[i++]=255}
 mg.putImageData(pixels,0,0);g.drawImage(mini,0,0,560,560);
 for(const r of expandedRegions){g.fillStyle='#35483f';g.font='bold 9px system-ui';g.fillText(r.name,(r.x+20)*sc,(r.y+r.h*.28)*sc)}for(const l of landmarks){g.beginPath();g.ellipse(l.x*sc,l.y*sc,(l.kind==='highlands'?620:510)*sc,(l.kind==='highlands'?400:360)*sc,0,0,Math.PI*2);g.fillStyle=l.kind==='highlands'?'#85928a':l.kind==='marsh'?'#6a9b87':'#51865b';g.fill()}g.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,rad=lakeRadius(a),x=(pond.x+Math.cos(a)*pond.rx*rad)*sc,y=(pond.y+Math.sin(a)*pond.ry*rad)*sc;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fillStyle='#448caa';g.fill();for(const o of objects){if(o.type!=='tree'||o.x>4200||o.y>4200||islandDepth(o.x,o.y)<25||state.removed.includes(o.id))continue;g.fillStyle='#4d8051';g.fillRect(o.x*sc,o.y*sc,2,2)}for(const [p,label,color] of [[cottage,'CAMP','#f9e6a0'],[ruins,'RUNE','#e5c6f7'],[landmarks[0],'HIGHLANDS','#e7e4d4'],[storyStep().place,'QUEST','#f9bd64']]){if(!p)continue;g.fillStyle=color;g.beginPath();g.arc(p.x*sc,p.y*sc,4,0,Math.PI*2);g.fill();g.font='bold 10px system-ui';g.fillText(label,p.x*sc+7,p.y*sc-6)}for(const l of landmarks.slice(1)){g.fillStyle='#f4eed3';g.font='bold 10px system-ui';g.fillText(l.name,l.x*sc+6,l.y*sc-6)}for(const b of state.structures){g.fillStyle=b.kind==='campfire'?'#efaa5a':'#fff0bc';g.fillRect(b.x*sc-2,b.y*sc-2,4,4)}g.fillStyle='#ffe26e';g.beginPath();g.arc(state.x*sc,state.y*sc,6,0,Math.PI*2);g.fill();g.strokeStyle='#263d34';g.lineWidth=2;g.stroke();g.fillStyle='#fff5ce';g.font='bold 11px system-ui';g.fillText('YOU',state.x*sc+9,state.y*sc-7);mapBase=document.createElement('canvas');mapBase.width=560;mapBase.height=560;mapBase.getContext('2d').drawImage(canvas,0,0);const destinations=[{id:'woodland',name:'🌲 Woodland',x:1500,y:1500},...expandedRegions.map(r=>({id:r.id,name:r.name,x:r.x+r.w*.5,y:r.y+r.h*.5}))];const travel=$('regionTravel');for(const dest of destinations){const btn=document.createElement('button');btn.className='btn';btn.textContent=dest.name;btn.onclick=()=>{state.x=dest.x;state.y=dest.y;state.resting=false;cam.x=state.x;cam.y=state.y;save();close();notify('🗺️ Arrived at '+dest.name);};travel.appendChild(btn)}$('mapZoomIn').onclick=()=>changeMapZoom(.5);$('mapZoomOut').onclick=()=>changeMapZoom(-.5);drawMapZoom()}$('regionsQuickBtn').onclick=showMap;
@@ -5609,7 +5891,12 @@ const selected=craftCategories.find(c=>c.id===category);if(!selected){craft();re
 const choices=availableRecipes().filter(({r})=>selected.kinds.includes(r.kind));
 open(`<h2>${selected.title}</h2><p>${selected.subtitle}</p><button class="btn" id="craftBack" type="button">← All categories</button>${choices.map(v=>recipeCard(v,'recipe')).join('')||'<p>Nothing available yet.</p>'}<p class="small">🪵 ${state.wood} carried · 📦 ${state.woodStored} stored · 🪨 ${state.stone} stone · 🌿 ${state.twigs} twigs · 🍃 ${state.leaves} leaves</p>${category==='tools'?'<p class="small">Your crafted tools appear in the hotbar.</p>':''}${category==='remedies'?'<p class="small">🍓 '+state.berries+' berries · 🍄 '+state.mushrooms+' edible mushrooms · 🩵 '+state.medicinalMushrooms+' medicinal · 🥩 '+state.rawMeat+' raw meat · 🧪 '+state.antidotes+' antidotes</p>':''}<p class="small">Press B to return to the woodland.</p>`);
 document.getElementById('craftBack').onclick=()=>craft();document.querySelectorAll('[data-recipe]').forEach(b=>b.onclick=()=>build(+b.dataset.recipe))}
-function build(i){let r=recipes[i];if(!r)return;if(['salve','tea','mushroomMeal','meal','eggMeal','fishMeal','meatMeal','antidote','vegetableMeal'].includes(r.kind)&&dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Return to camp or a campfire to prepare this.');return}if(campStages.some(t=>t.kind===r.kind)&&campStages[state.campTier]?.kind!==r.kind){notify('🔒 Finish the current home upgrade first.');return}const herbTotal=Object.values(state.herbs).reduce((a,b)=>a+b,0);if(availableCampWood()<r.wood||state.stone<r.stone||state.berries<(r.berries||0)||state.mushrooms<(r.mushrooms||0)||state.eggs<(r.eggs||0)||state.fish<(r.fish||0)||state.rawMeat<(r.rawMeat||0)||state.vegetables<(r.vegetables||0)||state.medicinalMushrooms<(r.medicinalMushrooms||0)||herbTotal<(r.herbs||0)||state.twigs<(r.twigs||0)||state.leaves<(r.leaves||0)){notify('Not enough materials yet!');return}spendCampWood(r.wood);state.stone-=r.stone;state.berries-=r.berries||0;state.mushrooms-=r.mushrooms||0;state.eggs-=r.eggs||0;state.fish-=r.fish||0;state.rawMeat-=r.rawMeat||0;state.vegetables-=r.vegetables||0;state.medicinalMushrooms-=r.medicinalMushrooms||0;state.twigs-=r.twigs||0;state.leaves-=r.leaves||0;let need=r.herbs||0;for(const k of Object.keys(state.herbs)){const used=Math.min(need,state.herbs[k]);state.herbs[k]-=used;need-=used;if(!need)break}if(['salve','tea','mushroomMeal','eggMeal','fishMeal','meatMeal','antidote','vegetableMeal'].includes(r.kind)){startHaigenAction('cook',1100);if(r.kind==='salve')state.potions++;else if(r.kind==='antidote')state.antidotes++;else state.food++;close();notify(r.name+' prepared!');save();return}if(['axe','torch','shovel','pickaxe','net'].includes(r.kind)){state.tools[r.kind]++;equipTool(r.kind);close();notify(r.name+' crafted!');save();return}if(r.kind==='meal'){state.food++;startHaigenAction('cook',1100);close();notify('🍲 Meal prepared!');save();return}if(campStages.some(t=>t.kind===r.kind)){state.campTier++;mindEvent('build',r.name);state.structures=state.structures.filter(q=>!campStages.some(t=>t.kind===q.kind));memory('🏡 Haigen upgraded the campsite: '+r.name+'!');close();notify('✨ New home built! Another plan has been unlocked.');save();return}const firstBuild=r.kind==='shelter'&&!state.structures.some(q=>q.kind==='shelter')?{x:cottage.x+35,y:cottage.y-10}:r.kind==='campfire'&&!state.structures.some(q=>q.kind==='campfire')?firstFire:{x:clamp(state.x+rand(70,125),100,WORLD-100),y:clamp(state.y+rand(55,105),100,WORLD-100)};state.structures.push({kind:r.kind,x:firstBuild.x,y:firstBuild.y,...(r.kind==='campfire'?{lit:false,fuel:0}:{})});if(r.kind==='shelter')memory('🏕️ Haigen built his first woodland shelter in the clearing!');if(r.kind==='campfire')memory('🔥 Haigen laid a stone-ring fire pit for his first camp!');mindEvent('build',r.name);if(!state.quests.home){state.quests.home=true;memory('Haigen built his first woodland structure!')}close();notify(`${r.name} built!`);save()}function help(){open(`<h2>🌲 Welcome to Haigen's World</h2><p><b>Your adventure:</b> Explore the woodland, collect materials, build structures, discover secrets and befriend Dylan and Skölli.</p><p>🎮 <b>Move:</b> Drag the on-screen joystick, use an Xbox controller's left stick or D-pad, or use WASD / arrow keys.<br>✨ <b>Interact:</b> Stand near a tree, rock, bush, friend or landmark and tap Interact.<br>🍓 <b>Friends:</b> Collect berries and give them to your companions.<br>🔨 <b>Build:</b> Craft a campfire, garden or shelter.<br>📖 <b>Journal:</b> Remember your adventures.</p><p><b>First quest:</b> Clear the campsite debris piles, then chop trees, gather supplies and build a lean-to shelter. Then build a stone-ring campfire!</p><p class="small">Version 0.4 • Offline-friendly after loading • Progress stored in this browser, not synced between devices.</p><button class="btn" id="resetBtn">Reset saved world</button>`);$('resetBtn').onclick=()=>{if(confirm('Start a new world? This deletes your local progress.')){localStorage.removeItem('wandererV127PreviewSave');location.reload()}}}function joyMove(e){const rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;let x=(e.clientX-cx)/43,y=(e.clientY-cy)/43,m=Math.hypot(x,y);joy={x:x/Math.max(1,m),y:y/Math.max(1,m)};$('stick').style.transform=`translate(${joy.x*32}px,${joy.y*32}px)`}const j=$('joy');j.addEventListener('pointerdown',e=>{j.setPointerCapture(e.pointerId);joyMove(e)});j.addEventListener('pointermove',e=>{if(j.hasPointerCapture(e.pointerId))joyMove(e)});function release(){joy={x:0,y:0};$('stick').style.transform='translate(0,0)'}j.addEventListener('pointerup',release);j.addEventListener('pointercancel',release);function typingInField(target){return !!target&&(!!target.isContentEditable||['INPUT','TEXTAREA','SELECT'].includes(String(target.tagName||'').toUpperCase()))}
+function build(i){let r=recipes[i];if(!r)return;if(['salve','tea','mushroomMeal','meal','eggMeal','fishMeal','meatMeal','antidote','vegetableMeal'].includes(r.kind)&&dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Return to camp or a campfire to prepare this.');return}if(campStages.some(t=>t.kind===r.kind)&&campStages[state.campTier]?.kind!==r.kind){notify('🔒 Finish the current home upgrade first.');return}const herbTotal=Object.values(state.herbs).reduce((a,b)=>a+b,0);if(availableCampWood()<r.wood||state.stone<r.stone||state.berries<(r.berries||0)||state.mushrooms<(r.mushrooms||0)||state.eggs<(r.eggs||0)||state.fish<(r.fish||0)||state.rawMeat<(r.rawMeat||0)||state.vegetables<(r.vegetables||0)||state.medicinalMushrooms<(r.medicinalMushrooms||0)||herbTotal<(r.herbs||0)||state.twigs<(r.twigs||0)||state.leaves<(r.leaves||0)){notify('Not enough materials yet!');return}spendCampWood(r.wood);state.stone-=r.stone;state.berries-=r.berries||0;state.mushrooms-=r.mushrooms||0;state.eggs-=r.eggs||0;state.fish-=r.fish||0;state.rawMeat-=r.rawMeat||0;state.vegetables-=r.vegetables||0;state.medicinalMushrooms-=r.medicinalMushrooms||0;state.twigs-=r.twigs||0;state.leaves-=r.leaves||0;let need=r.herbs||0;for(const k of Object.keys(state.herbs)){const used=Math.min(need,state.herbs[k]);state.herbs[k]-=used;need-=used;if(!need)break}if(['salve','tea','mushroomMeal','eggMeal','fishMeal','meatMeal','antidote','vegetableMeal'].includes(r.kind)){startHaigenAction('cook',1100);if(r.kind==='salve')state.potions++;else if(r.kind==='antidote')state.antidotes++;else state.food++;close();notify(r.name+' prepared!');save();return}if(['axe','torch','shovel','pickaxe','net'].includes(r.kind)){state.tools[r.kind]++;equipTool(r.kind);close();notify(r.name+' crafted!');save();return}if(r.kind==='meal'){state.food++;startHaigenAction('cook',1100);close();notify('🍲 Meal prepared!');save();return}if(campStages.some(t=>t.kind===r.kind)){state.campTier++;mindEvent('build',r.name);state.structures=state.structures.filter(q=>!campStages.some(t=>t.kind===q.kind));memory('🏡 Haigen upgraded the campsite: '+r.name+'!');close();notify('✨ New home built! Another plan has been unlocked.');save();return}const firstBuild=r.kind==='shelter'&&!state.structures.some(q=>q.kind==='shelter')?{x:cottage.x+35,y:cottage.y-10}:r.kind==='campfire'&&!state.structures.some(q=>q.kind==='campfire')?firstFire:{x:clamp(state.x+rand(70,125),100,WORLD-100),y:clamp(state.y+rand(55,105),100,WORLD-100)};state.structures.push({kind:r.kind,x:firstBuild.x,y:firstBuild.y,...(r.kind==='campfire'?{lit:false,fuel:0}:{})});if(r.kind==='shelter')memory('🏕️ Haigen built his first woodland shelter in the clearing!');if(r.kind==='campfire')memory('🔥 Haigen laid a stone-ring fire pit for his first camp!');mindEvent('build',r.name);if(!state.quests.home){state.quests.home=true;memory('Haigen built his first woodland structure!')}close();notify(`${r.name} built!`);save()}function help(){open(`<h2>🌲 Welcome to Haigen's World</h2><p><b>Your adventure:</b> Explore the woodland, collect materials, build structures, discover secrets and befriend Dylan and Skölli.</p><p>🎮 <b>Move:</b> Drag the on-screen joystick, use an Xbox controller's left stick or D-pad, or use WASD / arrow keys.<br>✨ <b>Interact:</b> Stand near a tree, rock, bush, friend or landmark and tap Interact.<br>🍓 <b>Friends:</b> Collect berries and give them to your companions.<br>🔨 <b>Build:</b> Craft a campfire, garden or shelter.<br>📖 <b>Journal:</b> Remember your adventures.</p><p><b>First quest:</b> Clear the campsite debris piles, then chop trees, gather supplies and build a lean-to shelter. Then build a stone-ring campfire!</p><p class="small">Version 0.4 • Offline-friendly after loading • Progress stored in this browser, not synced between devices.</p><button class="btn" id="resetBtn">Reset saved world</button>`);$('resetBtn').onclick=()=>{if(confirm('Start a new world? This deletes your local progress.')){localStorage.removeItem('wandererV127PreviewSave');location.reload()}}}function joyMove(e){const rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;let x=(e.clientX-cx)/43,y=(e.clientY-cy)/43,m=Math.hypot(x,y);joy={x:x/Math.max(1,m),y:y/Math.max(1,m)};$('stick').style.transform=`translate(${joy.x*32}px,${joy.y*32}px)`}const j=$('joy');let joyPointer=null;j.style.touchAction='none';
+j.addEventListener('pointerdown',e=>{if(joyPointer!==null)return;e.preventDefault();joyPointer=e.pointerId;j.setPointerCapture(e.pointerId);joyMove(e)});
+j.addEventListener('pointermove',e=>{if(e.pointerId===joyPointer)joyMove(e)});
+function release(e){if(e.pointerId!==joyPointer)return;joyPointer=null;joy={x:0,y:0};$('stick').style.transform='translate(0,0)'}
+for(const event of ['pointerup','pointercancel','lostpointercapture'])j.addEventListener(event,release);
+function typingInField(target){return !!target&&(!!target.isContentEditable||['INPUT','TEXTAREA','SELECT'].includes(String(target.tagName||'').toUpperCase()))}
 addEventListener('keydown',e=>{
  if(typingInField(e.target))return;
  keys[e.key]=true;
@@ -5618,7 +5905,10 @@ addEventListener('keydown',e=>{
  if(e.key==='Escape'&&$('overlay').classList.contains('open'))close();
  if(e.key.toLowerCase()==='m'&&!e.repeat){if($('overlay').classList.contains('open'))close();else showMap()}
 });
-addEventListener('keyup',e=>{if(!typingInField(e.target))keys[e.key]=false});$('interactBtn').onclick=interact;$('useBtn').onclick=useTool;$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('storyBtn').onclick=storyJournal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('packBtn').onclick=backpack;$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('artBtn').onclick=toggleRebirthArt;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
+addEventListener('keyup',e=>{if(!typingInField(e.target))keys[e.key]=false});$('interactBtn').onclick=interact;const useButton=$('useBtn');
+useButton.style.touchAction='none';
+useButton.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();useTool()});
+useButton.onclick=e=>{if(!e.detail)useTool()};$('callBtn').onclick=call;$('mapBtn').onclick=showMap;$('journalBtn').onclick=journal;$('storyBtn').onclick=storyJournal;$('modeBtn').onclick=()=>setAutonomy(!state.autonomy);$('packBtn').onclick=backpack;$('autoTouchBtn').addEventListener('pointerup',e=>{e.preventDefault();setAutonomy(!state.autonomy)});$('craftBtn').onclick=craft;$('artBtn').onclick=toggleRebirthArt;$('helpBtn').onclick=help;// Touch-first HUD: invoke directly on pointerdown, suppress its synthetic click.
 for(const [id,fn] of [['modeBtn',()=>setAutonomy(!state.autonomy)],['packBtn',backpack],['mapBtn',showMap],['journalBtn',journal],['storyBtn',storyJournal],['craftBtn',craft],['artBtn',toggleRebirthArt],['helpBtn',help]]){const el=$(id);let handled=0;el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();e.stopPropagation();handled=Date.now();const drawer=document.querySelector('.mobile-menu');if(drawer)drawer.open=false;fn()}},true);el.addEventListener('click',e=>{if(Date.now()-handled<800){e.preventDefault();e.stopImmediatePropagation()}},true)}$('closeBtn').onclick=close;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))close()});// iPad camera: one finger pans, two fingers pinch to zoom; controls remain separate.
 let cameraZoom=1;
 function worldZoom(){return clamp(Math.min(W/1024,H/768),.52,1)*cameraZoom*(rbEnabled?1.18:1)}
@@ -5759,6 +6049,7 @@ function frame(now){
  $('previewFriends').onclick=()=>{
   // Companion art showcase is opt-in, preview only. Never alters quest or save data.
   for(const c of companions){
+   if(c.life.recovering)continue;
    if(c.kind!=='rabbit'&&c.kind!=='fox')continue;
    c.x=state.x+(c.kind==='rabbit'?-65:66);
    c.y=state.y+33;
@@ -5849,7 +6140,7 @@ function frame(now){
    engineReady:window.__haigenWorldReady
   };
  };
- const GAME_BUILD=127;document.getElementById('devVersion').textContent='V127 · ILLUSTRATED HUD';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=127;$('devVersion').textContent='V'+GAME_BUILD;$('devVersion').title='V127 · ILLUSTRATED HUD';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
@@ -6012,7 +6303,7 @@ offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Re
   snapshot:()=>{
    const t=Math.max(0,Number(state.daytime)||0);
    return {
-    x:state.x,y:state.y,
+    x:state.x,y:state.y,autonomy:state.autonomy,goal:autoJobLabel,
     health:state.health,energy:state.energy,hunger:state.hunger,
     day:1+Math.floor(t/180),
     phase:['Morning','Afternoon','Evening','Night'][Math.floor((t%180)/45)]||'Morning',
@@ -6023,9 +6314,10 @@ offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Re
    };
   },
   terrain:(x,y)=>islandTerrainRGB(x,y),
+  supplies:scoutSuppliesMenu,care:companionCareMenu,wardrobe:openTravelWardrobe,
   portrait:()=>haigenMovementAtlas,
   toolCanvas:id=>haigenToolSprite(id),
   refreshTools:()=>renderHotbar()
  };
- requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./v127-ornate-ui.js?v=1"></script></body></html>
+ requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?(state.autonomy?'Haigen is clearing camp. Move to take control.':'Clear the campsite with Collect, or let Haigen work from the menu.'):state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
+</script><script src="./v127-ornate-ui.js?v=5"></script></body></html>

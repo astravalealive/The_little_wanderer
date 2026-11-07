@@ -52,7 +52,7 @@ el.innerHTML=[
  '<button class="v127-utility" data-action="mapBtn" aria-label="Map">',icons.map,'</button></nav>',
  '<button class="v127-gear" id="v127Gear" type="button" aria-label="Settings">',icons.gear,'</button>',
  '<aside class="v127-settings v127-framed" id="v127Settings"><h3>Adventure Menu</h3>',
- '<button data-action="modeBtn">Take control / Explore</button>',
+ '<p id="haigenCurrentTask"></p><button data-action="modeBtn">Let Haigen work</button>',
  '<button data-action="storyBtn">The Silent Pond</button>',
  '<button data-action="craftBtn">Craft and Build</button>',
  '<button data-action="artBtn">Change World Style</button>',
@@ -63,6 +63,9 @@ el.innerHTML=[
  '<button data-action="cookBtn">Cook and Mix</button>',
  '<button data-action="mailBtn">Haigen’s Notes</button>',
  '<button data-action="styleBtn">Hair and Appearance</button>',
+ '<button id="dylanBasket">Dylan’s camp supplies</button>',
+ '<button id="friendCare">Companion care</button>',
+ '<button id="haigenWardrobe">Haigen’s outfits</button>',
  '<button id="v127MeetFriends">Meet Dylan and Skölli</button>',
  '<button id="v127VisitPond">Visit the frog pond</button>',
  '<button id="v127CloseSettings">Close</button></aside>'
@@ -80,6 +83,9 @@ el.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('cl
 }));
 $('v127Gear').onclick=()=>$('v127Settings').classList.toggle('open');
 $('v127CloseSettings').onclick=()=>$('v127Settings').classList.remove('open');
+$('dylanBasket').onclick=()=>{engine.supplies();$('v127Settings').classList.remove('open')};
+$('friendCare').onclick=()=>{engine.care();$('v127Settings').classList.remove('open')};
+$('haigenWardrobe').onclick=()=>{engine.wardrobe();$('v127Settings').classList.remove('open')};
 $('v127MeetFriends').onclick=()=>{$('previewFriends')?.click();$('v127Settings').classList.remove('open')};
 $('v127VisitPond').onclick=()=>{$('previewPond')?.click();$('v127Settings').classList.remove('open')};
 $('v127QuestToggle').onclick=()=>{
@@ -152,6 +158,11 @@ function tick(){
  if(now-lastDraw>180){lastDraw=now;
   try{
    const state=engine.snapshot(),hp=Math.min(100,Math.max(0,Number(state.health)||0));
+   const task=state.autonomy?'Haigen’s plan · '+(state.goal||'look around camp'):'You’re guiding Haigen';
+   if($('haigenCurrentTask').textContent!==task){
+    $('haigenCurrentTask').textContent=task;
+    el.querySelector('[data-action="modeBtn"]').textContent=state.autonomy?'Take control':'Let Haigen work';
+   }
    syncExtraSlots(state);
    if(Math.ceil(hp)!==lastHP){
     lastHP=Math.ceil(hp);
