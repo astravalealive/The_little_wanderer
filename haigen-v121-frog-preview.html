@@ -3584,8 +3584,12 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  const displayDir=newSheet&&transition&&oldSide&&newVertical?haigenTurnFrom:dir;
  // The V121 reference and legacy V119 fallback have opposite left/right row ordering.
  const referenceMovement=newSheet&&!haigenReferenceFallbackUsed;
- const row=displayDir==='up'?1:displayDir==='left'?(newSheet?(referenceMovement?2:3):2):displayDir==='right'?(newSheet?(referenceMovement?3:2):2):0;
- const scale=1.18,w=48*scale,h=72*scale;
+ // Both 192x288 source movement atlases are down, up, RIGHT, LEFT.
+  // The previous incorrect inversion produced the sideways moonwalk.
+  const row=displayDir==='up'?1:displayDir==='left'?3:displayDir==='right'?2:0;
+ // Match Haigen's original on-screen stature (not the shrunken V121 view).
+  // Keep the same foot baseline and let the wrist-mounted props inherit scale.
+  const scale=1.67,w=48*scale,h=72*scale;
  const left=Math.round(x-w/2),top=Math.round(y-h+7);
  ctx.save();ctx.imageSmoothingEnabled=false;
  ellipse(x+1,y+7,20,6,'#1a312b67');
@@ -4286,7 +4290,10 @@ function drawFrog(f){
  const dx=(f.toX||gx)-(f.fromX||gx),dy=(f.toY||gy)-(f.fromY||gy);
  const facing=Math.abs(dx)>1?(dx>=0?1:-1):1;
  const bodyY=gy-rise;
- if(rbEnabled){drawPixelFrog(f,gx,gy,bodyY,facing,p,arc,jumping);return}
+ // Restore the original V65 expressive frog drawing and its silly jointed
+ // rear legs, toe flicks, blink and landing squash. The generic square-faced
+ // Rebirth frog art was hiding those original animations.
+ // The classic frog animation is now the shared renderer in both art modes.
  ctx.save();
  // Ground shadow stays put as the frog springs up; it shrinks in midair.
  ctx.globalAlpha=.38-arc*.18;
