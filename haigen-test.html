@@ -516,6 +516,9 @@ function updateChickens(dt){
  }
 }
 function drawHen(h){
+ if(rbEnabled&&rbWoodland(h.x,h.y)){
+  rbDrawCreature('chicken',h.x,h.y,Math.cos(h.angle||0)>=0?'right':'left',!h.rest,time+h.phase*1000,2.05);return;
+ }
  const t=time*.006+h.phase,walking=!h.rest;
  const peck=walking&&Math.sin(t*.9)>.55;
  const scratch=walking&&Math.sin(t*.42)>.8;
@@ -767,7 +770,114 @@ function updateBeasts(dt){
   }
  }
 }
+// V115 native pixel creatures. Each has distinct side, front, back and walk poses.
+// Draw-only: predator attacks, fleeing, health, egg lifecycle and frog jumping are unchanged.
+const rbCreatureCache=new Map();
+function rbCreatureSprite(kind,dir,frame){
+ const key=kind+':'+dir+':'+frame;
+ if(rbCreatureCache.has(key))return rbCreatureCache.get(key);
+ const beast=kind==='wolf'||kind==='boar',bird=kind==='chicken'||kind==='duck';
+ const w=beast?40:bird?28:18,h=beast?32:bird?24:16;
+ const c=document.createElement('canvas');c.width=w;c.height=h;
+ const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+ const p=(x,y,w,h,color)=>rbPixel(g,x,y,w,h,color);
+ const side=dir==='left'||dir==='right',back=dir==='up',step=frame===1?-2:frame===2?2:0;
+ if(kind==='wolf'){
+  const fur='#768183',shade='#525c60',mid='#9fa9a5',cream='#c0c8bc';
+  if(side){
+   p(1,15,9,6,shade);p(3,12,6,4,fur);
+   p(11+step,23,6,8,shade);p(29-step,23,6,8,shade);
+   p(7,9,27,17,shade);p(10,8,24,15,fur);p(14,10,16,5,mid);
+   p(27,5,11,15,shade);p(29,7,9,12,fur);
+   p(29,0,4,9,shade);p(35,1,4,9,shade);p(30,3,2,5,'#ab9994');
+   p(32,14,8,4,cream);p(37,16,3,3,'#27373a');
+   p(34,10,2,3,'#d5cfad');p(35,11,1,2,'#1d2c31');
+   p(28,21,8,3,cream);
+  }else{
+   p(10+step,23,6,8,shade);p(24-step,23,6,8,shade);
+   p(11,11,19,15,fur);p(15,13,11,10,mid);
+   p(11,4,7,8,shade);p(24,4,7,8,shade);
+   p(13,7,15,16,fur);
+   if(back){p(16,8,9,12,shade);p(14,13,13,6,mid)}
+   else{
+    p(16,17,9,6,cream);p(15,13,3,3,'#d8d2b4');p(24,13,3,3,'#d8d2b4');
+    p(16,14,2,2,'#253238');p(24,14,2,2,'#253238');p(19,20,4,3,'#303638');
+   }
+  }
+ }else if(kind==='boar'){
+  const fur='#7d5840',dark='#513d34',light='#a37c58',snout='#b8967b';
+  if(side){
+   for(let i=0;i<7;i++)p(8+i*4,5-(i%3)*2,4,10,dark);
+   p(11+step,23,6,8,dark);p(29-step,23,6,8,dark);
+   p(5,11,30,15,dark);p(7,9,28,15,fur);p(10,11,16,4,light);
+   p(27,10,11,14,fur);p(30,5,7,8,dark);
+   p(31,17,9,6,snout);p(36,18,2,4,'#75594b');
+   p(30,13,3,3,'#e9d5af');p(31,14,1,2,'#312d29');
+   p(31,21,4,5,'#e6d5bc');
+  }else{
+   p(9+step,23,7,8,dark);p(25-step,23,7,8,dark);
+   p(6,12,29,15,dark);p(10,9,22,18,fur);
+   for(let i=0;i<5;i++)p(8+i*5,7-(i%2)*3,4,8,dark);
+   p(11,6,7,9,dark);p(24,6,7,9,dark);
+   if(back){p(14,13,14,8,light)}
+   else{p(12,15,18,9,light);p(14,17,14,7,snout);
+    p(15,11,3,3,'#ede2c8');p(24,11,3,3,'#ede2c8');
+    p(16,12,1,2,'#262b2b');p(25,12,1,2,'#262b2b');
+    p(16,20,3,3,'#805b50');p(24,20,3,3,'#805b50');
+   }
+  }
+ }else if(kind==='chicken'){
+  const body='#e3d3af',wing='#c5b98f',shade='#8a8270';
+  p(9+step,20,2,4,'#a78145');p(17-step,20,2,4,'#a78145');
+  if(side){
+   p(4,10,18,12,shade);p(6,8,17,12,body);p(7,13,11,6,wing);
+   p(18,5,7,12,body);p(19,2,6,6,'#ae5c53');p(24,12,4,3,'#d7a24e');
+   p(21,10,2,2,'#272d2b');p(3,8,6,8,'#a99a7b');
+  }else{
+   p(6,9,16,12,shade);p(7,8,14,12,body);p(10,7,10,11,'#f0e0bd');
+   p(10,2,8,7,'#b66959');p(12,4,6,4,'#c9846a');
+   if(!back){p(10,11,2,2,'#33332f');p(17,11,2,2,'#33332f');p(12,16,5,3,'#c78b45')}
+  }
+ }else if(kind==='duck'){
+  const body='#a28d72',shade='#655d55',wing='#ccb599';
+  if(side){
+   p(4,10,18,12,shade);p(3,8,20,12,body);p(6,10,12,7,wing);
+   p(19,5,6,13,'#d3c3a0');p(19,2,8,9,'#537368');
+   p(24,7,4,3,'#d9a94c');p(23,6,2,2,'#253636');
+   p(2,7,6,4,'#6c6054');
+  }else{
+   p(5,11,19,10,shade);p(7,9,15,11,body);p(10,7,10,11,'#c0b09a');
+   p(11,4,8,8,'#6f8678');p(13,9,4,3,'#c8a35b');
+   if(!back){p(12,8,2,2,'#283536');p(17,8,2,2,'#283536')}
+  }
+  p(8+step,19,3,3,'#bd8b4d');p(19-step,19,3,3,'#bd8b4d');
+ }else if(kind==='frog'){
+  const skin='#63894f',shade='#385e42',light='#9ab66e';
+  p(1,8,5,5,shade);p(12,8,5,5,shade);
+  p(3,6,12,7,skin);p(5,7,8,4,light);
+  p(3,3,5,5,skin);p(10,3,5,5,skin);
+  if(!back){p(5,4,2,2,'#e2d9a6');p(11,4,2,2,'#e2d9a6');p(6,5,1,1,'#1e302b');p(12,5,1,1,'#1e302b')}
+  p(1+step,12,5,3,'#466e49');p(12-step,12,5,3,'#466e49');
+ }
+ rbCreatureCache.set(key,c);return c;
+}
+function rbDrawCreature(kind,x,y,dir='right',moving=false,anim=0,scale=2){
+ const frame=moving?1+Math.floor((anim||0)/160)%2:0;
+ const sprite=rbCreatureSprite(kind,dir,frame);
+ const w=sprite.width*scale,h=sprite.height*scale;
+ const sx=Math.round(x-w/2),sy=Math.round(y-h+8);
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ellipse(x,y+6,Math.max(11,w*.39),4,'#223e355b');
+ if(dir==='left'){ctx.translate(sx+w,0);ctx.scale(-1,1);ctx.drawImage(sprite,0,sy,w,h)}
+ else ctx.drawImage(sprite,sx,sy,w,h);
+ ctx.restore();
+}
+
 function drawBeast(b){
+ if(rbEnabled&&rbWoodland(b.x,b.y)&&(b.kind==='wolf'||b.kind==='boar')){
+  const moving=['patrol','retreating','confronting','charging'].includes(b.mode);
+  rbDrawCreature(b.kind,b.x,b.y,b.dir||'right',moving,b.anim,2.15);return;
+ }
  // Shared directional animal silhouettes: torso, head and eye point the same way.
  const moving=b.mode==='patrol'||b.mode==='retreating'||b.mode==='confronting'||b.mode==='charging';
  const stride=moving?Math.sin(b.anim*.011)*5:0;
@@ -2829,6 +2939,9 @@ function updateDucks(dt){
 function drawDuck(d){
  const flying=d.air>.08,alt=d.air*(42+Math.sin(time*.002+d.phase)*5);
  const male=d.kind==='mallard',size=d.size;
+ if(rbEnabled&&rbWoodland(d.x,d.y)){
+  rbDrawCreature('duck',d.x,d.y-alt,Math.cos(d.heading)<0?'left':'right',flying||Math.abs(d.speed||0)>.02,time+d.phase*1000,1.7*size);return;
+ }
  ctx.save();ctx.translate(d.x,d.y-alt);ctx.scale(size*(Math.cos(d.heading)<0?-1:1),size);
  ctx.save();ctx.globalAlpha=flying?.3:.65;ctx.strokeStyle='#d1f0ee';ctx.lineWidth=1.5;
  ctx.beginPath();ctx.ellipse(0,alt+7,21,5,0,0,Math.PI*2);ctx.stroke();
@@ -2960,6 +3073,9 @@ function drawFrog(f){
  const dx=(f.toX||gx)-(f.fromX||gx),dy=(f.toY||gy)-(f.fromY||gy);
  const facing=Math.abs(dx)>1?(dx>=0?1:-1):1;
  const bodyY=gy-rise;
+ if(rbEnabled&&rbWoodland(gx,gy)){
+  rbDrawCreature('frog',gx,bodyY,facing>=0?'right':'left',jumping,time,1.7);return;
+ }
  ctx.save();
  // Ground shadow stays put as the frog springs up; it shrinks in midair.
  ctx.globalAlpha=.38-arc*.18;
