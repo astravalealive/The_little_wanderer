@@ -1,0 +1,69 @@
+name: Haigen preview smoke test
+on:
+  push:
+    paths:
+      - haigen-v121-frog-preview.html
+      - .github/workflows/haigen-preview-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser engine
+        run: npm install --no-save playwright-core@1.56.1
+      - name: Exercise Haigen world in browser
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/haigen-preview-http.log 2>&1 &
+          sleep 2
+          node <<'NODE'
+          const {chromium}=require('playwright-core');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+            for(const vp of [{width:390,height:844},{width:1024,height:768}]){
+              const page=await browser.newPage({viewport:vp,deviceScaleFactor:2});
+              const errors=[];
+              page.on('pageerror',e=>errors.push('pageerror '+e.message));
+              page.on('console',m=>{if(m.type()==='error')errors.push('console '+m.text())});
+              await page.goto('http://127.0.0.1:8765/haigen-v121-frog-preview.html?restore=1',{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(3600);
+              const before=await page.evaluate(()=>{
+                const el=document.getElementById('previewStats');
+                const ce=document.getElementById('worldError');
+                const cv=document.getElementById('game');
+                const ctx=cv.getContext('2d');
+                const w=cv.width,h=cv.height;
+                const px=ctx.getImageData(Math.floor(w/2)-80,Math.floor(h/2)-90,160,180).data;
+                let opaque=0,unique=new Set();
+                for(let i=0;i<px.length;i+=4){if(px[i+3])opaque++;unique.add(px[i]+','+px[i+1]+','+px[i+2])}
+                return {ready:window.__haigenWorldReady,stats:el?.textContent||null,error:ce?.style.display==='block'?ce.textContent:null,canvas:{w,h,colors:unique.size,opaque}};
+              });
+              await page.keyboard.down('ArrowRight');
+              await page.waitForTimeout(1100);
+              await page.keyboard.up('ArrowRight');
+              await page.waitForTimeout(600);
+              const after=await page.evaluate(()=>document.getElementById('previewStats')?.textContent||'');
+              console.log('HAIGEN SMOKE '+JSON.stringify({viewport:vp,before,after,errors}));
+              await page.screenshot({path:'/tmp/haigen-preview-'+vp.width+'.png'});
+              if(!before.ready||before.error)throw new Error('World frame did not render '+JSON.stringify(before));
+              if(errors.length)throw new Error('Browser errors '+JSON.stringify(errors));
+              if(before.canvas.colors<20)throw new Error('Canvas almost blank '+JSON.stringify(before.canvas));
+              const m1=before.stats?.match(/Haigen (\d+),(\d+)/),m2=after.match(/Haigen (\d+),(\d+)/);
+              if(!m1||!m2||m1[1]===m2[1]&&m1[2]===m2[2])throw new Error('Haigen has not moved '+before.stats+' vs '+after);
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: haigen-preview-smoke-captures
+          path: /tmp/haigen-preview-*.png
