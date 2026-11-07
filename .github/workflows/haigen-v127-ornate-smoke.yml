@@ -90,7 +90,6 @@ jobs:
               if(!await page.locator('#v127Settings').evaluate(e=>e.classList.contains('open')))throw Error('Settings failed');
               await page.locator('#v127MeetFriends').click();
               await page.waitForTimeout(400);
-              if(!window){} // noop for code coverage
               const friends=await page.evaluate(()=>window.__v126SkolliStatus().lastFrame);
               if(!friends)throw Error('Skölli not visible after Meet Friends');
               await page.locator('#v127ZoomIn').click();
