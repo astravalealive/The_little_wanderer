@@ -182,3 +182,13 @@ body.v127-rpg .slot .rpg-item-svg svg{width:100%;height:100%;display:block}
  body.v127-rpg .slot>svg{width:28px;height:29px}
  body.v127-rpg .slot .rpg-item-svg{width:27px;height:29px}
 }
+
+@media(max-width:600px){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 198px);
+  left:12px;transform:none;max-width:min(300px,calc(100vw - 24px));
+  font:700 12px/1.3 Georgia,serif;text-align:left
+ }
+ .v127-quest[data-collapsed="true"]{padding:7px 9px;min-height:36px}
+ .v127-quest[data-collapsed="true"] h3{margin:2px 18px 1px 0;font-size:13px}
+}
