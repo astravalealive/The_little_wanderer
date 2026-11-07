@@ -1,0 +1,94 @@
+name: Haigen V124 companions and wildlife render test
+on:
+  push:
+    paths:
+      - haigen-v124-fauna-playtest.html
+      - assets/haigen-fauna-v124.png
+      - assets/haigen-companions-v124.png
+      - .github/workflows/haigen-v124-fauna-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - name: Browser render test, original frogs and all sprite cells
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/haigen-v124-http.log 2>&1 &
+          sleep 2
+          node <<'NODE'
+          const {chromium}=require('playwright-core');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+            for(const size of [{width:390,height:844},{width:1024,height:768}]){
+              const page=await browser.newPage({viewport:size,deviceScaleFactor:2});
+              const errors=[];
+              page.on('pageerror',e=>errors.push('page '+e.message));
+              page.on('console',m=>{if(m.type()==='error')errors.push('console '+m.text())});
+              await page.goto('http://127.0.0.1:8765/haigen-v124-fauna-playtest.html?v=qa&restore=1',{waitUntil:'domcontentloaded'});
+              await page.waitForFunction(()=>window.__haigenWorldReady===true&&
+                window.__v124ArtStatus?.().fauna&&window.__v124ArtStatus?.().companions,{timeout:20000});
+              await page.waitForTimeout(1400);
+              const before=await page.evaluate(()=>window.__v124PreviewQA());
+              if(before.originalPondFrogs!==22||!before.art.fauna||!before.art.companions)
+               throw Error('Art or classic frog regression '+JSON.stringify(before));
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewFriends').click();
+              await page.waitForTimeout(800);
+              const after=await page.evaluate(()=>window.__v124PreviewQA());
+              await page.screenshot({path:'/tmp/haigen-v124-sidekicks-'+size.width+'.png',fullPage:false});
+              if(after.nearbyCompanions.length<2||!after.lastCompanion)
+               throw Error('Sidekick rendering failed '+JSON.stringify(after));
+              // Every sheet cell should contain actual nontransparent pixels.
+              const art=await page.evaluate(async()=>{
+                const paths=['assets/haigen-fauna-v124.png','assets/haigen-companions-v124.png'];
+                const counts=[];
+                for(const path of paths){
+                  const image=new Image();
+                  await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src='./'+path});
+                  const c=document.createElement('canvas');c.width=image.naturalWidth;c.height=image.naturalHeight;
+                  const ctx=c.getContext('2d');ctx.drawImage(image,0,0);
+                  const arr=ctx.getImageData(0,0,c.width,c.height).data;
+                  const cw=path.includes('companions')?64:96;
+                  const ch=path.includes('companions')?64:76;
+                  const numX=Math.floor(c.width/cw),numY=Math.floor(c.height/ch);
+                  const rows=[];
+                  for(let ry=0;ry<numY;ry++)for(let rx=0;rx<numX;rx++){
+                    let px=0;
+                    for(let yy=ry*ch;yy<(ry+1)*ch;yy++)for(let xx=rx*cw;xx<(rx+1)*cw;xx++)
+                      if(arr[(yy*c.width+xx)*4+3]>64)px++;
+                    rows.push(px);
+                  }
+                  counts.push({path,width:c.width,height:c.height,lowest:Math.min(...rows),cells:rows.length});
+                }
+                return counts;
+              });
+              if(art[0].cells!==12||art[1].cells!==32||art.some(a=>a.lowest<70))
+               throw Error('Artwork atlas cell blank '+JSON.stringify(art));
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewPond').click();
+              await page.waitForTimeout(800);
+              const pond=await page.evaluate(()=>window.__haigenPondProbe);
+              await page.screenshot({path:'/tmp/haigen-v124-frogs-'+size.width+'.png'});
+              if(pond.liveFrogs!==22||pond.nearbyFrogs<1)
+               throw Error('Funny pond frogs missing '+JSON.stringify(pond));
+              if(errors.length)throw Error('Runtime browser errors '+JSON.stringify(errors));
+              console.log('V124 PASSED '+JSON.stringify({size,art,after,pond}));
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: haigen-v124-companion-and-frog-captures
+          path: /tmp/haigen-v124-*.png
