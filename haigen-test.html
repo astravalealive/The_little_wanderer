@@ -1841,9 +1841,16 @@ const haigenTrailSites=[
  {x:1950,y:1150,kind:'trailLantern',name:'Eastern trail lantern'}
 ];
 function nextHaigenTrailProject(){
- return haigenTrailSites.find(p=>
-   !state.structures.some(o=>o.haigenProject===p.name)&&
-   islandDepth(p.x,p.y)>85&&!blockedBySolid(p.x,p.y));
+ for(const p of haigenTrailSites){
+  if(state.structures.some(o=>o.haigenProject===p.name))continue;
+  // Each named site may shift slightly into a genuine walkable clearing.
+  for(let i=0;i<18;i++){
+   const a=i*2.399,rad=i?25+Math.floor(i/5)*22:0;
+   const x=Math.round(p.x+Math.cos(a)*rad),y=Math.round(p.y+Math.sin(a)*rad);
+   if(islandDepth(x,y)>90&&!blockedBySolid(x,y))return {...p,x,y};
+  }
+ }
+ return null;
 }
 function autoBuildTrailProject(dt){
  const project=nextHaigenTrailProject();
@@ -1851,7 +1858,7 @@ function autoBuildTrailProject(dt){
  const cost=project.kind==='trailLantern'?{wood:3,stone:2,twigs:1}:{wood:3,stone:1,twigs:1};
  if(state.wood<cost.wood||state.stone<cost.stone||state.twigs<cost.twigs)return false;
  autoPlan('build the '+project.name.toLowerCase(),'build-trail:'+project.name);
- const approach={x:project.x+90,y:project.y+55};
+ const approach=[{x:project.x+90,y:project.y+55},{x:project.x-85,y:project.y+38},{x:project.x,y:project.y+102}].find(p=>autoStand(p.x,p.y))||project;
  if(dist(state,approach)>84){autoTravel(approach,dt,84,.11);return 'travelling'}
  startHaigenAction('craft',1100);
  state.wood-=cost.wood;state.stone-=cost.stone;state.twigs-=cost.twigs;
@@ -1993,10 +2000,12 @@ function autonomousTick(dt){
  }
  if(mindRetreat(dt))return;
  if(instructionTick(dt))return;
+ // Respect the physical strike / cooking / crafting animation time before
+ // choosing another task. Otherwise a boulder shatters in one video frame.
+ if(autoPause>0){autoPause=Math.max(0,autoPause-dt);if(autoBubbleTimer<=0)speak(currentThoughtTopic(),4200);return}
  if(lifeProjectTick(dt))return;
  if(autoCampChores(dt))return;
  if(autoFreedomTick(dt))return;
- if(autoPause>0){autoPause=Math.max(0,autoPause-dt);if(autoBubbleTimer<=0)speak(currentThoughtTopic(),4200);return}
  if(autoDestination&&(state.removed.includes(autoDestination.id)||
  (autoDestination.type==='bush'&&!berryReady(autoDestination))||
  (autoIgnore.get(autoDestination.id)||0)>Date.now()))autoDestination=null;
