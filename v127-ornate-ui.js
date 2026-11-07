@@ -54,6 +54,8 @@ el.innerHTML=[
  '<button data-action="craftBtn">Craft and Build</button>',
  '<button data-action="artBtn">Change World Style</button>',
  '<button data-action="helpBtn">Controls and Help</button>',
+ '<button id="v127MeetFriends">Meet Dylan and Skölli</button>',
+ '<button id="v127VisitPond">Visit the frog pond</button>',
  '<button id="v127CloseSettings">Close</button></aside>'
 ].join('');
 document.body.appendChild(el);
@@ -63,6 +65,8 @@ el.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('cl
 }));
 $('v127Gear').onclick=()=>$('v127Settings').classList.toggle('open');
 $('v127CloseSettings').onclick=()=>$('v127Settings').classList.remove('open');
+$('v127MeetFriends').onclick=()=>{$('previewFriends')?.click();$('v127Settings').classList.remove('open')};
+$('v127VisitPond').onclick=()=>{$('previewPond')?.click();$('v127Settings').classList.remove('open')};
 $('v127QuestToggle').onclick=()=>{
  const quest=$('v127Quest'),collapsed=quest.dataset.collapsed!=='true';
  quest.dataset.collapsed=String(collapsed);
