@@ -214,9 +214,20 @@ function drawRegionalWildlife(){
 // All biome creatures are drawn in canvas, not font glyphs or emoji.
 // Faces, gait and species-specific body proportions distinguish each animal.
 function drawWildAnimal(a){
- if(rbEnabled&&['snake','scorpion','crab','lizard','frog','hare','gull','raven','heron','bison','stag','goat','turtle','rat','fox','otter'].includes(a.type)){
-  const k=['gull','raven','heron'].includes(a.type)?'bird':a.type;
-  worldFaunaDraw(k,a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,Math.max(.65,a.size*.96));return;
+ if(rbEnabled&&['snake','scorpion','crab','lizard','frog','hare','gull','raven','heron','bison','stag','goat','turtle','rat','fox','otter','watcher','ashCreeper','scuttleback'].includes(a.type)){
+  const kind=a.type;
+  worldFaunaDraw(kind,a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,Math.max(.65,a.size*.96));
+  // Attack tells and health bars remain visible over the illustrated sprites.
+  if(animalHp(a)<(wildlifeHealth[a.type]||3)){
+   const hp=animalHp(a)/(wildlifeHealth[a.type]||3);
+   ctx.fillStyle='#293733';ctx.fillRect(a.x-22,a.y-67,44,7);
+   ctx.fillStyle='#d99472';ctx.fillRect(a.x-21,a.y-66,42*Math.max(0,hp),5);
+  }
+  if(a.windupMs>0){
+   ctx.fillStyle='#f6d798';ctx.font='bold 20px system-ui';ctx.textAlign='center';
+   ctx.fillText('!',a.x,a.y-73);
+  }
+  return;
  }
  const k=a.type,bird=['gull','raven','heron'].includes(k),hopper=k==='hare'||k==='frog';const bounce=a.walking?(bird?Math.abs(Math.sin(a.gait*1.4))*5:hopper?Math.abs(Math.sin(a.gait))*7:Math.sin(a.gait)*1.5):Math.sin(time*.001+a.phase)*.25;const t=-bounce;
  ctx.save();ctx.translate(a.x,a.y+t);ctx.scale(a.face*a.size,a.size);
@@ -1064,12 +1075,48 @@ illustratedCompanionAtlas.onload=()=>{
  window.__v124CompanionAtlasReady=illustratedCompanionReady;
 };
 illustratedCompanionAtlas.onerror=()=>{illustratedCompanionReady=false;window.__v124CompanionAtlasReady=false};
-illustratedCompanionAtlas.src='./assets/haigen-companions-v124.png?v=1';
+illustratedCompanionAtlas.src='./assets/haigen-companions-v124.png?v=2';
 const illustratedFaunaCells={
  frog:[0,0],butterfly:[1,0],squirrel:[2,0],bird:[3,0],
  duck:[0,1],fish:[1,1],wolf:[2,1],boar:[3,1],
  scorpion:[0,2],snake:[1,2],crab:[2,2],lizard:[3,2]
 };
+
+// Additional biome wildlife share the same illustrated 96x76 pixel grid.
+// Includes animals without a counterpart on the original reference sheet.
+const illustratedExtraFauna=new Image();
+let illustratedExtraReady=false;
+illustratedExtraFauna.onload=()=>{
+ illustratedExtraReady=illustratedExtraFauna.naturalWidth===384&&illustratedExtraFauna.naturalHeight===304;
+ window.__v124ExtraFaunaReady=illustratedExtraReady;
+};
+illustratedExtraFauna.onerror=()=>{illustratedExtraReady=false;window.__v124ExtraFaunaReady=false};
+illustratedExtraFauna.src='./assets/haigen-extra-fauna-v124.png?v=1';
+const extraFaunaCells={
+ bison:[0,0],stag:[1,0],goat:[2,0],hare:[3,0],
+ turtle:[0,1],rat:[1,1],otter:[2,1],gull:[3,1],
+ raven:[0,2],heron:[1,2],watcher:[2,2],ashCreeper:[3,2],
+ scuttleback:[0,3]
+};
+function drawIllustratedExtraFauna(kind,x,y,dir='right',walking=false,anim=0,scale=1){
+ const cell=extraFaunaCells[kind];if(!illustratedExtraReady||!cell)return false;
+ const large=['bison','stag','goat'].includes(kind);
+ const gScale=(large?1.1:kind==='hare'?.85:kind==='rat'?.75:.95)*Math.max(.62,Math.min(1.5,scale));
+ const width=96*gScale,height=76*gScale;
+ const stride=walking?Math.sin(anim*.012):0;
+ const bob=walking?Math.abs(stride)*(kind==='hare'?7:kind==='rat'?2:2):0;
+ const xx=Math.round(x-width/2),yy=Math.round(y-height+6-bob);
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ellipse(x,y+5,Math.max(8,width*.33),4,'#203b3454');
+ if(dir==='left'){
+  ctx.translate(xx+width,0);ctx.scale(-1,1);
+  ctx.drawImage(illustratedExtraFauna,cell[0]*96,cell[1]*76,96,76,0,yy,width,height);
+ }else ctx.drawImage(illustratedExtraFauna,cell[0]*96,cell[1]*76,96,76,xx,yy,width,height);
+ ctx.restore();
+ window.__v124LastFauna={kind,dir,moving:walking,scale:gScale,extra:true};
+ return true;
+}
+
 const illustratedFaunaSizes={
  butterfly:.73,squirrel:.78,bird:.63,duck:.96,fish:.83,
  wolf:.94,boar:.94,scorpion:.83,snake:.89,crab:.82,lizard:.84
@@ -1120,6 +1167,7 @@ function drawIllustratedCompanion(x,y,type,actor){
 function worldFaunaDraw(kind,x,y,dir='right',walking=false,anim=0,scale=1){
  if(kind==='fox'&&drawIllustratedCompanion(x,y,'fox',{dir,moving:walking,anim}))return true;
  if(drawIllustratedFauna(kind,x,y,dir,walking,anim,scale))return true;
+ if(drawIllustratedExtraFauna(kind,x,y,dir,walking,anim,scale))return true;
  const frame=walking?1+Math.floor(anim/150)%2:0,sprite=worldFauna(kind,frame);
  const w=sprite.width*scale,h=sprite.height*scale;
  ctx.save();ctx.imageSmoothingEnabled=false;
@@ -5605,7 +5653,9 @@ function frame(now){
  // Atlas loader state is externally visible for browser visual regression.
  window.__v124ArtStatus=()=>({
   companions:illustratedCompanionReady,fauna:illustratedFaunaReady,
+  extraFauna:illustratedExtraReady,
   sourceAnimals:Object.keys(illustratedFaunaCells).filter(k=>k!=='frog'),
+  newBiomes:Object.keys(extraFaunaCells),
   companionsSheet:'Dillon + Skölli / 4 directions / 4 frames'
  });
  window.__v124PreviewQA=()=>{
