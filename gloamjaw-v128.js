@@ -389,6 +389,6 @@ function drawEffects(){
  ctx.restore();
 }
 window.__gloamAddon={y:y+10,arena,update,drawGround,drawBoss,drawEffects,craftLocked,crafted,useTool,
- snapshot:()=>({build:'128.2',hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length,artReady:gloamArtLoaded,artError:gloamArtError,artPose:gloamPose()})};
+ snapshot:()=>({build:130,hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length,artReady:gloamArtLoaded,artError:gloamArtError,artPose:gloamPose()})};
 window.__gloamQA=window.__gloamAddon.snapshot;
 })();
