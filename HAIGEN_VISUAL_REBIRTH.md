@@ -31,6 +31,20 @@ An original top-down woodland fantasy with 16-bit-era readability, restrained co
 
 ## Implementation sequence
 
+### V119: Single-character animation rig, props and region wardrobe (implemented)
+
+- A **new original 192×288 movement atlas** under `assets/haigen-v119-movement-atlas.png` uses 4 rows (down, up, right, left), each with four distinct walk frames in fixed 48×72 cells. Trainers are actual art, not stretched missing shoes. Brief side-to-front turns retain the approved three-quarter poses.
+- The original V117 approved sheet remains in place for Haigen's blanket/sleeping pose and safe fallback; the V118 expanding-poses workaround is no longer used when the new atlas is loaded.
+- **Independent animation layers**: base character, region outfit, equipped item, transient action, special swimming mask, damage shock. Never change the player collision or animation cell dimensions because an item is held.
+- Region variants: orange hooded winter coat, desert travel outfit, beach shorts and lighter top, fen/downs/wasteland palettes; swimming adds snorkel goggles and tube. These are first-pass recolours and pixel accessories, not finished illustrated outfit atlases.
+- Carry/ready poses currently support axe, pickaxe, shovel, torch, rod and net in all four directions. Tool-action progress includes timed key poses, while the old oversized detached swing is suppressed when the new character is loaded.
+- Event-driven sequences now include chopping, digging, mining, torch raising, fishing cast and fish landing, eating, salve/antidote, food and medicine cooking. The animation layer stays ephemeral and never changes the saved economy.
+- Predator damage: brief shock stepping pose, current injury flashing, collision-aware finite knockback directed away from the attacker, temporarily pauses player/AI movement. Preserves health/poison/rescue systems.
+- New craftable net and hotbar tool; catching butterflies and catching/carrying/releasing a frog into safe habitat are playable foundations for a future dedicated minigame.
+- **Future dedicated animation atlases:** precise action sheets and transitions for each tool and facing, fishing line/bobber synchronisation, frog-and-butterfly minigame timing, enhanced snorkelling/swimming cycle, outfit-specific rest/attack variants, finer impact particles, and iPad frame-rate polish.
+
+
+
 ### V118: Haigen's approved silhouette locked
 - The family's approved sprite sheet is the identity reference: shaggy sweeping blonde fringe, oversized black/charcoal hoodie, dark shorts and trainers.
 - Normalize front, back and side sprite frames to a consistent **42px opaque width inside 48×72 cells**. Preserve a fixed foot baseline and maintain native pixel sharpness.
