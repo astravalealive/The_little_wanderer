@@ -66,7 +66,7 @@ body:not(.rebirth-art) canvas#game{image-rendering:auto}
 body:has(.mobile-menu[open]) .haigen-speech,
 body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 @media (max-width:410px){.haigen-speech{font-size:14px;max-width:min(288px,calc(100vw - 22px));padding:9px 11px}}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=129"></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V130</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v128 boss playtest</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=129"></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V131</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v128 boss playtest</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -233,7 +233,7 @@ function drawWildAnimal(a){
  if((illustratedFaunaReady||illustratedExtraReady||skolliAtlasReady)&&
  ['snake','scorpion','crab','lizard','hare','gull','raven','heron','bison','stag','goat','turtle','rat','fox','otter','watcher','ashCreeper','scuttleback'].includes(a.type)){
   const kind=a.type;
-  worldFaunaDraw(kind,a.x,a.y,a.heading||(a.face<0?'left':'right'),a.walking,a.gait*150,Math.max(.65,a.size*.96));
+  worldFaunaDraw(kind,a.x,a.y,a.heading||(a.face<0?'left':'right'),a.walking,a.gait*150,Math.max(.65,a.size*.96),a.windupMs>0?'windup':a.lungeMs>0?'attack':time<a.scaredUntil?'flee':a.walking?'walk':a.pause>1900?'rest':'forage');
   // Attack tells and health bars remain visible over the illustrated sprites.
   if(animalHp(a)<(wildlifeHealth[a.type]||3)){
    const hp=animalHp(a)/(wildlifeHealth[a.type]||3);
@@ -1117,61 +1117,109 @@ const extraFaunaCells={
 };
 // V126: unified motion, palette and pixel density for every existing biome
 // species, using the approved transparent animal atlases (no emoji stand-ins).
+// Single approved creature art pipeline: 27 species, six walk/action frames.
+// Sources are retained; no auto-generated emoji or placeholder sprites.
 const wildlifeMotionSheet=new Image();
-wildlifeMotionSheet.src='./assets/haigen-wildlife-motion.webp';
+let wildlifeMotionReady=false;
+wildlifeMotionSheet.onload=()=>{
+ wildlifeMotionReady=wildlifeMotionSheet.naturalWidth===576&&wildlifeMotionSheet.naturalHeight>=76*27;
+ window.__wildlifeMotionReady=wildlifeMotionReady;
+};
+wildlifeMotionSheet.onerror=()=>{wildlifeMotionReady=false;window.__wildlifeMotionReady=false};
+wildlifeMotionSheet.src='./assets/haigen-wildlife-motion.webp?v=131';
 const motionSpecies='frog butterfly squirrel bird duck fish wolf boar scorpion snake crab lizard bison stag goat hare turtle rat otter gull raven heron watcher ashCreeper scuttleback chicken duckling'.split(' ');
-function drawUnifiedCreatureArt(sheet,cell,kind,x,y,dir,walking,anim,scale,sizeScale=1){
+const creatureFlying=new Set(['bird','butterfly','gull','raven','heron']);
+const creatureHopping=new Set(['frog','hare','squirrel','rat','duckling']);
+const creatureCrawling=new Set(['snake','scorpion','crab','lizard','turtle','otter','ashCreeper','scuttleback']);
+const creatureLarge=new Set(['wolf','boar','bison','stag','goat']);
+function creatureActivity(activity,moving){
+ if(activity&&activity!=='auto')return activity;
+ return moving?'walk':'idle';
+}
+function creatureFrameFor(kind,activity,moving,anim){
+ // Source atlas has six movement poses; reuse these for physically meaningful
+ // activity phases rather than inventing nonexistent directional art.
+ const index=Math.abs(anim||0),clock=time+kind.length*173;
+ if(activity==='rest'||activity==='sleep')return 0;
+ if(activity==='alert'||activity==='watch')return Math.floor(clock/740)%2?1:0;
+ if(activity==='forage'||activity==='search'||activity==='sniff')return [0,1,2,1][Math.floor(clock/490)%4];
+ if(activity==='windup')return Math.floor(clock/170)%2?2:3;
+ if(activity==='attack'||activity==='charge'||activity==='lunge')return 3+Math.floor(index/75)%3;
+ if(activity==='hurt')return Math.floor(clock/125)%2?4:5;
+ if(activity==='flee'||activity==='fly')return Math.floor(index/75)%6;
+ if(moving)return Math.floor(index/(creatureHopping.has(kind)?108:creatureLarge.has(kind)?146:120))%6;
+ return [0,0,1,0][Math.floor(clock/850)%4];
+}
+function drawUnifiedCreatureArt(sheet,cell,kind,x,y,dir,walking,anim,scale,sizeScale=1,activity='auto'){
+ if(!sheet||!cell)return false;
+ const action=creatureActivity(activity,walking);
  const size=sizeScale*Math.max(kind==='duckling'?.25:.62,Math.min(scale,1.5));
  const width=96*size,height=76*size;
- const pulse=Math.sin(anim*.012),absolute=Math.abs(pulse);
- const jumping=['hare','squirrel','rat','duckling'].includes(kind);
- const crawling=['snake','lizard','scorpion','crab','turtle','otter','ashCreeper','scuttleback'].includes(kind);
- const flying=['bird','butterfly','gull','raven','heron'].includes(kind);
- const big=['bison','stag','goat','wolf','boar'].includes(kind);
- const hop=walking?(jumping?absolute*6.8:big?absolute*2.1:crawling?absolute*.8:flying?absolute*5:absolute*1.7):0;
- const breath=walking?0:Math.sin(time*.0019+(kind.length*1.7))*.008;
- const lean=walking?(crawling?pulse*.055:big?pulse*.014:flying?pulse*.058:pulse*.022):0;
- const squash=walking?(jumping?.044:crawling?.014:.016)*pulse:breath;
- const tilt=kind==='snake'&&walking?pulse*.065:kind==='crab'&&walking?pulse*.028:lean;
- const flip=dir==='left'?-1:1;
- const facingVertical=dir==='up'||dir==='down';
- const idling=!walking,activity=idling?(['observing','foraging','resting'][Math.floor(time/2700+kind.length)%3]):'moving';
+ const pulse=Math.sin((anim||0)*.012),absolute=Math.abs(pulse);
+ const hopping=creatureHopping.has(kind),crawling=creatureCrawling.has(kind);
+ const flying=creatureFlying.has(kind),big=creatureLarge.has(kind);
+ const active=walking||['attack','charge','lunge','flee','fly'].includes(action);
+ const scared=action==='flee',striking=['attack','charge','lunge','windup'].includes(action);
+ const hop=active?(hopping?absolute*(scared?9:7):big?absolute*2.4:crawling?absolute*.95:flying?absolute*6:absolute*1.8):0;
+ const breathe=active?0:Math.sin(time*.002+kind.length*1.7)*.013;
+ const lean=active?(crawling?pulse*.05:big?pulse*.018:flying?pulse*.07:pulse*.025):0;
+ const squash=active?(hopping?.048:crawling?.018:.021)*pulse:breathe;
+ const tilt=kind==='snake'&&active?pulse*.065:kind==='crab'&&active?pulse*.033:lean;
+ const frame=creatureFrameFor(kind,action,active,anim);
+ const row=motionSpecies.indexOf(kind);
+ const motion=wildlifeMotionReady&&row>=0;
+ const src=motion?wildlifeMotionSheet:sheet;
+ const ox=motion?frame*96:cell[0]*96,oy=motion?row*76:cell[1]*76;
+ const facing=(dir==='up'||dir==='down'||dir==='left'||dir==='right')?dir:'right';
+ const vertical=facing==='up'||facing==='down';
+ const flip=facing==='left'?-1:1;
+ const dip=action==='forage'||action==='search'||action==='sniff'?3+Math.sin(time*.005+kind.length)*2:0;
+ const crouch=action==='windup'?5:action==='rest'||action==='sleep'?6:0;
+ const spring=action==='attack'||action==='lunge'?-Math.abs(Math.sin((anim||0)*.026))*9:0;
  ctx.save();ctx.imageSmoothingEnabled=false;
- ellipse(x,y+5,Math.max(8,width*.29)*(1-hop*.008),4,'#203b3454');
- ctx.translate(Math.round(x),Math.round(y+6-hop));
- // Preserve actual approved sprite artwork; minor perspective shifts are
- // presentation cues only, not a claim of independently drawn N/S frames.
- ctx.scale(flip*(facingVertical?.91:1),facingVertical?.97:1);
- ctx.rotate(tilt+(idling&&activity==='foraging'?.035*Math.sin(time*.003):0));
- ctx.scale(1+squash,1-squash*.65);
- const speciesRow=motionSpecies.indexOf(kind);
- const animated=walking&&speciesRow>=0&&wildlifeMotionSheet.naturalWidth===576;
- const pose=walking?Math.abs(Math.floor(anim/112))%6:0;
- ctx.drawImage(animated?wildlifeMotionSheet:sheet,animated?pose*96:cell[0]*96,animated?speciesRow*76:cell[1]*76,96,76,
-  Math.round(-width/2),Math.round(-height),width,height);
+ ellipse(x,y+6,Math.max(8,width*.29)*(1-hop*.009),4,'#203b3454');
+ ctx.translate(Math.round(x),Math.round(y+6-hop+dip+crouch+spring));
+ ctx.scale(flip*(vertical?.89:1),vertical?.96:1);
+ ctx.rotate(tilt+(facing==='up'?-0.025:facing==='down'?.025:0));
+ ctx.scale(1+squash,(action==='sleep'?.84:1)-squash*.65);
+ ctx.drawImage(src,ox,oy,96,76,Math.round(-width/2),Math.round(-height),width,height);
  ctx.restore();
- window.__v126LastCreature={kind,dir,walking,pose,activity,
-  hop,tilt,scale:size,flying,crawling,jumping,big};
- window.__v124LastFauna={kind,dir,moving:walking,scale:size,extra:sheet===illustratedExtraFauna};
+ // Keep danger readable without changing collision, attacks or saved wildlife.
+ if(action==='windup'||action==='attack'||action==='charge'||action==='lunge'){
+  ctx.save();ctx.strokeStyle='#edb46dbb';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.arc(x,y-height*.77,Math.max(9,width*.27),Math.PI*1.05,Math.PI*1.95);ctx.stroke();ctx.restore();
+ }
+ if(action==='forage'||action==='search'){
+  ctx.save();ctx.fillStyle='#d3ad7b88';ctx.fillRect(x-3,y-1,3,2);ctx.fillRect(x+6,y+1,2,2);ctx.restore();
+ }
+ window.__v126LastCreature={kind,dir:facing,walking,pose:frame,activity:action,
+  hop,tilt,scale:size,flying,crawling,jumping:hopping,big,illustrated:motion};
+ window.__v124LastFauna={kind,dir:facing,moving:walking,scale:size,extra:sheet===illustratedExtraFauna};
  return true;
 }
-function drawIllustratedExtraFauna(kind,x,y,dir='right',walking=false,anim=0,scale=1){
+window.__creatureSprites=()=>({
+ species:motionSpecies.slice(),count:motionSpecies.length,
+ motionReady:wildlifeMotionReady,source:'haigen-wildlife-motion.webp',
+ posesPerSpecies:6,activities:['idle','walk','forage','rest','watch','flee','windup','attack','hurt','fly'],
+ lastFrame:window.__v126LastCreature||null
+});
+function drawIllustratedExtraFauna(kind,x,y,dir='right',walking=false,anim=0,scale=1,activity='auto'){
  const cell=extraFaunaCells[kind];if(!illustratedExtraReady||!cell)return false;
  const large=['bison','stag','goat'].includes(kind);
  const factor=large?1.1:kind==='hare'?.85:kind==='rat'?.75:kind==='chicken'?.52:kind==='duckling'?.77:.95;
  return drawUnifiedCreatureArt(illustratedExtraFauna,cell,kind,x,y,dir,walking,anim,
-  Math.max(kind==='duckling'?.25:.62,Math.min(1.5,scale)),factor);
+  Math.max(kind==='duckling'?.25:.62,Math.min(1.5,scale)),factor,activity);
 }
 
 const illustratedFaunaSizes={
  butterfly:.73,squirrel:.78,bird:.63,duck:.96,fish:.83,
  wolf:.94,boar:.94,scorpion:.83,snake:.89,crab:.82,lizard:.84
 };
-function drawIllustratedFauna(kind,x,y,dir='right',walking=false,anim=0,scale=1){
+function drawIllustratedFauna(kind,x,y,dir='right',walking=false,anim=0,scale=1,activity='auto'){
  if(kind==='frog'||!illustratedFaunaReady)return false;
  const cell=illustratedFaunaCells[kind];if(!cell)return false;
  return drawUnifiedCreatureArt(illustratedFaunaAtlas,cell,kind,x,y,dir,walking,anim,
-  Math.max(.62,Math.min(scale,1.5)),illustratedFaunaSizes[kind]||.9);
+  Math.max(.62,Math.min(scale,1.5)),illustratedFaunaSizes[kind]||.9,activity);
 }
 // Dylan's ears, feet and hop, and Skölli's alert ears, tail and trot
 // use independent, 4-direction/4-frame character atlases.
@@ -1195,9 +1243,9 @@ function drawApprovedDylan(x,y,actor){
  const m=actor||playerMotion,dir=m.dir||'down',moving=!!m.moving;
  const anim=m.anim||0;
  const frame=moving?Math.floor(anim/125)%4:0;
- const resting=actor?.mode==='resting',alert=actor?.mode==='alert';
- const row=resting||alert?4:moving?(dir==='up'?2:dir==='down'?3:1):0;
- const col=resting?0:alert?1:moving?frame:(dir==='up'?2:dir==='right'?1:dir==='left'?3:0);
+ const resting=['resting','sleeping'].includes(actor?.mode),alert=['alert','watching','notifying'].includes(actor?.mode),foraging=['foraging','searching','delivering','collecting'].includes(actor?.mode);
+ const row=resting||alert||foraging?4:moving?(dir==='up'?2:dir==='down'?3:1):0;
+ const col=resting?0:alert?1:foraging?(actor?.mode==='delivering'?3:2):moving?frame:(dir==='up'?2:dir==='right'?1:dir==='left'?3:0);
  const reflect=moving&&dir==='left';
  const bounce=moving?Math.abs(Math.sin(anim*.0125))*6:0;
  const leap=actor?.mode==='pouncing'?Math.sin(Math.max(0,Math.min(1,1-actor.t/650))*Math.PI)*16:0;
@@ -1234,7 +1282,7 @@ function drawApprovedSkolli(x,y,actor){
  if(!skolliAtlasReady)return false;
  const m=actor||playerMotion,dir=m.dir||'down',moving=!!m.moving,anim=m.anim||0;
  const mode=actor?.mode||'exploring';
- const rest=['resting','sleeping'].includes(mode);
+ const rest=['resting','sleeping','healing'].includes(mode);
  const sniff=['sniffing','foraging','searching'].includes(mode);
  const alert=['watching','alert','investigating','guarding'].includes(mode);
  const pounce=mode==='pouncing'||mode==='chasing';
@@ -1285,10 +1333,10 @@ function drawIllustratedCompanion(x,y,type,actor){
  return true;
 }
 
-function worldFaunaDraw(kind,x,y,dir='right',walking=false,anim=0,scale=1){
- if(kind==='fox'&&drawIllustratedCompanion(x,y,'fox',{dir,moving:walking,anim}))return true;
- if(drawIllustratedFauna(kind,x,y,dir,walking,anim,scale))return true;
- if(drawIllustratedExtraFauna(kind,x,y,dir,walking,anim,scale))return true;
+function worldFaunaDraw(kind,x,y,dir='right',walking=false,anim=0,scale=1,activity='auto'){
+ if(kind==='fox'&&drawIllustratedCompanion(x,y,'fox',{dir,moving:walking,anim,mode:activity==='flee'?'chasing':activity==='rest'?'resting':activity==='forage'?'foraging':activity==='alert'?'alert':activity==='attack'?'pouncing':'exploring'}))return true;
+ if(drawIllustratedFauna(kind,x,y,dir,walking,anim,scale,activity))return true;
+ if(drawIllustratedExtraFauna(kind,x,y,dir,walking,anim,scale,activity))return true;
  const frame=walking?1+Math.floor(anim/150)%2:0,sprite=worldFauna(kind,frame);
  const w=sprite.width*scale,h=sprite.height*scale;
  ctx.save();ctx.imageSmoothingEnabled=false;
@@ -1314,7 +1362,7 @@ function rbDrawCreature(kind,x,y,dir='right',moving=false,anim=0,scale=2){
 function drawBeast(b){
  if(illustratedFaunaReady&&['wolf','boar'].includes(b.kind)){
   const moving=['patrol','retreating','confronting','charging'].includes(b.mode);
-  drawIllustratedFauna(b.kind,b.x,b.y,b.dir||'right',moving,b.anim,1.4);
+  drawIllustratedFauna(b.kind,b.x,b.y,b.dir||'right',moving,b.anim,1.4,b.windupMs>0?'windup':b.mode==='charging'?'charge':b.mode==='confronting'?'alert':b.mode==='retreating'?'flee':b.mode==='rooting'?'forage':b.mode==='patrol'?'walk':'rest');
   // Keep the old damage and alert readouts without returning to generic art.
   ctx.save();ctx.textAlign='center';ctx.font='bold 12px system-ui';ctx.fillStyle='#fff0ce';
   ctx.fillText(b.name,b.x,b.y-90);
@@ -4689,7 +4737,7 @@ function mixColour(day,night,amount){
 function drawWoodlandCritter(c){
  if(c.hiddenUntil&&time<c.hiddenUntil)return;
  if(illustratedFaunaReady&&['squirrel','butterfly'].includes(c.kind)){
-  worldFaunaDraw(c.kind,c.x,c.y,'right',time<c.scaredUntil,time+c.phase*220,.8);return;
+  worldFaunaDraw(c.kind,c.x,c.y,Math.sin(time*.0011+c.phase)<0?'left':'right',time<c.scaredUntil,time+c.phase*220,.8,time<c.scaredUntil?'flee':c.kind==='butterfly'?'fly':'forage');return;
  }
  const scared=time<c.scaredUntil,wiggle=Math.sin(time*.004+c.phase);
  if(c.kind==='squirrel'){
@@ -4918,7 +4966,7 @@ function drawBird(b){
  if(illustratedFaunaReady){
   const flying=b.air>.04,alt=flying?b.air*(35+Math.sin(time*.003+b.phase)*7):0;
   drawIllustratedFauna('bird',b.x,b.y-alt,b.vx<0?'left':'right',
-   flying||Math.abs(b.vx)>.04,time+b.phase*200,.94);
+   flying||Math.abs(b.vx)>.04,time+b.phase*200,.94,flying?'fly':'forage');
   if(flying){
    const flap=Math.sin(time*.022+b.phase)*11;
    ctx.save();ctx.strokeStyle='#a1b4ad';ctx.lineWidth=2.8;ctx.lineCap='square';
@@ -5931,7 +5979,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=130;document.getElementById('devVersion').textContent='V130';document.getElementById('devVersion').title='V130 · unified illustrated art and activity animation';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=131;document.getElementById('devVersion').textContent='V131';document.getElementById('devVersion').title='V131 · creature animation activities';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});

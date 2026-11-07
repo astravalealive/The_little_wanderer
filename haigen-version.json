@@ -1,4 +1,4 @@
 {
-  "build": 130,
-  "notes": "V130 stable illustrated live game. Restores and keeps approved painted roads, 6-frame wildlife movement, woodland and regional animal atlases, biome outfits, approved Skölli and Dylan, Haigen sprites, boss Gloamjaw in western woodland. Adds four-way wildlife movement orientation and subtle species-specific activity breathing/posture without pretending new rear/front artwork exists. Includes window.__haigenAssetReport() to detect missing art. No save migration and no changes to original Ember game. Original approved Gloamjaw PNG concept sheets are not yet packaged into the live game; the existing illustrated SVG atlas remains. iPad visual check pending."
+  "build": 131,
+  "notes": "V131 LIVE: 27-species six-frame creature animation framework, activity-driven poses for rest, forage, watch, flee, attack, lunge, fly; preservers approved art, painted roads, Skolli and Dylan, Gloamjaw, saved progress, and Ember. Direction presentation remains four-way cues pending independent facing art."
 }
