@@ -31,6 +31,15 @@ An original top-down woodland fantasy with 16-bit-era readability, restrained co
 
 ## Implementation sequence
 
+### V118: Haigen's approved silhouette locked
+- The family's approved sprite sheet is the identity reference: shaggy sweeping blonde fringe, oversized black/charcoal hoodie, dark shorts and trainers.
+- Normalize front, back and side sprite frames to a consistent **42px opaque width inside 48×72 cells**. Preserve a fixed foot baseline and maintain native pixel sharpness.
+- Cache normalization on loading the existing original atlas; do not apply per-frame resizing at draw time. The resting and pointing artwork remain unchanged.
+- This resolves the visual change between narrow front/back sprites and fuller side walking frames in the iPad recording.
+- Validate against the next hands-on iPad Safari walk cycle before extending the art reboot to animals, buildings and biomes.
+
+
+
 ### V116: Stable hybrid rendering (implemented)
 - **Full native device-resolution canvas** in Rebirth as well as Classic. The entire frame is never resampled/pixelated. This removes the crawling/jittering pixel-grid effect when the camera scrolls.
 - Keep pixel artwork at original tile/sprite resolution and draw it with nearest-neighbour per asset. Normal scenery/vector effects and HUD retain full sharpness.
