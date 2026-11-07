@@ -31,6 +31,15 @@
 }
  /* No world bubbles may obscure the main menu or any modal panel. */
 body:has(.mobile-menu[open]) .toast,body:has(.overlay.open) .toast{visibility:hidden!important;opacity:0!important}
+
+/* Forest-toned UI: keep all touch targets, contrast and panel scroll behaviour. */
+body.rebirth-art .panel,body.rebirth-art .mobile-menu-body,body.rebirth-art .modal{background:#213a33f5;border-color:#9c9a7d;box-shadow:0 4px 0 #172921c9,0 9px 25px #0b19179c}
+body.rebirth-art .btn{background:#d4c6a5;border-color:#eee1b8;color:#2c3932;box-shadow:0 3px 0 #73765f}
+body.rebirth-art .mobile-menu-main #modeBtn{background:#b6c8a5}
+body.rebirth-art .hotbar{background:#263d35e8;border-color:#9c9a7d}
+body.rebirth-art .slot{background:#c7b89a;border-color:#93977b}
+body.rebirth-art .slot.selected{background:#b9caaa}
+body.rebirth-art .toast{background:#203a33f2;border-color:#baba91}
 .dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style></head><body><canvas id="game"></canvas><div class="dev-version" id="devVersion" aria-label="Game build version">V.113</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v113 🌍</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
@@ -1557,8 +1566,106 @@ function foliageVisibility(o){
  else obscuringTreeAlpha.set(o.id,{alpha:next,last:time});
  return next;
 }
+
+// V114 original 16-bit-inspired woodland, generated offline on the user's device.
+// The first art slice covers Haigen's home woodland and the Silent Pond.
+const rbTileCache={grass:null,tree:new Map(),rock:new Map()};
+function rbWoodland(x,y){return x>=0&&x<3500&&y>=0&&y<3100&&!expandedRegion(x,y)}
+function rbGrass(){
+ if(rbTileCache.grass)return rbTileCache.grass;
+ const tile=document.createElement('canvas');tile.width=256;tile.height=256;const g=tile.getContext('2d');
+ g.fillStyle='#638a73';g.fillRect(0,0,256,256);
+ let seed=83517;const rng=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+ for(let i=0;i<170;i++){
+  const x=Math.floor(rng()*62)*4,y=Math.floor(rng()*62)*4;
+  rbPixel(g,x,y,8+i%4*4,4+i%2*4,i%5===0?'#9da88a':i%3===0?'#497665':'#74947b');
+ }
+ for(let i=0;i<120;i++){
+  const x=Math.floor(rng()*62)*4,y=Math.floor(rng()*62)*4;
+  rbPixel(g,x+4,y,3,7,i%5===0?'#b6ae8b':i%2?'#46745f':'#8eaa88');
+  rbPixel(g,x,y+4,4,3,'#3f6c5a');
+ }
+ for(let i=0;i<10;i++){
+  const x=Math.floor(rng()*61)*4,y=Math.floor(rng()*61)*4;
+  rbPixel(g,x,y+3,4,4,'#bc8e9a');rbPixel(g,x+4,y,4,4,'#e4c4b1');
+ }
+ rbTileCache.grass=ctx.createPattern(tile,'repeat');return rbTileCache.grass;
+}
+function rbDrawGround(){
+ const z=clamp(Math.min(W/1024,H/768),.52,1)*cameraZoom;
+ const l=Math.max(0,cam.x-W/(2*z)-50),t=Math.max(0,cam.y-H/(2*z)-50);
+ const r=Math.min(3500,cam.x+W/(2*z)+50),b=Math.min(3100,cam.y+H/(2*z)+50);
+ if(r<=l||b<=t)return;
+ ctx.save();ctx.fillStyle=rbGrass();ctx.fillRect(l,t,r-l,b-t);
+ const dark=nightStrength();if(dark){ctx.fillStyle='rgba(19,32,48,'+(dark*.62)+')';ctx.fillRect(l,t,r-l,b-t)}
+ ctx.restore();
+}
+function rbTreeImage(id){
+ const variation=Math.abs(id)%12;if(rbTileCache.tree.has(variation))return rbTileCache.tree.get(variation);
+ const image=document.createElement('canvas');image.width=72;image.height=92;
+ const g=image.getContext('2d'),p=(x,y,w,h,c)=>rbPixel(g,x,y,w,h,c);
+ p(30,54,15,34,'#504c3f');p(33,55,9,33,'#846d52');p(35,66,3,21,'#b19b76');
+ p(26,87,23,4,'#344e45');
+ if(variation%4===1){
+  for(let i=0;i<5;i++){
+   const y=4+i*13,w=17+i*10,x=36-w/2;
+   p(x,y,w,12,'#1f4b4d');p(x+3,y+2,w-6,8,i%2?'#39756a':'#356e66');
+   p(x+5,y+3,w-12,3,'#84a499');p(x+1,y+10,w-2,4,'#29584f');
+  }
+ }else{
+  const shapes=variation%4===0?
+   [[8,39,30,26],[37,32,27,30],[17,15,40,36],[5,29,22,24],[44,26,21,25]]:
+   [[17,25,29,35],[36,27,29,30],[8,43,35,23],[22,9,36,37]];
+  for(let i=0;i<shapes.length;i++){
+   const [x,y,w,h]=shapes[i];
+   p(x-2,y+3,w+4,h-2,'#1f5045');p(x,y,w,h-6,i%2?'#33725d':'#356b55');
+   p(x+3,y+3,w-7,h-12,i%3?'#47886e':'#549170');
+   p(x+7,y+4,Math.max(7,w-15),5,'#8cad8c');
+   p(x+4,y+h-9,w-9,4,'#265b4d');
+  }
+ }
+ for(let i=0;i<10;i++){
+  const x=8+(i*19+variation*13)%54,y=14+(i*11+variation*7)%46;
+  p(x,y,3,3,i%3?'#9cb49a':'#668e7c');
+ }
+ rbTileCache.tree.set(variation,image);return image;
+}
+function rbDrawTree(o){
+ const c=rbTreeImage(o.id),s=(o.size||1)*(.99+seeded(o.id*31)*.31);
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ellipse(o.x+1,o.y+4,26*s,8*s,'#24423766');
+ ctx.drawImage(c,Math.round(o.x-c.width*s/2),Math.round(o.y-c.height*s+4),Math.round(c.width*s),Math.round(c.height*s));ctx.restore();
+}
+function rbRockImage(id){
+ const v=Math.abs(id)%6;if(rbTileCache.rock.has(v))return rbTileCache.rock.get(v);
+ const c=document.createElement('canvas');c.width=42;c.height=28;
+ const g=c.getContext('2d'),p=(x,y,w,h,color)=>rbPixel(g,x,y,w,h,color);
+ p(4,17,35,8,'#455853');p(6,11,31,12,'#6a7d77');p(11,6,23,15,'#929d90');
+ p(16,4,14,7,'#c1c2ac');p(13,11,10,4,'#aeb6a4');p(29,13,7,8,'#526c68');
+ p(8,21,26,4,'#4c6260');if(v%2)p(16,13,3,7,'#64756c');
+ rbTileCache.rock.set(v,c);return c;
+}
+function rbDrawRock(o){
+ const c=rbRockImage(o.id),scale=1.65*(o.size||1);
+ ctx.save();ctx.imageSmoothingEnabled=false;ellipse(o.x,o.y+6,24*scale,6,'#283e3955');
+ ctx.drawImage(c,Math.round(o.x-c.width*scale/2),Math.round(o.y-c.height*scale+7),Math.round(c.width*scale),Math.round(c.height*scale));ctx.restore();
+}
+function rbDrawBush(o){
+ ctx.save();ctx.translate(Math.round(o.x),Math.round(o.y));const p=(x,y,w,h,c)=>rbPixel(ctx,x,y,w,h,c);
+ ellipse(0,5,29,9,'#23473870');
+ for(const [bx,by] of [[-23,-15],[-8,-26],[9,-20],[18,-13],[-8,-9]]){
+  p(bx-7,by-1,19,13,'#2e594d');p(bx-5,by-4,17,11,'#407a63');
+  p(bx-2,by-4,10,4,'#7da48a');p(bx+8,by+5,5,4,'#335d50');
+ }
+ if(berryReady(o))for(const [x,y] of [[-19,-15],[-4,-26],[16,-12],[7,-18],[-13,-6]]){
+  p(x,y,5,5,'#aa4e58');p(x+1,y,2,2,'#e0a89c');
+ }
+ ctx.restore();
+}
+
 function drawSceneryNearHaigen(o){
- const renderer={tree,rock,bush,flower,mushroom:mushroomPatch,
+ const woodland=rbEnabled&&rbWoodland(o.x,o.y);
+ const renderer={tree:woodland?rbDrawTree:tree,rock:woodland?rbDrawRock:rock,bush:woodland?rbDrawBush:bush,flower,mushroom:mushroomPatch,
   cactus:drawRegionalScenery,palm:drawRegionalScenery,
   fir:drawRegionalScenery,bareTree:drawRegionalScenery}[o.type];
  if(!renderer)return;
@@ -3006,7 +3113,7 @@ function drawHaigenSnorkelLocal(dir){
  }
  ctx.restore();
 }
-function draw(){const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const questHud=$('campQuestHud');if(questHud)questHud.textContent=state.campClearingDone?'🏕️ Campsite secure ✓':'🏕️ Clear campsite '+state.campClearingPicked.length+'/'+campDebris.length+' · X Collect brush';const homeHud=$('homesteadHud');if(homeHud)homeHud.textContent='🪵 '+state.wood+'/'+woodCarryLimit+' · 📦 '+state.woodStored+'/'+woodStoreLimit()+' · 🥚 '+state.eggs+' · 🐟 '+state.fish+' · 🥩 '+state.rawMeat+' · 🥕 '+state.vegetables+' · 🩵 '+state.medicinalMushrooms+' · 🧪 '+state.antidotes;const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100'+(state.poisonMs>0?' · 🟢 POISONED':'')+(collapseRemaining>0?' · 💤 RESCUE':'');hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=clamp(Math.min(W/1024,H/768),.52,1)*cameraZoom;ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(0,0,WORLD,WORLD);drawExpandedTerrain(nightMix);ctx.save();islandClipPath(ctx);ctx.clip();for(let i=0;i<410;i++){let x=seeded(i+950)*WORLD,y=seeded(i+1200)*WORLD;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850||expandedRegion(x,y))continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
+function draw(){const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const questHud=$('campQuestHud');if(questHud)questHud.textContent=state.campClearingDone?'🏕️ Campsite secure ✓':'🏕️ Clear campsite '+state.campClearingPicked.length+'/'+campDebris.length+' · X Collect brush';const homeHud=$('homesteadHud');if(homeHud)homeHud.textContent='🪵 '+state.wood+'/'+woodCarryLimit+' · 📦 '+state.woodStored+'/'+woodStoreLimit()+' · 🥚 '+state.eggs+' · 🐟 '+state.fish+' · 🥩 '+state.rawMeat+' · 🥕 '+state.vegetables+' · 🩵 '+state.medicinalMushrooms+' · 🧪 '+state.antidotes;const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100'+(state.poisonMs>0?' · 🟢 POISONED':'')+(collapseRemaining>0?' · 💤 RESCUE':'');hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=clamp(Math.min(W/1024,H/768),.52,1)*cameraZoom;ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(0,0,WORLD,WORLD);drawExpandedTerrain(nightMix);ctx.save();islandClipPath(ctx);ctx.clip();if(rbEnabled)rbDrawGround();for(let i=0;i<410;i++){let x=seeded(i+950)*WORLD,y=seeded(i+1200)*WORLD;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850||expandedRegion(x,y)||(rbEnabled&&rbWoodland(x,y)))continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
 const tint=ctx.createRadialGradient(0,0,.04,0,0,1),shade=l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564';
 tint.addColorStop(0,shade+'cc');tint.addColorStop(.67,shade+'77');tint.addColorStop(1,shade+'00');
 ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(let j=0;j<24;j++){const a=j*2.399,r=Math.sqrt((j+1)/25),px=l.x+Math.cos(a)*r*390,py=l.y+Math.sin(a)*r*245;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],j%3?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,j%2?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,j%2?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();drawWetGround();clearingGround(cottage.x,cottage.y);drawCampDecor();if(!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80)){ellipse(firstFire.x,firstFire.y,47,25,'#76674a');for(let j=0;j<8;j++)ellipse(firstFire.x+Math.cos(j*Math.PI/4)*33,firstFire.y+Math.sin(j*Math.PI/4)*17,8,6,'#a7a18c')}lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();lakeShape(.79);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();lakeShape(.48);ctx.fillStyle=mixColour('#236c91','#243c68',nightMix);ctx.fill();ctx.restore();for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawPondMist(nightMix);drawSilentPond();drawStoryClues();// Fish are below the water's coloured surface; only the rare leap is above it.
