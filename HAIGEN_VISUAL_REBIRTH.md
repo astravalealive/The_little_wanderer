@@ -31,6 +31,16 @@ An original top-down woodland fantasy with 16-bit-era readability, restrained co
 
 ## Implementation sequence
 
+### V120: Haigen's Working World (implemented)
+- **Physical stone:** 3–5 pickaxe strikes per large boulder, followed by 3–6 persistent small stone pieces that are individually collected. Large boulders cannot be picked up directly. Stone is no longer granted merely by digging or collecting intact scenery.
+- **Starter tools:** rough pickaxe uses wood and twigs, so a new save can obtain stone without a circular recipe. Old save inventories remain valid.
+- **Independent purpose:** Haigen can choose mining, crafting a pickaxe, felling trees, cooking, fishing, gardening, frog catch/release, exploration, and permanently building lanterns and waymarkers from his own supplies. Plans are written in his notebook; jobs persist as optional save state. Construction happens only on arrival, consumes resources, and persists.
+- **Tool motion:** cached original 16-bit-style tool sprites, wrist-anchored grips and deliberately scaled props, 4-pose action arcs, independent equipment selection, build hammer and cleaned white pixels near Haigen's sprite outline.
+- **World art:** existing original cached pixel-art renderer applied to vegetation, boulders, buildings, pond details, garden, coop, storage and jetty; 21 wildlife kinds can render cached directional pixel silhouettes. Terrain is being incrementally modernised.
+- **Scope note:** the newly generated high-resolution reference-art sheets have *not* been imported as exact PNG sprite atlas files; the game uses its original programmatically drawn matching asset system. Full iPad Safari performance and controller testing remains necessary.
+
+
+
 ### V119: Single-character animation rig, props and region wardrobe (implemented)
 
 - A **new original 192×288 movement atlas** under `assets/haigen-v119-movement-atlas.png` uses 4 rows (down, up, right, left), each with four distinct walk frames in fixed 48×72 cells. Trainers are actual art, not stretched missing shoes. Brief side-to-front turns retain the approved three-quarter poses.
