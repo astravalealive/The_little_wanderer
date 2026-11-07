@@ -3260,8 +3260,16 @@ haigenMovementAtlas.onload=()=>{
  haigenMovementReady=haigenMovementAtlas.naturalWidth===192&&haigenMovementAtlas.naturalHeight===288;
  haigenCostumeAtlases.clear();
 };
-haigenMovementAtlas.onerror=()=>{haigenMovementReady=false};
-haigenMovementAtlas.src='./assets/haigen-v119-movement-atlas.png?v=119';
+// Fall back safely to the previous V119 sprite if the reference atlas fails to load.
+let haigenReferenceFallbackUsed=false;
+haigenMovementAtlas.onerror=()=>{
+ haigenMovementReady=false;
+ if(!haigenReferenceFallbackUsed){
+  haigenReferenceFallbackUsed=true;
+  haigenMovementAtlas.src='./assets/haigen-v119-movement-atlas.png?v=119';
+ }
+};
+haigenMovementAtlas.src='./assets/haigen-reference-walk-atlas.webp?v=121';
 let haigenPreviousFacing='down',haigenTurnFrom='down',haigenTurnAt=-10000;
 function startHaigenAction(kind,duration=650){
  haigenVisualAction={kind,start:performance.now(),duration};
@@ -3295,16 +3303,24 @@ function haigenCostumeAtlas(base,kind){
  const g=c.getContext('2d',{willReadFrequently:true});if(!g)return base;
  g.imageSmoothingEnabled=false;
  g.drawImage(base,0,0,192,sheetHeight,0,0,192,sheetHeight);
+ // The reference's third DOWN walk cell accidentally faces BACK.
+ // Copy the approved forward idle pose here until that one source frame is redrawn.
+ const referenceMovement=newSheet&&!haigenReferenceFallbackUsed;
+ if(referenceMovement)g.drawImage(base,0,0,48,72,96,0,48,72);
  // Clean the bright edge specks from the extracted transparent atlas.
  // Restrict to silhouettes; do not erase pale trainers or golden hair highlights
  // that are surrounded by opaque pixels.
  if(newSheet){
   const img=g.getImageData(0,0,192,sheetHeight),d=img.data,src=new Uint8ClampedArray(d);
   for(let y=0;y<sheetHeight;y++){
-   if(y%72>=64)continue; // preserve pale shoe soles
+   if(y%72>=(referenceMovement?61:64))continue; // preserve trainers and soles
    for(let x=1;x<191;x++){
     const k=(y*192+x)*4,r=src[k],gg=src[k+1],bb=src[k+2];
-    if(src[k+3]===0||r<242||gg<239||bb<231)continue;
+    // Reference art retains neutral fringe from its white JPEG source.
+    const paleSpeck=r>=242&&gg>=239&&bb>=231;
+    const neutral=Math.max(r,gg,bb)-Math.min(r,gg,bb)<36;
+    const referenceFringe=referenceMovement&&neutral&&(r+gg+bb)>=375;
+    if(src[k+3]===0||(!paleSpeck&&!referenceFringe))continue;
     const exposed=src[k-1]===0||src[k+7]===0||
       (y>0&&src[k-192*4+3]===0)||(y<sheetHeight-1&&src[k+192*4+3]===0);
     if(exposed)d[k+3]=0;
@@ -3560,7 +3576,9 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  const oldSide=haigenTurnFrom==='left'||haigenTurnFrom==='right';
  const newVertical=dir==='up'||dir==='down';
  const displayDir=newSheet&&transition&&oldSide&&newVertical?haigenTurnFrom:dir;
- const row=displayDir==='up'?1:displayDir==='left'?(newSheet?3:2):displayDir==='right'?2:0;
+ // The V121 reference and legacy V119 fallback have opposite left/right row ordering.
+ const referenceMovement=newSheet&&!haigenReferenceFallbackUsed;
+ const row=displayDir==='up'?1:displayDir==='left'?(newSheet?(referenceMovement?2:3):2):displayDir==='right'?(newSheet?(referenceMovement?3:2):2):0;
  const scale=1.18,w=48*scale,h=72*scale;
  const left=Math.round(x-w/2),top=Math.round(y-h+7);
  ctx.save();ctx.imageSmoothingEnabled=false;
