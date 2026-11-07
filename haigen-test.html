@@ -2899,77 +2899,124 @@ function haigenSpriteStatus(){
  const equip=useHands?'':state.equipped==='hands'?'':state.equipped;
  return {action,knock,equip:state.carriedFrogId>=0?'frog':equip,outfit:haigenOutfit()};
 }
+// V120 coherent pixel props: cached 40x60 atlases with grips anchored in hands.
+// Pose changes are four distinct 10-12fps phases: windup, contact, follow-through, recovery.
+const haigenToolAtlases=new Map();
+function haigenToolSprite(kind){
+ if(haigenToolAtlases.has(kind))return haigenToolAtlases.get(kind);
+ const cv=document.createElement('canvas');cv.width=40;cv.height=60;
+ const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+ const p=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+ const line=(pts,color,width=1)=>{g.strokeStyle=color;g.lineWidth=width;g.lineCap='square';g.beginPath();g.moveTo(...pts[0]);pts.slice(1).forEach(pt=>g.lineTo(...pt));g.stroke()};
+ const wood='#634331',woodLight='#a8784d',dark='#252b2d',iron='#a5b0ab',shine='#e3e5d7';
+ if(kind==='axe'||kind==='shovel'||kind==='pickaxe'||kind==='torch'||kind==='net'){
+  p(18,16,6,42,dark);p(19,14,4,43,wood);p(20,20,2,35,woodLight);
+  p(17,47,9,4,'#5f4a37');p(18,49,7,2,'#c49d67');
+ }
+ if(kind==='axe'){
+  // Heavy offset blade with shaded cutting edge; not a floating grey rectangle.
+  p(14,8,14,19,dark);p(7,9,13,16,dark);
+  p(6,12,11,11,iron);p(9,9,12,15,'#788e91');p(9,9,5,4,shine);
+  p(5,14,4,9,shine);p(19,11,6,13,'#414b4c');
+  p(18,20,5,5,'#b1a8a0');p(19,20,3,2,'#e1d7c2');
+ }else if(kind==='pickaxe'){
+  // Tapered two-sided metal head with a long handle and a bolted socket.
+  p(4,7,32,6,dark);p(6,6,28,5,iron);
+  p(4,10,6,6,'#879796');p(30,10,5,6,'#7c8c89');
+  p(2,14,4,4,'#d3dad1');p(34,14,4,4,'#b6bbb3');
+  p(13,8,14,8,'#506363');p(18,11,5,5,'#d9cbb0');
+  p(13,5,9,3,shine);
+ }else if(kind==='shovel'){
+  p(14,3,12,20,dark);p(15,5,10,17,iron);
+  p(17,6,5,10,'#d9e0d5');p(17,17,7,5,'#707e7b');
+  p(13,18,14,4,'#404e4d');p(10,25,8,3,dark);p(24,25,8,3,dark);
+ }else if(kind==='torch'){
+  p(13,13,14,12,dark);p(14,16,12,9,'#8b5e36');
+  p(16,13,8,4,'#efbd63');p(17,22,6,4,'#392c2a');
+  p(15,4,10,12,'#ed8b31');p(18,0,5,12,'#ffe59a');
+  p(22,7,7,6,'#fdc84e');p(12,10,5,8,'#dd6c2d');
+ }else if(kind==='net'){
+  g.strokeStyle='#6e5c43';g.lineWidth=4;g.beginPath();g.ellipse(20,15,16,12,0,0,Math.PI*2);g.stroke();
+  g.strokeStyle='#d9d3b6';g.lineWidth=2;g.beginPath();g.ellipse(20,15,14,10,0,0,Math.PI*2);g.stroke();
+  g.strokeStyle='#9ba7a2';g.lineWidth=1;
+  for(let x=10;x<=30;x+=5){line([[x,7],[x,24]],'#c3cec8',.8)}
+  for(let y=9;y<=22;y+=4){line([[8,y],[32,y]],'#aab5af',.8)}
+  p(18,27,4,10,'#7b6a4a');
+ }else if(kind==='rod'){
+  line([[19,57],[21,43],[27,29],[32,14],[35,3]],'#342e2a',4);
+  line([[19,55],[22,42],[27,28],[32,14],[35,3]],'#987852',2);
+  p(16,41,11,9,dark);p(18,42,8,7,'#9ea9a5');p(20,44,3,3,'#343c40');
+  line([[36,6],[38,17],[36,43]],'#b9c8c0',.85);
+  p(34,41,7,6,'#e8e6cc');p(34,43,7,4,'#b64948');
+ }else if(kind==='frog'){
+  p(12,22,20,12,'#385b39');p(15,18,17,11,'#78a95f');
+  p(13,16,8,7,'#729a58');p(25,16,8,7,'#729a58');
+  p(17,18,3,3,'#e8dfaa');p(28,18,3,3,'#e8dfaa');
+  p(17,19,1,2,'#282e2c');p(28,19,1,2,'#282e2c');
+  p(10,30,12,5,'#587e4f');p(27,30,9,5,'#587e4f');
+ }
+ haigenToolAtlases.set(kind,cv);return cv;
+}
 function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  if(!kind)return;
- const isLeft=dir==='left',back=dir==='up';
- const progress=action?.progress||0;
- const key=action?.kind||'';
- let working=['axe','shovel','pickaxe','torch','net','rod'].includes(kind)&&key===kind;
- if(kind==='rod'&&['cast','reel','land'].includes(key))working=true;
- if(kind==='net'&&['net','catch','release'].includes(key))working=true;
+ const key=action?.kind||'',progress=action?.progress||0;
+ const working=(key===kind)||(kind==='rod'&&['cast','reel','land'].includes(key))||
+  (kind==='net'&&['net','catch','release'].includes(key));
  const phase=working?Math.min(3,Math.floor(progress*4)):0;
- const upSwing=working&&(phase===1||phase===2);
+ const direction=dir==='left'?'left':dir==='right'?'right':dir==='up'?'up':'down';
  ctx.save();ctx.imageSmoothingEnabled=false;
- if(isLeft){ctx.translate(left+48*scale,top);ctx.scale(-scale,scale)}
+ if(direction==='left'){ctx.translate(left+48*scale,top);ctx.scale(-scale,scale)}
  else{ctx.translate(left,top);ctx.scale(scale,scale)}
- // Pixel construction in unscaled 48x72 sprite coordinates.
  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
- const handX=dir==='right'||dir==='left'?35:38;
- const handY=dir==='up'?46:48;
+ const skin='#e7b78e',shade='#ab795f',sleeve='#343039',light='#514651';
  if(['eat','medicine','cook'].includes(key)){
-  const rising=Math.sin(Math.PI*progress);
-  const hy=handY-rising*17;
-  p(handX-3,hy,7,7,'#edba93');
-  if(key==='eat'){p(handX-2,hy-5,8,6,'#bc8551');p(handX,hy-5,3,2,'#e9c08b')}
-  else if(key==='medicine'){p(handX,hy-8,6,9,'#b9dacc');p(handX+1,hy-10,4,3,'#568878');p(handX+2,hy-4,2,3,'#d8f0e5')}
-  else{p(handX+1,hy-17,3,16,'#b3a68a');p(handX-2,hy-20,10,5,'#b5b8a7')}
+  const raise=Math.sin(Math.PI*progress)*17,handY=44-raise;
+  p(31,34-raise*.38,8,9,sleeve);p(34,36-raise*.38,3,3,light);
+  p(35,handY,7,6,skin);p(39,handY+3,2,2,shade);
+  if(key==='eat'){p(33,handY-7,10,7,'#865b38');p(34,handY-9,8,5,'#c29a60');p(37,handY-8,3,2,'#edc68a')}
+  if(key==='medicine'){p(34,handY-10,8,12,'#556e6f');p(35,handY-10,6,9,'#a7d1bd');p(36,handY-13,4,4,'#768b76');p(37,handY-7,2,4,'#eff7e9')}
+  if(key==='cook'){p(37,handY-19,3,20,'#7e6946');p(31,handY-22,12,6,'#b1b2a0');p(34,handY-20,5,3,'#e2e1c3')}
   ctx.restore();return;
  }
  if(kind==='frog'){
-  p(handX-6,handY-5,12,6,'#e7be91');
-  p(handX-6,handY-11,12,8,'#558653');
-  p(handX-7,handY-14,6,6,'#77a763');p(handX+3,handY-14,6,6,'#77a763');
-  p(handX-5,handY-13,2,2,'#ebddb4');p(handX+5,handY-13,2,2,'#ebddb4');
+  const frog=haigenToolSprite('frog');
+  ctx.drawImage(frog,22,25,24,30);
+  p(23,51,10,6,skin);p(32,51,10,6,skin);
   ctx.restore();return;
  }
- const cx=handX+1,cy=handY-2;
- // Whole tool rotates around the hand; animation positions follow direction.
- let a=working?[ -.45,-1.4,.22,.53][phase]:-.22;
- if(back)a-=.20;
- if(kind==='torch')a=working?[-.3,-.5,-.8,-.35][phase]:-.18;
- if(kind==='rod')a=working?[-.65,-1.1,-.35,-.15][phase]:-.35;
- if(kind==='net')a=working?[-.45,-1.05,.45,-.1][phase]:-.2;
- ctx.translate(cx,cy);ctx.rotate(a);
- // Scale is handled by the parent transform, so every tool keeps a coherent size.
- p(-2,-2,7,7,'#eab78f');
- const len=kind==='torch'?23:kind==='rod'?39:kind==='net'?29:28;
- p(1,-len,3,len,'#73553a');p(2,-len+2,1,len-3,'#bc9970');
- if(kind==='axe'){
-  p(-5,-len-3,15,5,'#8b9899');p(-8,-len+1,20,7,'#c8d0cc');p(-9,-len+3,4,9,'#d5ded8');p(8,-len+2,4,5,'#5a696b');
- }else if(kind==='pickaxe'){
-  p(-15,-len-3,32,4,'#879594');p(-13,-len-5,7,2,'#d4d9d2');p(12,-len+2,4,5,'#596864');
- }else if(kind==='shovel'){
-  p(-5,-len-7,14,12,'#9ca8a7');p(-3,-len-8,10,3,'#d8d6c6');p(-3,-len,10,4,'#778787');
- }else if(kind==='torch'){
-  p(-3,-len-4,13,5,'#544537');
-  const flame=4+((Math.floor(performance.now()/120)%3));
-  p(0,-len-4-flame,7,flame+4,'#e89b39');
-  p(2,-len-1-flame,4,flame+1,'#ffdf76');
- }else if(kind==='rod'){
-  p(2,-len-5,2,7,'#b8a485');
-  ctx.strokeStyle='#d4dccc';ctx.lineWidth=.8;ctx.beginPath();
-  ctx.moveTo(4,-len-4);ctx.lineTo(15,-len+20);ctx.stroke();
-  if(key==='land'){p(10,-len+17,10,5,'#9cb3ae');p(16,-len+16,5,3,'#d5e4e1')}
- }else if(kind==='net'){
-  ctx.strokeStyle='#b3aaa1';ctx.lineWidth=2;
-  ctx.beginPath();ctx.ellipse(2,-len-7,10,8,0,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle='#d8e1d6';ctx.lineWidth=.6;
-  for(let j=-5;j<=5;j+=5){ctx.beginPath();ctx.moveTo(j,-len-14);ctx.lineTo(j,-len);ctx.stroke()}
-  ctx.beginPath();ctx.moveTo(-8,-len-7);ctx.lineTo(11,-len-7);ctx.stroke();
+ const sprite=haigenToolSprite(kind);
+ const isLong=kind==='rod'||kind==='net';
+ const anchorX=direction==='up'?16:direction==='down'?30:34;
+ const anchorY=direction==='up'?43:49;
+ let angle=direction==='up'?-.45:-.40;
+ if(isLong)angle=-.21;
+ if(kind==='torch')angle=-.12;
+ if(working){
+  const poses=kind==='rod'?[-.60,-.96,-.17,-.30]:
+    kind==='net'?[-.7,-1.18,.54,-.2]:[-.50,-1.23,.31,-.19];
+  angle=poses[phase];
+ }
+ const handPivot=kind==='rod'||kind==='net'?55:52;
+ const wristShift=working?([0,-5,4,0][phase]):0;
+ ctx.translate(anchorX+wristShift,anchorY+(working&&phase===1?-3:0));
+ ctx.rotate(angle);
+ // The hand is on the lower shaft, never detached from the handle.
+ ctx.drawImage(sprite,-20,-handPivot,40,60);
+ // Two believable grips, arm cuffs and knuckles visually lock the tool to Haigen.
+ p(-11,0,9,7,sleeve);p(-8,-1,7,5,light);
+ p(-8,-5,8,7,skin);p(-7,0,7,2,shade);
+ if(kind!=='torch'&&kind!=='rod'){
+  p(4,-17,9,7,sleeve);p(5,-16,6,4,light);
+  p(6,-18,7,6,skin);p(7,-13,5,2,shade);
+ }
+ if(working&&phase===2&&['axe','pickaxe','shovel','net'].includes(kind)){
+  for(let i=0;i<4;i++){
+   const xx=-22+i*8,yy=-47+(i%2)*6;
+   p(xx,yy,3,3,kind==='axe'?'#d3b384':kind==='pickaxe'?'#c3c6b9':'#a0a98a');
+  }
  }
  ctx.restore();
 }
-
 function drawApprovedHaigen(x,y,actor,deepWater=false){
  if(!haigenApprovedAtlasReady&&!haigenMovementReady)return false;
  const status=haigenSpriteStatus();
