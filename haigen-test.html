@@ -2240,12 +2240,12 @@ function homesteadMenu(kind){
     if(!homesteadCost(3,0,2))return;state.fishingRod=true;equipTool('rod');notify('🎣 Fishing rod crafted!');save();homesteadMenu(kind)
    }]);
    else if(!state.castAt)items.push(['Cast fishing line',()=>{
-    state.castAt=Date.now();state.biteAt=state.castAt+5500+Math.floor(Math.random()*4000);state.biteNotified=false;startHaigenAction('cast',1050);
+    state.castAt=Date.now();state.biteAt=state.castAt+5500+Math.floor(Math.random()*4000);state.biteNotified=false;equipTool('rod');startHaigenAction('cast',1050);
     notify('🎣 Line cast! Return when the float starts to bob.');save();close();
    }]);
    else items.push(['Reel in the line',()=>{
     if(Date.now()<state.biteAt){notify('🎣 No bite yet. Watch the float a little longer.');close();return}
-    const qty=Math.random()<.25?2:1;state.fish+=qty;state.castAt=0;state.biteAt=0;state.biteNotified=false;startHaigenAction('land',1350);
+    const qty=Math.random()<.25?2:1;state.fish+=qty;state.castAt=0;state.biteAt=0;state.biteNotified=false;equipTool('rod');startHaigenAction('land',1350);
     notify('🐟 Caught '+qty+' lake fish! Cook them at camp.');save();close()
    }]);
   }
@@ -2779,7 +2779,7 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  const base=newSheet?haigenMovementAtlas:haigenApprovedWalkAtlas||haigenApprovedAtlas;
  const spriteAtlas=haigenCostumeAtlas(base,status.outfit);
  const motion=actor||playerMotion,dir=motion.dir||'down',moving=!!motion.moving;
- const frame=moving?Math.floor((motion.anim||0)/150)%4:0;
+ const frame=status.knock?1+Math.floor((performance.now()-status.knock.started)/85)%2: moving?Math.floor((motion.anim||0)/150)%4:0;
  // Very short three-quarter turn-in frames, only when crossing an axis.
  if(dir!==haigenPreviousFacing){
   haigenTurnFrom=haigenPreviousFacing;
