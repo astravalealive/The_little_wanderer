@@ -1,4 +1,4 @@
 {
-  "build": 120,
+  "build": 129,
   "notes": "V120 Working World: boulders require 3–5 genuine pickaxe hits and break into persistent collectable stone pieces. Prevent direct large-rock harvesting, free soil-stone and offline generation; accessible starter pickaxe from timber/twigs, old inventories retained. Independent Haigen now selects finite jobs to mine, chop, cook, fish, garden, explore, catch/release and build up to 5 permanent trail lanterns/signposts using resources, with proper cooldowns and safe-site approach. Held axe, pick, shovel, torch, rod, net and building hammer use smaller cohesive wrist-aligned pixel art and four-pose swings; bright white-edge sprite cleanup. Regional fauna expanded to cached sprites across 21 animal types. Existing world structure and biome sprites improved; separately generated concept-art bitmap sheets are not yet embedded as exact atlases. Preserve V119 Haigen movement/outfits, V116 legible speech, existing saves, companion/animal lifecycles, Silent Pond, controllers and original Ember. Code compiles; targeted mining/building/fauna unit checks passed; iPad Safari full playtest remains."
 }
