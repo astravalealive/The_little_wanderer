@@ -3406,22 +3406,36 @@ function haigenCostumeAtlas(base,kind){
  // Restrict to silhouettes; do not erase pale trainers or golden hair highlights
  // that are surrounded by opaque pixels.
  if(newSheet){
-  const img=g.getImageData(0,0,192,sheetHeight),d=img.data,src=new Uint8ClampedArray(d);
-  for(let y=0;y<sheetHeight;y++){
-   if(y%72>=(referenceMovement?61:64))continue; // preserve trainers and soles
-   for(let x=1;x<191;x++){
-    const k=(y*192+x)*4,r=src[k],gg=src[k+1],bb=src[k+2];
-    // Reference art retains neutral fringe from its white JPEG source.
-    const paleSpeck=r>=242&&gg>=239&&bb>=231;
-    const neutral=Math.max(r,gg,bb)-Math.min(r,gg,bb)<36;
-    const referenceFringe=referenceMovement&&neutral&&(r+gg+bb)>=375;
-    if(src[k+3]===0||(!paleSpeck&&!referenceFringe))continue;
-    const exposed=src[k-1]===0||src[k+7]===0||
-      (y>0&&src[k-192*4+3]===0)||(y<sheetHeight-1&&src[k+192*4+3]===0);
-    if(exposed)d[k+3]=0;
+  // The extracted reference atlas contained connected near-white JPEG-edge
+  // fringe. Flood only the outside of each 48x72 frame, not internal eyes,
+  // highlights, warm skin, trainers or blonde hair.
+  const image=g.getImageData(0,0,192,sheetHeight),d=image.data;
+  const W=192,CW=48,CH=72;
+  for(let row=0;row<4;row++)for(let col=0;col<4;col++){
+   const visited=new Uint8Array(CW*CH),queue=[];
+   const canClear=(xx,yy)=>{
+    const k=((row*CH+yy)*W+col*CW+xx)*4;
+    const a=d[k+3],r=d[k],gr=d[k+1],b=d[k+2];
+    if(a<80)return true;
+    const delta=Math.max(r,gr,b)-Math.min(r,gr,b);
+    if(yy>=61&&Math.min(r,gr,b)<243)return false;
+    return delta<48&&r+gr+b>618;
+   };
+   const put=(x,y)=>{
+    if(x<0||x>=CW||y<0||y>=CH)return;
+    const k=y*CW+x;if(visited[k]||!canClear(x,y))return;
+    visited[k]=1;queue.push(k);
+   };
+   for(let x=0;x<CW;x++){put(x,0);put(x,CH-1)}
+   for(let y=0;y<CH;y++){put(0,y);put(CW-1,y)}
+   for(let q=0;q<queue.length;q++){
+    const i=queue[q],xx=i%CW,yy=Math.floor(i/CW);
+    const k=((row*CH+yy)*W+col*CW+xx)*4;
+    d[k+3]=0;
+    put(xx-1,yy);put(xx+1,yy);put(xx,yy-1);put(xx,yy+1);
    }
   }
-  g.putImageData(img,0,0);
+  g.putImageData(image,0,0);
  }
 
  const palette={
@@ -3609,9 +3623,9 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  // Grip orientation is not a generic rotation around the middle of the
  // sprite. The *butt of the handle* follows the wrist through a 4-pose arc.
  const angles={
-  axe:[-.18,-1.09,.54,-.20],
-  pickaxe:[-.21,-1.16,.42,-.15],
-  shovel:[-.15,-.64,.21,-.17],
+  axe:[.30,-1.09,.54,-.20],
+  pickaxe:[.28,-1.16,.42,-.15],
+  shovel:[.17,-.64,.21,-.17],
   torch:[-.12,-.30,-.49,-.11],
   rod:[-.28,-.88,.29,-.25],
   net:[-.25,-1.03,.38,-.14],hammer:[-.22,-1.18,.35,-.20]
@@ -3625,7 +3639,7 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  ctx.rotate(angle);
  // A 40×60 sprite becomes a 27×42 game prop so it doesn't overwhelm
  // Haigen's 48×72 body. The lower shaft (y≈48) meets the wrist at (0,0).
- const toolScale=kind==='rod'?.77:kind==='net'?.78:kind==='torch'?.70:.74;
+ const toolScale=kind==='rod'?.75:kind==='net'?.74:kind==='torch'?.68:.66;
  ctx.scale(toolScale,toolScale);
  ctx.drawImage(haigenToolSprite(kind),-20,-49,40,60);
  ctx.restore();
