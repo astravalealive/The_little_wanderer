@@ -4854,9 +4854,18 @@ function updateBirds(dt){
 }
 function drawBird(b){
  if(b.hiddenUntil&&time<b.hiddenUntil)return;
- if(illustratedFaunaReady&&b.air<=.04){
-  drawIllustratedFauna('bird',b.x,b.y,b.vx<0?'left':'right',
-   Math.abs(b.vx)>.04,time+b.phase*200,.94);return;
+ if(illustratedFaunaReady){
+  const flying=b.air>.04,alt=flying?b.air*(35+Math.sin(time*.003+b.phase)*7):0;
+  drawIllustratedFauna('bird',b.x,b.y-alt,b.vx<0?'left':'right',
+   flying||Math.abs(b.vx)>.04,time+b.phase*200,.94);
+  if(flying){
+   const flap=Math.sin(time*.022+b.phase)*11;
+   ctx.save();ctx.strokeStyle='#a1b4ad';ctx.lineWidth=2.8;ctx.lineCap='square';
+   ctx.beginPath();ctx.moveTo(b.x-6,b.y-alt-14);ctx.lineTo(b.x-16,b.y-alt-27-flap);
+   ctx.moveTo(b.x+5,b.y-alt-14);ctx.lineTo(b.x+16,b.y-alt-25+flap);
+   ctx.stroke();ctx.restore();
+  }
+  return;
  }
  const wing=Math.sin(time*.022+b.phase),flying=b.air>.04,alt=flying?b.air*(35+Math.sin(time*.003+b.phase)*7):0;
  const hop=!flying?Math.max(0,Math.sin(time*.009+b.phase))*3:0;const x=b.x,y=b.y-alt-hop;
