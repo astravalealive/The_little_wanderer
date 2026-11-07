@@ -1510,12 +1510,12 @@ function autoCampChores(dt){
   if(harvestGarden())state.autoSteps++;
   return true;
  }
- if(state.food<3&&(state.rawMeat>=1||state.vegetables>=3||state.eggs>=2||state.fish>=1||state.mushrooms>=3||state.berries>=6)){
+ if(state.food<2&&(state.rawMeat>=1||state.vegetables>=3||state.eggs>=2||state.fish>=1||state.mushrooms>=3||state.berries>=6)){
   autoPlan('cook meals at camp','cook');
   if(dist(state,cottage)>225){autoTravel(autoCampSpot(),dt,175);return true}
   const options=[['rawMeat',1,'campfire roast'],['vegetables',3,'garden stew'],['eggs',2,'fried eggs'],['fish',1,'grilled fish'],['mushrooms',3,'mushroom stew'],['berries',3,'berry meal']];
   const selected=options.find(([resource,count])=>(state[resource]||0)>=count);
-  if(selected){state[selected[0]]-=selected[1];state.food++;state.autoSteps++;save();notify('🍲 Haigen cooked '+selected[2]+'.')}
+  if(selected){state[selected[0]]-=selected[1];state.food++;startHaigenAction('cook',900);state.autoSteps++;save();notify('🍲 Haigen cooked '+selected[2]+'.')}
   return true;
  }
  return false;
@@ -1609,6 +1609,146 @@ function lifeProjectTick(dt){
  return true;
 }
 
+
+// Mining is a real, tool-gated journey. A boulder is never collected by hand.
+function autoMineStone(dt){
+ const drops=state.stoneDrops.filter(o=>dist(o,state)<1750).sort((a,b)=>dist(a,state)-dist(b,state));
+ if(drops.length){
+  const piece=drops[0];
+  autoPlan('pick up the stone pieces I broke free','mine-pickup:'+piece.id);
+  if(dist(piece,state)>67){autoTravel(piece,dt,67,.12);return true}
+  collectStonePiece(piece);state.autoSteps++;autoPause=350;return true;
+ }
+ if(!state.tools.pickaxe){
+  // The first crude flint pickaxe must NOT require stone you cannot gather yet.
+  const wood=state.wood+(state.woodStorageTier?state.woodStored:0);
+  if(wood<5||state.twigs<3){
+   const target=autoTarget('tree');
+   autoPlan('gather timber to make a pickaxe','craft-pickaxe-supplies');
+   if(target){if(dist(state,target)>80)autoTravel(target,dt,80,.13);
+    else if(harvest(target)){gainWood(2);state.twigs+=2;state.autoSteps++;autoPause=400;save()}
+   }else if(!autoWaypoint||dist(state,autoWaypoint)<105)autoWaypoint=autoExplore();
+   if(!target&&autoWaypoint)autoTravel(autoWaypoint,dt,95,.11);
+   return true;
+  }
+  autoPlan('make my first pickaxe from wood and flint','craft-pickaxe');
+  if(dist(state,cottage)>185){autoTravel(autoCampSpot(),dt,170,.13);return true}
+  if(spendCampWood(5)){state.twigs-=3;state.tools.pickaxe=1;startHaigenAction('craft',1000);
+   mindWrite('I finally made a pickaxe. Now I can break the big boulders and collect the pieces.','growth');
+   state.autoSteps++;save();}
+  autoPause=1000;return true;
+ }
+ const boulder=autoTarget('rock');
+ if(boulder){
+  autoPlan('mine a boulder with my pickaxe','mine:'+boulder.id);
+  if(dist(state,boulder)>99){autoTravel(boulder,dt,99,.115);return true}
+  breakBoulder(boulder);autoPause=460;state.autoSteps++;return true;
+ }
+ autoPlan('search for a safe mining place','mining-search');
+ if(!autoWaypoint||dist(state,autoWaypoint)<100)autoWaypoint=autoExplore();
+ if(autoWaypoint)autoTravel(autoWaypoint,dt,95,.12);
+ return true;
+}
+
+// A varied purpose-driven life after the first three homestead structures.
+// Repeatable jobs have finite time budgets; no permanent "collect rocks" loop.
+function autoFreedomTick(dt){
+ if(!state.autonomy||state.playerInstruction)return false;
+ const now=Date.now();
+ let job=state.autoFreeJob;
+ if(job&&(!['mine','fish','cook','explore','forge','wood','garden','net'].includes(job.kind)||now-(job.startedAt||now)>85000)){
+  state.autoFreeJob=null;job=null;
+ }
+ if(!job){
+  const choices=[];
+  if(state.stone<8)choices.push('mine','mine');
+  if(!state.tools.pickaxe)choices.push('forge');
+  if(state.food<4&&(state.fish||state.rawMeat||state.eggs>=2||state.mushrooms>=3||state.berries>=3))choices.push('cook');
+  if(state.fishingRod&&state.jettyBuilt&&state.fish<4)choices.push('fish');
+  if(state.gardenTier&&gardenRipe())choices.push('garden');
+  if(state.wood<8&&state.tools.axe)choices.push('wood');
+  if(state.tools.net&&state.carriedFrogId>=0)choices.push('net');
+  if(state.tools.net&&state.frogsReleased<4&&state.energy>65)choices.push('net');
+  choices.push('explore','explore');
+  const index=(state.autoSteps+Math.floor(state.daytime/70)+haigenMind.visited.length)%choices.length;
+  job={kind:choices[index],startedAt:now,steps:0};
+  state.autoFreeJob=job;
+  const labels={mine:'mining stone for new projects',forge:'making a useful pickaxe',fish:'catching food with my rod',cook:'cooking a proper meal',explore:'finding somewhere new',wood:'chopping firewood',garden:'tending my vegetables',net:'studying frogs and releasing them'};
+  mindWrite('My next job is '+labels[job.kind]+'. I want to accomplish something useful.','plan');
+  autoDestination=null;autoWaypoint=null;autoResetNav();save();
+ }
+ job.steps++;
+ const finish=(message)=>{
+  if(message)mindWrite(message,'achievement');
+  state.autoFreeJob=null;autoDestination=null;autoWaypoint=null;autoPause=800;save();return true;
+ };
+ if(job.kind==='forge'||job.kind==='mine'){
+  if(job.kind==='mine'&&state.stone>=8)return finish('The stone supply is ready for my next building idea.');
+  autoMineStone(dt);
+  if(state.tools.pickaxe&&job.kind==='forge')return finish('I made a pickaxe. Now I can start proper mining.');
+  return true;
+ }
+ if(job.kind==='cook'){
+  if(state.food>=4)return finish('I cooked enough meals for a few journeys.');
+  const ingredients=[['rawMeat',1],['fish',1],['eggs',2],['vegetables',3],['mushrooms',3],['berries',3]];
+  const choice=ingredients.find(([name,n])=>state[name]>=n);
+  if(!choice)return finish();
+  autoPlan('prepare a hot meal','freedom-cooking');
+  if(dist(state,cottage)>190){autoTravel(autoCampSpot(),dt,170,.12);return true}
+  state[choice[0]]-=choice[1];state.food++;startHaigenAction('cook',1100);state.autoSteps++;save();
+  return finish('I cooked food instead of just gathering more ingredients.');
+ }
+ if(job.kind==='fish'){
+  if(state.fish>=4)return finish('Fishing gave us enough food for supper.');
+  autoPlan('go fishing at the jetty','freedom-fishing');
+  if(dist(state,jettyPlot)>140){autoTravel(jettyPlot,dt,120,.12);return true}
+  if(!state.castAt){haigenUseRod();autoPause=1300;return true}
+  if(Date.now()>=state.biteAt){haigenUseRod();return finish('I landed a fish myself. Maybe I can cook it later.')}
+  autoPause=850;return true;
+ }
+ if(job.kind==='wood'){
+  if(state.wood>=10)return finish('I chopped some wood for future building.');
+  const tree=autoTarget('tree');
+  if(!tree)return finish();
+  autoPlan('cut timber for the homestead','freedom-wood');
+  if(dist(state,tree)>110){autoTravel(tree,dt,105,.12);return true}
+  if(!state.tools.axe){return finish()}
+  const hit=(Number(state.treeHits[tree.id])||0)+1;state.treeHits[tree.id]=hit;
+  startToolSwing('axe');autoPause=410;
+  if(hit>=3){delete state.treeHits[tree.id];harvest(tree);gainWood(4);state.twigs+=2;state.autoSteps++;save()}
+  return true;
+ }
+ if(job.kind==='garden'){
+  if(!state.gardenTier||!gardenRipe())return finish();
+  autoPlan('harvest my vegetable beds','freedom-garden');
+  if(dist(state,gardenPlot)>110){autoTravel(gardenPlot,dt,110,.12);return true}
+  if(harvestGarden())return finish('The vegetables I planted are ready. I can cook with these.');
+  return finish();
+ }
+ if(job.kind==='net'){
+  autoPlan('observe and care for pond creatures','freedom-net');
+  if(state.carriedFrogId>=0){
+   if(!frogs[state.carriedFrogId]){state.carriedFrogId=-1;return finish()}
+   if(dist(state,pond)>290){autoTravel({x:pond.x,y:pond.y},dt,245,.13);return true}
+   if(haigenUseNet())return finish('I carried a frog back to its home and released it safely.');
+   return finish();
+  }
+  const frog=frogs.filter(f=>(!f.safeUntil||time>=f.safeUntil)&&dist(f,state)<650).sort((a,b)=>dist(a,state)-dist(b,state))[0];
+  if(!frog)return finish();
+  if(dist(state,frog)>92){autoTravel(frog,dt,92,.11);return true}
+  haigenUseNet();autoPause=650;return true;
+ }
+ // Exploration is a concrete route, not an extra resource pickup.
+ autoPlan('travel to an unexplored place','freedom-explore');
+ if(!autoWaypoint)autoWaypoint=autoExplore();
+ if(!autoWaypoint)return finish();
+ if(autoTravel(autoWaypoint,dt,95,.13)){
+  mindEvent('discover',expandedRegion(state.x,state.y)?.id||'woodland');
+  return finish('I reached a place I had not properly explored. I wonder what I can build here.');
+ }
+ return true;
+}
+
 function autonomousTick(dt){
  state.fun=Math.min(100,state.fun+dt*.00018);state.activity=Math.min(100,state.activity+dt*.0003);
  autoBubbleTimer-=dt;
@@ -1636,6 +1776,7 @@ function autonomousTick(dt){
  if(instructionTick(dt))return;
  if(lifeProjectTick(dt))return;
  if(autoCampChores(dt))return;
+ if(autoFreedomTick(dt))return;
  if(autoPause>0){autoPause=Math.max(0,autoPause-dt);if(autoBubbleTimer<=0)speak(currentThoughtTopic(),4200);return}
  if(autoDestination&&(state.removed.includes(autoDestination.id)||
  (autoDestination.type==='bush'&&!berryReady(autoDestination))||
@@ -3750,7 +3891,7 @@ function updateHaigenSpeech(){
  el.style.visibility='visible';
 }
 
-function draw(){const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const questHud=$('campQuestHud');if(questHud)questHud.textContent=state.campClearingDone?'🏕️ Campsite secure ✓':'🏕️ Clear campsite '+state.campClearingPicked.length+'/'+campDebris.length+' · X Collect brush';const homeHud=$('homesteadHud');if(homeHud)homeHud.textContent='🪵 '+state.wood+'/'+woodCarryLimit+' · 📦 '+state.woodStored+'/'+woodStoreLimit()+' · 🥚 '+state.eggs+' · 🐟 '+state.fish+' · 🥩 '+state.rawMeat+' · 🥕 '+state.vegetables+' · 🩵 '+state.medicinalMushrooms+' · 🧪 '+state.antidotes;const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100'+(state.poisonMs>0?' · 🟢 POISONED':'')+(collapseRemaining>0?' · 💤 RESCUE':'');hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=worldZoom();ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(0,0,WORLD,WORLD);drawExpandedTerrain(nightMix);ctx.save();islandClipPath(ctx);ctx.clip();if(rbEnabled)rbDrawGround();for(let i=0;i<410;i++){let x=seeded(i+950)*WORLD,y=seeded(i+1200)*WORLD;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850||expandedRegion(x,y)||(rbEnabled&&rbWoodland(x,y)))continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
+function draw(){const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const questHud=$('campQuestHud');if(questHud)questHud.textContent=state.campClearingDone?'🏕️ Campsite secure ✓':'🏕️ Clear campsite '+state.campClearingPicked.length+'/'+campDebris.length+' · X Collect brush';const homeHud=$('homesteadHud');if(homeHud)homeHud.textContent='🪵 '+state.wood+'/'+woodCarryLimit+' · 📦 '+state.woodStored+'/'+woodStoreLimit()+' · 🪨 '+state.stone+' · 🥚 '+state.eggs+' · 🐟 '+state.fish+' · 🥩 '+state.rawMeat+' · 🥕 '+state.vegetables+' · 🩵 '+state.medicinalMushrooms+' · 🧪 '+state.antidotes;const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100'+(state.poisonMs>0?' · 🟢 POISONED':'')+(collapseRemaining>0?' · 💤 RESCUE':'');hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=worldZoom();ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(0,0,WORLD,WORLD);drawExpandedTerrain(nightMix);ctx.save();islandClipPath(ctx);ctx.clip();if(rbEnabled)rbDrawGround();for(let i=0;i<410;i++){let x=seeded(i+950)*WORLD,y=seeded(i+1200)*WORLD;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850||expandedRegion(x,y)||(rbEnabled&&rbWoodland(x,y)))continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
 const tint=ctx.createRadialGradient(0,0,.04,0,0,1),shade=l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564';
 tint.addColorStop(0,shade+'cc');tint.addColorStop(.67,shade+'77');tint.addColorStop(1,shade+'00');
 ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(let j=0;j<24;j++){const a=j*2.399,r=Math.sqrt((j+1)/25),px=l.x+Math.cos(a)*r*390,py=l.y+Math.sin(a)*r*245;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],j%3?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,j%2?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,j%2?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();drawWetGround();clearingGround(cottage.x,cottage.y);drawCampDecor();if(!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80)){ellipse(firstFire.x,firstFire.y,47,25,'#76674a');for(let j=0;j<8;j++)ellipse(firstFire.x+Math.cos(j*Math.PI/4)*33,firstFire.y+Math.sin(j*Math.PI/4)*17,8,6,'#a7a18c')}lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();lakeShape(.79);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();lakeShape(.48);ctx.fillStyle=mixColour('#236c91','#243c68',nightMix);ctx.fill();ctx.restore();for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawPondMist(nightMix);drawSilentPond();drawStoryClues();// Fish are below the water's coloured surface; only the rare leap is above it.
@@ -3794,7 +3935,7 @@ for(let i=0;i<11;i++){
  ctx.beginPath();ctx.arc(px+Math.sin(time*.003+i)*5,py-travel,2+(i%3),0,Math.PI*2);ctx.stroke();
  ctx.restore();
 }
-for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();const visible=objects.filter(o=>!state.removed.includes(o.id)&&canPlaceScenery(o)&&flowerHasHabitat(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);homesteadPlots.forEach(p=>{drawHomesteadPlotGround(p);drawLifeConstruction(p,false)});const drawables=[...homesteadPlots.filter(p=>homesteadTier(p)>0&&p.kind!=='jetty').map(p=>({y:homesteadSortY(p),draw:()=>drawHomesteadPlotForeground(p)})),...homesteadPlots.filter(p=>state.lifeProject?.kind===p.kind&&homesteadTier(p)===0).map(p=>({y:homesteadSortY(p),draw:()=>drawLifeConstruction(p,true)})),...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.meatDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawMeatDrop(o)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.fillStyle='#8d603d';ctx.fillRect(o.x-22,o.y-8,44,17);ellipse(o.x+22,o.y,8,9,'#c9a67b')}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>drawSceneryNearHaigen(o)})),...woodlandDetails.filter(o=>(o.kind!=='fungi'||woodlandFungiReady(o))&&canPlaceScenery(o)&&!campsiteProtected(o)&&!homesteadPlots.some(p=>Math.hypot(o.x-p.x,o.y-p.y)<120)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),{y:state.y,draw:()=>{ctx.save();
+for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();const visible=objects.filter(o=>!state.removed.includes(o.id)&&canPlaceScenery(o)&&flowerHasHabitat(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);homesteadPlots.forEach(p=>{drawHomesteadPlotGround(p);drawLifeConstruction(p,false)});const drawables=[...homesteadPlots.filter(p=>homesteadTier(p)>0&&p.kind!=='jetty').map(p=>({y:homesteadSortY(p),draw:()=>drawHomesteadPlotForeground(p)})),...homesteadPlots.filter(p=>state.lifeProject?.kind===p.kind&&homesteadTier(p)===0).map(p=>({y:homesteadSortY(p),draw:()=>drawLifeConstruction(p,true)})),...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.meatDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawMeatDrop(o)})),...state.stoneDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawStonePiece(o)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.fillStyle='#8d603d';ctx.fillRect(o.x-22,o.y-8,44,17);ellipse(o.x+22,o.y,8,9,'#c9a67b')}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>drawSceneryNearHaigen(o)})),...woodlandDetails.filter(o=>(o.kind!=='fungi'||woodlandFungiReady(o))&&canPlaceScenery(o)&&!campsiteProtected(o)&&!homesteadPlots.some(p=>Math.hypot(o.x-p.x,o.y-p.y)<120)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),{y:state.y,draw:()=>{ctx.save();
  if(collapseRemaining<=0&&time<damageFlashUntil)ctx.globalAlpha*=Math.floor(time/95)%2===0?.34:1;
  const depth=lakeLevel(state.x,state.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
