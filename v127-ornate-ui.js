@@ -19,7 +19,10 @@ const icons={
  shovel:svg('<path d="M18 10L20 11L13 29L10 28Z" fill="#996640"/><path d="M10 2H23L26 10L19 18L11 13Z" fill="#a6b2b3" stroke="#405059" stroke-width="2"/>'),
  rod:svg('<path d="M8 29Q17 5 27 3" stroke="#b88953" stroke-width="3" fill="none"/><path d="M27 3Q30 16 26 24" stroke="#d8d6b8" stroke-width="1" fill="none"/><circle cx="12" cy="22" r="5" fill="#aab4b1" stroke="#4c565a" stroke-width="2"/><circle cx="26" cy="27" r="3" fill="#c64c3d"/>'),
  net:svg('<path d="M15 18L19 19L8 31L6 28Z" fill="#997047"/><ellipse cx="20" cy="11" rx="9" ry="9" fill="#b7d1a577" stroke="#d0bb83" stroke-width="3"/><path d="M12 11h16M20 2v18M13 6l14 10M27 6l-14 10" stroke="#efe1bd" stroke-width=".8"/>'),
- torch:svg('<path d="M15 14h5L19 30h-5Z" fill="#ae8052"/><path d="M17 2Q26 8 21 17Q16 22 11 16Q9 11 17 2Z" fill="#e47d33"/><path d="M18 7Q22 12 18 17Q14 18 15 13Z" fill="#ffe27b"/>')
+ torch:svg('<path d="M15 14h5L19 30h-5Z" fill="#ae8052"/><path d="M17 2Q26 8 21 17Q16 22 11 16Q9 11 17 2Z" fill="#e47d33"/><path d="M18 7Q22 12 18 17Q14 18 15 13Z" fill="#ffe27b"/>'),
+ berries:svg('<circle cx="10" cy="20" r="6" fill="#c7464e" stroke="#5c242b" stroke-width="1.7"/><circle cx="21" cy="20" r="6" fill="#b93643" stroke="#5c242b" stroke-width="1.7"/><circle cx="16" cy="12" r="6" fill="#cf4651" stroke="#5c242b" stroke-width="1.7"/><path d="M16 7Q21 1 26 5L19 11Z" fill="#709f55"/>'),
+ mushroom:svg('<path d="M13 15H20V29H13Z" fill="#e5cf9e" stroke="#4e392a" stroke-width="1.5"/><path d="M3 16Q4 3 16 3Q28 3 29 16Z" fill="#b94b3b" stroke="#4c3029" stroke-width="2"/><circle cx="10" cy="10" r="3" fill="#f5dba6"/><circle cx="23" cy="11" r="3" fill="#f5dba6"/>')
+
 };
 const imageCache=new Map();
 window.__v127ToolIcon=function(id){
@@ -54,6 +57,12 @@ el.innerHTML=[
  '<button data-action="craftBtn">Craft and Build</button>',
  '<button data-action="artBtn">Change World Style</button>',
  '<button data-action="helpBtn">Controls and Help</button>',
+ '<button data-action="eatBtn">Eat / Use Food</button>',
+ '<button data-action="healBtn">Heal</button>',
+ '<button data-action="restBtn">Rest</button>',
+ '<button data-action="cookBtn">Cook and Mix</button>',
+ '<button data-action="mailBtn">Haigen’s Notes</button>',
+ '<button data-action="styleBtn">Hair and Appearance</button>',
  '<button id="v127MeetFriends">Meet Dylan and Skölli</button>',
  '<button id="v127VisitPond">Visit the frog pond</button>',
  '<button id="v127CloseSettings">Close</button></aside>'
@@ -72,6 +81,37 @@ $('v127QuestToggle').onclick=()=>{
  quest.dataset.collapsed=String(collapsed);
  $('v127QuestToggle').textContent=collapsed?'+':'−';
 };
+// Additional inventory slots extend the native toolbar but never alter equipment.
+const extraItems=[
+ {id:'berries',label:'Berries',art:icons.berries,num:'8',field:'berries'},
+ {id:'mushroom',label:'Mushroom',art:icons.mushroom,num:'9',field:'mushrooms'},
+ {id:'bag',label:'Bag',art:icons.pack,num:'0',field:'food'}
+];
+function syncExtraSlots(state){
+ const bar=$('hotbar');if(!bar)return;
+ for(const item of extraItems){
+  let button=bar.querySelector('[data-item="'+item.id+'"]');
+  if(!button){
+   button=document.createElement('button');button.type='button';
+   button.className='slot v127-item-slot';button.dataset.item=item.id;
+   button.setAttribute('aria-label',item.label+' inventory');
+   button.innerHTML='<span class="rpg-index">'+item.num+'</span><span class="rpg-item-svg">'+item.art+'</span><small>'+item.label+'</small><span class="rpg-count">0</span>';
+   button.onclick=()=>{$('packBtn')?.click()};
+   bar.appendChild(button);
+  }
+  const number=button.querySelector('.rpg-count');
+  if(number)number.textContent=String(Math.max(0,Math.floor(Number(state[item.field])||0)));
+ }
+}
+const toast=$('toast');
+if(toast&&typeof MutationObserver!=='undefined'){
+ const clean=()=>{
+  const raw=toast.textContent||'';
+  const plain=raw.replace(/\p{Extended_Pictographic}\uFE0F?/gu,'').replace(/\s{2,}/g,' ').trim();
+  if(plain!==raw)toast.textContent=plain;
+ };
+ new MutationObserver(clean).observe(toast,{childList:true,subtree:true,characterData:true});
+}
 let radius=550,lastMini=0,lastDraw=0,lastStage=-1,lastHP=-1,lastDay='';
 $('v127ZoomIn').onclick=()=>{radius=Math.max(200,radius*.72);lastMini=0};
 $('v127ZoomOut').onclick=()=>{radius=Math.min(1500,radius*1.38);lastMini=0};
@@ -106,6 +146,7 @@ function tick(){
  if(now-lastDraw>180){lastDraw=now;
   try{
    const state=engine.snapshot(),hp=Math.min(100,Math.max(0,Number(state.health)||0));
+   syncExtraSlots(state);
    if(Math.ceil(hp)!==lastHP){
     lastHP=Math.ceil(hp);
     const hearts=[...el.querySelectorAll('.v127-heart')];
