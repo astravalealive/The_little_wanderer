@@ -207,6 +207,10 @@ function drawRegionalWildlife(){
 // All biome creatures are drawn in canvas, not font glyphs or emoji.
 // Faces, gait and species-specific body proportions distinguish each animal.
 function drawWildAnimal(a){
+ if(rbEnabled&&['snake','scorpion','crab','lizard','frog','hare','gull','raven','heron'].includes(a.type)){
+  const k=a.type==='hare'?'squirrel':['gull','raven','heron'].includes(a.type)?'bird':a.type;
+  worldFaunaDraw(k,a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,Math.max(.65,a.size*.96));return;
+ }
  const k=a.type,bird=['gull','raven','heron'].includes(k),hopper=k==='hare'||k==='frog';const bounce=a.walking?(bird?Math.abs(Math.sin(a.gait*1.4))*5:hopper?Math.abs(Math.sin(a.gait))*7:Math.sin(a.gait)*1.5):Math.sin(time*.001+a.phase)*.25;const t=-bounce;
  ctx.save();ctx.translate(a.x,a.y+t);ctx.scale(a.face*a.size,a.size);
  ctx.lineCap='round';ctx.lineJoin='round';
@@ -907,7 +911,86 @@ function rbCreatureSprite(kind,dir,frame){
  }
  rbCreatureCache.set(key,c);return c;
 }
+// One visually coherent wildlife atlas for all biomes. Cached, transparent,
+// species-specific silhouettes, ground-anchored animation and original colours.
+const worldFaunaCache=new Map();
+function worldFauna(kind,frame=0){
+ const key=kind+':'+frame;if(worldFaunaCache.has(key))return worldFaunaCache.get(key);
+ const big=['wolf','boar'].includes(kind),w=big?80:60,h=big?63:52;
+ const c=document.createElement('canvas');c.width=w;c.height=h;
+ const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+ const p=(x,y,ww,hh,col)=>{g.fillStyle=col;g.fillRect(x,y,ww,hh)};
+ const shape=(pts,col)=>{g.fillStyle=col;g.beginPath();g.moveTo(...pts[0]);pts.slice(1).forEach(q=>g.lineTo(...q));g.closePath();g.fill()};
+ const dark='#2a3331',step=frame===1?-3:frame===2?3:0;
+ if(big){
+  const wolf=kind==='wolf',fur=wolf?'#758783':'#895e42',hi=wolf?'#b2b9ab':'#b58c61';
+  p(10,42+step,13,19,dark);p(48,42-step,13,19,dark);
+  shape([[8,29],[16,15],[50,13],[64,26],[61,47],[11,47]],dark);
+  shape([[12,26],[21,19],[52,18],[61,30],[55,43],[16,44]],fur);
+  p(21,21,27,7,hi);p(31,35,22,6,wolf?'#576866':'#654c3a');
+  if(wolf){
+   shape([[50,20],[52,2],[61,10],[69,11],[68,32]],dark);
+   shape([[52,19],[55,8],[63,16],[64,29]],fur);
+   shape([[60,23],[78,24],[68,33],[59,31]],'#c7caba');
+   p(63,18,5,4,'#f5e2b7');p(65,20,2,2,dark);p(75,26,3,3,dark);
+   p(4,29,12,7,'#526460');p(4,25,6,7,'#98a49d');
+  }else{
+   for(let i=0;i<8;i++)p(16+i*5,12-(i%3)*3,5,8,'#513b30');
+   p(54,16,16,21,fur);p(63,26,16,9,'#b99273');p(68,28,5,4,'#79543e');
+   p(63,20,4,3,'#f3dcc3');p(64,21,2,2,dark);p(60,35,8,6,'#e0cda9');
+  }
+  p(12,55,11,4,'#45514a');p(50,55,11,4,'#45514a');
+ }else if(kind==='snake'){
+  for(const [x,y] of [[4,30],[11,19],[30,18],[38,29],[22,34]]){
+   p(x,y,19,12,dark);p(x+3,y+2,13,8,'#907b50');p(x+6,y+3,6,2,'#c9b278')}
+  p(39,11,10,20,'#826d49');p(39,9,17,11,dark);p(41,10,14,8,'#b19a69');
+  p(50,12,4,3,'#e3d5ae');p(52,13,2,2,dark);
+ }else if(kind==='scorpion'||kind==='crab'){
+  const sc=kind==='scorpion',col=sc?'#9b784c':'#c76c46';
+  p(15,24,33,18,dark);p(18,22,28,17,col);p(24,25,12,5,sc?'#c6a76e':'#f0a16c');
+  for(let i=0;i<4;i++){p(5,19+i*6,12,3,col);p(45,19+i*6,13,3,col)}
+  p(3,14,14,12,dark);p(5,15,10,9,col);p(44,14,14,12,dark);p(46,15,10,9,col);
+  if(sc){p(35,8,7,20,dark);p(40,3,12,8,col);p(50,11,5,5,'#dfc38c')}
+  else{p(23,19,4,3,'#f7dbb6');p(36,19,4,3,'#f7dbb6')}
+ }else if(kind==='lizard'||kind==='frog'){
+  const l=kind==='lizard';p(12,25,36,14,dark);p(15,24,31,12,l?'#658b55':'#628b4c');
+  if(l){p(4,24,13,6,'#547b4a');p(44,20,10,12,'#7eaa63');p(48,22,3,3,dark)}
+  else{p(17,18,10,13,'#8eb66b');p(38,18,10,13,'#8eb66b');p(20,20,3,4,'#e8e0ac');p(41,20,3,4,'#e8e0ac');p(22,21,2,2,dark);p(43,21,2,2,dark)}
+  p(14+step,37,13,7,'#4c7446');p(36-step,37,13,7,'#4c7446');
+ }else if(kind==='butterfly'){
+  shape([[28,26],[11,9],[4,21],[18,33]],dark);shape([[31,26],[47,9],[56,21],[42,33]],dark);
+  shape([[26,25],[11,13],[8,23],[21,30]],'#d59c4f');shape([[33,25],[45,13],[52,23],[41,30]],'#db9d4e');
+  p(28,20,4,20,dark);p(16,20,4,4,'#f3dbab');p(42,20,4,4,'#f3dbab');
+ }else if(kind==='squirrel'){
+  p(5,8,22,29,dark);p(9,11,16,24,'#aa7950');p(17,13,5,9,'#ce9f71');
+  p(19,28,30,18,dark);p(22,28,25,16,'#a67249');p(40,22,13,14,'#b58456');
+  p(48,24,5,3,'#e1cfab');p(50,25,2,2,dark);p(26+step,43,8,5,'#70513d');p(40-step,43,8,5,'#70513d');
+ }else if(kind==='duck'||kind==='bird'||kind==='chicken'){
+  const duck=kind==='duck',bird=kind==='bird',col=duck?'#928778':bird?'#809b9c':'#dfcda7';
+  p(12,28,37,17,dark);p(15,25,33,16,col);p(21,27,19,9,duck?'#c5aa92':'#e6d7b7');
+  p(39,20,13,16,duck?'#648574':col);p(44,16,10,11,duck?'#5b8672':'#efe4c6');
+  p(50,23,7,5,'#dca14c');p(48,21,2,2,dark);
+  p(18+step,43,4,5,'#ac7e42');p(40-step,43,4,5,'#ac7e42');
+ }else if(kind==='fish'){
+  shape([[12,30],[3,18],[3,42]],'#667d84');
+  shape([[13,28],[27,19],[45,23],[56,31],[45,40],[25,42]],dark);
+  shape([[16,28],[27,22],[43,26],[51,31],[42,37],[26,39]],'#91aeb0');
+  p(47,29,3,3,dark);
+ }
+ worldFaunaCache.set(key,c);return c;
+}
+function worldFaunaDraw(kind,x,y,dir='right',walking=false,anim=0,scale=1){
+ const frame=walking?1+Math.floor(anim/150)%2:0,sprite=worldFauna(kind,frame);
+ const w=sprite.width*scale,h=sprite.height*scale;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ellipse(x,y+5,w*.37,5,'#24433a59');
+ const sx=Math.round(x-w/2),sy=Math.round(y-h+7);
+ if(dir==='left'){ctx.translate(sx+w,0);ctx.scale(-1,1);ctx.drawImage(sprite,0,sy,w,h)}
+ else ctx.drawImage(sprite,sx,sy,w,h);
+ ctx.restore();return true;
+}
 function rbDrawCreature(kind,x,y,dir='right',moving=false,anim=0,scale=2){
+ if(rbEnabled){worldFaunaDraw(kind,x,y,dir,moving,anim,Math.min(1.4,scale*.7));return}
  const frame=moving?1+Math.floor((anim||0)/160)%2:0;
  const sprite=rbCreatureSprite(kind,dir,frame);
  const w=sprite.width*scale,h=sprite.height*scale;
@@ -3780,6 +3863,9 @@ function mixColour(day,night,amount){
 
 function drawWoodlandCritter(c){
  if(c.hiddenUntil&&time<c.hiddenUntil)return;
+ if(rbEnabled&&['squirrel','butterfly'].includes(c.kind)){
+  worldFaunaDraw(c.kind,c.x,c.y,'right',time<c.scaredUntil,time+c.phase*220,.8);return;
+ }
  const scared=time<c.scaredUntil,wiggle=Math.sin(time*.004+c.phase);
  if(c.kind==='squirrel'){
   const run=scared?1:Math.sin(time*.0009+c.phase)>.5?.45:0;
