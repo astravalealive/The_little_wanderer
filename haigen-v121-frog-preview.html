@@ -2507,7 +2507,37 @@ function worldPaint(kind,variant=0){
  }
  worldArtCache.set(key,cv);return cv;
 }
+// Exact illustrated assets extracted from the approved environment reference,
+// rather than another approximated canvas-pixel remake. The old procedural
+// renderers remain as an offline/load-failure fallback.
+const approvedEnvironmentImage=new Image();
+let approvedEnvironmentReady=false;
+approvedEnvironmentImage.onload=()=>{
+ approvedEnvironmentReady=approvedEnvironmentImage.naturalWidth===512&&approvedEnvironmentImage.naturalHeight===416;
+};
+approvedEnvironmentImage.onerror=()=>{approvedEnvironmentReady=false};
+approvedEnvironmentImage.src='./assets/haigen-approved-environment-atlas.webp?v=1';
+const approvedEnvironmentFrames={
+ tree:[0,0,136,127],fir:[145,0,105,151],bush:[262,0,96,83],
+ rock:[369,0,92,68],stump:[266,95,88,74],
+ mushroom:[362,83,90,74],tent:[0,169,206,138],
+ cottage:[212,174,300,143],flowerBush:[0,316,92,83],
+ ore:[101,322,91,76],logs:[202,322,105,75],
+ barrel:[319,321,75,89],campfire:[404,324,100,85]
+};
+function drawApprovedEnvironmentSprite(kind,x,y,w,h){
+ const asset=kind==='log'?'logs':kind;
+ const crop=approvedEnvironmentFrames[asset];
+ if(!approvedEnvironmentReady||!crop)return false;
+ const [sx,sy,sw,sh]=crop;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(approvedEnvironmentImage,sx,sy,sw,sh,
+   Math.round(x-w/2),Math.round(y-h),Math.round(w),Math.round(h));
+ ctx.restore();
+ return true;
+}
 function worldSprite(kind,x,y,w,h,variant=0){
+ if(drawApprovedEnvironmentSprite(kind,x,y,w,h))return true;
  const img=worldPaint(kind,variant%6);
  if(!img)return false;
  ctx.save();ctx.imageSmoothingEnabled=false;
@@ -2521,8 +2551,8 @@ function worldArtScenery(o){
  const name=map[type];if(!name)return false;
  const size=o.size||1;
  const dimensions={
-  tree:[102,136],fir:[98,137],palm:[112,139],bareTree:[100,124],cactus:[75,90],
-  rock:[76,57],bush:[72,52],flower:[36,36],mushroom:[39,31]
+  tree:[150,142],fir:[107,156],palm:[112,139],bareTree:[100,124],cactus:[75,90],
+  rock:[86,66],bush:[76,65],flower:[36,36],mushroom:[46,37]
  };
  const [w,h]=dimensions[name],v=Math.abs(Math.floor(o.id||0))%6;
  worldSprite(name,o.x,o.y,w*size,h*size,v);
@@ -2612,7 +2642,7 @@ function bush(o){const n=nightStrength(),v=Math.abs(Math.floor(o.x*.07+o.y*.03))
   else{ctx.fillStyle='#69513b';ctx.fillRect(s.x-4,s.y-55,8,55);ctx.fillStyle=s.kind==='trailLantern'?'#f1be68':'#be9965';ctx.fillRect(s.x-19,s.y-67,38,22)}
   if(s.kind==='trailLantern'&&s.lit!==false){ctx.save();ctx.globalAlpha=.15;ellipse(s.x,s.y-65,37,39,'#ffd681');ctx.restore()}
   return;
- }if(rbEnabled&&['shelter','campfire'].includes(s.kind)){if(s.kind==='shelter')worldSprite('tent',s.x,s.y,170,132);else worldSprite('campfire',s.x,s.y,90,70);return}if(s.kind==='shelter'){ellipse(s.x,s.y+15,78,28,'#284a3288');poly([[s.x-70,s.y+5],[s.x,s.y-88],[s.x+70,s.y+5]],'#96794c','#4e5839');poly([[s.x-54,s.y+3],[s.x,s.y-73],[s.x+5,s.y+3]],'#b7a16d');ctx.fillStyle='#453b2c';ctx.fillRect(s.x+5,s.y-28,36,33);ctx.strokeStyle='#755137';ctx.lineWidth=5;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(s.x-55+i*24,s.y+4);ctx.lineTo(s.x,s.y-76);ctx.stroke()}ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3e2ad';ctx.fillText('🌿 Woodland shelter',s.x,s.y-103)}else if(s.kind==='garden'){ellipse(s.x,s.y,67,39,'#76593b');for(let i=0;i<6;i++){ellipse(s.x-38+i*15,s.y-8+(i%2)*15,9,10,'#5fb057')}}else if(s.kind==='campfire'){ellipse(s.x,s.y,43,23,'#4b473d');for(let i=0;i<7;i++)ellipse(s.x+Math.cos(i)*25,s.y+Math.sin(i)*14,9,7,'#9a9c8d');if(s.lit!==false){poly([[s.x-8,s.y],[s.x-4,s.y-36],[s.x+12,s.y-6],[s.x+5,s.y+3]],'#f1aa40');poly([[s.x-2,s.y],[s.x+2,s.y-21],[s.x+8,s.y-3]],'#ffe28c')}else{ctx.fillStyle='#72533d';ctx.fillRect(s.x-18,s.y-8,36,10)}}}const campStages=[
+ }if(rbEnabled&&['shelter','campfire'].includes(s.kind)){if(s.kind==='shelter')worldSprite('tent',s.x,s.y,190,127);else worldSprite('campfire',s.x,s.y,90,70);return}if(s.kind==='shelter'){ellipse(s.x,s.y+15,78,28,'#284a3288');poly([[s.x-70,s.y+5],[s.x,s.y-88],[s.x+70,s.y+5]],'#96794c','#4e5839');poly([[s.x-54,s.y+3],[s.x,s.y-73],[s.x+5,s.y+3]],'#b7a16d');ctx.fillStyle='#453b2c';ctx.fillRect(s.x+5,s.y-28,36,33);ctx.strokeStyle='#755137';ctx.lineWidth=5;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(s.x-55+i*24,s.y+4);ctx.lineTo(s.x,s.y-76);ctx.stroke()}ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3e2ad';ctx.fillText('🌿 Woodland shelter',s.x,s.y-103)}else if(s.kind==='garden'){ellipse(s.x,s.y,67,39,'#76593b');for(let i=0;i<6;i++){ellipse(s.x-38+i*15,s.y-8+(i%2)*15,9,10,'#5fb057')}}else if(s.kind==='campfire'){ellipse(s.x,s.y,43,23,'#4b473d');for(let i=0;i<7;i++)ellipse(s.x+Math.cos(i)*25,s.y+Math.sin(i)*14,9,7,'#9a9c8d');if(s.lit!==false){poly([[s.x-8,s.y],[s.x-4,s.y-36],[s.x+12,s.y-6],[s.x+5,s.y+3]],'#f1aa40');poly([[s.x-2,s.y],[s.x+2,s.y-21],[s.x+8,s.y-3]],'#ffe28c')}else{ctx.fillStyle='#72533d';ctx.fillRect(s.x-18,s.y-8,36,10)}}}const campStages=[
  {kind:'shelter',name:'🏕️ Leaf-and-log lean-to',wood:6,stone:0,twigs:2,leaves:3,desc:'A first shelter from the weather'},
  {kind:'hut',name:'🛖 Timber hut',wood:24,stone:12,twigs:8,leaves:10,desc:'Replace your lean-to with a cosy wooden hut'},
  {kind:'lodge',name:'🏠 Reinforced woodland lodge',wood:65,stone:45,twigs:15,leaves:15,desc:'Strong walls, solid beams and a proper roof'},
@@ -3059,7 +3089,7 @@ function rbDrawHouse(x,y,tier){
  ctx.restore();
 }
 
-function drawCampHome(){const tier=state.campTier;if(tier<1)return;const x=cottage.x+35,y=cottage.y-10;if(rbEnabled&&tier>1){worldSprite('cottage',x,y,tier===2?190:260,tier===2?164:223,tier);return}if(rbEnabled&&(tier===2||tier===3)){rbDrawHouse(x,y,tier);return}if(tier===1){structure({kind:'shelter',x,y});return}
+function drawCampHome(){const tier=state.campTier;if(tier<1)return;const x=cottage.x+35,y=cottage.y-10;if(rbEnabled&&tier>1){worldSprite('cottage',x,y,tier===2?236:302,tier===2?142:183,tier);return}if(rbEnabled&&(tier===2||tier===3)){rbDrawHouse(x,y,tier);return}if(tier===1){structure({kind:'shelter',x,y});return}
  const w=tier===2?100:tier===3?145:205,h=tier===2?95:tier===3?128:165;
  ellipse(x,y+24,w+28,36,'#183f3299');
  ctx.fillStyle=tier===2?'#91673e':'#858d83';ctx.fillRect(x-w/2,y-h,w,h+18);
