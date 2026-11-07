@@ -1762,7 +1762,7 @@ function autoBuildTrailProject(dt){
  if(state.wood<cost.wood||state.stone<cost.stone||state.twigs<cost.twigs)return false;
  autoPlan('build the '+project.name.toLowerCase(),'build-trail:'+project.name);
  const approach={x:project.x+90,y:project.y+55};
- if(dist(state,approach)>84){autoTravel(approach,dt,84,.11);return true}
+ if(dist(state,approach)>84){autoTravel(approach,dt,84,.11);return 'travelling'}
  startHaigenAction('craft',1100);
  state.wood-=cost.wood;state.stone-=cost.stone;state.twigs-=cost.twigs;
  state.structures.push({id:'haigen-'+Date.now()+'-'+project.kind,kind:project.kind,
@@ -1770,7 +1770,7 @@ function autoBuildTrailProject(dt){
  state.autoSteps++;
  mindWrite('I built the '+project.name.toLowerCase()+'. Travellers will have a safer path now.','achievement');
  think('I made something that will stay here!',4500,true);
- save();return true;
+ save();return 'built';
 }
 
 function autoFreedomTick(dt){
@@ -1841,7 +1841,9 @@ function autoFreedomTick(dt){
   return true;
  }
  if(job.kind==='build'){
-  if(autoBuildTrailProject(dt))return finish('I built a new landmark by myself. I can find my way home more easily now.');
+  const progress=autoBuildTrailProject(dt);
+  if(progress==='built')return finish('I built a new landmark by myself. I can find my way home more easily now.');
+  if(progress==='travelling')return true;
   return finish();
  }
  if(job.kind==='garden'){
