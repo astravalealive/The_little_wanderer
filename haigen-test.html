@@ -391,7 +391,7 @@ const objects=[];for(let i=0;i<1050;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i
 for(let i=2030;i<4400;i++){const x=100+seeded(i*3)*4000,y=100+seeded(i*3+1)*4000;if(x<2990&&y<2990)continue;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.44?'tree':v<.62?'rock':v<.8?'bush':v<.93?'flower':'mushroom',size:.75+v*.55})}
 // Extra scenery uses fresh IDs; existing 0-4399 object IDs remain stable.
 for(let i=4400;i<8500;i++){const r=expandedRegions[i%expandedRegions.length],x=r.x+60+seeded(i*3)*(r.w-120),y=r.y+60+seeded(i*3+1)*(r.h-120),v=seeded(i*3+2);if(islandDepth(x,y)<75)continue;let type=r.id==='desert'?(v<.23?'cactus':'rock'):r.id==='coast'?(v<.23?'palm':v<.65?'rock':'flower'):r.id==='snow'?(v<.35?'fir':'rock'):r.id==='fen'?(v<.32?'bareTree':v<.77?'bush':'rock'):r.id==='wasteland'?(v<.7?'rock':'bareTree'):(v<.045?'tree':v<.46?'bush':v<.73?'flower':'rock');objects.push({id:i,x,y,type,size:.8+v*.5})}
-const pond={x:850,y:1700,rx:330,ry:240};function lakeRadius(a){return 1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2)}function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale,x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
+const pond={x:850,y:1700,rx:330,ry:240};function lakeRadius(a){return 1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2)}function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
 const campProtectionRadius=365;
 state.campClearingDone=state.campClearingDone===true||state.campTier>0;
 state.campClearingPicked=Array.isArray(state.campClearingPicked)?state.campClearingPicked:[];
@@ -2059,7 +2059,52 @@ function interactHomestead(){
  if(p){homesteadMenu(p.kind);return true}return false;
 }
 
-function drawCampHome(){const tier=state.campTier;if(tier<1)return;const x=cottage.x+35,y=cottage.y-10;if(tier===1){structure({kind:'shelter',x,y});return}
+
+// A roofed timber house drawn as an original sprite, not a borrowed tileset.
+const rbHouseCache=new Map();
+function rbHouseSprite(tier){
+ if(rbHouseCache.has(tier))return rbHouseCache.get(tier);
+ const c=document.createElement('canvas');c.width=92;c.height=94;
+ const g=c.getContext('2d'),p=(x,y,w,h,color)=>rbPixel(g,x,y,w,h,color);
+ const w=76,x=8;
+ // Foundation and slatted walls.
+ p(5,73,82,11,'#4e5550');p(10,49,74,30,'#51443b');p(12,48,70,28,tier===2?'#917558':'#929387');
+ for(let i=0;i<8;i++){const px=12+i*9;p(px,48,3,30,'#5e5140');p(px+4,51,2,20,'#ac9169')}
+ p(10,75,75,4,'#bd9b75');
+ // Real roof overhang, layered slate or aged timber shingles.
+ const roof=tier===2?'#5b625e':'#4f6060';
+ for(let row=0;row<6;row++){
+  const y=11+row*7,xx=31-row*5,ww=29+row*10;
+  p(xx-4,y+4,ww+8,10,'#333b3d');
+  p(xx,y,ww,8,roof);
+  for(let t=0;t<ww-3;t+=9)p(xx+t+(row%2)*3,y+5,7,2,row%2?'#87908a':'#737c77');
+  p(xx,y+7,ww,2,'#353c3b');
+ }
+ // Stone chimney with soot and cap, behind the roofline.
+ p(17,3,13,24,'#747d76');p(15,1,17,5,'#a4aaa0');p(21,6,3,17,'#4d5d57');
+ // Deep-set door, shutters, mullioned honey-toned window.
+ p(39,60,16,22,'#282d2c');p(41,62,12,20,'#514039');p(42,63,3,16,'#896d4f');
+ p(50,72,2,2,'#c6a46d');
+ for(const px of [18,64]){
+  p(px-2,57,13,14,'#3c4340');p(px,59,9,10,'#ba9868');
+  p(px+4,59,2,10,'#555048');p(px,63,9,2,'#555048');
+  p(px-5,57,3,13,'#6a5b49');p(px+11,57,3,13,'#6a5b49');
+ }
+ p(9,80,76,3,'#697c67');p(35,82,25,4,'#9b8871');
+ // Timbers and flowering vine detail remain subdued.
+ p(8,62,4,17,'#4d5d4b');p(7,55,4,11,'#658267');
+ if(tier>=3){p(85,56,3,23,'#495b53');p(83,51,5,9,'#6c8874')}
+ rbHouseCache.set(tier,c);return c;
+}
+function rbDrawHouse(x,y,tier){
+ const c=rbHouseSprite(tier),scale=tier===2?1.8:2.35;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ellipse(x,y+22,59*scale,13,'#233e365b');
+ ctx.drawImage(c,Math.round(x-c.width*scale/2),Math.round(y-c.height*scale+18),Math.round(c.width*scale),Math.round(c.height*scale));
+ ctx.restore();
+}
+
+function drawCampHome(){const tier=state.campTier;if(tier<1)return;const x=cottage.x+35,y=cottage.y-10;if(rbEnabled&&(tier===2||tier===3)){rbDrawHouse(x,y,tier);return}if(tier===1){structure({kind:'shelter',x,y});return}
  const w=tier===2?100:tier===3?145:205,h=tier===2?95:tier===3?128:165;
  ellipse(x,y+24,w+28,36,'#183f3299');
  ctx.fillStyle=tier===2?'#91673e':'#858d83';ctx.fillRect(x-w/2,y-h,w,h+18);
