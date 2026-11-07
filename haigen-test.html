@@ -90,7 +90,7 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
  cv.height=Math.max(1,Math.round(H*dpr));
  ctx.setTransform(cv.width/W,0,0,cv.height/H,0,0);
  ctx.imageSmoothingEnabled=true;
-}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD=7800;let state;const fresh=()=>({x:1250,y:1310,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dillon. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:false,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});try{state=Object.assign(fresh(),JSON.parse(localStorage.getItem('wandererTestSave')||'{}'))}catch{state=fresh()}state.campTier=Math.max(0,Math.min(4,Number(state.campTier)||0));if(state.campTier===0&&state.structures.some(q=>q.kind==='shelter'))state.campTier=1;state.hunger=Math.max(0,Math.min(100,Number.isFinite(state.hunger)?state.hunger:85));state.hungerClock=0;state.energy=Math.max(0,Math.min(100,Number.isFinite(state.energy)?state.energy:85));state.resting=false;state.hairStyle=['waves','curls','short','wild'].includes(state.hairStyle)?state.hairStyle:'waves';state.fun=Math.max(0,Math.min(100,Number.isFinite(state.fun)?state.fun:75));state.activity=Math.max(0,Math.min(100,Number.isFinite(state.activity)?state.activity:65));state.diaryEntries=Array.isArray(state.diaryEntries)?state.diaryEntries:[];state.requests=Array.isArray(state.requests)?state.requests:[];state.health=Math.max(1,Math.min(100,Number.isFinite(state.health)?state.health:100));state.lastHitAt=Number(state.lastHitAt)||0;state.tools=Object.assign({axe:0,torch:0,shovel:0,pickaxe:0,net:0},state.tools||{});state.carriedFrogId=Number.isInteger(state.carriedFrogId)&&state.carriedFrogId>=0&&state.carriedFrogId<22?state.carriedFrogId:-1;state.frogsReleased=Math.max(0,Number(state.frogsReleased)||0);state.butterfliesCaught=Math.max(0,Number(state.butterfliesCaught)||0);state.minerals=Object.assign({clay:0,flint:0,iron:0,copper:0,quartz:0,crystal:0},state.minerals||{});state.excavations=state.excavations||{};state.food=Number(state.food)||0;state.autonomy=!!state.autonomy;state.returnReport=Array.isArray(state.returnReport)?state.returnReport:[];state.autoSteps=Number(state.autoSteps)||0;state.harvestedAt=state.harvestedAt||{};state.mushrooms=Number(state.mushrooms)||0;state.herbs=state.herbs||{};state.potions=Number(state.potions)||0;state.flowerFinds=Number(state.flowerFinds)||0;state.fallen=Array.isArray(state.fallen)?state.fallen:[];state.treeHits=state.treeHits||{};state.boulderHits=state.boulderHits&&typeof state.boulderHits==='object'?state.boulderHits:{};state.stoneDrops=Array.isArray(state.stoneDrops)?state.stoneDrops.filter(d=>d&&Number.isFinite(d.x)&&Number.isFinite(d.y)&&Number(d.amount)>0).slice(0,300):[];state.autoFreeJob=state.autoFreeJob&&typeof state.autoFreeJob==='object'?state.autoFreeJob:null;state.twigs=Number(state.twigs)||0;state.leaves=Number(state.leaves)||0;state.equipped=state.equipped||'hands';state.memories=state.memories.map(m=>m.replaceAll('Héri','Dillon').replaceAll('Skolli','Skölli'));if(state.worldLayout!==3000){const shift=p=>{if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.y))return;p.x=clamp(1500+(p.x-1420)*.39,55,WORLD-55);p.y=clamp(1500+(p.y-1150)*.39,55,WORLD-55)};shift(state);for(const p of state.structures||[])shift(p);for(const p of state.fallen||[])shift(p);state.worldLayout=3000;try{localStorage.setItem('wandererTestSave',JSON.stringify(state))}catch(e){}}const seeded=n=>{let x=Math.sin(n*127.1+78.233)*43758.5453;return x-Math.floor(x)};
+}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD=7800;let state;const fresh=()=>({x:1250,y:1310,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dillon. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:false,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});try{state=Object.assign(fresh(),JSON.parse(localStorage.getItem('wandererTestSave')||'{}'))}catch{state=fresh()}state.campTier=Math.max(0,Math.min(4,Number(state.campTier)||0));if(state.campTier===0&&state.structures.some(q=>q.kind==='shelter'))state.campTier=1;state.hunger=Math.max(0,Math.min(100,Number.isFinite(state.hunger)?state.hunger:85));state.hungerClock=0;state.energy=Math.max(0,Math.min(100,Number.isFinite(state.energy)?state.energy:85));state.resting=false;state.hairStyle=['waves','curls','short','wild'].includes(state.hairStyle)?state.hairStyle:'waves';state.fun=Math.max(0,Math.min(100,Number.isFinite(state.fun)?state.fun:75));state.activity=Math.max(0,Math.min(100,Number.isFinite(state.activity)?state.activity:65));state.diaryEntries=Array.isArray(state.diaryEntries)?state.diaryEntries:[];state.requests=Array.isArray(state.requests)?state.requests:[];state.health=Math.max(1,Math.min(100,Number.isFinite(state.health)?state.health:100));state.lastHitAt=Number(state.lastHitAt)||0;state.tools=Object.assign({axe:0,torch:0,shovel:0,pickaxe:0,net:0},state.tools||{});state.carriedFrogId=Number.isInteger(state.carriedFrogId)&&state.carriedFrogId>=0&&state.carriedFrogId<22?state.carriedFrogId:-1;state.frogsReleased=Math.max(0,Number(state.frogsReleased)||0);state.butterfliesCaught=Math.max(0,Number(state.butterfliesCaught)||0);state.minerals=Object.assign({clay:0,flint:0,iron:0,copper:0,quartz:0,crystal:0},state.minerals||{});state.excavations=state.excavations||{};state.food=Number(state.food)||0;state.autonomy=!!state.autonomy;state.returnReport=Array.isArray(state.returnReport)?state.returnReport:[];state.autoSteps=Number(state.autoSteps)||0;state.harvestedAt=state.harvestedAt||{};state.mushrooms=Number(state.mushrooms)||0;state.herbs=state.herbs||{};state.potions=Number(state.potions)||0;state.flowerFinds=Number(state.flowerFinds)||0;state.fallen=Array.isArray(state.fallen)?state.fallen:[];state.treeHits=state.treeHits||{};state.boulderHits=state.boulderHits&&typeof state.boulderHits==='object'?state.boulderHits:{};state.stoneDrops=Array.isArray(state.stoneDrops)?state.stoneDrops.filter(d=>d&&Number.isFinite(d.x)&&Number.isFinite(d.y)&&Number(d.amount)>0).slice(0,300):[];state.autoFreeJob=state.autoFreeJob&&typeof state.autoFreeJob==='object'?state.autoFreeJob:null;state.looseWoodTaken=state.looseWoodTaken&&typeof state.looseWoodTaken==='object'?state.looseWoodTaken:{};state.twigs=Number(state.twigs)||0;state.leaves=Number(state.leaves)||0;state.equipped=state.equipped||'hands';state.memories=state.memories.map(m=>m.replaceAll('Héri','Dillon').replaceAll('Skolli','Skölli'));if(state.worldLayout!==3000){const shift=p=>{if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.y))return;p.x=clamp(1500+(p.x-1420)*.39,55,WORLD-55);p.y=clamp(1500+(p.y-1150)*.39,55,WORLD-55)};shift(state);for(const p of state.structures||[])shift(p);for(const p of state.fallen||[])shift(p);state.worldLayout=3000;try{localStorage.setItem('wandererTestSave',JSON.stringify(state))}catch(e){}}const seeded=n=>{let x=Math.sin(n*127.1+78.233)*43758.5453;return x-Math.floor(x)};
 // The original 4200-unit woodland remains in its exact location for old saves and story quests.
 const expandedRegions=[
  {id:'downs',name:'The Open Downs',x:4200,y:0,w:1900,h:3100,color:'#b8c77e',animals:['🦬','🐇','🦊']},
@@ -1461,6 +1461,7 @@ function instructionTick(dt){
    const wanted=state.wood<4?'tree':state.stone<2?'rock':null;
    if(!wanted){storyTick();return true}
    if(wanted==='rock'){autoMineStone(dt);storyTick();return true}
+   if(wanted==='tree'&&!state.tools.axe){autoGatherWood(dt);return true}
    if(autoDestination&&(autoDestination.type!==wanted||state.removed.includes(autoDestination.id)))autoDestination=null;
    if(!autoDestination){
     const choices=objects.filter(o=>o.type===wanted&&!state.removed.includes(o.id)&&!(autoIgnore.get(o.id)>Date.now())&&!inPond(o.x,o.y,40));
@@ -1508,6 +1509,7 @@ function instructionTick(dt){
  }
  const wanted=goal.resource==='berries'?'bush':goal.resource;
  if(wanted==='rock'){autoMineStone(dt);return true}
+ if(wanted==='tree'&&!state.tools.axe){autoGatherWood(dt);return true}
  if(autoDestination&&(autoDestination.type!==wanted||state.removed.includes(autoDestination.id)))autoDestination=null;
  if(!autoDestination){
   const candidates=objects.filter(o=>o.type===wanted&&!state.removed.includes(o.id)&&!(autoIgnore.get(o.id)>Date.now())&&flowerHasHabitat(o)&&(wanted!=='bush'||berryReady(o))&&!inPond(o.x,o.y,40));
@@ -1658,6 +1660,7 @@ function lifeFinish(){
 function lifeGather(need,dt){
  if(need==='twigs'&&state.wood>=woodCarryLimit){state.wood--;state.twigs+=2;autoPlan('split a log for kindling','project-kindling');save();return}
  if(need==='stone')return autoMineStone(dt);
+ if(need==='wood'||need==='twigs')return autoGatherWood(dt);
  const type='tree',o=autoTarget(type);
  autoPlan('gather '+need+' for '+lifeBlueprint().name,'project-gather:'+need);
  if(!o){if(!autoWaypoint||dist(state,autoWaypoint)<100)autoWaypoint=autoExplore();if(autoWaypoint)autoTravel(autoWaypoint,dt,100,.12);return}
@@ -1699,6 +1702,40 @@ function lifeProjectTick(dt){
 
 
 // Mining is a real, tool-gated journey. A boulder is never collected by hand.
+// Accessible progression: pick up fallen logs first, then craft axes and picks.
+function looseWoodReady(o){const at=Number(state.looseWoodTaken[o.seed])||0;return o.kind==='log'&&(!at||Date.now()-at>20*60000)}
+function collectLooseWood(o){
+ if(!looseWoodReady(o)||state.wood>woodCarryLimit-2)return false;
+ state.looseWoodTaken[o.seed]=Date.now();gainWood(2);state.twigs++;state.autoSteps++;
+ startHaigenAction('gather',550);
+ if(!state.autonomy)notify('🪵 Picked up fallen timber and a twig.');
+ save();return true;
+}
+function autoGatherWood(dt){
+ if(state.twigs<3&&state.wood>=5){state.wood--;state.twigs+=2;startHaigenAction('craft',500);save();return true}
+ if(state.wood>=woodCarryLimit-1)return false;
+ const logs=woodlandDetails.filter(o=>looseWoodReady(o)&&canPlaceScenery(o)&&!campsiteProtected(o)&&dist(o,state)<1700)
+  .sort((a,b)=>dist(a,state)-dist(b,state));
+ if(logs.length){
+  const log=logs[0];autoPlan('collect fallen wood without cutting living trees','fallen:'+log.seed);
+  if(dist(state,log)>83)autoTravel(log,dt,83,.12);
+  else{collectLooseWood(log);autoPause=420}
+  return true;
+ }
+ if(state.tools.axe){
+  const tree=autoTarget('tree');
+  if(tree){autoPlan('chop timber with my axe','axe-tree:'+tree.id);
+   if(dist(state,tree)>115)autoTravel(tree,dt,115,.12);
+   else{const n=(Number(state.treeHits[tree.id])||0)+1;state.treeHits[tree.id]=n;startToolSwing('axe');autoPause=470;
+    if(n>=3){delete state.treeHits[tree.id];harvest(tree);gainWood(4);state.twigs+=2;state.autoSteps++;save()}}
+   return true;
+  }
+ }
+ autoPlan('search for fallen branches','fallen-search');
+ if(!autoWaypoint||dist(state,autoWaypoint)<95)autoWaypoint=autoExplore();
+ if(autoWaypoint)autoTravel(autoWaypoint,dt,95,.12);
+ return true;
+}
 function autoMineStone(dt){
  const drops=state.stoneDrops.filter(o=>dist(o,state)<1750).sort((a,b)=>dist(a,state)-dist(b,state));
  if(drops.length){
@@ -1710,15 +1747,7 @@ function autoMineStone(dt){
  if(!state.tools.pickaxe){
   // The first crude flint pickaxe must NOT require stone you cannot gather yet.
   const wood=state.wood+(state.woodStorageTier?state.woodStored:0);
-  if(wood<5||state.twigs<3){
-   const target=autoTarget('tree');
-   autoPlan('gather timber to make a pickaxe','craft-pickaxe-supplies');
-   if(target){if(dist(state,target)>80)autoTravel(target,dt,80,.13);
-    else if(harvest(target)){gainWood(2);state.twigs+=2;state.autoSteps++;autoPause=400;save()}
-   }else if(!autoWaypoint||dist(state,autoWaypoint)<105)autoWaypoint=autoExplore();
-   if(!target&&autoWaypoint)autoTravel(autoWaypoint,dt,95,.11);
-   return true;
-  }
+  if(wood<5||state.twigs<3){autoGatherWood(dt);return true}
   autoPlan('make my first pickaxe from wood and flint','craft-pickaxe');
   if(dist(state,cottage)>185){autoTravel(autoCampSpot(),dt,170,.13);return true}
   if(spendCampWood(5)){state.twigs-=3;state.tools.pickaxe=1;startHaigenAction('craft',1000);
@@ -1829,7 +1858,8 @@ function autoFreedomTick(dt){
   autoPause=850;return true;
  }
  if(job.kind==='wood'){
-  if(state.wood>=10)return finish('I chopped some wood for future building.');
+  if(state.wood>=10)return finish('I collected timber for future buildings.');
+  autoGatherWood(dt);return true;
   const tree=autoTarget('tree');
   if(!tree)return finish();
   autoPlan('cut timber for the homestead','freedom-wood');
@@ -1911,11 +1941,13 @@ function autonomousTick(dt){
  (autoIgnore.get(autoDestination.id)||0)>Date.now()))autoDestination=null;
  if(!autoDestination){
   const wanted=autoResourceWanted();
+  if(wanted==='tree'&&!state.tools.axe){autoGatherWood(dt);return}
   if(wanted==='rock'){autoMineStone(dt);return}
   autoDestination=autoTarget(wanted)||autoTarget('bush')||autoTarget('mushroom');
   if(autoDestination){autoWaypoint=null;autoResetNav();autoPlan('gather '+autoDestination.type,'resource:'+autoDestination.id)}
  }
  if(autoDestination?.type==='rock'){autoDestination=null;autoMineStone(dt);return}
+ if(autoDestination?.type==='tree'&&!state.tools.axe){autoDestination=null;autoGatherWood(dt);return}
  if(autoDestination){
   if(dist(state,autoDestination)>74){autoTravel(autoDestination,dt,74);return}
   const found=autoDestination;autoDestination=null;autoResetNav();
@@ -4014,7 +4046,7 @@ for(let i=0;i<235;i++){
  if(kind==='firefly'&&roadDistance(x,y)<100)continue;
  woodlandCritters.push({x,y,homeX:x,homeY:y,kind,phase:i*1.73,scaredUntil:0})
 }
-function drawWoodlandDetail(o){const x=o.x,y=o.y;if(rbEnabled&&['log','stump','fungi','grass'].includes(o.kind)){worldSprite(o.kind==='fungi'?'mushroom':o.kind==='grass'?'grass':o.kind,x,y,o.kind==='log'?66:44,o.kind==='stump'?45:38,o.id||0);return}if(o.kind==='moss'){ellipse(x,y,22,9,'#52844b');ellipse(x-8,y-4,13,6,'#7da660');ellipse(x+8,y-2,10,6,'#659652')}
+function drawWoodlandDetail(o){const x=o.x,y=o.y;if(o.kind==='log'&&!looseWoodReady(o))return;if(rbEnabled&&['log','stump','fungi','grass'].includes(o.kind)){worldSprite(o.kind==='fungi'?'mushroom':o.kind==='grass'?'grass':o.kind,x,y,o.kind==='log'?66:44,o.kind==='stump'?45:38,o.id||0);return}if(o.kind==='moss'){ellipse(x,y,22,9,'#52844b');ellipse(x-8,y-4,13,6,'#7da660');ellipse(x+8,y-2,10,6,'#659652')}
 else if(o.kind==='log'){ellipse(x,y+7,39,11,'#345d39');ctx.save();ctx.translate(x,y);ctx.rotate(.12);ctx.fillStyle='#765337';ctx.fillRect(-31,-8,60,17);ellipse(29,0,9,9,'#c6a57b');ellipse(29,0,5,5,'#98754d');ctx.restore();ellipse(x-12,y-8,15,4,'#74a05c')}
 else if(o.kind==='fungi'){for(let j=0;j<3;j++){const xx=x+j*13-13;ctx.fillStyle='#e4d6b2';ctx.fillRect(xx-2,y-11-(j%2)*5,4,13);ellipse(xx,y-12-(j%2)*5,8,5,medicinalMushroom(o)?'#91b9c9':j===1?'#b85b44':'#d39a68')}}
 else if(o.kind==='stump'){ellipse(x,y+6,23,10,'#365e3d');ctx.fillStyle='#79563b';ctx.fillRect(x-14,y-17,28,22);ellipse(x,y-17,15,7,'#b9946a');ellipse(x,y-17,9,4,'#8b6849')}
@@ -4788,6 +4820,8 @@ const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,st
  ...objects.filter(o=>(o.type==='mushroom'||o.type==='bush')&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:o.type})),
  ...woodlandDetails.filter(o=>o.kind==='fungi'&&woodlandFungiReady(o)&&!campsiteProtected(o)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:'fungi'}))
  ].sort((a,b)=>a.d-b.d)[0];
+ const loose=woodlandDetails.filter(o=>looseWoodReady(o)&&dist(o,state)<95).sort((a,b)=>dist(a,state)-dist(b,state))[0];
+ if(loose){collectLooseWood(loose);return}
  if(foraging){
   if(foraging.kind==='bush')pickBerries(foraging.o);
   else if(foraging.kind==='fungi')pickWoodlandFungi(foraging.o);
