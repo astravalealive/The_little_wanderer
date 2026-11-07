@@ -66,7 +66,7 @@ body:not(.rebirth-art) canvas#game{image-rendering:auto}
 body:has(.mobile-menu[open]) .haigen-speech,
 body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 @media (max-width:410px){.haigen-speech{font-size:14px;max-width:min(288px,calc(100vw - 22px));padding:9px 11px}}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=129"></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V131</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v128 boss playtest</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=129"></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V132</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v128 boss playtest</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -500,6 +500,8 @@ state.henCount=state.coopTier?Math.max(2,Math.min(12,Number(state.henCount)||2))
 state.rooster=!!state.rooster&&state.coopTier>=2;
 state.chicks=Array.isArray(state.chicks)?state.chicks.filter(Number.isFinite):[];
 state.incubateUntil=Number(state.incubateUntil)||0;
+state.incubateStartAt=state.incubateUntil?(Number(state.incubateStartAt)||state.incubateUntil-120000):0;
+state.coopHatchedAt=Number(state.coopHatchedAt)||0;
 state.jettyBuilt=!!state.jettyBuilt;state.fishingRod=!!state.fishingRod;
 state.fish=Math.max(0,Number(state.fish)||0);
 state.castAt=Number(state.castAt)||0;state.biteAt=Number(state.biteAt)||0;
@@ -557,7 +559,7 @@ function updateChickens(dt){
  if(laid){state.nestEggs=Math.min(5+state.coopTier*5,state.nestEggs+laid);state.lastEggAt+=laid*cycle}
  if(state.incubateUntil&&now>=state.incubateUntil){
   if(state.henCount+state.chicks.length<henCapacity())state.chicks.push(now);
-  state.incubateUntil=0;notify('🐣 A chick has hatched at the coop!');save();
+  state.incubateUntil=0;state.incubateStartAt=0;state.coopHatchedAt=now;notify('🐣 A chick has hatched at the coop!');save();
  }
  const grown=state.chicks.filter(t=>now-t>=180000);
  if(grown.length){
@@ -629,14 +631,83 @@ function drawRooster(){
  for(const p of [-7,7]){ctx.beginPath();ctx.moveTo(p,2);ctx.lineTo(p-2,14);ctx.lineTo(p+7,16);ctx.stroke()}
  ctx.restore();
 }
+// V132: detailed nests, shell cracking and ground-pecking chicks.
+function drawChick132(x,y,age,i=0,emerging=false){
+ const k=.78+Math.min(1,age/180000)*.34,t=time*.004+i*2.41;
+ const peck=!emerging&&Math.sin(t*1.5)>.26,dip=peck?7:0;
+ ctx.save();ctx.translate(x,y);ctx.scale(k,k);
+ ellipse(0,4,13,4,'#294a3655');
+ ctx.strokeStyle='#d28c43';ctx.lineWidth=2.4;ctx.lineCap='round';
+ for(const side of [-1,1]){const stride=Math.sin(t*1.6+side)*2;
+  ctx.beginPath();ctx.moveTo(side*5,-1);ctx.lineTo(side*5+stride,8);
+  ctx.lineTo(side*5+stride+5,10);ctx.moveTo(side*5+stride,8);ctx.lineTo(side*5+stride-4,11);ctx.stroke()}
+ const grad=ctx.createLinearGradient(-14,-30,13,4);
+ grad.addColorStop(0,'#fff0ad');grad.addColorStop(.5,'#f5d27b');grad.addColorStop(1,'#d9a15a');
+ ctx.fillStyle=grad;ctx.strokeStyle='#a77d49';ctx.lineWidth=1.3;
+ ctx.beginPath();ctx.ellipse(-3,-11,13,14,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ ellipse(-9,-12,6.5,8,'#ffe9a6');ellipse(9,-23+dip,10,10,'#f8d67e');
+ ellipse(7,-29+dip,5,3,'#fff1b6');ellipse(12,-26+dip,2.2,2.4,'#392d2a');
+ poly([[16,-22+dip],[25,-20+dip],[16,-17+dip]],'#e8a14b','#ac7148');
+ if(peck){ellipse(19,-3,2.3,1.4,'#b68d5a');ellipse(24,-5,1.5,1,'#c69b65')}
+ ctx.restore();
+ window.__v132LastChick={peck,emerging,index:i};
+}
+function drawNest132(x,y,eggCount,stage=0,scale=1){
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+ ellipse(0,7,41,17,'#2f453866');ellipse(0,1,37,15,'#775137');
+ ellipse(0,-2,30,11,'#c69c69');
+ for(let i=0;i<24;i++){const a=i*2.399,r=22+i%4*3;
+  ctx.strokeStyle=i%4===0?'#77834f':i%2?'#dcaf72':'#9a7147';
+  ctx.lineWidth=1.5+i%3;ctx.beginPath();
+  ctx.moveTo(Math.cos(a)*r-8,Math.sin(a)*r*.51);
+  ctx.quadraticCurveTo(Math.cos(a+1)*r,Math.sin(a+1)*r*.5,
+   Math.cos(a)*(r+9)+7,Math.sin(a)*(r+11)*.48);ctx.stroke()}
+ for(let i=0;i<Math.min(4,Math.max(eggCount,stage?1:0));i++){
+  let ex=[-13,1,15,-1][i],ey=[-13,-20,-12,-6][i];
+  if(i===2&&stage===1)ex+=Math.sin(time*.03)*2.2;
+  const c=ctx.createRadialGradient(ex-4,ey-6,.5,ex,ey,17);
+  c.addColorStop(0,'#fff6dc');c.addColorStop(.5,'#f0dfc0');c.addColorStop(1,'#be9679');
+  ctx.fillStyle=c;ctx.strokeStyle='#947159';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.ellipse(ex,ey,10,14,-.08,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ellipse(ex-3,ey-5,3,5,'#ffffff80');
+  for(let p=0;p<5;p++)ellipse(ex+Math.sin(i*3+p*2)*5,ey+Math.cos(i+p*3)*6,
+   1.1,.9,p%2?'#a77f5f77':'#dfac8877');
+  if(i===Math.min(4,Math.max(eggCount,stage?1:0))-1&&stage>=2){
+   ctx.strokeStyle='#916c56';ctx.lineWidth=stage>=4?2.2:1.4;
+   ctx.beginPath();ctx.moveTo(ex-6,ey-2);ctx.lineTo(ex-1,ey+1);
+   ctx.lineTo(ex+2,ey-4);ctx.lineTo(ex+5,ey+2);
+   if(stage>=3)ctx.lineTo(ex+9,ey-1);ctx.stroke();
+   if(stage>=4)ellipse(ex+2,ey+6,6,3,'#946950');
+  }
+ }
+ if(stage>=5){ellipse(13,-10,6,6,'#ffe49b');ellipse(15,-12,1.4,1.5,'#3f3229');
+  poly([[18,-9],[24,-7],[18,-5]],'#e9a04a')}
+ if(stage>=6){ellipse(14,-1,12,5,'#f7e5c5');ctx.strokeStyle='#91745e';
+  ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(6,-1);ctx.lineTo(10,-4);
+  ctx.lineTo(14,0);ctx.lineTo(18,-3);ctx.lineTo(22,-1);ctx.stroke()}
+ if(stage>=7)drawChick132(25,-3,0,0,true);
+ ctx.restore();
+}
+function coopEggStage132(){
+ if(state.incubateUntil){
+  const rem=Math.max(0,state.incubateUntil-Date.now());
+  if(rem>25000)return Math.floor(time/340)%13===0?1:0;
+  return Math.min(6,2+Math.floor((1-rem/25000)*5));
+ }
+ return state.coopHatchedAt&&Date.now()-state.coopHatchedAt<5800?7:0;
+}
 function drawChickenNest(){
  if(!state.coopTier)return;
- ellipse(chickenNest.x,chickenNest.y+5,38,19,'#8e673d');ellipse(chickenNest.x,chickenNest.y,29,12,'#c6a16c');
- for(let i=0;i<Math.min(10,state.nestEggs);i++)ellipse(chickenNest.x-18+(i%5)*9,chickenNest.y-8+Math.floor(i/5)*10,5,7,'#fff0cf');
- if(state.nestEggs){ctx.fillStyle='#fff8dc';ctx.textAlign='center';ctx.font='bold 12px system-ui';ctx.fillText('🥚 '+state.nestEggs+' eggs · X Collect',chickenNest.x,chickenNest.y-34)}
+ drawNest132(chickenNest.x,chickenNest.y,state.nestEggs+(state.incubateUntil?2:0),coopEggStage132(),1);
+ if(state.nestEggs){ctx.fillStyle='#fff8dc';ctx.textAlign='center';
+  ctx.font='bold 12px system-ui';ctx.fillText(state.nestEggs+' eggs · X Collect',chickenNest.x,chickenNest.y-42)}
  for(let i=0;i<state.chicks.length;i++){
-  const angle=i*2.4+Math.sin(time*.001)*.2,x=coopPlot.x+Math.cos(angle)*34,y=coopPlot.y+67+Math.sin(angle)*17;
-  ellipse(x,y+4,9,3,'#2d4f4155');ellipse(x,y-7,8,9,'#f5db8d');ellipse(x+6,y-14,5,5,'#fff0b2');ellipse(x+9,y-14,1.5,1.5,'#292b25');
+  const age=Math.max(0,Date.now()-state.chicks[i]);
+  if(i===state.chicks.length-1&&state.coopHatchedAt&&Date.now()-state.coopHatchedAt<2100)continue;
+  const a=i*2.399+Math.sin(time*.00033+i)*.4,rad=35+(i%3)*10;
+  const x=coopPlot.x+Math.cos(a)*rad+Math.sin(time*.00071+i)*9;
+  const y=coopPlot.y+67+Math.sin(a)*20+Math.cos(time*.00061+i)*5;
+  drawChick132(x,y,age,i);
  }
 }
 const companions=[{name:'Dylan',kind:'rabbit',x:state.x+65,y:state.y+25,target:null,t:0,mode:'wandering'},{name:'Skölli',kind:'fox',x:1780,y:1660,target:null,t:0,mode:'exploring'}];// Territorial wildlife lives beyond the campsite's protected clearing.
@@ -3283,7 +3354,7 @@ function homesteadMenu(kind){
     notify('🐓 The rooster joins your flock. You can now hatch chicks!');save();homesteadMenu(kind)
    }]);
    if(state.rooster&&!state.incubateUntil&&state.nestEggs>=2&&state.henCount+state.chicks.length<henCapacity())items.push(['Incubate 2 eggs · raise a chick',()=>{
-    state.nestEggs-=2;state.incubateUntil=Date.now()+120000;
+    state.nestEggs-=2;state.incubateStartAt=Date.now();state.incubateUntil=state.incubateStartAt+120000;
     notify('🐣 The eggs are warming!');save();homesteadMenu(kind)
    }]);
    if(state.incubateUntil)info+=' · Eggs incubating';
@@ -4622,7 +4693,31 @@ function updateDucks(dt){
   d.foraging=time%11000<2700||(state.weather?.rain||0)>.45&&Math.sin(time*.004+d.phase)>.2;
  }
 }
+// V132: correct buoyancy, hidden walking feet and faint under-water paddle.
+function drawDuckWater132(x,y,phase,size=1){
+ ctx.save();ctx.translate(x,y);ctx.scale(size,size);
+ const paddle=Math.sin(phase*1.7);
+ ellipse(-9,4+paddle*2,6,2,'#d3a36b40');
+ ellipse(10,4-paddle*2,6,2,'#d3a36b40');
+ ellipse(0,-3,30,5,'#438eae55');
+ ctx.strokeStyle='#d8f6e4bd';ctx.lineWidth=1.65;
+ ctx.beginPath();ctx.ellipse(0,1,30+Math.sin(phase)*2,7,0,0,Math.PI*2);ctx.stroke();
+ ctx.strokeStyle='#c9f2de6b';ctx.beginPath();
+ ctx.moveTo(-23,0);ctx.quadraticCurveTo(-33,-4,-42,2);
+ ctx.moveTo(23,0);ctx.quadraticCurveTo(34,-4,42,2);ctx.stroke();
+ ctx.restore();
+}
 function drawDuck(d){
+ if(d.air<.08&&lakeLevel(d.x,d.y)<.91){
+  const dir=Math.cos(d.heading)<-.45?'left':Math.cos(d.heading)>.45?'right':Math.sin(d.heading)<0?'up':'down';
+  ctx.save();ctx.beginPath();ctx.rect(d.x-95,d.y-108,190,102);ctx.clip();
+  worldFaunaDraw('duck',d.x,d.y+Math.sin(time*.004+d.phase)*2,dir,true,time*.43+d.phase*1000,
+   1.23*d.size,d.foraging?'forage':'walk');
+  ctx.restore();
+  drawDuckWater132(d.x,d.y,time*.006+d.phase,d.size);
+  window.__v132DuckWater={feetHidden:true,dir};
+  return;
+ }
  const flying=d.air>.08,alt=d.air*(42+Math.sin(time*.002+d.phase)*5);
  if(illustratedFaunaReady){
   drawIllustratedFauna('duck',d.x,d.y-alt,Math.cos(d.heading)<0?'left':'right',
@@ -4668,28 +4763,22 @@ function drawDuck(d){
 }
 function drawDuckNest(f){
  if(f.stage==='gather'&&f.twigs<2)return;
- const x=f.nestX,y=f.nestY;
- ctx.save();ellipse(x,y+5,34,15,'#344d5266');ellipse(x,y,30,12,'#86704e');
- for(let i=0;i<f.twigs+f.reeds;i++){
-  const a=i*2.399,r=16+(i%3)*4;
-  ctx.strokeStyle=i%2?'#7b9a68':'#ac8456';ctx.lineWidth=2.7;
-  ctx.beginPath();ctx.moveTo(x+Math.cos(a)*r,y+Math.sin(a)*r*.48);
-  ctx.lineTo(x+Math.cos(a)*(r+13),y+Math.sin(a)*(r+13)*.48);ctx.stroke();
+ const hatch=f.stage==='hatch',stage=hatch?Math.max(2,Math.min(6,2+Math.floor((f.elapsed%2300)/460))):0;
+ drawNest132(f.nestX,f.nestY,Math.min(4,f.eggs),stage,.79);
+ if(f.eggs>4&&['lay','incubate','hatch'].includes(f.stage)){
+  ctx.save();ctx.font='bold 11px system-ui';ctx.fillStyle='#fff0d1';ctx.textAlign='center';
+  ctx.fillText(f.eggs+' eggs',f.nestX,f.nestY-33);ctx.restore();
  }
- ellipse(x,y-2,23,8,'#c5b58c');
- for(let j=0;j<f.eggs;j++){
-  const col=j%5,row=Math.floor(j/5);
-  ellipse(x-13+col*6,y-5+row*6,3.5,5,'#ebe3c9');
- }
- ctx.restore();
 }
 function drawDuckling(ch){
  const growth=Math.min(1,ch.age),scale=.47+growth*.43;
  if(illustratedExtraReady){
-  // Duckling artwork remains consistent on land, swimming and short flights.
+  const water=!ch.flying&&!ch.departAlt&&lakeLevel(ch.x,ch.y)<.91;
+  if(water){ctx.save();ctx.beginPath();ctx.rect(ch.x-45,ch.y-58,90,52);ctx.clip()}
   drawIllustratedExtraFauna('duckling',ch.x,ch.y-(ch.departAlt||0),
     ch.vx<0?'left':'right',ch.alarmed||ch.foraging,
-    time+ch.phase*1000,.36+growth*.32);
+    time+ch.phase*1000,.36+growth*.32,ch.foraging?'forage':ch.alarmed?'flee':'walk');
+  if(water){ctx.restore();drawDuckWater132(ch.x,ch.y,time*.008+ch.phase,.39+growth*.28)}
   return;
  }
  ctx.save();ctx.translate(ch.x,ch.y-(ch.departAlt||0));
@@ -5979,7 +6068,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=131;document.getElementById('devVersion').textContent='V131';document.getElementById('devVersion').title='V131 · creature animation activities';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=132;document.getElementById('devVersion').textContent='V132';document.getElementById('devVersion').title='V132 · chicks, eggs, ducks, boss animations';let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
@@ -6161,4 +6250,4 @@ offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Re
   refreshTools:()=>renderHotbar()
  };
  requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./v127-ornate-ui.js?v=1"></script><script src="./gloamjaw-v128.js?v=5"></script></body></html>
+</script><script src="./v127-ornate-ui.js?v=1"></script><script src="./gloamjaw-v128.js?v=132"></script></body></html>

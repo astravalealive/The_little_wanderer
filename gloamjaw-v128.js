@@ -76,8 +76,10 @@ function finish(){
  P.memory('Haigen defeated Gloamjaw, the hungry bloom hidden in the southern woodland clearing. The crossbow blueprint is unlocked.');
  P.notify('🌿 GLOAMJAW DEFEATED! Crossbow crafting unlocked.');P.save();
 }
+let lastGloamHitAt=-1e9;
 function damageBoss(dmg){
  if(data.defeated)return false;
+ lastGloamHitAt=P.snapshot().time;
  data.hp=Math.max(0,data.hp-dmg);
  if(!data.hp)finish();return true;
 }
@@ -227,13 +229,19 @@ function drawBoss(){
  const now=P.snapshot();
  if(Math.abs(x-now.cameraX)>1150||Math.abs(y-now.cameraY)>900)return;
  if(!data.defeated&&gloamArtLoaded&&gloamIllustratedAtlas){
-  const frame=gloamPose(),size=GLOAM_ART_CELL;
-  ctx.save();
-  ctx.imageSmoothingEnabled=false;
-  ctx.drawImage(gloamIllustratedAtlas,(frame%3)*size,Math.floor(frame/3)*size,size,size,
-    Math.round(x-181),Math.round(y-312),362,362);
-  ctx.restore();
-  return;
+  const frame=gloamPose(),size=GLOAM_ART_CELL,t=now.time;
+  const warning=combat.mode==='warning',striking=combat.mode==='strike';
+  const recoil=striking?Math.sin((700-combat.timer)/700*Math.PI)*.085:0;
+  const breath=Math.sin(t*.0031)*.017,sway=Math.sin(t*.0016)*.017;
+  const flash=t-lastGloamHitAt<210;
+  ctx.save();ctx.imageSmoothingEnabled=false;
+  ctx.translate(Math.round(x),Math.round(y+24));
+  ctx.rotate(sway+(striking&&combat.attack==='vine'?Math.sin(t*.023)*.055:0));
+  ctx.scale(1+breath+recoil,1-breath-(warning?Math.sin(t*.018)*.03:0));
+  if(flash)ctx.globalAlpha=Math.floor(t/70)%2===0?.57:1;
+  if(warning&&combat.attack==='spores'){ctx.shadowColor='#d4d78e';ctx.shadowBlur=14+Math.sin(t*.017)*6}
+  ctx.drawImage(gloamIllustratedAtlas,(frame%3)*size,Math.floor(frame/3)*size,size,size,-181,-336,362,362);
+  ctx.restore();return;
  }
  ctx.save();ctx.translate(x,y);ctx.imageSmoothingEnabled=false;
  const tick=now.time,breath=Math.sin(tick*.0028),sway=Math.sin(tick*.0018)*7,

@@ -1,4 +1,4 @@
 {
-  "build": 131,
-  "notes": "V131 LIVE: 27-species six-frame creature animation framework, activity-driven poses for rest, forage, watch, flee, attack, lunge, fly; preservers approved art, painted roads, Skolli and Dylan, Gloamjaw, saved progress, and Ember. Direction presentation remains four-way cues pending independent facing art."
+  "build": 132,
+  "notes": "V132 LIVE: beautiful shell/shading details, incubating egg cracks, pecking chicks, duck nests and swimming ducks/ducklings without visible walking feet, stronger Gloamjaw idle/attack/recoil animations. Preserves saved egg/duck lifecycle, world graphics, companion sprites and Ember. Newly approved external sprite images are visual references and are not yet installed as binary assets."
 }
