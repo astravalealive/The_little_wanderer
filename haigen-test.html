@@ -3143,6 +3143,24 @@ function haigenCostumeAtlas(base,kind){
  const g=c.getContext('2d',{willReadFrequently:true});if(!g)return base;
  g.imageSmoothingEnabled=false;
  g.drawImage(base,0,0,192,sheetHeight,0,0,192,sheetHeight);
+ // Clean the bright edge specks from the extracted transparent atlas.
+ // Restrict to silhouettes; do not erase pale trainers or golden hair highlights
+ // that are surrounded by opaque pixels.
+ if(newSheet){
+  const img=g.getImageData(0,0,192,sheetHeight),d=img.data,src=new Uint8ClampedArray(d);
+  for(let y=0;y<sheetHeight;y++){
+   if(y%72>=64)continue; // preserve pale shoe soles
+   for(let x=1;x<191;x++){
+    const k=(y*192+x)*4,r=src[k],gg=src[k+1],bb=src[k+2];
+    if(src[k+3]===0||r<242||gg<239||bb<231)continue;
+    const exposed=src[k-1]===0||src[k+7]===0||
+      (y>0&&src[k-192*4+3]===0)||(y<sheetHeight-1&&src[k+192*4+3]===0);
+    if(exposed)d[k+3]=0;
+   }
+  }
+  g.putImageData(img,0,0);
+ }
+
  const palette={
   snow:[[71,48,37],[180,93,40],[229,146,65]],
   desert:[[67,58,42],[157,130,85],[210,181,125]],
@@ -3277,59 +3295,83 @@ function haigenToolSprite(kind){
 function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  if(!kind)return;
  const key=action?.kind||'',progress=action?.progress||0;
- const working=(key===kind)||(kind==='rod'&&['cast','reel','land'].includes(key))||
+ const isTool=['axe','shovel','pickaxe','torch','rod','net'].includes(kind);
+ const working=key===kind||(kind==='rod'&&['cast','reel','land'].includes(key))||
   (kind==='net'&&['net','catch','release'].includes(key));
  const phase=working?Math.min(3,Math.floor(progress*4)):0;
+ // The identical 48×72 body coordinate system is used for *every* tool.
+ // All wrist placement is intentionally aligned to Haigen's actual sleeve.
  const direction=dir==='left'?'left':dir==='right'?'right':dir==='up'?'up':'down';
  ctx.save();ctx.imageSmoothingEnabled=false;
  if(direction==='left'){ctx.translate(left+48*scale,top);ctx.scale(-scale,scale)}
  else{ctx.translate(left,top);ctx.scale(scale,scale)}
  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
- const skin='#e7b78e',shade='#ab795f',sleeve='#343039',light='#514651';
+ const skin='#e9b88c',skinShade='#ae795d',sleeve='#343038',cuff='#58505b',crease='#29252e';
+ const shoulder=direction==='up'?[19,38]:direction==='down'?[35,37]:[30,38];
+ const hand=direction==='up'?[20,48]:direction==='down'?[40,47]:[37,49];
+ const activeHandY=hand[1]+(working?[0,-7,1,3][phase]:0);
  if(['eat','medicine','cook'].includes(key)){
-  const raise=Math.sin(Math.PI*progress)*17,handY=44-raise;
-  p(31,34-raise*.38,8,9,sleeve);p(34,36-raise*.38,3,3,light);
-  p(35,handY,7,6,skin);p(39,handY+3,2,2,shade);
-  if(key==='eat'){p(33,handY-7,10,7,'#865b38');p(34,handY-9,8,5,'#c29a60');p(37,handY-8,3,2,'#edc68a')}
-  if(key==='medicine'){p(34,handY-10,8,12,'#556e6f');p(35,handY-10,6,9,'#a7d1bd');p(36,handY-13,4,4,'#768b76');p(37,handY-7,2,4,'#eff7e9')}
-  if(key==='cook'){p(37,handY-19,3,20,'#7e6946');p(31,handY-22,12,6,'#b1b2a0');p(34,handY-20,5,3,'#e2e1c3')}
+  const rise=Math.sin(progress*Math.PI)*18,hy=activeHandY-rise;
+  p(shoulder[0],shoulder[1],8,9,sleeve);
+  p(hand[0]-5,hy-4,9,9,cuff);p(hand[0]-3,hy,8,6,skin);
+  if(key==='eat'){p(hand[0]-6,hy-10,13,8,'#b88b57');p(hand[0]-5,hy-9,8,4,'#e7c384')}
+  if(key==='medicine'){p(hand[0]-3,hy-12,7,13,'#5b9181');p(hand[0]-2,hy-11,5,9,'#b8ddc4');p(hand[0]-1,hy-15,4,4,'#798d7c')}
+  if(key==='cook'){p(hand[0],hy-24,3,24,'#836c4c');p(hand[0]-5,hy-28,13,6,'#ced2c4')}
   ctx.restore();return;
  }
  if(kind==='frog'){
+  p(29,44,12,10,cuff);p(31,46,10,8,skin);
   const frog=haigenToolSprite('frog');
-  ctx.drawImage(frog,22,25,24,30);
-  p(23,51,10,6,skin);p(32,51,10,6,skin);
+  ctx.drawImage(frog,17,21,29,36);
+  p(26,51,8,5,skin);p(38,51,7,5,skin);
   ctx.restore();return;
  }
- const sprite=haigenToolSprite(kind);
- const isLong=kind==='rod'||kind==='net';
- const anchorX=direction==='up'?16:direction==='down'?30:34;
- const anchorY=direction==='up'?43:49;
- let angle=direction==='up'?-.45:-.40;
- if(isLong)angle=-.21;
- if(kind==='torch')angle=-.12;
- if(working){
-  const poses=kind==='rod'?[-.60,-.96,-.17,-.30]:
-    kind==='net'?[-.7,-1.18,.54,-.2]:[-.50,-1.23,.31,-.19];
-  angle=poses[phase];
- }
- const handPivot=kind==='rod'||kind==='net'?55:52;
- const wristShift=working?([0,-5,4,0][phase]):0;
- ctx.translate(anchorX+wristShift,anchorY+(working&&phase===1?-3:0));
+ if(!isTool){ctx.restore();return}
+ const anchorX=hand[0],anchorY=activeHandY;
+ // Grip orientation is not a generic rotation around the middle of the
+ // sprite. The *butt of the handle* follows the wrist through a 4-pose arc.
+ const angles={
+  axe:[-.18,-1.09,.54,-.20],
+  pickaxe:[-.21,-1.16,.42,-.15],
+  shovel:[-.15,-.64,.21,-.17],
+  torch:[-.12,-.30,-.49,-.11],
+  rod:[-.28,-.88,.29,-.25],
+  net:[-.25,-1.03,.38,-.14]
+ };
+ const pose=angles[kind]||angles.axe;
+ let angle=working?pose[phase]:pose[0];
+ if(direction==='up')angle+=.2;
+ if(direction==='down')angle-=.08;
+ ctx.save();
+ ctx.translate(anchorX,anchorY);
  ctx.rotate(angle);
- // The hand is on the lower shaft, never detached from the handle.
- ctx.drawImage(sprite,-20,-handPivot,40,60);
- // Two believable grips, arm cuffs and knuckles visually lock the tool to Haigen.
- p(-11,0,9,7,sleeve);p(-8,-1,7,5,light);
- p(-8,-5,8,7,skin);p(-7,0,7,2,shade);
- if(kind!=='torch'&&kind!=='rod'){
-  p(4,-17,9,7,sleeve);p(5,-16,6,4,light);
-  p(6,-18,7,6,skin);p(7,-13,5,2,shade);
+ // A 40×60 sprite becomes a 27×42 game prop so it doesn't overwhelm
+ // Haigen's 48×72 body. The lower shaft (y≈48) meets the wrist at (0,0).
+ const toolScale=kind==='rod'?.77:kind==='net'?.78:kind==='torch'?.70:.74;
+ ctx.scale(toolScale,toolScale);
+ ctx.drawImage(haigenToolSprite(kind),-20,-49,40,60);
+ ctx.restore();
+ // The arm overlays the tool handle, visually locking the hand onto it.
+ // This is deliberately drawn AFTER the tool in each facing.
+ const wristX=anchorX,wristY=anchorY;
+ const midX=(shoulder[0]+wristX)/2;
+ const midY=(shoulder[1]+wristY)/2;
+ p(midX-5,midY-4,10,11,sleeve);
+ p(wristX-7,wristY-7,12,10,cuff);
+ p(wristX-5,wristY-5,10,8,skin);
+ p(wristX-5,wristY+1,9,2,skinShade);
+ p(wristX-7,wristY-6,3,3,crease);
+ // Second hand: only show it when using a two-handed heavy tool.
+ if(working&&['axe','pickaxe','shovel','net'].includes(kind)&&phase!==0){
+  p(wristX-14,wristY-17,9,8,sleeve);
+  p(wristX-10,wristY-17,8,6,skin);
+  p(wristX-8,wristY-12,5,2,skinShade);
  }
- if(working&&phase===2&&['axe','pickaxe','shovel','net'].includes(kind)){
-  for(let i=0;i<4;i++){
-   const xx=-22+i*8,yy=-47+(i%2)*6;
-   p(xx,yy,3,3,kind==='axe'?'#d3b384':kind==='pickaxe'?'#c3c6b9':'#a0a98a');
+ if(working&&phase===2&&['axe','pickaxe','shovel'].includes(kind)){
+  const dust=kind==='axe'?'#bc9a72':kind==='pickaxe'?'#aeb6ae':'#c5b295';
+  for(let i=0;i<5;i++){
+   const dx=i*8-15,dy=-39+i%3*6;
+   p(wristX+dx,wristY+dy,3+(i%2),3,dust);
   }
  }
  ctx.restore();
