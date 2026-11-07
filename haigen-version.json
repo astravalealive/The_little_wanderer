@@ -1,4 +1,4 @@
 {
-  "build": 112,
-  "notes": "V112 menu and keyboard cleanup: removes unreliable free-text Tell Haigen panel and its button; fixes global keyboard handling so typing spaces/letters in inputs works; six primary mobile actions (AI toggle, Backpack, Map, Story, Build, Notes) with infrequent actions under More. Adds a read-only categorized Backpack view showing real carried materials, food, herbs, remedies, gear and stored wood. No carry limits are enforced yet; existing saves, quests, autonomy and Ember remain intact."
+  "build": 113,
+  "notes": "V113 Haigen's Life Builder Chapter One. In autonomous mode he independently decides which missing homestead structure to build (coop, kitchen garden or wood shed), clears camp debris, gathers real wood/stone/twigs, spends resources in three work stages, and completes functioning buildings. Earthy timber-and-stone scaffolding, moving hammer and dust, visible project status in his notebook, and fewer repetitive collection notes. Existing saves and completed buildings, player control, companion stories, original Ember and Silent Pond are preserved. AI remains a bounded local simulation."
 }
