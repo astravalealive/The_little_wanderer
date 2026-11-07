@@ -5216,7 +5216,7 @@ function frame(now){
  previewTools.id='v121PreviewTools';
  previewTools.setAttribute('aria-label','Haigen preview troubleshooting');
  previewTools.style.cssText='position:fixed;z-index:8;left:9px;top:calc(env(safe-area-inset-top,0px) + 93px);display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:min(90vw,300px);pointer-events:auto';
- previewTools.innerHTML='<div style="display:flex;gap:5px;flex-wrap:wrap"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:6px 9px;min-height:36px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:6px 9px;min-height:36px">🎨 Change look</button></div><details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>Preview help</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
+ previewTools.innerHTML='<div style="display:flex;gap:5px;flex-wrap:wrap"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:6px 9px;min-height:36px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:6px 9px;min-height:36px">🎨 Change look</button></div><details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>Preview help</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
  document.body.appendChild(previewTools);
  $('previewFind').onclick=()=>{
    // Keep the live V120 save and Haigen's world objects intact.
@@ -5225,6 +5225,20 @@ function frame(now){
    notify('🔎 Camera centred on Haigen.');
  };
  $('previewLook').onclick=()=>toggleRebirthArt();
+ $('previewPond').onclick=()=>{
+  // Dry bank of the original pond; only the V121 preview save is updated.
+  const candidates=[
+   {x:pond.x+pond.rx*1.4,y:pond.y},
+   {x:pond.x+pond.rx*1.45,y:pond.y-80},
+   {x:pond.x+pond.rx*1.45,y:pond.y+85},
+   {x:pond.x,y:pond.y+pond.ry*1.5}
+  ];
+  const bank=candidates.find(q=>lakeLevel(q.x,q.y)>1.25&&islandDepth(q.x,q.y)>130&&!blockedBySolid(q.x,q.y))||candidates[0];
+  state.x=bank.x;state.y=bank.y;state.resting=false;state.autonomy=false;
+  state.playerInstruction=null;look.x=0;look.y=0;cameraZoom=1;
+  cam.x=bank.x;cam.y=bank.y;cameraReleaseAt=-1e9;
+  save();notify('🐸 Visiting the frog pond!');
+ };
  $('previewCopySave').onclick=()=>{
    try{
     const live=localStorage.getItem('wandererTestSave');
