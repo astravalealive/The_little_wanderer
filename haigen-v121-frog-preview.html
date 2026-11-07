@@ -3649,7 +3649,10 @@ function rbDrawActor(x,y,type,actor,deepWater){
 }
 
 function character(x,y,type,actor,deepWater=false){
- if(rbEnabled&&(type==='boy'||type==='rabbit'||type==='fox')){rbDrawActor(x,y,type,actor,deepWater);return}
+ // Preserve Dillon and Skölli's original detailed ears, faces, tail and movement.
+ // V120's 30x40 Rebirth placeholders turned them into featureless rectangles.
+ // Route only Haigen through the V121 replacement atlas until companion art is approved.
+ if(rbEnabled&&type==='boy'){rbDrawActor(x,y,type,actor,deepWater);return}
  const motion=actor||playerMotion,dir=motion.dir||'down',moving=!!motion.moving,phase=motion.anim||0;
  const gait=moving?Math.sin(phase*(type==='rabbit'?.018:type==='fox'?.014:.012)):0;
  const hop=moving?(type==='rabbit'?Math.abs(gait)*8:type==='fox'?Math.abs(gait)*3:Math.abs(gait)*2):0;
