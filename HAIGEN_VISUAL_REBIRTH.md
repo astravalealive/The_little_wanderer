@@ -31,9 +31,16 @@ An original top-down woodland fantasy with 16-bit-era readability, restrained co
 
 ## Implementation sequence
 
-### V115: SNES pixel-density foundation (implemented)
+### V116: Stable hybrid rendering (implemented)
+- **Full native device-resolution canvas** in Rebirth as well as Classic. The entire frame is never resampled/pixelated. This removes the crawling/jittering pixel-grid effect when the camera scrolls.
+- Keep pixel artwork at original tile/sprite resolution and draw it with nearest-neighbour per asset. Normal scenery/vector effects and HUD retain full sharpness.
+- Haigen's thought bubble now uses **HTML in fixed screen space**. Font size remains 14px regardless of camera zoom, long sentences wrap, and the bubble follows the projected world position without compressing dialogue into one line.
+- Menus and modals hide the dialogue automatically. The existing game state, AI, life-building and saves are unchanged.
+- **Field test:** iPad Safari scroll/zoom and speech readability, especially dense forest and two-makers thoughts; verify no excessive movement jitter.
+
+### V115: SNES pixel-density foundation (historical experiment)
 - Original SNES reference: 256×224 screen, 16×16 overworld tiles constructed from 8×8 graphic tiles. These are **historical constraints for our original artwork**, not copied assets.
-- Rebirth mode uses a virtual 256×224 native canvas framing, expanded along the longer display axis for iPad and iPhone aspect ratios while preserving square pixels. CSS nearest-neighbour enlarges the image.
+- V115 experimented with a virtual 256×224 framebuffer. **Retired in V116** after video testing showed camera-motion shimmer and unreadable canvas text. Native asset tiles stay 16×16/8×8; render the composited world at full device resolution.
 - Mobile world zoom increased 18% for legibility. All camera pan and pointer-to-world calculations use the same zoom helper.
 - Ground atlas divided into **16×16** cells and detailed with **8×8** subtiles. Pixel flora and mushroom clusters replace painterly versions in the home woodland.
 - First directional animal conversion: Greyfang/wolf, boar, hens, frogs and ducks, with original sprites and cached frames.
