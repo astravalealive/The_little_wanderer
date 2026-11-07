@@ -1,4 +1,4 @@
 {
-  "build": 115,
-  "notes": "V115 authentic SNES-scale pixel density: responsive virtual 256x224 retro framebuffer with aspect-correct extension on modern portrait and landscape displays, nearest-neighbour scaling, 18 percent closer world camera and consistent touch coordinates; original 16x16 grass atlas composed of 8x8 subtiles; more detailed original pixel wildflowers/mushrooms and direction-aware pixel wolves, boars, hens, ducks and frogs. Classic toggle still preserves high-DPI painterly rendering. Existing saves, world, AI builder, plot positions, quests, controls and Ember are unchanged. iPad Safari visual/interaction field test is still required."
+  "build": 116,
+  "notes": "V116 visual stability and dialogue fix based on iPad user recording: remove the 256x224 full-screen virtual pixel framebuffer and return both Rebirth and Classic to native high-DPI rendering; retain original 16x16 asset detail and per-sprite nearest-neighbour pixels. Native HTML speech bubble follows Haigen in screen coordinates, wraps long thoughts, remains 14px readable at any world zoom, and hides behind menus. Preserve existing animal sprites, player AI, saves and Ember. Full-browser visual playtest still pending."
 }
