@@ -3260,8 +3260,16 @@ haigenMovementAtlas.onload=()=>{
  haigenMovementReady=haigenMovementAtlas.naturalWidth===192&&haigenMovementAtlas.naturalHeight===288;
  haigenCostumeAtlases.clear();
 };
-haigenMovementAtlas.onerror=()=>{haigenMovementReady=false};
-haigenMovementAtlas.src='./assets/haigen-v119-movement-atlas.png?v=119';
+// Fall back safely to the previous V119 sprite if the reference atlas fails to load.
+let haigenReferenceFallbackUsed=false;
+haigenMovementAtlas.onerror=()=>{
+ haigenMovementReady=false;
+ if(!haigenReferenceFallbackUsed){
+  haigenReferenceFallbackUsed=true;
+  haigenMovementAtlas.src='./assets/haigen-v119-movement-atlas.png?v=119';
+ }
+};
+haigenMovementAtlas.src='./assets/haigen-reference-walk-atlas.webp?v=121';
 let haigenPreviousFacing='down',haigenTurnFrom='down',haigenTurnAt=-10000;
 function startHaigenAction(kind,duration=650){
  haigenVisualAction={kind,start:performance.now(),duration};
@@ -3560,7 +3568,7 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  const oldSide=haigenTurnFrom==='left'||haigenTurnFrom==='right';
  const newVertical=dir==='up'||dir==='down';
  const displayDir=newSheet&&transition&&oldSide&&newVertical?haigenTurnFrom:dir;
- const row=displayDir==='up'?1:displayDir==='left'?(newSheet?3:2):displayDir==='right'?2:0;
+ const row=displayDir==='up'?1:displayDir==='left'?2:displayDir==='right'?(newSheet?3:2):0;
  const scale=1.18,w=48*scale,h=72*scale;
  const left=Math.round(x-w/2),top=Math.round(y-h+7);
  ctx.save();ctx.imageSmoothingEnabled=false;
