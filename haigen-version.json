@@ -1,4 +1,4 @@
 {
-  "build": 114,
-  "notes": "V114 visual rebirth vertical slice: original 16-bit inspired directional pixel sprites for Haigen, Dillon and Skölli, three walk poses each; faster direction-aware axe/pick/shovel strikes; new woodland grass-tile texture, oak/pine trees, rocks and bushes, pixelate pond edge and tier 2/3 cottage; atmospheric forest palette for UI. Reversible Rebirth / Classic art switch under More, style stored independently using haigenVisualStyle. New HAIGEN_VISUAL_REBIRTH.md art bible and subsequent phases. AI, old saves, story, controls and original Ember preserved. Requires visual iPad Safari playtest."
+  "build": 115,
+  "notes": "V115 authentic SNES-scale pixel density: responsive virtual 256x224 retro framebuffer with aspect-correct extension on modern portrait and landscape displays, nearest-neighbour scaling, 18 percent closer world camera and consistent touch coordinates; original 16x16 grass atlas composed of 8x8 subtiles; more detailed original pixel wildflowers/mushrooms and direction-aware pixel wolves, boars, hens, ducks and frogs. Classic toggle still preserves high-DPI painterly rendering. Existing saves, world, AI builder, plot positions, quests, controls and Ember are unchanged. iPad Safari visual/interaction field test is still required."
 }
