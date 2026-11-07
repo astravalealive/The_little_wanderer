@@ -6018,6 +6018,7 @@ offlineProgress();$('artBtn').textContent=rbEnabled?'🎨 Classic look':'🎨 Re
     phase:['Morning','Afternoon','Evening','Night'][Math.floor((t%180)/45)]||'Morning',
     stage:Number(state.story?.stage)||0,
     equipped:state.equipped,wood:state.wood,stone:state.stone,
+    berries:Number(state.berries)||0,mushrooms:Number(state.mushrooms)||0,food:Number(state.food)||0,
     dylanName:'Dylan',skolliSpecies:'fox'
    };
   },
