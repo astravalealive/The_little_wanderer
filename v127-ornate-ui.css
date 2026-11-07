@@ -4,7 +4,11 @@
 :root {--rpg-ink:#191a18;--rpg-panel:#111a1aef;--rpg-bronze:#a97537;--rpg-gold:#eac481;--rpg-bark:#493124;--rpg-ivory:#ffe9bd}
 body.v127-rpg {font-family:Georgia,'Times New Roman',serif;color:var(--rpg-ivory)}
 body.v127-rpg .hud,body.v127-rpg .mobile-menu,body.v127-rpg #regionsQuickBtn{display:none!important}
-body.v127-rpg .hint,body.v127-rpg .dev-version{display:none!important}
+body.v127-rpg .hint{display:none!important}
+body.v127-rpg .dev-version{
+ right:calc(env(safe-area-inset-right,0px) + 5px);bottom:calc(env(safe-area-inset-bottom,0px) + 1px);
+ z-index:22;color:#ffe9bd;background:#19201deb;border-color:#896c44;line-height:12px;padding:0 4px;
+}
 body.v127-rpg .bottom{z-index:11;bottom:calc(env(safe-area-inset-bottom,0px) + 97px);left:13px;right:13px}
 body.v127-rpg .bottom .joystick{background:#161f1bb5;border:3px solid #b38a55;box-shadow:inset 0 0 0 3px #3b2e23,0 2px 15px #000b;width:106px;height:106px}
 body.v127-rpg .bottom .stick{width:43px;height:43px;left:30px;top:30px;background:#b8a078;border-color:#e8cf93}
@@ -195,3 +199,5 @@ body.v127-rpg .slot .rpg-item-svg svg{width:100%;height:100%;display:block}
 
 /* Keep care and wardrobe reachable on short touch screens. */
 .v127-settings.open{max-height:52dvh;overflow-y:auto;overscroll-behavior:contain}
+
+@media(max-width:1000px){body.v127-rpg .hotbar{bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}}
