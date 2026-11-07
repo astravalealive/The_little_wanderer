@@ -4174,22 +4174,26 @@ function haigenUseNet(){
    notify('🐸 Take your little passenger back near a safe pond or marsh to release it.');return false;
   }
   frog.x=pos.x;frog.y=pos.y;frog.fromX=pos.x;frog.fromY=pos.y;
-  frog.toX=pos.x;frog.toY=pos.y;frog.hopUntil=0;frog.hopAt=time+1400;
+  frog.toX=pos.x;frog.toY=pos.y;frog.hopUntil=0;frog.hopAt=time+1400;frog.safeUntil=time+5500;
   state.carriedFrogId=-1;state.frogsReleased++;
   startHaigenAction('release',850);
   notify('🐸 Released gently back into its habitat!');save();return true;
  }
- const nearFrog=frogs.filter(f=>Math.hypot(state.x-f.x,state.y-f.y)<135)
-  .sort((a,b)=>dist(state,a)-dist(state,b))[0];
- if(nearFrog){
-  state.carriedFrogId=nearFrog.id;
+ // Choose the nearest target, with a short no-recapture period for frogs.
+ const targets=[
+  ...frogs.filter(f=>(!f.safeUntil||time>=f.safeUntil)&&Math.hypot(state.x-f.x,state.y-f.y)<110)
+   .map(f=>({kind:'frog',creature:f,d:dist(state,f)})),
+  ...woodlandCritters.filter(c=>c.kind==='butterfly'&&!(c.hiddenUntil&&time<c.hiddenUntil)&&Math.hypot(c.x-state.x,c.y-state.y)<100)
+   .map(c=>({kind:'butterfly',creature:c,d:dist(state,c)}))
+ ].sort((a,b)=>a.d-b.d);
+ const target=targets[0];
+ if(target?.kind==='frog'){
+  state.carriedFrogId=target.creature.id;
   startHaigenAction('catch',950);
   notify('🐸 Gently scooped up a frog. Return to the pond and use the net to release it.');save();return true;
  }
- const critter=woodlandCritters.filter(c=>c.kind==='butterfly'&&!(c.hiddenUntil&&time<c.hiddenUntil)&&Math.hypot(c.x-state.x,c.y-state.y)<100)
-  .sort((a,b)=>dist(state,a)-dist(state,b))[0];
- if(critter){
-  critter.hiddenUntil=time+20000;state.butterfliesCaught++;
+ if(target?.kind==='butterfly'){
+  target.creature.hiddenUntil=time+20000;state.butterfliesCaught++;
   startHaigenAction('net',850);
   notify('🦋 Caught a butterfly! It will flutter free again shortly.');save();return true;
  }
