@@ -1,0 +1,151 @@
+
+/* Haigen's World V127: native, functional Norse-woodland HUD.
+   Inspired by the approved visual direction, not a static screenshot. */
+:root {--rpg-ink:#191a18;--rpg-panel:#111a1aef;--rpg-bronze:#a97537;--rpg-gold:#eac481;--rpg-bark:#493124;--rpg-ivory:#ffe9bd}
+body.v127-rpg {font-family:Georgia,'Times New Roman',serif;color:var(--rpg-ivory)}
+body.v127-rpg .hud,body.v127-rpg .mobile-menu,body.v127-rpg #regionsQuickBtn{display:none!important}
+body.v127-rpg .hint,body.v127-rpg .dev-version{display:none!important}
+body.v127-rpg .bottom{z-index:11;bottom:calc(env(safe-area-inset-bottom,0px) + 97px);left:13px;right:13px}
+body.v127-rpg .bottom .joystick{background:#161f1bb5;border:3px solid #b38a55;box-shadow:inset 0 0 0 3px #3b2e23,0 2px 15px #000b;width:106px;height:106px}
+body.v127-rpg .bottom .stick{width:43px;height:43px;left:30px;top:30px;background:#b8a078;border-color:#e8cf93}
+body.v127-rpg .bottom .actions{gap:7px}
+body.v127-rpg .bottom .action{min-width:96px;min-height:44px;font:700 12px Georgia,serif;color:#ffedc7;background:linear-gradient(160deg,#62462c,#2a241e);border:2px solid #ae8350;box-shadow:inset 0 0 0 2px #2d211a,0 3px 10px #0007;border-radius:10px}
+body.v127-rpg #interactBtn,body.v127-rpg #useBtn{font-size:0!important}
+body.v127-rpg #interactBtn::after{content:"X  COLLECT";font:700 12px Georgia,serif}
+body.v127-rpg #useBtn::after{content:"RT  USE TOOL";font:700 12px Georgia,serif}
+body.v127-rpg .hotbar{
+ z-index:21;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 9px);
+ gap:4px;padding:7px 11px;max-width:min(calc(100vw - 280px),840px);
+ border-radius:15px;background:linear-gradient(180deg,#3d2b21ee,#0f1515f6 24%,#151816f7 76%,#4d3627f5);
+ border:3px ridge #cd9a57;box-shadow:inset 0 0 0 2px #6a472c,0 0 0 2px #261d18,0 8px 22px #070e0fc9;
+ scrollbar-color:#a9783e #211c18
+}
+body.v127-rpg .hotbar::before,body.v127-rpg .hotbar::after{content:"✥";color:#e4ba6f;align-self:center;font:700 20px Georgia,serif;filter:drop-shadow(0 1px 1px #140c0b)}
+body.v127-rpg .slot{
+ display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;
+ color:#efd8a8;min-width:57px;width:57px;min-height:58px;flex:0 0 auto;
+ background:linear-gradient(150deg,#34302a,#151b1a);border:2px solid #987448;border-radius:7px;
+ box-shadow:inset 0 0 0 2px #2b2924,0 2px 1px #0b0a09;cursor:pointer;
+}
+body.v127-rpg .slot.selected{background:linear-gradient(145deg,#504029,#1c1c19);border:2px solid #ffda6a;box-shadow:0 0 0 1px #e3af3a,inset 0 0 10px #ffd15f66,0 0 15px #f2b33180}
+body.v127-rpg .slot:disabled{opacity:.42;filter:grayscale(.75)}
+body.v127-rpg .slot small{font:600 9px Georgia,serif;letter-spacing:.02em;color:#e1caa0;line-height:1.1}
+body.v127-rpg .slot .rpg-item-art{width:34px;height:34px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(1px 2px 1px #090d0dc9)}
+body.v127-rpg .slot .rpg-item-svg{width:33px;height:33px;filter:drop-shadow(1px 2px 1px #080c0bcb)}
+body.v127-rpg .slot .rpg-index{position:absolute;top:0;left:3px;color:#ffe5a4;font:700 10px Georgia,serif;text-shadow:1px 1px 1px #000}
+body.v127-rpg .overlay{z-index:50}
+body.v127-rpg .modal{
+ background:linear-gradient(125deg,#17231f,#171b1c);border:3px ridge #d7a960;
+ border-radius:12px;box-shadow:inset 0 0 0 3px #473222,0 18px 55px #000b;
+ color:#f5e3bf;font-family:Georgia,serif
+}
+body.v127-rpg .btn{background:linear-gradient(160deg,#59432c,#282821);color:#ffebc7;border:2px solid #ae8650;border-radius:7px;box-shadow:inset 0 0 0 2px #2e2721,0 2px 5px #0008}
+body.v127-rpg .toast{
+ z-index:12;background:linear-gradient(130deg,#14211fe9,#25241fe9);
+ border:2px ridge #c59d66;box-shadow:inset 0 0 0 2px #3d2b24,0 5px 16px #0008;
+ font-family:Georgia,serif;top:124px
+}
+body.v127-rpg .haigen-speech{
+ border:2px ridge #aa7b45;background:#e8d5ad;color:#272523;
+ border-radius:9px;font-family:Georgia,serif;box-shadow:0 4px 1px #3a2e29aa,0 7px 18px #0008
+}
+#v127Root{position:fixed;inset:0;z-index:18;pointer-events:none;color:#f5e5c3}
+#v127Root button{cursor:pointer;touch-action:manipulation}
+.v127-framed{
+ background:linear-gradient(160deg,#27302ce8,#111a19f0 22%,#161b1ae8 79%,#302a23ec);
+ border:3px ridge #c9995a;border-radius:8px;
+ box-shadow:0 0 0 2px #2e2018,inset 0 0 0 2px #503927,0 6px 14px #0008;
+}
+.v127-head{position:absolute;top:calc(env(safe-area-inset-top,0px) + 9px);left:15px;min-width:263px;display:grid;grid-template-columns:76px 193px;gap:6px;align-items:start}
+.v127-portrait{position:relative;grid-row:1 / span 2;display:flex;align-items:center;justify-content:center;width:77px;height:77px;border:4px ridge #e0ad67;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 40% 35%,#66523a,#151d1b 72%);box-shadow:0 0 0 2px #241911,0 2px 6px #000a}
+.v127-portrait canvas{width:70px;height:70px;position:static!important;image-rendering:pixelated}
+.v127-portrait-name{position:absolute;top:75px;left:2px;width:80px;text-align:center;background:linear-gradient(#e9d2a2,#ab7c48);color:#2b211b;border:2px ridge #c3995a;border-radius:4px;font:700 15px Georgia,serif;box-shadow:0 2px 4px #0009}
+.v127-heart-row{display:flex;gap:1px;white-space:nowrap;height:30px;align-items:center}
+.v127-heart{display:inline-flex;width:24px;height:23px;filter:drop-shadow(0 2px 1px #000a)}
+.v127-heart svg{display:block;width:100%;height:100%}
+.v127-life{width:178px;height:18px;margin-top:5px;border:3px ridge #bd9153;border-radius:6px;background:#211c19;overflow:hidden;box-shadow:inset 0 0 0 1px #070e0c}
+.v127-life-fill{height:100%;background:linear-gradient(#adf073 0%,#62b94d 36%,#257f43 80%,#134a27);transition:width .25s}
+.v127-period{position:absolute;top:calc(env(safe-area-inset-top,0px) + 108px);left:17px;padding:8px 12px;min-width:175px;font:700 15px Georgia,serif;display:flex;gap:8px;align-items:center}
+.v127-period svg{width:20px;height:20px}
+.v127-quest{position:absolute;top:calc(env(safe-area-inset-top,0px) + 9px);right:188px;width:min(345px,28vw);min-width:240px;padding:11px 13px;pointer-events:auto}
+.v127-quest h3{margin:0 0 7px;font:700 18px Georgia,serif;color:#ffe9bc;text-shadow:0 1px 1px #000;letter-spacing:.01em}
+.v127-quest ul{padding:0;margin:0;list-style:none}
+.v127-quest li{display:flex;align-items:start;gap:8px;font:14px/1.22 Georgia,serif;margin:5px 0}
+.v127-checkbox{height:15px;width:15px;flex:0 0 15px;border:2px solid #ad8354;background:#141b19;display:inline-grid;place-items:center;border-radius:2px;color:#c5e866;font:700 12px Georgia,serif}
+.v127-mini{position:absolute;top:calc(env(safe-area-inset-top,0px) + 9px);right:15px;width:151px;height:151px;border-radius:50%;padding:6px;background:#30251c;box-shadow:0 0 0 2px #25160e,0 0 0 5px #a47743,0 0 0 7px #d4a86b,0 5px 11px #000b;pointer-events:auto}
+.v127-mini canvas{position:static!important;width:100%;height:100%;border-radius:50%;display:block;image-rendering:pixelated}
+.v127-north{position:absolute;top:-12px;left:calc(50% - 12px);width:24px;height:24px;border:2px ridge #d6a55f;background:#1c1d19;border-radius:50%;text-align:center;font:700 15px/20px Georgia,serif;color:#ffe4ac}
+.v127-map-control{position:absolute;right:-18px;bottom:31px;display:flex;flex-direction:column;gap:3px}
+.v127-map-control button{width:31px;height:30px;background:#24251e;color:#ffdfac;border:2px ridge #c2945b;font:700 21px/23px Georgia,serif;border-radius:6px}
+.v127-mini-marker{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:17px solid #fff3de;filter:drop-shadow(1px 2px 2px #102525)}
+.v127-utilities{position:absolute;left:15px;bottom:calc(env(safe-area-inset-bottom,0px) + 15px);display:flex;gap:7px;pointer-events:auto}
+.v127-utility,.v127-gear{position:relative;width:55px;height:55px;padding:8px;background:linear-gradient(150deg,#57402b,#171b1a);border:3px ridge #d4a266;border-radius:10px;box-shadow:inset 0 0 0 2px #29211c,0 3px 9px #000a;color:#f5d6a4}
+.v127-utility svg,.v127-gear svg{width:100%;height:100%;display:block;filter:drop-shadow(1px 2px 1px #0008)}
+.v127-gear{position:absolute;right:15px;bottom:calc(env(safe-area-inset-bottom,0px) + 15px);pointer-events:auto}
+.v127-settings{position:absolute;right:13px;bottom:calc(env(safe-area-inset-bottom,0px) + 83px);width:210px;padding:12px;pointer-events:auto;display:none}
+.v127-settings.open{display:block}
+.v127-settings h3{font:700 17px Georgia,serif;margin:0 0 9px}
+.v127-settings button{display:block;width:100%;padding:8px 10px;margin:5px 0;background:#3c3127;border:1px solid #b88b55;border-radius:5px;color:#ffe2af;font:700 13px Georgia,serif;text-align:left}
+.v127-companions{position:absolute;top:calc(env(safe-area-inset-top,0px) + 158px);left:15px;display:flex;flex-direction:column;gap:5px}
+.v127-companion{display:flex;align-items:center;gap:6px;padding:5px 8px;font:700 13px Georgia,serif;min-width:115px}
+.v127-companion-mark{width:15px;height:15px;border:2px ridge #c89b5f;border-radius:50%;background:#bc6940}
+.v127-companion:nth-child(2) .v127-companion-mark{background:#d6b17e}
+.v127-companion em{font:normal 10px Georgia,serif;color:#9acb8e}
+#v127Root .v127-quest{pointer-events:none}
+#v127Root .v127-utilities,#v127Root .v127-mini,#v127Root .v127-settings,#v127Root .v127-gear{pointer-events:auto}
+body.v127-rpg #v127Root .v127-quest-toggle{display:none}
+@media(max-width:950px){
+ .v127-quest{right:175px;width:250px;min-width:200px}
+ .v127-companions{display:none}
+ body.v127-rpg .hotbar{max-width:calc(100vw - 16px)}
+ body.v127-rpg .hotbar::before,body.v127-rpg .hotbar::after{display:none}
+ .v127-utilities{bottom:calc(env(safe-area-inset-bottom,0px) + 91px)}
+ .v127-gear{bottom:calc(env(safe-area-inset-bottom,0px) + 91px)}
+ .v127-settings{bottom:calc(env(safe-area-inset-bottom,0px) + 154px)}
+}
+@media(max-width:600px){
+ .v127-head{top:calc(env(safe-area-inset-top,0px) + 7px);left:8px;min-width:0;grid-template-columns:49px 132px;gap:4px}
+ .v127-portrait{width:51px;height:51px;border-width:3px}
+ .v127-portrait canvas{width:49px;height:49px}
+ .v127-portrait-name{top:49px;width:55px;font-size:10px}
+ .v127-heart-row{height:20px;gap:0}
+ .v127-heart{width:16px;height:16px}
+ .v127-life{width:127px;height:13px;margin-top:2px;border-width:2px}
+ .v127-period{top:calc(env(safe-area-inset-top,0px) + 76px);left:8px;min-width:0;font-size:11px;padding:5px 7px}
+ .v127-period svg{width:15px;height:15px}
+ .v127-mini{right:14px;top:calc(env(safe-area-inset-top,0px) + 12px);width:91px;height:91px;padding:5px}
+ .v127-north{width:20px;height:20px;left:calc(50% - 10px);top:-11px;font:700 12px/16px Georgia,serif}
+ .v127-map-control{right:-14px;bottom:13px}
+ .v127-map-control button{width:25px;height:24px;font-size:16px;line-height:19px}
+ .v127-mini-marker{border-left-width:5px;border-right-width:5px;border-bottom-width:12px}
+ .v127-quest{top:calc(env(safe-area-inset-top,0px) + 116px);right:9px;width:170px;min-width:0;padding:7px 9px}
+ .v127-quest h3{font-size:13px;margin:0 0 3px}
+ .v127-quest li{font-size:11px;margin:4px 0;gap:5px}
+ .v127-checkbox{width:12px;height:12px;flex-basis:12px;font-size:9px;border-width:1px}
+ .v127-quest[data-collapsed="true"] ul{display:none}
+ .v127-quest .v127-quest-toggle{display:block!important;position:absolute;top:4px;right:3px;color:#e1c089;background:transparent;border:0;font:700 15px Georgia,serif;padding:2px 5px;pointer-events:auto}
+ #v127Root .v127-quest{pointer-events:auto}
+ .v127-utilities{left:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 196px);gap:3px}
+ .v127-utility{width:35px;height:35px;padding:5px;border-radius:6px;border-width:2px}
+ .v127-gear{right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 195px);width:36px;height:36px;padding:5px;border-width:2px}
+ .v127-settings{right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 239px);width:190px}
+ body.v127-rpg .bottom{bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:8px;right:8px}
+ body.v127-rpg .bottom .joystick{width:89px;height:89px}
+ body.v127-rpg .bottom .stick{width:39px;height:39px;left:23px;top:23px}
+ body.v127-rpg .bottom .actions{gap:6px}
+ body.v127-rpg .bottom .action{min-height:37px;min-width:87px;padding:6px 8px}
+ body.v127-rpg .hotbar{bottom:calc(env(safe-area-inset-bottom,0px) + 8px);max-width:calc(100vw - 10px);padding:5px;gap:3px;border-width:2px;border-radius:9px}
+ body.v127-rpg .slot{min-width:46px;width:46px;min-height:50px;border-width:1px}
+ body.v127-rpg .slot .rpg-item-art{width:28px;height:29px}
+ body.v127-rpg .slot .rpg-item-svg{width:27px;height:29px}
+ body.v127-rpg .slot small{font-size:8px}
+ body.v127-rpg #interactBtn::after,body.v127-rpg #useBtn::after{font-size:10px}
+ body.v127-rpg .toast{top:155px;max-width:calc(100vw - 36px);font-size:12px}
+}
+@media(max-height:490px){
+ .v127-period{top:calc(env(safe-area-inset-top,0px) + 80px)}
+ .v127-quest{top:calc(env(safe-area-inset-top,0px) + 80px)}
+ .v127-utilities{bottom:calc(env(safe-area-inset-bottom,0px) + 73px)}
+ .v127-gear{bottom:calc(env(safe-area-inset-bottom,0px) + 73px)}
+ body.v127-rpg .bottom{bottom:calc(env(safe-area-inset-bottom,0px) + 72px)}
+}
