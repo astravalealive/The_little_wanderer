@@ -1,0 +1,102 @@
+name: Haigen V126 full creature art and original Dylan regression
+on:
+  push:
+    paths:
+      - haigen-v126-creatures-playtest.html
+      - assets/skolli-fox-v126.png
+      - .github/workflows/haigen-v126-creatures-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - name: Confirm Dylan artwork, animation and original frog code are unchanged
+        run: |
+          test "$(git hash-object assets/dylan-rabbit-approved-v125.png)" = "8958c0ec8310d212bf13f1a7cbf63c15da0ece1b"
+          python3 - <<'PY'
+          from pathlib import Path
+          old=Path('haigen-v125-dylan-playtest.html').read_text()
+          new=Path('haigen-v126-creatures-playtest.html').read_text()
+          def between(src,start,end):
+              a=src.index(start);b=src.index(end,a+len(start));return src[a:b]
+          assert between(old,'function drawApprovedDylan(','window.__v125DylanStatus=') == between(new,'function drawApprovedDylan(','window.__v125DylanStatus='), 'Approved Dylan renderer changed'
+          assert between(old,'function drawFrog(f){','function drawBird(') == between(new,'function drawFrog(f){','function drawBird('), 'Classic frog drawing changed'
+          assert "name:'Dylan'" in new and 'Dillon' not in new.replace("'Dillon','Dylan'",'')
+          assert "const GAME_BUILD=126" in new
+          assert "wandererV126PreviewSave" in new and "localStorage.setItem('wandererV125PreviewSave'" not in new
+          print('APPROVED DYLAN AND ORIGINAL FROGS LOCKED')
+          PY
+      - name: Verify 29 illustrated creatures and active companion art on iPad/desktop
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/v126-http.log 2>&1 &
+          sleep 2
+          node <<'NODE'
+          const {chromium}=require('playwright-core');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+            for(const vp of [{width:390,height:844},{width:1024,height:768}]){
+              const page=await browser.newPage({viewport:vp,deviceScaleFactor:2});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+              await page.goto('http://127.0.0.1:8765/haigen-v126-creatures-playtest.html?restore=1&v=qa',{waitUntil:'domcontentloaded'});
+              await page.waitForFunction(()=>window.__haigenWorldReady===true&&
+                window.__v125DylanStatus?.().loaded&&window.__v126SkolliStatus?.().loaded&&
+                window.__v124ArtStatus?.().fauna&&window.__v124ArtStatus?.().extraFauna,{timeout:25000});
+              await page.waitForTimeout(650);
+              const art=await page.evaluate(()=>({
+                fox:window.__v126SkolliStatus(),
+                dylan:window.__v125DylanStatus(),
+                fauna:window.__v124ArtStatus(),
+                pond:window.__v124PreviewQA().originalPondFrogs,
+                version:document.getElementById('devVersion')?.textContent
+              }));
+              if(art.fox.width!==384||art.fox.height!==480||art.dylan.sourceWidth!==384||
+                 art.pond!==22||art.version!=='V126 · CREATURES')
+                throw Error('Animal assets damaged '+JSON.stringify(art));
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewFriends').click();
+              await page.waitForTimeout(550);
+              const fox=await page.evaluate(()=>window.__v126SkolliStatus());
+              if(!fox.lastFrame||!fox.lastFrame.alert)throw Error('Skölli did not render alert pose '+JSON.stringify(fox));
+              await page.screenshot({path:'/tmp/v126-friends-'+vp.width+'.png'});
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewGuide').click();
+              const gallery=[];
+              for(let i=0;i<29;i++){
+                let state=await page.evaluate(()=>window.__v126GuideStatus());
+                gallery.push(state.kind);
+                if(!state.visible||!state.rendered||state.total!==29)
+                  throw Error('Creature gallery entry failed '+JSON.stringify(state));
+                if(i===0||i===1||i===3||i===14||i===24)
+                  await page.screenshot({path:'/tmp/v126-creature-'+vp.width+'-'+i+'.png'});
+                await page.locator('#guideNext').click();
+              }
+              if(new Set(gallery).size!==29||!gallery.includes('Dylan')||!gallery.includes('Skölli')||!gallery.includes('frog'))
+                throw Error('Creature catalogue lost species '+JSON.stringify(gallery));
+              await page.locator('#guideClose').click();
+              await page.locator('summary').filter({hasText:'Preview help'}).click();
+              await page.locator('#previewPond').click();
+              await page.waitForTimeout(450);
+              const pond=await page.evaluate(()=>window.__haigenPondProbe);
+              if(pond.liveFrogs!==22||pond.nearbyFrogs<1)throw Error('Funny frog regression '+JSON.stringify(pond));
+              if(errors.length)throw Error('Browser JavaScript errors '+JSON.stringify(errors));
+              console.log('V126 CREATURE TEST PASSED '+JSON.stringify({vp,species:gallery.length,fox:fox.lastFrame,dylan:art.dylan.loaded,pond:pond.liveFrogs}));
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: haigen-v126-animal-art-screenshots
+          path: /tmp/v126-*.png
