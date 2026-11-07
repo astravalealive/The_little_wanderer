@@ -63,6 +63,7 @@ el.innerHTML=[
  '<button data-action="cookBtn">Cook and Mix</button>',
  '<button data-action="mailBtn">Haigen’s Notes</button>',
  '<button data-action="styleBtn">Hair and Appearance</button>',
+ '<button id="friendCare">Companion care</button>',
  '<button id="haigenWardrobe">Haigen’s outfits</button>',
  '<button id="v127MeetFriends">Meet Dylan and Skölli</button>',
  '<button id="v127VisitPond">Visit the frog pond</button>',
@@ -81,6 +82,7 @@ el.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('cl
 }));
 $('v127Gear').onclick=()=>$('v127Settings').classList.toggle('open');
 $('v127CloseSettings').onclick=()=>$('v127Settings').classList.remove('open');
+$('friendCare').onclick=()=>{engine.care();$('v127Settings').classList.remove('open')};
 $('haigenWardrobe').onclick=()=>{engine.wardrobe();$('v127Settings').classList.remove('open')};
 $('v127MeetFriends').onclick=()=>{$('previewFriends')?.click();$('v127Settings').classList.remove('open')};
 $('v127VisitPond').onclick=()=>{$('previewPond')?.click();$('v127Settings').classList.remove('open')};
