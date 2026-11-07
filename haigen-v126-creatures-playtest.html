@@ -5696,6 +5696,59 @@ function frame(now){
  previewTools.style.cssText='position:fixed;z-index:8;left:9px;top:calc(env(safe-area-inset-top,0px) + 93px);display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:min(90vw,300px);pointer-events:auto';
  previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>V126 · Preview help</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewFriends" class="btn" style="font-size:11px;padding:5px">🐇 Meet Dylan &amp; Skölli</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
  document.body.appendChild(previewTools);
+ // Optional field guide for visual inspection. Never inserts artificial wildlife
+ // into the actual map, changes the creature AI or writes to saved progress.
+ const guideNames=['Skölli','Dylan','frog',...Object.keys(illustratedFaunaCells).filter(k=>k!=='frog'),...Object.keys(extraFaunaCells)];
+ let guideIndex=0;
+ const guide=document.createElement('div');guide.id='v126FieldGuide';
+ guide.style.cssText='position:fixed;z-index:24;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,360px);background:#17372fe8;border:2px solid #c8b478;border-radius:14px;padding:12px;box-shadow:0 12px 36px #102722c2;color:#fff0cf;text-align:center;font:600 15px system-ui;display:none;pointer-events:auto';
+ guide.innerHTML='<div style="font:700 18px Georgia,serif;margin-bottom:5px">🌲 Creature Field Guide</div><div id="guideName"></div><canvas id="guideCanvas" width="300" height="170" style="width:100%;max-width:300px;height:auto;border-radius:8px;margin:8px auto;image-rendering:pixelated"></canvas><div style="display:flex;gap:6px;justify-content:center"><button type="button" id="guidePrev" class="btn" style="font-size:13px;min-height:36px">◀ Prev</button><button type="button" id="guideNext" class="btn" style="font-size:13px;min-height:36px">Next ▶</button><button type="button" id="guideClose" class="btn" style="font-size:13px;min-height:36px">✕ Close</button></div><div style="font-size:10px;opacity:.8;margin-top:6px">Original illustrated species, V126 animation art</div>';
+ document.body.appendChild(guide);
+ const guideButton=document.createElement('button');
+ guideButton.id='previewGuide';guideButton.type='button';guideButton.className='btn';
+ guideButton.style.cssText='font-size:11px;padding:5px';
+ guideButton.textContent='🐾 Creature gallery';
+ previewTools.querySelector('details > div').appendChild(guideButton);
+ function drawV126Guide(){
+  const kind=guideNames[guideIndex],g=$('guideCanvas').getContext('2d');
+  g.imageSmoothingEnabled=false;
+  g.fillStyle='#89a978';g.fillRect(0,0,300,170);
+  g.fillStyle='#739466';g.fillRect(0,130,300,40);
+  const draw=(im,sx,sy,sw,sh)=>{
+   if(!im||!im.complete||!im.naturalWidth)return false;
+   const large=kind==='bison'||kind==='stag'||kind==='goat';
+   const h=large?130:kind==='butterfly'?115:135,w=large?166:kind==='butterfly'?125:147;
+   g.drawImage(im,sx,sy,sw,sh,Math.round((300-w)/2),Math.round(133-h),w,h);
+   return true;
+  };
+  let rendered=false;
+  if(kind==='Skölli')rendered=draw(skolliAtlas,0,0,96,96);
+  else if(kind==='Dylan')rendered=draw(approvedDylanAtlas,0,0,96,96);
+  else if(kind==='frog'){
+   const original=pixelFrog('#63a64b',true,7,false);
+   rendered=draw(original,0,0,112,64);
+  }else if(illustratedFaunaCells[kind]){
+   const cell=illustratedFaunaCells[kind];
+   rendered=draw(illustratedFaunaAtlas,cell[0]*96,cell[1]*76,96,76);
+  }else if(extraFaunaCells[kind]){
+   const cell=extraFaunaCells[kind];
+   rendered=draw(illustratedExtraFauna,cell[0]*96,cell[1]*76,96,76);
+  }
+  $('guideName').textContent=(guideIndex+1)+' / '+guideNames.length+' · '+(kind==='frog'?'Original funny frog':kind);
+  if(!rendered){g.fillStyle='#ece5ca';g.font='14px system-ui';g.fillText('Loading animal art…',78,84)}
+  window.__v126GuideProbe={kind,index:guideIndex,total:guideNames.length,rendered};
+ }
+ $('previewGuide').onclick=()=>{
+  previewTools.querySelector('details').open=false;
+  guide.style.display='block';drawV126Guide();
+ };
+ $('guidePrev').onclick=()=>{guideIndex=(guideIndex-1+guideNames.length)%guideNames.length;drawV126Guide()};
+ $('guideNext').onclick=()=>{guideIndex=(guideIndex+1)%guideNames.length;drawV126Guide()};
+ $('guideClose').onclick=()=>{guide.style.display='none'};
+ window.__v126GuideStatus=()=>({
+  visible:guide.style.display!=='none',
+  ...(window.__v126GuideProbe||{total:guideNames.length})
+ });
  $('previewFind').onclick=()=>{
    // Keep the live V120 save and Haigen's world objects intact.
    look.x=0;look.y=0;cameraZoom=1;
