@@ -68,6 +68,12 @@ el.innerHTML=[
  '<button id="v127CloseSettings">Close</button></aside>'
 ].join('');
 document.body.appendChild(el);
+// Keep the iPad landscape readable, while allowing the full objective panel
+// to open from its large + target. Desktop keeps the quest visible.
+if(window.innerWidth<=600){
+ $('v127Quest').dataset.collapsed='true';
+ $('v127QuestToggle').textContent='+';
+}
 el.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>{
  const existing=$(button.dataset.action);if(existing)existing.click();
  $('v127Settings').classList.remove('open');
