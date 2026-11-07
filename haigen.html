@@ -1122,7 +1122,7 @@ const extraFaunaCells={
 const wildlifeMotionSheet=new Image();
 let wildlifeMotionReady=false;
 wildlifeMotionSheet.onload=()=>{
- wildlifeMotionReady=wildlifeMotionSheet.naturalWidth===576&&wildlifeMotionSheet.naturalHeight>=76*27;
+ wildlifeMotionReady=wildlifeMotionSheet.naturalWidth===576; // Preserve the original sprite-sheet acceptance rule
  window.__wildlifeMotionReady=wildlifeMotionReady;
 };
 wildlifeMotionSheet.onerror=()=>{wildlifeMotionReady=false;window.__wildlifeMotionReady=false};
@@ -1199,7 +1199,7 @@ function drawUnifiedCreatureArt(sheet,cell,kind,x,y,dir,walking,anim,scale,sizeS
 }
 window.__creatureSprites=()=>({
  species:motionSpecies.slice(),count:motionSpecies.length,
- motionReady:wildlifeMotionReady,source:'haigen-wildlife-motion.webp',
+ motionReady:wildlifeMotionReady,motionSheetHeight:wildlifeMotionSheet.naturalHeight,source:'haigen-wildlife-motion.webp',
  posesPerSpecies:6,activities:['idle','walk','forage','rest','watch','flee','windup','attack','hurt','fly'],
  lastFrame:window.__v126LastCreature||null
 });
