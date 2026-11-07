@@ -57,7 +57,17 @@ jobs:
               if(before.canvas.colors<20)throw new Error('Canvas almost blank '+JSON.stringify(before.canvas));
               const m1=before.stats?.match(/Haigen (\d+),(\d+)/),m2=after.match(/Haigen (\d+),(\d+)/);
               if(!m1||!m2||m1[1]===m2[1]&&m1[2]===m2[2])throw new Error('Haigen has not moved '+before.stats+' vs '+after);
-              // Confirm the user-facing frog shortcut actually reaches the living pond.
+              // Regression gallery for the reported left-facing moonwalk:
+              // both side views are captured at gameplay scale and kept as artifacts.
+              await page.keyboard.down('ArrowLeft');
+              await page.waitForTimeout(550);
+              await page.screenshot({path:'/tmp/haigen-preview-left-'+vp.width+'.png'});
+              await page.keyboard.up('ArrowLeft');
+              await page.keyboard.down('ArrowRight');
+              await page.waitForTimeout(550);
+              await page.screenshot({path:'/tmp/haigen-preview-right-'+vp.width+'.png'});
+              await page.keyboard.up('ArrowRight');
+                            // Confirm the user-facing frog shortcut actually reaches the living pond.
               await page.locator('summary').filter({hasText:'Preview help'}).click();
               await page.locator('#previewPond').click();
               await page.waitForTimeout(1100);
@@ -66,6 +76,7 @@ jobs:
                 error:document.getElementById('worldError')?.style.display==='block'?document.getElementById('worldError')?.textContent:null
               }));
               console.log('HAIGEN POND '+JSON.stringify(pond));
+              await page.screenshot({path:'/tmp/haigen-preview-pond-'+vp.width+'.png'});
               if(pond.error||pond.waterDepth<1.2||pond.nearbyFrogs<1)throw new Error('Pond visit failed '+JSON.stringify(pond));
               await page.close();
             }
