@@ -3687,9 +3687,10 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  const displayDir=newSheet&&transition&&oldSide&&newVertical?haigenTurnFrom:dir;
  // The V121 reference and legacy V119 fallback have opposite left/right row ordering.
  const referenceMovement=newSheet&&!haigenReferenceFallbackUsed;
- // Both 192x288 source movement atlases are down, up, RIGHT, LEFT.
-  // The previous incorrect inversion produced the sideways moonwalk.
-  const row=displayDir==='up'?1:displayDir==='left'?3:displayDir==='right'?2:0;
+ // Inspecting the actual approved sheet proves left art was never supplied.
+  // Actual source atlas: both side rows face RIGHT, so LEFT must mirror row 2.
+ const row=displayDir==='up'?1:(displayDir==='left'||displayDir==='right')?2:0;
+ const mirrorLeft=displayDir==='left';
  // Match Haigen's original on-screen stature (not the shrunken V121 view).
   // Keep the same foot baseline and let the wrist-mounted props inherit scale.
   const scale=1.67,w=48*scale,h=72*scale;
@@ -3698,13 +3699,16 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  ellipse(x+1,y+7,20,6,'#1a312b67');
  // Keep 3/4 right/left artwork, complete feet, and constant 48x72 sprite box.
  if(displayDir==='up'&&status.equip)haigenDrawPixelTool(status.equip,displayDir,frame,status.action,scale,left,top);
- if(displayDir==='left'&&!newSheet){
+ if(mirrorLeft){
+  ctx.save();
+  // Pixel-perfect horizontal mirror: turn the RIGHT walking row to the LEFT.
   ctx.translate(left+w,0);ctx.scale(-1,1);
   ctx.drawImage(spriteAtlas,frame*48,row*72,48,72,0,top,w,h);
-  ctx.restore();ctx.save();ctx.imageSmoothingEnabled=false;
+  ctx.restore();
  }else{
   ctx.drawImage(spriteAtlas,frame*48,row*72,48,72,left,top,w,h);
  }
+ window.__haigenSpriteProbe={dir:displayDir,row,mirrored:mirrorLeft,scale,frame};
  if(displayDir!=='up'&&status.equip)haigenDrawPixelTool(status.equip,displayDir,frame,status.action,scale,left,top);
  if(!status.equip&&status.action&&['eat','medicine','cook'].includes(status.action.kind))
   haigenDrawPixelTool('hands',displayDir,frame,status.action,scale,left,top);
