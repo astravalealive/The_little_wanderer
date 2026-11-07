@@ -2155,8 +2155,8 @@ function foliageVisibility(o){
  const dy=(state.y-46-canopyY)/Math.max(1,radiusY);
  const distance=Math.hypot(dx,dy);
  // Near-field foliage fades so Haigen and companions remain readable underneath.
- const overlap=o.y>=state.y-35&&distance<1.32;
- const blend=overlap?Math.min(1,Math.max(.3,(1.32-distance)*2.3)):0;
+ const overlap=distance<1.45;
+ const blend=overlap?Math.min(1,Math.max(.25,(1.45-distance)*2.2)):0;
  const target=1-blend*.82;
  const old=obscuringTreeAlpha.get(o.id);
  const current=old&&time-old.last<420?old.alpha:1;
@@ -2555,8 +2555,16 @@ function worldArtScenery(o){
   tree:[150,142],fir:[107,156],palm:[112,139],bareTree:[100,124],cactus:[75,90],
   rock:[86,66],bush:[76,65],flower:[36,36],mushroom:[46,37]
  };
- const [w,h]=dimensions[name],v=Math.abs(Math.floor(o.id||0))%6;
- worldSprite(name,o.x,o.y,w*size,h*size,v);
+ const id=Math.abs(Math.floor(o.id||0)),v=id%6;
+ // Alternate slender firs with round deciduous trees so the forest isn't one
+ // wall of repeated circles. Slightly vary canopy sizes without touching trunks,
+ // collisions, saves or the underlying landscape.
+ const spriteName=type==='tree'&&id%7===0?'fir':name;
+ const [w,h]=dimensions[spriteName];
+ const isTree=type==='tree'||type==='fir';
+ const campNear=isTree&&Math.hypot(o.x-cottage.x,o.y-cottage.y)<420;
+ const canopyScale=isTree?(campNear?.70:.77)+seeded(id*43+78)*.16:1;
+ worldSprite(spriteName,o.x,o.y,w*size*canopyScale,h*size*canopyScale,v);
  if(type==='rock'){
   const hits=Number(state.boulderHits[o.id])||0;
   if(hits){ctx.save();ctx.strokeStyle='#282f35';ctx.lineWidth=2.5;ctx.beginPath();
