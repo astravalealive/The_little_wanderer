@@ -1740,11 +1740,44 @@ function autoMineStone(dt){
 
 // A varied purpose-driven life after the first three homestead structures.
 // Repeatable jobs have finite time budgets; no permanent "collect rocks" loop.
+
+// Small, permanent, useful projects after the chicken coop / garden / woodshed.
+// Save-compatible standard structures, never another temporary journal wish.
+const haigenTrailSites=[
+ {x:1450,y:1210,kind:'trailLantern',name:'Clearing lantern'},
+ {x:1350,y:970,kind:'waymarker',name:'Woodland waymarker'},
+ {x:1700,y:1120,kind:'trailLantern',name:'Northern trail lantern'},
+ {x:1120,y:1360,kind:'waymarker',name:'Pond direction sign'},
+ {x:1950,y:1150,kind:'trailLantern',name:'Eastern trail lantern'}
+];
+function nextHaigenTrailProject(){
+ return haigenTrailSites.find(p=>
+   !state.structures.some(o=>o.haigenProject===p.name)&&
+   islandDepth(p.x,p.y)>85&&!blockedBySolid(p.x,p.y));
+}
+function autoBuildTrailProject(dt){
+ const project=nextHaigenTrailProject();
+ if(!project)return false;
+ const cost=project.kind==='trailLantern'?{wood:3,stone:2,twigs:1}:{wood:3,stone:1,twigs:1};
+ if(state.wood<cost.wood||state.stone<cost.stone||state.twigs<cost.twigs)return false;
+ autoPlan('build the '+project.name.toLowerCase(),'build-trail:'+project.name);
+ const approach={x:project.x+90,y:project.y+55};
+ if(dist(state,approach)>84){autoTravel(approach,dt,84,.11);return true}
+ startHaigenAction('craft',1100);
+ state.wood-=cost.wood;state.stone-=cost.stone;state.twigs-=cost.twigs;
+ state.structures.push({id:'haigen-'+Date.now()+'-'+project.kind,kind:project.kind,
+  x:project.x,y:project.y,lit:true,haigenProject:project.name});
+ state.autoSteps++;
+ mindWrite('I built the '+project.name.toLowerCase()+'. Travellers will have a safer path now.','achievement');
+ think('I made something that will stay here!',4500,true);
+ save();return true;
+}
+
 function autoFreedomTick(dt){
  if(!state.autonomy||state.playerInstruction)return false;
  const now=Date.now();
  let job=state.autoFreeJob;
- if(job&&(!['mine','fish','cook','explore','forge','wood','garden','net'].includes(job.kind)||now-(job.startedAt||now)>85000)){
+ if(job&&(!['mine','fish','cook','explore','forge','wood','garden','net','build'].includes(job.kind)||now-(job.startedAt||now)>85000)){
   state.autoFreeJob=null;job=null;
  }
  if(!job){
@@ -1755,13 +1788,14 @@ function autoFreedomTick(dt){
   if(state.fishingRod&&state.jettyBuilt&&state.fish<4)choices.push('fish');
   if(state.gardenTier&&gardenRipe())choices.push('garden');
   if(state.wood<8&&state.tools.axe)choices.push('wood');
+  if(nextHaigenTrailProject()&&state.wood>=3&&state.stone>=2&&state.twigs>=1)choices.push('build','build');
   if(state.tools.net&&state.carriedFrogId>=0)choices.push('net');
   if(state.tools.net&&state.frogsReleased<4&&state.energy>65)choices.push('net');
   choices.push('explore','explore');
   const index=(state.autoSteps+Math.floor(state.daytime/70)+haigenMind.visited.length)%choices.length;
   job={kind:choices[index],startedAt:now,steps:0};
   state.autoFreeJob=job;
-  const labels={mine:'mining stone for new projects',forge:'making a useful pickaxe',fish:'catching food with my rod',cook:'cooking a proper meal',explore:'finding somewhere new',wood:'chopping firewood',garden:'tending my vegetables',net:'studying frogs and releasing them'};
+  const labels={mine:'mining stone for new projects',forge:'making a useful pickaxe',fish:'catching food with my rod',cook:'cooking a proper meal',explore:'finding somewhere new',wood:'chopping firewood',garden:'tending my vegetables',net:'studying frogs and releasing them',build:'building lanterns and signs along the trails'};
   mindWrite('My next job is '+labels[job.kind]+'. I want to accomplish something useful.','plan');
   autoDestination=null;autoWaypoint=null;autoResetNav();save();
  }
@@ -1805,6 +1839,10 @@ function autoFreedomTick(dt){
   startToolSwing('axe');autoPause=410;
   if(hit>=3){delete state.treeHits[tree.id];harvest(tree);gainWood(4);state.twigs+=2;state.autoSteps++;save()}
   return true;
+ }
+ if(job.kind==='build'){
+  if(autoBuildTrailProject(dt))return finish('I built a new landmark by myself. I can find my way home more easily now.');
+  return finish();
  }
  if(job.kind==='garden'){
   if(!state.gardenTier||!gardenRipe())return finish();
@@ -2369,7 +2407,12 @@ function mushroomPatch(o){
  }
 }
 
-function bush(o){const n=nightStrength(),v=Math.abs(Math.floor(o.x*.07+o.y*.03))%3;const tint=(day,dark)=>{if(n<=0)return day;if(n>=1)return dark;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const a=rgb(day),b=rgb(dark);return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*n).toString(16).padStart(2,'0')).join('')};ellipse(o.x,o.y+5,28,12,tint('#1e5b38','#234e37'));ellipse(o.x-14,o.y-12,20,20,tint('#5a994d',['#426b4d','#3a6856','#557350'][v]));ellipse(o.x+13,o.y-13,22,21,tint('#79b25c',['#679474','#579b70','#79976a'][v]));if(berryReady(o)){for(let i=0;i<5;i++)ellipse(o.x-19+i*9,o.y-16+(i%2)*8,4,4,tint('#db5570','#d98bad'))}else{for(let i=0;i<3;i++)ellipse(o.x-13+i*12,o.y-18+(i%2)*6,2.2,2.2,tint('#96b65c','#6f8770'))}}function flower(o){const f=flowerKind(o);ellipse(o.x,o.y,17,8,'#40794c');ctx.strokeStyle='#4c8750';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x,o.y-22);ctx.stroke();for(let j=0;j<6;j++){let a=j*Math.PI/3;ellipse(o.x+Math.cos(a)*9,o.y-22+Math.sin(a)*9,6,6,f.color)}ellipse(o.x,o.y-22,5,5,'#f7e6a4')}function clearingGround(x,y){ellipse(x,y+14,113,49,'#b3a477');ellipse(x,y+12,95,37,'#8f9567');for(let i=0;i<6;i++)ellipse(x-80+i*29,y+23+(i%2)*12,9,5,'#698d50')}function startingClearing(x,y){ctx.strokeStyle='#8b633e';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x-37,y-9);ctx.lineTo(x-37,y-92);ctx.moveTo(x-37,y-92);ctx.lineTo(x+12,y-101);ctx.stroke();ctx.fillStyle='#ead39a';ctx.fillRect(x-36,y-89,57,27);ctx.font='bold 11px system-ui';ctx.fillStyle='#4c4531';ctx.textAlign='center';ctx.fillText('FIRST CAMP',x-7,y-72);for(let i=0;i<3;i++){ctx.fillStyle='#805a38';ctx.fillRect(x+27+i*11,y+7-i*3,31,8)}ctx.font='13px system-ui';ctx.fillStyle='#f7e8b1';ctx.fillText('Build your shelter',x,y-112)}function house(x,y){ellipse(x,y+24,105,43,'#173f32aa');ctx.fillStyle='#a27b4c';ctx.fillRect(x-69,y-85,138,109);poly([[x-91,y-78],[x,y-167],[x+91,y-78]],'#745346','#473e35');poly([[x-76,y-83],[x,y-149],[x+76,y-83]],'#b77b4e');ctx.fillStyle='#543c32';ctx.fillRect(x-17,y-34,34,58);ctx.fillStyle='#f6d18a';ctx.fillRect(x+32,y-50,25,27);ctx.fillStyle='#775139';ctx.fillRect(x+42,y-50,4,27);ctx.fillStyle='#a8b97b';ctx.fillRect(x-65,y-10,30,23);ctx.fillStyle='#dbbd7c';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText('HOME',x,y-177)}function ruin(x,y){ellipse(x,y,70,30,'#304b3c');for(let i=-1;i<=1;i++){ctx.fillStyle='#8d9c91';ctx.fillRect(x+i*44-12,y-54,24,65);ctx.fillStyle='#b8bdab';ctx.fillRect(x+i*44-12,y-54,24,9)}ctx.font='24px serif';ctx.textAlign='center';ctx.fillStyle='#f5d78b';ctx.fillText('ᚠ',x,y-24)}function structure(s){if(rbEnabled&&['shelter','campfire'].includes(s.kind)){if(s.kind==='shelter')worldSprite('tent',s.x,s.y,170,132);else worldSprite('campfire',s.x,s.y,90,70);return}if(s.kind==='shelter'){ellipse(s.x,s.y+15,78,28,'#284a3288');poly([[s.x-70,s.y+5],[s.x,s.y-88],[s.x+70,s.y+5]],'#96794c','#4e5839');poly([[s.x-54,s.y+3],[s.x,s.y-73],[s.x+5,s.y+3]],'#b7a16d');ctx.fillStyle='#453b2c';ctx.fillRect(s.x+5,s.y-28,36,33);ctx.strokeStyle='#755137';ctx.lineWidth=5;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(s.x-55+i*24,s.y+4);ctx.lineTo(s.x,s.y-76);ctx.stroke()}ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3e2ad';ctx.fillText('🌿 Woodland shelter',s.x,s.y-103)}else if(s.kind==='garden'){ellipse(s.x,s.y,67,39,'#76593b');for(let i=0;i<6;i++){ellipse(s.x-38+i*15,s.y-8+(i%2)*15,9,10,'#5fb057')}}else if(s.kind==='campfire'){ellipse(s.x,s.y,43,23,'#4b473d');for(let i=0;i<7;i++)ellipse(s.x+Math.cos(i)*25,s.y+Math.sin(i)*14,9,7,'#9a9c8d');if(s.lit!==false){poly([[s.x-8,s.y],[s.x-4,s.y-36],[s.x+12,s.y-6],[s.x+5,s.y+3]],'#f1aa40');poly([[s.x-2,s.y],[s.x+2,s.y-21],[s.x+8,s.y-3]],'#ffe28c')}else{ctx.fillStyle='#72533d';ctx.fillRect(s.x-18,s.y-8,36,10)}}}const campStages=[
+function bush(o){const n=nightStrength(),v=Math.abs(Math.floor(o.x*.07+o.y*.03))%3;const tint=(day,dark)=>{if(n<=0)return day;if(n>=1)return dark;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const a=rgb(day),b=rgb(dark);return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*n).toString(16).padStart(2,'0')).join('')};ellipse(o.x,o.y+5,28,12,tint('#1e5b38','#234e37'));ellipse(o.x-14,o.y-12,20,20,tint('#5a994d',['#426b4d','#3a6856','#557350'][v]));ellipse(o.x+13,o.y-13,22,21,tint('#79b25c',['#679474','#579b70','#79976a'][v]));if(berryReady(o)){for(let i=0;i<5;i++)ellipse(o.x-19+i*9,o.y-16+(i%2)*8,4,4,tint('#db5570','#d98bad'))}else{for(let i=0;i<3;i++)ellipse(o.x-13+i*12,o.y-18+(i%2)*6,2.2,2.2,tint('#96b65c','#6f8770'))}}function flower(o){const f=flowerKind(o);ellipse(o.x,o.y,17,8,'#40794c');ctx.strokeStyle='#4c8750';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x,o.y-22);ctx.stroke();for(let j=0;j<6;j++){let a=j*Math.PI/3;ellipse(o.x+Math.cos(a)*9,o.y-22+Math.sin(a)*9,6,6,f.color)}ellipse(o.x,o.y-22,5,5,'#f7e6a4')}function clearingGround(x,y){ellipse(x,y+14,113,49,'#b3a477');ellipse(x,y+12,95,37,'#8f9567');for(let i=0;i<6;i++)ellipse(x-80+i*29,y+23+(i%2)*12,9,5,'#698d50')}function startingClearing(x,y){ctx.strokeStyle='#8b633e';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x-37,y-9);ctx.lineTo(x-37,y-92);ctx.moveTo(x-37,y-92);ctx.lineTo(x+12,y-101);ctx.stroke();ctx.fillStyle='#ead39a';ctx.fillRect(x-36,y-89,57,27);ctx.font='bold 11px system-ui';ctx.fillStyle='#4c4531';ctx.textAlign='center';ctx.fillText('FIRST CAMP',x-7,y-72);for(let i=0;i<3;i++){ctx.fillStyle='#805a38';ctx.fillRect(x+27+i*11,y+7-i*3,31,8)}ctx.font='13px system-ui';ctx.fillStyle='#f7e8b1';ctx.fillText('Build your shelter',x,y-112)}function house(x,y){ellipse(x,y+24,105,43,'#173f32aa');ctx.fillStyle='#a27b4c';ctx.fillRect(x-69,y-85,138,109);poly([[x-91,y-78],[x,y-167],[x+91,y-78]],'#745346','#473e35');poly([[x-76,y-83],[x,y-149],[x+76,y-83]],'#b77b4e');ctx.fillStyle='#543c32';ctx.fillRect(x-17,y-34,34,58);ctx.fillStyle='#f6d18a';ctx.fillRect(x+32,y-50,25,27);ctx.fillStyle='#775139';ctx.fillRect(x+42,y-50,4,27);ctx.fillStyle='#a8b97b';ctx.fillRect(x-65,y-10,30,23);ctx.fillStyle='#dbbd7c';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText('HOME',x,y-177)}function ruin(x,y){ellipse(x,y,70,30,'#304b3c');for(let i=-1;i<=1;i++){ctx.fillStyle='#8d9c91';ctx.fillRect(x+i*44-12,y-54,24,65);ctx.fillStyle='#b8bdab';ctx.fillRect(x+i*44-12,y-54,24,9)}ctx.font='24px serif';ctx.textAlign='center';ctx.fillStyle='#f5d78b';ctx.fillText('ᚠ',x,y-24)}function structure(s){if(s.kind==='trailLantern'||s.kind==='waymarker'){
+  if(rbEnabled){worldSprite(s.kind==='trailLantern'?'lantern':'sign',s.x,s.y,s.kind==='trailLantern'?54:68,s.kind==='trailLantern'?79:83)}
+  else{ctx.fillStyle='#69513b';ctx.fillRect(s.x-4,s.y-55,8,55);ctx.fillStyle=s.kind==='trailLantern'?'#f1be68':'#be9965';ctx.fillRect(s.x-19,s.y-67,38,22)}
+  if(s.kind==='trailLantern'&&s.lit!==false){ctx.save();ctx.globalAlpha=.15;ellipse(s.x,s.y-65,37,39,'#ffd681');ctx.restore()}
+  return;
+ }if(rbEnabled&&['shelter','campfire'].includes(s.kind)){if(s.kind==='shelter')worldSprite('tent',s.x,s.y,170,132);else worldSprite('campfire',s.x,s.y,90,70);return}if(s.kind==='shelter'){ellipse(s.x,s.y+15,78,28,'#284a3288');poly([[s.x-70,s.y+5],[s.x,s.y-88],[s.x+70,s.y+5]],'#96794c','#4e5839');poly([[s.x-54,s.y+3],[s.x,s.y-73],[s.x+5,s.y+3]],'#b7a16d');ctx.fillStyle='#453b2c';ctx.fillRect(s.x+5,s.y-28,36,33);ctx.strokeStyle='#755137';ctx.lineWidth=5;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(s.x-55+i*24,s.y+4);ctx.lineTo(s.x,s.y-76);ctx.stroke()}ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3e2ad';ctx.fillText('🌿 Woodland shelter',s.x,s.y-103)}else if(s.kind==='garden'){ellipse(s.x,s.y,67,39,'#76593b');for(let i=0;i<6;i++){ellipse(s.x-38+i*15,s.y-8+(i%2)*15,9,10,'#5fb057')}}else if(s.kind==='campfire'){ellipse(s.x,s.y,43,23,'#4b473d');for(let i=0;i<7;i++)ellipse(s.x+Math.cos(i)*25,s.y+Math.sin(i)*14,9,7,'#9a9c8d');if(s.lit!==false){poly([[s.x-8,s.y],[s.x-4,s.y-36],[s.x+12,s.y-6],[s.x+5,s.y+3]],'#f1aa40');poly([[s.x-2,s.y],[s.x+2,s.y-21],[s.x+8,s.y-3]],'#ffe28c')}else{ctx.fillStyle='#72533d';ctx.fillRect(s.x-18,s.y-8,36,10)}}}const campStages=[
  {kind:'shelter',name:'🏕️ Leaf-and-log lean-to',wood:6,stone:0,twigs:2,leaves:3,desc:'A first shelter from the weather'},
  {kind:'hut',name:'🛖 Timber hut',wood:24,stone:12,twigs:8,leaves:10,desc:'Replace your lean-to with a cosy wooden hut'},
  {kind:'lodge',name:'🏠 Reinforced woodland lodge',wood:65,stone:45,twigs:15,leaves:15,desc:'Strong walls, solid beams and a proper roof'},
