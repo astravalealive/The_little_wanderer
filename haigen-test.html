@@ -3383,7 +3383,18 @@ function haigenSpriteStatus(){
  const action=haigenActiveAction();
  const knock=haigenKnock&&haigenKnock.remaining>0?haigenKnock:null;
  const useHands=action&&['eat','medicine','cook'].includes(action.kind);
- const equip=useHands?'':state.equipped==='hands'?'':state.equipped;
+ let equip=useHands?'':state.equipped==='hands'?'':state.equipped;
+ if(state.autonomy&&!useHands){
+  const kind=action?.kind;
+  const actionTool={axe:'axe',pickaxe:'pickaxe',shovel:'shovel',torch:'torch',
+   cast:'rod',reel:'rod',land:'rod',net:'net',catch:'net',release:'net',craft:'hammer'};
+  if(actionTool[kind])equip=actionTool[kind];
+  else if(state.autoFreeJob?.kind==='mine'&&state.tools.pickaxe)equip='pickaxe';
+  else if(state.autoFreeJob?.kind==='wood'&&state.tools.axe)equip='axe';
+  else if(state.autoFreeJob?.kind==='fish'&&state.fishingRod)equip='rod';
+  else if(state.autoFreeJob?.kind==='net'&&state.tools.net)equip='net';
+  else if(state.autoFreeJob?.kind==='build')equip='hammer';
+ }
  return {action,knock,equip:state.carriedFrogId>=0?'frog':equip,outfit:haigenOutfit()};
 }
 // V120 coherent pixel props: cached 40x60 atlases with grips anchored in hands.
@@ -3396,11 +3407,15 @@ function haigenToolSprite(kind){
  const p=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
  const line=(pts,color,width=1)=>{g.strokeStyle=color;g.lineWidth=width;g.lineCap='square';g.beginPath();g.moveTo(...pts[0]);pts.slice(1).forEach(pt=>g.lineTo(...pt));g.stroke()};
  const wood='#634331',woodLight='#a8784d',dark='#252b2d',iron='#a5b0ab',shine='#e3e5d7';
- if(kind==='axe'||kind==='shovel'||kind==='pickaxe'||kind==='torch'||kind==='net'){
+ if(kind==='axe'||kind==='shovel'||kind==='pickaxe'||kind==='torch'||kind==='net'||kind==='hammer'){
   p(18,16,6,42,dark);p(19,14,4,43,wood);p(20,20,2,35,woodLight);
   p(17,47,9,4,'#5f4a37');p(18,49,7,2,'#c49d67');
  }
- if(kind==='axe'){
+ if(kind==='hammer'){
+  p(7,6,27,13,dark);p(10,7,22,10,'#9da69e');p(12,8,16,3,'#d9d7c5');
+  p(7,15,5,8,'#525e5b');p(29,15,5,8,'#4c5652');
+  p(18,17,5,9,'#b8b3a1');
+ }else if(kind==='axe'){
   // Heavy offset blade with shaded cutting edge; not a floating grey rectangle.
   p(14,8,14,19,dark);p(7,9,13,16,dark);
   p(6,12,11,11,iron);p(9,9,12,15,'#788e91');p(9,9,5,4,shine);
@@ -3447,8 +3462,8 @@ function haigenToolSprite(kind){
 function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  if(!kind)return;
  const key=action?.kind||'',progress=action?.progress||0;
- const isTool=['axe','shovel','pickaxe','torch','rod','net'].includes(kind);
- const working=key===kind||(kind==='rod'&&['cast','reel','land'].includes(key))||
+ const isTool=['axe','shovel','pickaxe','torch','rod','net','hammer'].includes(kind);
+ const working=key===kind||(kind==='hammer'&&key==='craft')||(kind==='rod'&&['cast','reel','land'].includes(key))||
   (kind==='net'&&['net','catch','release'].includes(key));
  const phase=working?Math.min(3,Math.floor(progress*4)):0;
  // The identical 48×72 body coordinate system is used for *every* tool.
@@ -3488,7 +3503,7 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
   shovel:[-.15,-.64,.21,-.17],
   torch:[-.12,-.30,-.49,-.11],
   rod:[-.28,-.88,.29,-.25],
-  net:[-.25,-1.03,.38,-.14]
+  net:[-.25,-1.03,.38,-.14],hammer:[-.22,-1.18,.35,-.20]
  };
  const pose=angles[kind]||angles.axe;
  let angle=working?pose[phase]:pose[0];
