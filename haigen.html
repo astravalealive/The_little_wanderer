@@ -6944,7 +6944,7 @@ if(state.campTier>0){
  const doorX=homeInside?interiorDoorX:exteriorDoorX;
  const doorHalf=26;
  const withinDoor=Math.abs(state.x-doorX)<=doorHalf;
- const crossedIn=!homeInside&&prevPlayerY>=front&&state.y<front&&withinDoor;
+ const crossedIn=!homeInside&&withinDoor&&state.y<prevPlayerY&&prevPlayerY>=front-12&&state.y<=front+24;
  const exitThreshold=back+(front-back)*.90;
  const crossedOut=homeInside&&homeFloor===0&&homeStairCooldown===0&&prevPlayerY<exitThreshold&&state.y>=exitThreshold&&withinDoor;
  const roomX=(state.x-(hx-halfWidth))/(halfWidth*2);
@@ -6963,7 +6963,7 @@ if(state.campTier>0){
  }else if(!homeInside){
   // Do not let the player bypass the entrance through walls or roof.
   const footprint=roomX>0&&roomX<1&&roomY>0&&roomY<1;
-  if(footprint){state.x=prevPlayerX;state.y=prevPlayerY;}
+  if(footprint && !(withinDoor&&state.y>=front-35)){state.x=prevPlayerX;state.y=prevPlayerY;}
  }else{
   // V240: hard containment recovery. Previous collision only rejected NEW
   // invalid positions; once already outside a wall, sliding could never recover.
