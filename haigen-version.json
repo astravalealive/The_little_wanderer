@@ -1,4 +1,4 @@
 {
-  "build": 226,
-  "notes": "Improve approved homestead ZIP artwork loading; show current house upgrade level in building menu."
+  "build": 227,
+  "notes": "Trim presentation backgrounds around approved house art; preview all five levels without changing earned upgrades."
 }
