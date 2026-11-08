@@ -1,4 +1,4 @@
 {
   "build": 150,
-  "notes": "V150: fixes stale V147 in-game build counter and repeating update prompt. V149 eastern dunes retained. Wildlife flight improvements pending."
+  "notes": "V150: fixes stale V147 build counter and repeating update prompt; keeps illustrated butterflies and woodland birds visually airborne without ground-walking motion-sheet frames. Retains V149 expanded eastern dunes."
 }
