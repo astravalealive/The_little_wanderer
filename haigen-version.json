@@ -1,4 +1,4 @@
 {
-  "build": 137,
-  "notes": "V137 LIVE: Restore defeated Gloamjaw automatically once in DEV mode on V137 load; repeatable Revive Boss in DEV KIT resets boss HP to 180, attack state, spores/projectiles and awareness without modifying world progression, saves, approved boss art, V136 attack FX or timings. Existing Ember game untouched."
+  "build": 138,
+  "notes": "V138 LIVE: Environment Sprite Atlas QA/cleanup. Root cause: stale neighbour artwork included by oversized environmental source rects. Generated and integrated a transparent isolated original-art sprite atlas, removing contamination from rocks (old log fragments), firs, bushes, stumps, mushrooms, tents, flowers, ore and timber. Realigned resulting sprites to prop anchors, preserved original atlas as fallback, audited other game image assets. Unchanged: world positions, controls, combat, Gloamjaw V136 VFX and V137 revival, saves, Skolli/Dylan, approved character art and Ember."
 }
