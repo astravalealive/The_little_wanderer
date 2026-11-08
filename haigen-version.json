@@ -1,4 +1,4 @@
 {
-  "build": 155,
-  "notes": "V155: fixes hard rectangular black border where terrain reached world x=0/y=0. Terrain chunks now render beyond original world bounds as sea, with viewport-wide ocean background. V154 player layering remains."
+  "build": 156,
+  "notes": "V156: wider sand beach transitions, animated surf foam tracking shoreline, and movement-based splashes while Haigen paddles in shallow sea. Deep sea remains locked."
 }
