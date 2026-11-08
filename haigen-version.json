@@ -1,4 +1,4 @@
 {
-  "build": 151,
-  "notes": "V151: butterflies use flapping wing rendering, hovering above the woodland and briefly settling; birds use actual airborne and grounded states rather than always being shown flying. Desert terrain redesign remains pending."
+  "build": 152,
+  "notes": "V152: first coastline pass: Haigen can paddle into shallow sea up to a depth boundary; coastal water now overlays only his lower body with a wading ripple. Deep sea remains blocked. Frog King and lake depth progression are upcoming."
 }
