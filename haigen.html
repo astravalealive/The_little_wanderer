@@ -6937,7 +6937,7 @@ if(state.campTier>0){
  const halfWidth=width*.43,front=hy+13,back=hy-height*.78;
  // Tier 1 approved cottage artwork has its door at ~30% of the facade width (not 36%).
  // Keep interior staircase geometry independent so the working room collision remains intact.
- const doorFractions=[0,.32,.48,.49,.50,.50];
+ const doorFractions=[0,.32,.42,.41,.43,.43];
  const exteriorDoorX=hx+(doorFractions[tier]-.5)*width;
  // Interior stairs remain centred on their own artwork, independent of the exterior facade.
  const interiorDoorX=hx;
@@ -6970,7 +6970,7 @@ if(state.campTier>0){
   // Clamp feet into the room before checking furniture or staircase triggers.
   const safeLeft=hx-halfWidth+halfWidth*2*.32;
   const safeRight=hx+halfWidth-halfWidth*2*.32;
-  const safeBack=back+(front-back)*(homeFloor===1?.16:(tier<=2?.38:.31));
+  const safeBack=back+(front-back)*(homeFloor===1?.16:(tier<=2?.38:.25));
   const frontLimit=(xx)=>Math.abs(xx-doorX)<=doorHalf*.85?.945:.80;
   const safeFront=back+(front-back)*frontLimit(state.x);
   state.x=Math.max(safeLeft,Math.min(safeRight,state.x));
@@ -6978,7 +6978,7 @@ if(state.campTier>0){
   const stairTier=tier>=3;
   // Stairs are walkable, with a transition at the upper landing.
   const inStairLane=roomX>=.32&&roomX<=.41;
-  const atTop=inStairLane&&roomY<=(tier<=2?.38:.32)&&oldRoomY>(tier<=2?.38:.32);
+  const atTop=inStairLane&&roomY<=.34&&oldRoomY>.34;
   const atBottom=inStairLane&&roomY>=.49&&oldRoomY<.49;
   if(stairTier&&homeStairCooldown===0&&homeFloor===0&&atTop){
    homeFloor=1;homeStairCooldown=850;
@@ -6990,7 +6990,7 @@ if(state.campTier>0){
    notify('Haigen goes downstairs.');
   }else{
    const inBox=(x1,y1,x2,y2)=>roomX>x1&&roomX<x2&&roomY>y1&&roomY<y2;
-   const wall=roomX<.32||roomX>.68||roomY<(homeFloor===1?.16:(tier<=2?.38:.31))||roomY>frontLimit(state.x);
+   const wall=roomX<.32||roomX>.68||roomY<(homeFloor===1?.16:(tier<=2?.38:(inStairLane?.25:.31)))||roomY>frontLimit(state.x);
    // Tier-specific footprint masks leave a continuous corridor to the stairs.
    const bed=tier<=2&&inBox(.15,.34,.39,.77);
    const hearth=inBox(.62,.13,.78,.34);
@@ -7006,7 +7006,7 @@ if(state.campTier>0){
     const blockedAt=(xx,yy)=>{
      const rx=(xx-(hx-halfWidth))/(halfWidth*2),ry=(yy-back)/(front-back);
      const box=(x1,y1,x2,y2)=>rx>x1&&rx<x2&&ry>y1&&ry<y2;
-     return rx<.32||rx>.68||ry<(homeFloor===1?.16:(tier<=2?.38:.31))||ry>frontLimit(xx)||
+     return rx<.32||rx>.68||ry<(homeFloor===1?.16:(tier<=2?.38:(rx>=.32&&rx<=.41?.25:.31)))||ry>frontLimit(xx)||
       (homeFloor===0&&((tier<=2&&box(.15,.34,.39,.77))||box(.62,.13,.78,.34)||(tier===2&&box(.69,.49,.82,.73))||(tier>=3&&box(.39,.44,.73,.78))||(tier>=2&&box(.82,.53,.91,.82))||(stairTier&&box(.055,.12,.085,.55))))||
       (homeFloor===1&&(box(.61,.20,.86,.52)||box(.32,.12,.49,.28)));
     };
@@ -7018,7 +7018,7 @@ if(state.campTier>0){
   }
   // Final invariant after sliding: the feet never occupy the back wall,
   // fireplace facade or outer frame, even after a rejected furniture move.
-  const floorTop=back+(front-back)*(homeFloor===1?.16:(tier<=2?.38:.31));
+  const floorTop=back+(front-back)*(homeFloor===1?.16:(tier<=2?.38:(state.x>=hx-halfWidth+halfWidth*2*.32&&state.x<=hx-halfWidth+halfWidth*2*.41?.25:.31)));
   state.x=Math.max(safeLeft,Math.min(safeRight,state.x));
   state.y=Math.max(floorTop,Math.min(back+(front-back)*frontLimit(state.x),state.y));
  }
