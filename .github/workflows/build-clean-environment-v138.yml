@@ -1,0 +1,33 @@
+name: Build cleaned isolated environment sprites V138
+on:
+  push:
+    paths:
+      - .github/scripts/build_clean_environment_v138.py
+      - .github/workflows/build-clean-environment-v138.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  clean-environment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image tools
+        run: python -m pip install --disable-pip-version-check Pillow numpy
+      - name: Isolate sprites, preserve original atlas and produce visual QA
+        run: python .github/scripts/build_clean_environment_v138.py
+      - name: Commit approved-source cleaned atlas and QA report
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/haigen-environment-clean-v138.webp assets/environment-clean-preview-v138.json
+          if git diff --cached --quiet; then
+            echo 'No environment art changes'
+          else
+            git commit -m 'Add isolated clean environment atlas V138 for final game integration'
+            git push origin HEAD:main
+          fi
