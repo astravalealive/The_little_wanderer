@@ -564,7 +564,14 @@ function drawRegionalScenery(o){
  const t=o.type,v=seeded(o.id*29+4),size=o.size||1;
  ctx.scale(size*(.85+seeded(o.id*19+5)*.35),size*(.75+v*.9));
  ctx.lineCap='round';
- if(t==='specter'){
+ if(t==='rock'){
+  ellipse(3,9,24,9,'#27342d55');
+  poly([[-24,1],[-19,-19],[-6,-33],[16,-29],[26,-11],[21,5]],'#444e59');
+  poly([[-19,-19],[-6,-33],[4,-17],[-2,-4],[-24,1]],'#87949c');
+  poly([[4,-17],[16,-29],[26,-11],[21,5],[-2,-4]],'#596673');
+  ctx.strokeStyle='#a6b4ae';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-11,-22);ctx.lineTo(-4,-27);ctx.lineTo(3,-17);ctx.stroke();
+  ctx.fillStyle='#7c9d62';ctx.fillRect(-13,-4,12,3);ctx.fillRect(10,-8,9,3);
+ }else if(t==='specter'){
   const tick=Date.now()*.001,hover=Math.sin(tick*1.6+o.id)*13;
   ctx.translate(0,hover-22);
   ctx.shadowColor='#b9a1ff';ctx.shadowBlur=22;
@@ -633,6 +640,24 @@ for(let i=8500;i<15100;i++){
 }
 // V181: remove inappropriate evergreen trees from the Ashen Expanse.
 for(const o of objects){if(expandedRegion(o.x,o.y)?.id==='wasteland'&&['fir','tree','palm','cactus'].includes(o.type))o.type='bareTree'}
+// V182: biome-wide environmental dressing with stable IDs and clear playable pathways.
+for(let i=15100;i<23900;i++){
+ const region=expandedRegions[(i-15100)%expandedRegions.length],k=Math.floor((i-15100)/expandedRegions.length);
+ const seed=250001+k*17+expandedRegions.indexOf(region)*773;
+ const x=region.x+70+seeded(seed)*Math.max(1,region.w-140);
+ const y=region.y+70+seeded(seed+1)*Math.max(1,region.h-140);
+ if(islandDepth(x,y)<380||expandedRegion(x,y)!==region||Math.hypot(x-1500,y-1500)<460)continue;
+ const v=seeded(seed+2),id=region.id;
+ const type=id==='wasteland'?(v<.31?'bareTree':v<.56?'specter':v<.85?'rock':'stump'):
+ id==='snow'?(v<.48?'fir':v<.85?'rock':'bareTree'):
+ id==='fen'?(v<.36?'bareTree':v<.63?'bush':v<.86?'mushroom':'rock'):
+ id==='rainforest'?(v<.59?'tree':v<.83?'bush':v<.95?'mushroom':'rock'):
+ id==='eastDunes'?(v<.35?'cactus':v<.86?'rock':'bareTree'):
+ id==='desert'?(v<.25?'cactus':v<.83?'rock':'bush'):
+ id==='coast'?(v<.18?'palm':v<.68?'rock':'bush'):
+ (v<.10?'tree':v<.27?'rock':v<.64?'bush':'flower');
+ objects.push({id:i,x,y,type,size:.65+seeded(seed+3)*.65});
+}
 const pond={x:850,y:1700,rx:330,ry:240};function lakeRadius(a){return 1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2)}function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
 const campProtectionRadius=365;
 state.campClearingDone=state.campClearingDone===true||state.campTier>0;
