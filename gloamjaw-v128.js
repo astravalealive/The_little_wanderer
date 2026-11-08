@@ -52,15 +52,54 @@ gloamArtImage.onload=()=>{
 };
 gloamArtImage.onerror=()=>{gloamArtError='Approved atlas not uploaded yet'};
 gloamArtImage.src='./assets/gloamjaw-approved-v133.png?v=133';
-function gloamFacing(){
- const dx=state.x-x,dy=state.y-y;
+// V135 · The Hungry Bloom does NOT know Haigen's whereabouts across the map.
+// It idles facing the camera. It can sense footsteps nearby, see movement in
+// the forward arc of its clearing, or notice a direct hit. Once alerted it
+// tracks Haigen while he stays nearby, then forgets him after he escapes.
+const gloamAttention={aware:false,facing:0,detectedAt:-1e9,holdUntil:-1e9,reason:'idle'};
+const GLOAM_NEAR_SENSE=230,GLOAM_SIGHT=420,GLOAM_TRACK=450,GLOAM_FORGET=530,GLOAM_MEMORY_MS=1950;
+function gloamDirection(px,py){
+ const dx=px-x,dy=py-y;
  if(Math.abs(dx)>Math.abs(dy)*.94)return dx<0?1:2;
  return dy < -70?3:0;
 }
+function gloamCanSense(r){
+ if(r<=GLOAM_NEAR_SENSE)return true; // Root vibrations / nearby footsteps, including behind it.
+ if(r>GLOAM_SIGHT)return false;
+ // 160° forward field of view. Front is toward the camera (positive world Y).
+ return (state.y-y)/Math.max(1,r)>=Math.cos(80*Math.PI/180);
+}
+function gloamAwaken(reason,t){
+ if(!gloamAttention.aware)gloamAttention.detectedAt=t;
+ gloamAttention.aware=true;
+ gloamAttention.facing=gloamDirection(state.x,state.y);
+ gloamAttention.holdUntil=t+GLOAM_MEMORY_MS;
+ gloamAttention.reason=reason;
+}
+function gloamPerceive(t,r,collapsed){
+ if(data.defeated||collapsed){
+  gloamAttention.aware=false;gloamAttention.facing=0;gloamAttention.reason='idle';return;
+ }
+ const sees=gloamCanSense(r);
+ if(sees)gloamAwaken(r<=GLOAM_NEAR_SENSE?'roots':'sight',t);
+ else if(gloamAttention.aware&&r<=GLOAM_TRACK){
+  // Having discovered Haigen, the boss follows him all round the clearing.
+  gloamAttention.facing=gloamDirection(state.x,state.y);
+  gloamAttention.holdUntil=t+GLOAM_MEMORY_MS;
+ }else if(r>GLOAM_FORGET||t>gloamAttention.holdUntil){
+  gloamAttention.aware=false;gloamAttention.facing=0;gloamAttention.reason='idle';
+ }
+ // Beyond tracking distance, keep the LAST seen direction briefly, not a
+ // remote live lock on Haigen's actual coordinates.
+}
+function gloamFacing(){return gloamAttention.aware?gloamAttention.facing:0}
 function gloamPose(){
  const t=P.snapshot().time,side=gloamFacing(),phase=Math.floor(t/320);
  if(data.defeated)return 27;
  if(t-lastGloamHitAt<220)return phase%2?25:24;
+ // No tracking, side profile or fighting stance while Gloamjaw is unaware.
+ if(!gloamAttention.aware)return phase%5===0?8:phase%5===1?9:0;
+ if(t-gloamAttention.detectedAt<440&&combat.mode==='idle')return side===1?4:side===2?5:10;
  if(combat.mode==='warning')return {vine:side===1?12:13,bite:18,spores:20,roots:22}[combat.attack]??8;
  if(combat.mode==='strike')return {vine:side===1?14:15,bite:19,spores:21,roots:23}[combat.attack]??9;
  if(combat.mode==='recover')return combat.attack==='bite'?17:9;
@@ -82,6 +121,7 @@ let lastGloamHitAt=-1e9;
 function damageBoss(dmg){
  if(data.defeated)return false;
  lastGloamHitAt=P.snapshot().time;
+ gloamAwaken('hit',lastGloamHitAt);
  data.hp=Math.max(0,data.hp-dmg);
  if(!data.hp)finish();return true;
 }
@@ -132,6 +172,7 @@ function useTool(){
 }
 function update(dt){
  const now=P.snapshot(),r=dist(state,bossPos);
+ gloamPerceive(now.time,r,now.collapsed);
  for(const a of combat.arrows){
   a.x+=a.vx*dt/1000;a.y+=a.vy*dt/1000;a.life-=dt;
   if(!data.defeated&&Math.hypot(a.x-x,a.y-(y-60))<77){damageBoss(a.damage);a.life=0;continue}
@@ -159,7 +200,10 @@ function update(dt){
  }
  if(r<415&&!data.discovered){data.discovered=true;
   P.memory('Haigen found Gloamjaw Hollow, a secluded clearing deep south of camp. An enormous hungry flower grows at its centre.');P.save()}
- if(r>368||state.resting)return;
+ if(r>368||state.resting||!gloamAttention.aware){
+  if(combat.mode!=='idle'){combat.mode='idle';combat.timer=1300;combat.spores=[]}
+  return;
+ }
  combat.timer-=dt;
  if(combat.mode==='idle'||combat.mode==='recover'){
   if(combat.timer>0)return;
@@ -400,6 +444,6 @@ function drawEffects(){
  ctx.restore();
 }
 window.__gloamAddon={y:y+10,arena,update,drawGround,drawBoss,drawEffects,craftLocked,crafted,useTool,
- snapshot:()=>({build:130,hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length,artReady:gloamArtLoaded,artError:gloamArtError,artPose:gloamPose()})};
+ snapshot:()=>({build:135,hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length,artReady:gloamArtLoaded,artError:gloamArtError,artPose:gloamPose(),aware:gloamAttention.aware,facing:gloamFacing(),attentionReason:gloamAttention.reason,senseRadius:GLOAM_NEAR_SENSE,sightRadius:GLOAM_SIGHT})};
 window.__gloamQA=window.__gloamAddon.snapshot;
 })();

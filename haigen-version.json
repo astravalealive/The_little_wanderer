@@ -1,4 +1,4 @@
 {
-  "build": 134,
-  "notes": "V134 LIVE: independent need/curiosity driven agenda and expanded self-directed crafting, wildlife observation, companion bonding and quest investigation; persistent diaries and immediate in-development DEV KIT with all weapons/items and refills. Existing saves, approved artwork, path network, Gloamjaw and Ember preserved."
+  "build": 135,
+  "notes": "V135 LIVE: Gloamjaw defaults to a front/camera-facing idle pose, senses Haigen only nearby or in a forward sight cone, tracks him around the clearing once aware and forgets him when he escapes. Being struck also alerts the boss. No attacks without awareness. Approved art, V134 DEV KIT/autonomy, saves, worlds and Ember unchanged."
 }
