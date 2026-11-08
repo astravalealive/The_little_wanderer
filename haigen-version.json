@@ -1,4 +1,4 @@
 {
-  "build": 147,
-  "notes": "V147 LIVE: Gloamjaw now appears as a special woodland flower until Haigen approaches. A 1.55-second rupture reveal precedes a boss-only Active Time Battle prototype with Attack, Tool, Heal, Defend, Retreat and Wait/Active mode; the original illustrated boss sprite and world exploration are preserved. Defeat still unlocks crossbow crafting. Development revive resets the reveal. V146 duck families remain unchanged."
+  "build": 148,
+  "notes": "V148 LIVE: Thrummaw, original desert underground predator in Sunscorched Dunes. Footstep vibration detection, sand ripple warning, ground eruption, illustrated jaw/tendril creature, boss-only ATB with Attack, Tool, Heal, Defend, Distract, Retreat and Wait/Active modes. Existing Gloamjaw, duck families, saves and wildlife preserved."
 }
