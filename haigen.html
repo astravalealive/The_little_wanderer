@@ -6979,14 +6979,14 @@ if(state.campTier>0){
   // Stairs are walkable, with a transition at the upper landing.
   const inStairLane=roomX>=.32&&roomX<=.41;
   const atTop=inStairLane&&roomY<=.34&&oldRoomY>.34;
-  const atBottom=inStairLane&&roomY>=.49&&oldRoomY<.49;
+  const atBottom=homeFloor===1&&roomX<=.39&&roomY>=.30&&roomY<=.78&&oldRoomX>.39;
   if(stairTier&&homeStairCooldown===0&&homeFloor===0&&atTop){
    homeFloor=1;homeStairCooldown=850;
-   state.x=hx-halfWidth*.44;state.y=back+(front-back)*.34;
+   state.x=hx-halfWidth*.22;state.y=back+(front-back)*.55;
    notify('Haigen climbs upstairs.');
   }else if(stairTier&&homeStairCooldown===0&&homeFloor===1&&atBottom){
    homeFloor=0;homeStairCooldown=850;
-   state.x=hx-halfWidth*.64;state.y=back+(front-back)*.47;
+   state.x=hx-halfWidth*.44;state.y=back+(front-back)*.44;
    notify('Haigen goes downstairs.');
   }else{
    const inBox=(x1,y1,x2,y2)=>roomX>x1&&roomX<x2&&roomY>y1&&roomY<y2;
@@ -6998,7 +6998,7 @@ if(state.campTier>0){
    const grandTable=tier>=3&&inBox(.39,.44,.73,.78);
    const storage=tier>=2&&inBox(.82,.53,.91,.82);
    const upstairsBed=homeFloor===1&&inBox(.61,.20,.86,.52);
-   const upstairsChest=homeFloor===1&&inBox(.32,.12,.49,.28);
+   const upstairsChest=homeFloor===1&&inBox(.46,.12,.53,.28);
    const stairSide=stairTier&&inBox(.055,.12,.085,.55);
    const blocked=wall||(homeFloor===0&&(bed||hearth||table||grandTable||storage||stairSide))||(homeFloor===1&&(upstairsBed||upstairsChest));
    if(blocked){
@@ -7008,7 +7008,7 @@ if(state.campTier>0){
      const box=(x1,y1,x2,y2)=>rx>x1&&rx<x2&&ry>y1&&ry<y2;
      return rx<.32||rx>.68||ry<(homeFloor===1?.16:(tier<=2?.38:(rx>=.32&&rx<=.41?.25:.31)))||ry>frontLimit(xx)||
       (homeFloor===0&&((tier<=2&&box(.15,.34,.39,.77))||box(.62,.13,.78,.34)||(tier===2&&box(.69,.49,.82,.73))||(tier>=3&&box(.39,.44,.73,.78))||(tier>=2&&box(.82,.53,.91,.82))||(stairTier&&box(.055,.12,.085,.55))))||
-      (homeFloor===1&&(box(.61,.20,.86,.52)||box(.32,.12,.49,.28)));
+      (homeFloor===1&&(box(.61,.20,.86,.52)||box(.46,.12,.53,.28)));
     };
     const nx=state.x,ny=state.y;
     state.x=prevPlayerX;state.y=prevPlayerY;
