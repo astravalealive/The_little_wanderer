@@ -1,4 +1,4 @@
 {
-  "build": 145,
-  "notes": "V145 LIVE: Clean original adult duck and duckling sprite artwork used for all swimming and land rendering. In-water sprites are cropped at the source to hide only legs, preserving body and head above the surface; ducklings use correctly scaled dedicated sprites. Flight has filled feather-shaped wings rather than noodle-like strokes. HUD and corner build counter updated from stale V138 to V145. Preserves the existing saves, duck lifecycle and other game systems."
+  "build": 146,
+  "notes": "V146 LIVE: Ducklings swim in a loose, winding line along their mother's actual path with individual wandering, collision spacing and natural regrouping when she pauses or slows. Families pause periodically; fathers keep a separate position. Mother ducks receive a cached brown mottled hen variant of the existing illustrated mallard sprite, preserving pixel-art detail in swimming, walking and flying. Version badge, title and update manifest all set to 146. Existing saves and duck lifecycle preserved."
 }
