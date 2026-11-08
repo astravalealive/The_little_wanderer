@@ -1,4 +1,4 @@
 {
-  "build": 231,
-  "notes": "Larger homestead houses, persistent indoor state, doorway-only entry, wall collision and opening-door animation."
+  "build": 232,
+  "notes": "Render approved indoor art behind Haigen; crop dark border; improve door alignment and retain collision."
 }
