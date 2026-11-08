@@ -1,4 +1,4 @@
 {
-  "build": 162,
-  "notes": "V162: unclipped procedural tree/rock rendering, six deterministic rock sizes and improved felled logs. Coastline and saves unchanged."
+  "build": 163,
+  "notes": "V163: six individually shaped rock silhouettes with varied proportions. Coastline repair remains pending."
 }
