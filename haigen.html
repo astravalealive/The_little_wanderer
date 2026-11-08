@@ -2458,7 +2458,33 @@ function independentChoiceTick(dt){
  return autoFreedomTick(dt);
 }
 window.__independentHaigen=()=>({agenda:independentAgenda.kind,remaining:Math.round(independentAgenda.remaining),recent:independentAgenda.recent.slice(),freedomJob:state.autoFreeJob?.kind||null,curiosity:haigenMind.curiosity});
+// V140: autonomous equipment is the real equipped slot, not only a sprite override.
+let autoDefenseNextAt=0;
+function autoEquipForWork(){
+ if(!state.autonomy)return;
+ const kind=state.autoFreeJob?.kind;
+ const desired=kind==='mine'?'pickaxe':kind==='wood'?'axe':kind==='fish'?'rod':kind==='net'?'net':
+  kind==='garden'?'shovel':kind==='build'?'hammer':null;
+ const owned=desired==='rod'?state.fishingRod:desired&&state.tools[desired]>0;
+ if(owned&&state.equipped!==desired){state.equipped=desired;renderHotbar()}
+}
+function autoDefendSelf(){
+ if(!state.autonomy||state.resting||state.health<30||time<autoDefenseNextAt)return false;
+ const threat=[...beasts,...regionalWildlife].filter(a=>
+  ((a.kind==='wolf'||a.kind==='boar')||hostileTypes.has(a.type))&&animalAlive(a)&&dist(a,state)<88)
+  .sort((a,b)=>dist(a,state)-dist(b,state))[0];
+ if(!threat)return false;
+ const weapon=state.tools.axe?'axe':state.tools.pickaxe?'pickaxe':'hands';
+ if(state.equipped!==weapon){state.equipped=weapon;renderHotbar()}
+ if(weapon!=='hands')startToolSwing(weapon);
+ hurtAnimal(threat,weapon==='axe'?3:weapon==='pickaxe'?2:1);
+ autoDefenseNextAt=time+1000;
+ autoPlan('defend myself from danger','defense');
+ return true;
+}
 function autonomousTick(dt){
+ if(autoDefendSelf())return;
+ autoEquipForWork();
  state.fun=Math.min(100,state.fun+dt*.00018);state.activity=Math.min(100,state.activity+dt*.0003);
  autoBubbleTimer-=dt;
  // Immediate needs supersede chores, without blindly returning to camp.
@@ -4103,7 +4129,7 @@ function haigenSpriteStatus(){
   else if(state.autoFreeJob?.kind==='net'&&state.tools.net)equip='net';
   else if(state.autoFreeJob?.kind==='build')equip='hammer';
  }
- return {action,knock,equip:state.carriedFrogId>=0?'frog':equip,outfit:haigenOutfit()};
+ return {action,knock,equip:state.carriedFrogId>=0&&state.tools.net?'net':equip,outfit:haigenOutfit()};
 }
 // V120 coherent pixel props: cached 40x60 atlases with grips anchored in hands.
 // Pose changes are four distinct 10-12fps phases: windup, contact, follow-through, recovery.
