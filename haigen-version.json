@@ -1,4 +1,4 @@
 {
-  "build": 232,
-  "notes": "Render approved indoor art behind Haigen; crop dark border; improve door alignment and retain collision."
+  "build": 233,
+  "notes": "Full-screen independent interior scene with approved house artwork, visible Haigen and doorway exit."
 }
