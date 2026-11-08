@@ -6838,7 +6838,7 @@ function blockedBySolid(x,y){if(window.__gloamAddon?.arena(x,y))return false;
  if(easternRiverWalkBlocked(x,y))return true;
  if(worldEditorBuildingBlocks(x,y))return true;
  if(islandDepth(x,y)<-105)return true; // V157: generous walkable shallows, deep sea still gated by flippers
- if(walkingLakeLevel(x,y)<.68)return true; // Paddle through shallows and medium water; darkest pond centre remains blocked
+ if(walkingLakeLevel(x,y)<.49)return true; // Match pond artwork: middle-blue ring spans .48-.79, only darkest centre (<.48) is blocked
  if(blockedByHomestead(x,y))return true;
  const cx=Math.floor(x/solidCellSize),cy=Math.floor(y/solidCellSize);
  for(let ix=cx-1;ix<=cx+1;ix++)for(let iy=cy-1;iy<=cy+1;iy++){
