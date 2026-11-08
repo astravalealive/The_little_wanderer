@@ -452,7 +452,7 @@ function easternRiverDepth(x,y){
  if(y<950||y>7500)return 999;
  return Math.abs(x-easternRiverX(y))-easternRiverWidth(y);
 }
-const easternBridges=[{y:2670,name:'Old Timber Crossing'},{y:4520,name:'Stoneward Bridge'}];
+const easternBridges=[{y:2670,name:'Old Timber Crossing'},{y:4520,name:'Stoneward Bridge'},{y:5530,name:'Riverwatch Bridge'}];
 function drawEasternBridges(left,right,top,bottom){
  for(const bridge of easternBridges){
   const x=easternRiverX(bridge.y),y=bridge.y;
@@ -532,6 +532,37 @@ function drawPaddleSplash(){
  ctx.lineTo(state.x+Math.cos(a)*(rr+9),state.y+Math.sin(a)*9-5);ctx.stroke()}
  ctx.restore();
 }
+// V190: walkable village lanes, shared river crossing, central squares and vegetable gardens.
+function drawRiverwatchTownGround(left,right,top,bottom){
+ const cy=5510,river=easternRiverX(cy);
+ if(right<3150||left>5800||bottom<4800||top>6350)return;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ const path=(pts,width=34)=>{
+  ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+  ctx.strokeStyle='#66563d';ctx.lineWidth=width+8;ctx.stroke();
+  ctx.strokeStyle='#c6a776';ctx.lineWidth=width;ctx.stroke();
+  ctx.strokeStyle='#e2c79a';ctx.lineWidth=3;ctx.setLineDash([5,16]);ctx.stroke();ctx.setLineDash([]);
+ };
+ for(const cx of [riverwatchWestBank.x,borderVillage.x]){
+  path([[cx-390,cy-490],[cx-160,cy-250],[cx,cy],[cx+180,cy+250],[cx+340,cy+460]],36);
+  path([[cx-480,cy-65],[cx-220,cy-65],[cx+30,cy-65],[cx+345,cy-65]],31);
+  path([[cx-330,cy+190],[cx-100,cy+170],[cx+240,cy+190]],28);
+  ctx.fillStyle='#b79c74';ctx.beginPath();ctx.ellipse(cx,cy+20,116,80,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#e0c99f';ctx.lineWidth=7;ctx.stroke();
+  // Small fenced allotments, deliberately set away from building footprints.
+  for(const gx of [cx-420,cx+350]){
+   const gy=cy+335;
+   ctx.fillStyle='#73563b';ctx.fillRect(gx-66,gy-52,132,104);
+   for(let j=0;j<4;j++){
+    ctx.fillStyle='#a87e52';ctx.fillRect(gx-55+j*29,gy-43,20,84);
+    for(let k=0;k<5;k++){ctx.fillStyle=(j+k)%2?'#527f39':'#76a14c';ctx.beginPath();ctx.ellipse(gx-45+j*29,gy-34+k*17,8,6,0,0,Math.PI*2);ctx.fill()}
+   }
+   ctx.strokeStyle='#d5b58a';ctx.lineWidth=4;ctx.strokeRect(gx-69,gy-55,138,110);
+  }
+ }
+ path([[riverwatchWestBank.x+250,cy+20],[river-120,cy+20],[river+120,cy+20],[borderVillage.x-330,cy+20]],30);
+ ctx.restore();
+}
 function drawExpandedTerrain(night){
  const z=worldZoom();
  const left=cam.x-W/(2*z)-60,right=cam.x+W/(2*z)+60;
@@ -541,6 +572,7 @@ function drawExpandedTerrain(night){
   for(let ix=Math.floor(left/islandChunkSize);ix<=Math.floor(right/islandChunkSize);ix++)
    ctx.drawImage(islandChunk(ix,iy),ix*islandChunkSize,iy*islandChunkSize,islandChunkSize,islandChunkSize);
  if(night>.01){ctx.fillStyle='rgba(20,31,55,'+(night*.26)+')';ctx.fillRect(left,top,right-left,bottom-top)}
+ drawRiverwatchTownGround(left,right,top,bottom);
  drawEasternBridges(left,right,top,bottom);
  // V156: animated foam contours follow actual land depth instead of rectangular map edges.
  ctx.save();ctx.strokeStyle=night>.5?'rgba(184,223,225,.52)':'rgba(247,253,233,.72)';ctx.lineWidth=3;ctx.lineCap='round';
@@ -669,20 +701,20 @@ for(let j=0;j<hamletBuildings.length;j++){
  const [dx,dy,kind]=hamletBuildings[j],x=hamletCenter.x+dx,y=hamletCenter.y+dy;
  objects.push({id:24000+j,x,y,type:'hamlet-'+kind,size:1});
 }
-// V187: second village in the indicated eastern river-border region, distinct from Saltwick.
-// V189: Riverwatch is a proper two-bank riverside town, not houses in the water.
-// Eastern bank is the main village; western bank is the farming quarter.
-const borderVillage={x:5350,y:5480,name:'Riverwatch'};
+// V190: Riverwatch occupies BOTH grassy banks in the exact river-to-beach clearing.
+const borderVillage={x:4930,y:5510,name:'Riverwatch'};
+const riverwatchWestBank={x:4070,y:5510};
 const riverwatchBuildings=[
- [-260,-300,'house'],[-60,-340,'inn'],[200,-285,'house'],
- [-350,-70,'barn'],[-75,-60,'well'],[215,-40,'market'],
- [-300,210,'house'],[10,215,'house'],[250,225,'house'],
- [-170,445,'barn'],[145,440,'house'],
+ [-310,-340,'house'],[-90,-360,'inn'],[165,-315,'house'],
+ [-365,-95,'barn'],[-85,-100,'well'],[195,-80,'market'],
+ [-315,170,'house'],[-45,165,'house'],[215,170,'house'],
+ [-160,390,'barn'],[165,385,'house']
 ];
-const riverwatchWestBank={x:3550,y:5520};
 const riverwatchWestBuildings=[
- [-240,-240,'house'],[25,-260,'house'],[-280,20,'barn'],
- [0,40,'market'],[-180,260,'house'],[120,250,'well']
+ [-310,-330,'house'],[-75,-335,'house'],[175,-300,'barn'],
+ [-315,-75,'barn'],[-70,-65,'market'],[170,-75,'well'],
+ [-300,190,'house'],[-40,190,'house'],[190,205,'house'],
+ [-90,395,'barn']
 ];
 for(let j=0;j<riverwatchBuildings.length;j++){
  const [dx,dy,kind]=riverwatchBuildings[j];
