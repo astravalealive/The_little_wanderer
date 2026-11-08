@@ -2748,8 +2748,17 @@ function rbDrawGround(){
  const l=Math.max(0,cam.x-W/(2*z)-50),t=Math.max(0,cam.y-H/(2*z)-50);
  const r=Math.min(3500,cam.x+W/(2*z)+50),b=Math.min(3100,cam.y+H/(2*z)+50);
  if(r<=l||b<=t)return;
- ctx.save();ctx.fillStyle=rbGrass();ctx.fillRect(l,t,r-l,b-t);
- const dark=nightStrength();if(dark){ctx.fillStyle='rgba(19,32,48,'+(dark*.62)+')';ctx.fillRect(l,t,r-l,b-t)}
+ ctx.save();ctx.fillStyle=rbGrass();
+// Preserve the illustrated woodland floor only inland. The island's actual
+// depth field must own the north-west shore, shallow water and deep ocean.
+const cell=16;
+for(let y=Math.floor(t/cell)*cell;y<b;y+=cell){
+ for(let x=Math.floor(l/cell)*cell;x<r;x+=cell){
+  const cx=x+cell*.5,cy=y+cell*.5;
+  if(islandDepth(cx,cy)>95)ctx.fillRect(Math.max(l,x),Math.max(t,y),Math.min(r,x+cell)-Math.max(l,x),Math.min(b,y+cell)-Math.max(t,y));
+ }
+}
+ const dark=nightStrength();if(dark){ctx.fillStyle='rgba(19,32,48,'+(dark*.62)+')'; /* woodland shading follows the inland grass only */ for(let y=Math.floor(t/16)*16;y<b;y+=16)for(let x=Math.floor(l/16)*16;x<r;x+=16)if(islandDepth(x+8,y+8)>95)ctx.fillRect(Math.max(l,x),Math.max(t,y),Math.min(r,x+16)-Math.max(l,x),Math.min(b,y+16)-Math.max(t,y))}
  ctx.restore();
 }
 function rbTreeImage(id){
