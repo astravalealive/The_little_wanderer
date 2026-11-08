@@ -2788,19 +2788,34 @@ function rbDrawTree(o){
  ellipse(o.x+1,o.y+4,26*s,8*s,'#24423766');
  ctx.drawImage(c,Math.round(o.x-c.width*s/2),Math.round(o.y-c.height*s+4),Math.round(c.width*s),Math.round(c.height*s));ctx.restore();
 }
+// V163: six distinct hand-shaped rock silhouettes, deterministic by object ID.
 function rbRockImage(id){
  const v=Math.abs(id)%6;if(rbTileCache.rock.has(v))return rbTileCache.rock.get(v);
- const c=document.createElement('canvas');c.width=42;c.height=28;
- const g=c.getContext('2d'),p=(x,y,w,h,color)=>rbPixel(g,x,y,w,h,color);
- p(4,17,35,8,'#455853');p(6,11,31,12,'#6a7d77');p(11,6,23,15,'#929d90');
- p(16,4,14,7,'#c1c2ac');p(13,11,10,4,'#aeb6a4');p(29,13,7,8,'#526c68');
- p(8,21,26,4,'#4c6260');if(v%2)p(16,13,3,7,'#64756c');
- rbTileCache.rock.set(v,c);return c;
+ const c=document.createElement('canvas');c.width=64;c.height=48;
+ const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+ const p=(x,y,w,h,color)=>rbPixel(g,x,y,w,h,color);
+ const shapes=[
+ [[7,34],[11,20],[23,12],[41,13],[53,25],[57,37],[47,43],[13,42]],
+ [[5,38],[9,31],[19,29],[22,12],[34,5],[43,15],[45,31],[58,36],[54,43],[9,44]],
+ [[8,40],[12,31],[23,29],[26,20],[36,16],[45,26],[52,28],[57,39],[49,43],[12,44]],
+ [[6,37],[10,18],[19,8],[32,7],[38,17],[47,16],[55,29],[56,40],[45,44],[13,43]],
+ [[5,40],[9,32],[18,32],[23,24],[33,25],[37,13],[48,16],[54,31],[59,40],[49,44],[10,44]],
+ [[8,39],[12,28],[20,20],[30,19],[36,25],[42,12],[52,20],[57,37],[48,44],[13,44]]
+ ];
+ const pts=shapes[v];g.beginPath();g.moveTo(...pts[0]);for(let i=1;i<pts.length;i++)g.lineTo(...pts[i]);g.closePath();g.fillStyle='#435a57';g.fill();
+ g.save();g.beginPath();g.moveTo(...pts[0]);for(let i=1;i<pts.length;i++)g.lineTo(...pts[i]);g.closePath();g.clip();
+ p(9,25,43,11,'#647973');p(13,19,31,10,'#82938a');p(18,15,19,6,'#a8afa0');
+ const cracks=[[[20,20],[27,27],[23,35]],[[34,12],[31,24],[39,31]],[[24,29],[34,33],[39,40]],[[20,12],[26,21],[23,30]],[[40,18],[35,29],[43,37]],[[17,25],[26,30],[30,39]]][v];
+ g.beginPath();g.moveTo(...cracks[0]);g.lineTo(...cracks[1]);g.lineTo(...cracks[2]);g.strokeStyle='#405b59';g.lineWidth=2;g.stroke();
+ p(14+v*3%21,24,9,4,'#526f59');p(18+v*4%19,21,5,3,'#779176');
+ g.restore();rbTileCache.rock.set(v,c);return c;
 }
 function rbDrawRock(o){
- const c=rbRockImage(o.id),scale=1.65*(o.size||1);
- ctx.save();ctx.imageSmoothingEnabled=false;ellipse(o.x,o.y+6,24*scale,6,'#283e3955');
- ctx.drawImage(c,Math.round(o.x-c.width*scale/2),Math.round(o.y-c.height*scale+7),Math.round(c.width*scale),Math.round(c.height*scale));ctx.restore();
+ const c=rbRockImage(o.id),v=Math.abs(o.id)%6;
+ const scale=(.78+v*.12)*(o.size||1);
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ellipse(o.x,o.y+6,25*scale,7,'#283e3955');
+ ctx.drawImage(c,Math.round(o.x-c.width*scale/2),Math.round(o.y-c.height*scale+8),Math.round(c.width*scale),Math.round(c.height*scale));ctx.restore();
 }
 function rbDrawBush(o){
  ctx.save();ctx.translate(Math.round(o.x),Math.round(o.y));const p=(x,y,w,h,c)=>rbPixel(ctx,x,y,w,h,c);
@@ -6447,7 +6462,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=162;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Accessible beaches, shallow paddling and visible step splashes';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=163;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Accessible beaches, shallow paddling and visible step splashes';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
