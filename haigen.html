@@ -6020,7 +6020,9 @@ let worldEditorHidden=new Set(worldEditorData.hidden);
 for(const [id,record] of Object.entries(worldEditorData.moves)){
  const o=worldEditorBuiltinById.get(Number(id));if(o){o.x=record.x;o.y=record.y}
 }
-let worldEditorActive=false,worldEditorMode='place',worldEditorKind='hamlet-house',worldEditorMinimised=false,worldEditorPanel=null,worldEditorDrag=null,worldEditorSelected=null;
+let worldEditorActive=false,worldEditorMode='select',worldEditorKind='hamlet-house',worldEditorMinimised=false,worldEditorPanel=null,worldEditorDrag=null,worldEditorSelected=null,worldEditorDeleteButton=null;
+let worldEditorHoldTimer=null;
+const worldEditorTouches=new Map();
 const worldEditorUndo=[];
 function worldEditorSave(){
  try{localStorage.setItem(worldEditorStorageKey,JSON.stringify(worldEditorData));return true}
@@ -6050,16 +6052,29 @@ function worldEditorScreenPoint(e){
          y:clamp(cam.y+((e.clientY-r.top)*H/r.height-H/2)/z,WORLD_MIN,WORLD)};
 }
 function worldEditorPick(x,y){
- const z=worldZoom();
- let best=null,score=34;
- const pick=o=>{
+ // Test the full visible artwork, not just the tiny point at its feet.
+ const z=worldZoom(),ranked=[];
+ const consider=(o,prefer)=>{
   if(worldEditorHidden.has(o.id)||state.removed.includes(o.id)||o.id===runeGuardianId)return;
-  const d=Math.hypot((o.x-x)*z,(o.y-y)*z);
-  if(d<score){score=d;best=o}
+  const building=o.type.startsWith('hamlet-'),tower=o.type==='lighthouse';
+  const upper=building?(o.type==='hamlet-inn'?132:112):tower?235:
+   o.type==='tree'||o.type==='fir'||o.type==='palm'?145:o.type==='bareTree'?118:60;
+  const width=building?(o.type==='hamlet-inn'?92:71):tower?52:
+   o.type==='tree'?66:o.type==='fir'?47:44;
+  const dx=Math.abs((o.x-x)*z),vertical=(o.y-y)*z;
+  const halfW=Math.max(18,width*z),top=Math.max(22,upper*z),bottom=Math.max(19,18*z);
+  if(dx>halfW||vertical < -bottom||vertical>top)return;
+  const score=dx/halfW+Math.abs(vertical-top*.44)/Math.max(20,top)+(prefer?0:.15);
+  ranked.push({o,score});
  };
- for(const o of worldEditorData.placed)pick(o);
- for(const o of objects)if(Math.abs(o.x-x)<140/z&&Math.abs(o.y-y)<140/z&&Math.hypot(o.x-cottage.x,o.y-cottage.y)>380)pick(o);
- return best;
+ for(const o of worldEditorData.placed)consider(o,true);
+ for(const o of objects){
+  if(Math.abs(o.x-x)>190/Math.max(.18,z)||Math.abs(o.y-y)>245/Math.max(.18,z))continue;
+  if(Math.hypot(o.x-cottage.x,o.y-cottage.y)<380)continue;
+  consider(o,o.type.startsWith('hamlet-'));
+ }
+ ranked.sort((a,b)=>a.score-b.score);
+ return ranked[0]?.o||null;
 }
 function worldEditorPlace(x,y,kind){
  if(worldEditorData.placed.length>=2200){notify('Editor object limit reached. Export or delete objects.');return null}
@@ -6134,7 +6149,24 @@ function worldEditorSprite(o){
  }else if(o.type==='specter')drawRegionalScenery(o);
  else if(!worldEditorGroundKinds.has(o.type))drawSceneryNearHaigen(o);
 }
+function worldEditorSelectionButtonPosition(){
+ if(!worldEditorDeleteButton)return;
+ const o=worldEditorSelected;
+ if(!worldEditorActive||!o){worldEditorDeleteButton.style.display='none';return}
+ const rect=gameCanvas.getBoundingClientRect(),z=worldZoom();
+ const elevation=o.type==='lighthouse'?246:o.type.startsWith('hamlet-')?145:
+  ['tree','fir','palm','bareTree'].includes(o.type)?145:70;
+ const x=rect.left+(W/2+(o.x-cam.x)*z)*rect.width/W;
+ const y=rect.top+(H/2+(o.y-elevation-cam.y)*z)*rect.height/H;
+ if(x<rect.left-18||x>rect.right+18||y<rect.top-55||y>rect.bottom+20){
+  worldEditorDeleteButton.style.display='none';return;
+ }
+ worldEditorDeleteButton.style.display='block';
+ worldEditorDeleteButton.style.left=Math.round(clamp(x-47,rect.left+5,rect.right-100))+'px';
+ worldEditorDeleteButton.style.top=Math.round(clamp(y-45,rect.top+4,rect.bottom-44))+'px';
+}
 function worldEditorOutline(){
+ worldEditorSelectionButtonPosition();
  if(!worldEditorActive||!worldEditorSelected)return;
  const o=worldEditorSelected;
  ctx.save();ctx.strokeStyle='#ffe477';ctx.lineWidth=3/worldZoom();
@@ -6156,9 +6188,9 @@ function worldEditorDrawPanel(){
  const html=['<div style="display:flex;align-items:center;gap:5px;justify-content:space-between"><b>🗺️ WORLD EDITOR</b>',
  '<button data-editor-action="min" style="font-size:14px">',worldEditorMinimised?'Expand':'Minimise','</button>',
  '<button data-editor-action="close">Done ✓</button></div>',
- '<div style="font-size:12px;margin:5px 0">',worldEditorMode==='place'?'Tap to place · drag to position':worldEditorMode==='move'?'Drag a building or scenery':worldEditorMode==='erase'?'Tap an object to remove':'Drag to pan · pinch to zoom',pos,'</div>',
+ '<div style="font-size:12px;margin:5px 0">',worldEditorMode==='place'?'Tap empty ground to place. Tap existing objects to select.':worldEditorMode==='pan'?'One finger pans · two fingers zoom':'Tap to select · hold briefly to drag · swipe empty ground to pan',pos,'</div>',
  '<div style="display:flex;gap:4px;flex-wrap:wrap">'];
- for(const [mode,label] of [['place','➕ Place'],['move','✥ Move'],['erase','✕ Erase'],['pan','✋ Pan']])
+ for(const [mode,label] of [['select','◎ Select'],['place','＋ Place'],['pan','✋ Pan']])
   html.push('<button data-editor-mode="'+mode+'" style="background:'+(worldEditorMode===mode?'#8a6a35':'#38433a')+'">'+label+'</button>');
  html.push('<button data-editor-action="undo" '+(worldEditorUndo.length?'':'disabled')+'>↶ Undo</button></div>');
  if(!worldEditorMinimised){
@@ -6217,12 +6249,25 @@ function worldEditorOpen(){
  worldEditorPanel=document.createElement('div');
  worldEditorPanel.id='haigenWorldEditor';
  worldEditorPanel.style.cssText='position:fixed;z-index:9999;left:8px;top:29%;width:min(338px,calc(100vw - 16px));max-height:55vh;overflow-y:auto;box-sizing:border-box;background:rgba(22,32,28,.96);color:#f4e9d1;border:2px solid #b58b50;border-radius:12px;padding:10px;box-shadow:0 7px 22px #0009;font:13px system-ui;touch-action:pan-y';
- document.body.appendChild(worldEditorPanel);worldEditorDrawPanel();
- notify('World Editor: choose a feature, then tap the map to place it.');
+ document.body.appendChild(worldEditorPanel);
+ worldEditorDeleteButton=document.createElement('button');
+ worldEditorDeleteButton.type='button';
+ worldEditorDeleteButton.textContent='✕ Delete';
+ worldEditorDeleteButton.setAttribute('aria-label','Delete selected world object');
+ worldEditorDeleteButton.style.cssText='position:fixed;z-index:10001;display:none;border:2px solid #e3b69b;border-radius:10px;background:#9f3534;color:white;font:bold 14px system-ui;padding:10px 13px;box-shadow:0 3px 12px #000a;touch-action:manipulation';
+ worldEditorDeleteButton.onclick=e=>{
+  e.preventDefault();e.stopPropagation();
+  if(worldEditorSelected)worldEditorErase(worldEditorSelected);
+ };
+ document.body.appendChild(worldEditorDeleteButton);
+ worldEditorMode='select';worldEditorDrawPanel();
+ notify('World Editor: tap an object to select; hold to drag; tap Delete above it to remove.');
 }
 function worldEditorClose(){
  worldEditorActive=false;worldEditorDrag=null;worldEditorSelected=null;cameraDetached=true;
+ if(worldEditorHoldTimer)clearTimeout(worldEditorHoldTimer);worldEditorHoldTimer=null;worldEditorTouches.clear();
  worldEditorSave();if(worldEditorPanel)worldEditorPanel.remove();worldEditorPanel=null;
+ if(worldEditorDeleteButton)worldEditorDeleteButton.remove();worldEditorDeleteButton=null;
  notify('World Editor closed. Layout saved on this device.');
 }
 let idleTime=0;// Solid objects use a small spatial hash for efficient iPad collision checks.
@@ -6954,43 +6999,100 @@ const cameraTouches=new Map();
 let pinchDistance=0;
 const gameCanvas=$('game');
 gameCanvas.style.touchAction='none';
-// Editor gestures run before ordinary camera and homestead controls.
+// V194: tap selection, contextual delete, touch-and-hold dragging, natural panning.
 const editorPointerPoint=e=>worldEditorScreenPoint(e);
+const editorCancelHold=()=>{
+ if(worldEditorHoldTimer!==null)clearTimeout(worldEditorHoldTimer);
+ worldEditorHoldTimer=null;
+};
+const editorCanvasPan=(dx,dy)=>{
+ const bounds=gameCanvas.getBoundingClientRect(),z=worldZoom();
+ cam.x=clamp(cam.x-dx*W/bounds.width/z,WORLD_MIN,WORLD);
+ cam.y=clamp(cam.y-dy*H/bounds.height/z,WORLD_MIN,WORLD);
+ cameraDetached=true;
+};
+let editorPinchDistance=0;
 gameCanvas.addEventListener('pointerdown',e=>{
  if(!worldEditorActive||worldEditorMode==='pan')return;
+ if(e.pointerType==='mouse'&&e.button!==0)return;
  e.preventDefault();e.stopImmediatePropagation();
  gameCanvas.setPointerCapture(e.pointerId);
- const p=editorPointerPoint(e);
- worldEditorDrag={pointerId:e.pointerId,last:p,mode:worldEditorMode,painted:false};
- if(worldEditorMode==='place'){
-  worldEditorHistory();const o=worldEditorPlace(p.x,p.y,worldEditorKind);
-  if(o){worldEditorDrag.object=o;worldEditorDrag.painted=true}
- }else{
-  const o=worldEditorPick(p.x,p.y);worldEditorSelected=o;
-  if(worldEditorMode==='move'&&o){
-   worldEditorHistory();worldEditorDrag.object=o;
-  }else if(worldEditorMode==='erase'&&o){
-   worldEditorErase(o);worldEditorDrag=null;
-  }
+ worldEditorTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(worldEditorTouches.size>1){
+  editorCancelHold();worldEditorDrag=null;
+  const p=[...worldEditorTouches.values()];
+  editorPinchDistance=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+  return;
+ }
+ const p=editorPointerPoint(e),o=worldEditorPick(p.x,p.y);
+ worldEditorSelected=o;
+ const d={pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastY:e.clientY,
+  first:p,last:p,object:o,held:false,scrolled:false,changed:false,paintStarted:false,mode:worldEditorMode,
+  offsetX:o?o.x-p.x:0,offsetY:o?o.y-p.y:0};
+ worldEditorDrag=d;
+ if(o){
+  editorCancelHold();
+  worldEditorHoldTimer=setTimeout(()=>{
+   if(worldEditorActive&&worldEditorDrag===d&&!d.scrolled&&worldEditorTouches.size===1){
+    d.held=true;worldEditorMinimised=true;worldEditorDrawPanel();
+   }
+  },330);
  }
  worldEditorDrawPanel();
 },true);
 gameCanvas.addEventListener('pointermove',e=>{
- if(!worldEditorActive||!worldEditorDrag||worldEditorDrag.pointerId!==e.pointerId)return;
+ if(!worldEditorActive||worldEditorMode==='pan'||!worldEditorTouches.has(e.pointerId))return;
  e.preventDefault();e.stopImmediatePropagation();
- const p=editorPointerPoint(e),d=worldEditorDrag;
- if(d.mode==='move'&&d.object)worldEditorMove(d.object,p.x,p.y);
- if(d.mode==='place'){
-  if(d.object&&!worldEditorGroundKinds.has(worldEditorKind))worldEditorMove(d.object,p.x,p.y);
-  else if(worldEditorGroundKinds.has(worldEditorKind)&&Math.hypot(p.x-d.last.x,p.y-d.last.y)>46){
-   const o=worldEditorPlace(p.x,p.y,worldEditorKind);if(o)d.painted=true;d.last=p;
+ const old=worldEditorTouches.get(e.pointerId);
+ worldEditorTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(worldEditorTouches.size>1){
+  editorCancelHold();
+  const p=[...worldEditorTouches.values()];
+  const distance=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+  if(editorPinchDistance>0)setCameraZoom(cameraZoom*distance/editorPinchDistance);
+  editorPinchDistance=distance;
+  return;
+ }
+ const d=worldEditorDrag;
+ if(!d||d.pointerId!==e.pointerId)return;
+ const dx=e.clientX-d.lastX,dy=e.clientY-d.lastY;
+ d.lastX=e.clientX;d.lastY=e.clientY;
+ const movement=Math.hypot(e.clientX-d.startX,e.clientY-d.startY),p=editorPointerPoint(e);
+ if(d.object){
+  if(d.held){
+   if(!d.changed&&movement>2){worldEditorHistory();d.changed=true}
+   if(d.changed)worldEditorMove(d.object,p.x+d.offsetX,p.y+d.offsetY);
+  }else if(movement>14){
+   editorCancelHold();d.scrolled=true;editorCanvasPan(dx,dy);
+  }else if(d.scrolled)editorCanvasPan(dx,dy);
+ }else if(d.mode==='place'&&worldEditorGroundKinds.has(worldEditorKind)&&movement>12){
+  if(!d.paintStarted){
+   worldEditorHistory();d.paintStarted=true;
+   worldEditorPlace(d.first.x,d.first.y,worldEditorKind);
   }
+  if(Math.hypot(p.x-d.last.x,p.y-d.last.y)>42){
+   worldEditorPlace(p.x,p.y,worldEditorKind);d.last=p;
+  }
+  d.changed=true;
+ }else if(movement>11){
+  d.scrolled=true;editorCanvasPan(dx,dy);
  }
 },true);
 const finishEditorPointer=e=>{
- if(!worldEditorActive||!worldEditorDrag||worldEditorDrag.pointerId!==e.pointerId)return;
+ if(!worldEditorActive||!worldEditorTouches.has(e.pointerId)||worldEditorMode==='pan')return;
  e.preventDefault();e.stopImmediatePropagation();
- worldEditorDrag=null;worldEditorRefresh();
+ worldEditorTouches.delete(e.pointerId);editorCancelHold();
+ const d=worldEditorDrag;
+ if(worldEditorTouches.size){worldEditorDrag=null;return}
+ editorPinchDistance=0;worldEditorDrag=null;
+ if(!d||d.pointerId!==e.pointerId)return;
+ if(e.type!=='pointercancel'&&!d.object&&!d.scrolled&&!d.paintStarted&&d.mode==='place'){
+  worldEditorHistory();
+  const p=editorPointerPoint(e),o=worldEditorPlace(p.x,p.y,worldEditorKind);
+  if(o){d.changed=true;if(!worldEditorGroundKinds.has(worldEditorKind))worldEditorMode='select'}
+ }
+ if(d.changed)worldEditorRefresh();
+ else worldEditorDrawPanel();
 };
 gameCanvas.addEventListener('pointerup',finishEditorPointer,true);
 gameCanvas.addEventListener('pointercancel',finishEditorPointer,true);
