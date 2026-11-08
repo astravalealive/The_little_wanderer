@@ -1,4 +1,4 @@
 {
-  "build": 158,
-  "notes": "V158: synchronised visible version labels, runtime build and update manifest. Shoreline access still requires live testing."
+  "build": 159,
+  "notes": "V159: winter gloves and sleeves now match the equipped winter outfit when holding or using tools. Coastline remains under investigation."
 }
