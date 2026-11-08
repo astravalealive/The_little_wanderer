@@ -1,4 +1,4 @@
 {
-  "build": 193,
-  "notes": "Visual World Editor in DEV KIT: place, move, erase, paint paths, save, export/import and undo."
+  "build": 197,
+  "notes": "Tap to select, on-object delete, hold to drag; upgraded buildings, trees, rocks, market, lighthouse, paths and gardens."
 }
