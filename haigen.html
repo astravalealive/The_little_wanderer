@@ -6966,7 +6966,8 @@ if(state.campTier>0){
   const safeLeft=hx-halfWidth+halfWidth*2*.32;
   const safeRight=hx+halfWidth-halfWidth*2*.32;
   const safeBack=back+(front-back)*(homeFloor===1?.16:(tier<=2?.38:.31));
-  const safeFront=front-(front-back)*.055;
+  const frontLimit=(xx)=>Math.abs(xx-doorX)<=doorHalf*.85?.945:.80;
+  const safeFront=back+(front-back)*frontLimit(state.x);
   state.x=Math.max(safeLeft,Math.min(safeRight,state.x));
   state.y=Math.max(safeBack,Math.min(safeFront,state.y));
   const stairTier=tier>=3;
@@ -6984,7 +6985,7 @@ if(state.campTier>0){
    notify('Haigen goes downstairs.');
   }else{
    const inBox=(x1,y1,x2,y2)=>roomX>x1&&roomX<x2&&roomY>y1&&roomY<y2;
-   const wall=roomX<.32||roomX>.68||roomY<(homeFloor===1?.16:(tier<=2?.38:.31))||roomY>.945;
+   const wall=roomX<.32||roomX>.68||roomY<(homeFloor===1?.16:(tier<=2?.38:.31))||roomY>frontLimit(state.x);
    // Tier-specific footprint masks leave a continuous corridor to the stairs.
    const bed=tier<=2&&inBox(.15,.34,.39,.77);
    const hearth=inBox(.52,.13,.78,.43);
@@ -7000,7 +7001,7 @@ if(state.campTier>0){
     const blockedAt=(xx,yy)=>{
      const rx=(xx-(hx-halfWidth))/(halfWidth*2),ry=(yy-back)/(front-back);
      const box=(x1,y1,x2,y2)=>rx>x1&&rx<x2&&ry>y1&&ry<y2;
-     return rx<.32||rx>.68||ry<(homeFloor===1?.16:(tier<=2?.38:.31))||ry>.945||
+     return rx<.32||rx>.68||ry<(homeFloor===1?.16:(tier<=2?.38:.31))||ry>frontLimit(xx)||
       (homeFloor===0&&((tier<=2&&box(.15,.34,.39,.77))||box(.52,.13,.78,.43)||(tier===2&&box(.54,.46,.82,.78))||(tier>=3&&box(.39,.44,.73,.78))||(tier>=2&&box(.82,.53,.91,.82))||(stairTier&&box(.055,.12,.085,.55))))||
       (homeFloor===1&&(box(.61,.20,.86,.52)||box(.32,.12,.49,.28)));
     };
@@ -7014,7 +7015,7 @@ if(state.campTier>0){
   // fireplace facade or outer frame, even after a rejected furniture move.
   const floorTop=back+(front-back)*(homeFloor===1?.16:(tier<=2?.38:.31));
   state.x=Math.max(safeLeft,Math.min(safeRight,state.x));
-  state.y=Math.max(floorTop,Math.min(safeFront,state.y));
+  state.y=Math.max(floorTop,Math.min(back+(front-back)*frontLimit(state.x),state.y));
  }
  homeDoorOpen=Math.max(0,homeDoorOpen-dt/900);
 }
