@@ -564,7 +564,17 @@ function drawRegionalScenery(o){
  const t=o.type,v=seeded(o.id*29+4),size=o.size||1;
  ctx.scale(size*(.85+seeded(o.id*19+5)*.35),size*(.75+v*.9));
  ctx.lineCap='round';
- if(t==='cactus'){
+ if(t==='specter'){
+  const tick=Date.now()*.001,hover=Math.sin(tick*1.6+o.id)*13;
+  ctx.translate(0,hover-22);
+  ctx.shadowColor='#b9a1ff';ctx.shadowBlur=22;
+  ctx.fillStyle='rgba(164,139,231,.20)';ellipse(0,8,25,9,'rgba(147,112,211,.17)');
+  ctx.beginPath();ctx.moveTo(-17,-37);ctx.quadraticCurveTo(-18,-77,0,-82);ctx.quadraticCurveTo(19,-77,17,-37);
+  ctx.quadraticCurveTo(23,-18,12,-9);ctx.lineTo(5,-19);ctx.lineTo(-3,-6);ctx.lineTo(-10,-18);ctx.lineTo(-20,-9);ctx.closePath();
+  ctx.fillStyle='rgba(191,171,247,.63)';ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle='#34254e';ctx.fillRect(-9,-54,5,7);ctx.fillRect(5,-54,5,7);
+  ctx.fillStyle='rgba(223,207,255,.7)';ctx.fillRect(-5,-73,9,4);
+ }else if(t==='cactus'){
   // Upright, branching saguaro with shaded ribs, spines and a ground shadow.
   ellipse(4,9,22,7,'#314b3a77');
   ctx.lineCap='round';ctx.lineJoin='round';
@@ -600,7 +610,7 @@ function canPlaceScenery(o){return islandDepth(o.x,o.y)>shoreSceneryClearance(o)
 const objects=[];for(let i=0;i<1050;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;if(Math.hypot(x-1500,y-1500)<235)continue;const r=seeded(i*3+2);objects.push({id:i,x,y,type:r<.48?'tree':r<.69?'rock':r<.88?'bush':'flower',size:rand(0.85,1.25)})}for(let i=1050;i<1230;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;objects.push({id:i,x,y,type:'mushroom',size:.65+seeded(i*3+2)*.5})}for(let i=1230;i<2030;i++){const x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.42?'flower':v<.73?'bush':v<.92?'mushroom':'tree',size:.7+v*.5})}// New outer woodland ring preserves every original object and existing save coordinate.
 for(let i=2030;i<4400;i++){const x=100+seeded(i*3)*4000,y=100+seeded(i*3+1)*4000;if(x<2990&&y<2990)continue;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.44?'tree':v<.62?'rock':v<.8?'bush':v<.93?'flower':'mushroom',size:.75+v*.55})}
 // Extra scenery uses fresh IDs; existing 0-4399 object IDs remain stable.
-for(let i=4400;i<8500;i++){const r=expandedRegions[i%expandedRegions.length],x=r.x+60+seeded(i*3)*(r.w-120),y=r.y+60+seeded(i*3+1)*(r.h-120),v=seeded(i*3+2);if(islandDepth(x,y)<75||expandedRegion(x,y)!==r)continue;let type=(r.id==='desert'||r.id==='eastDunes')?(v<.23?'cactus':'rock'):r.id==='coast'?(v<.23?'palm':v<.65?'rock':'flower'):r.id==='rainforest'?(v<.68?'tree':'bush'):r.id==='snow'?(v<.35?'fir':'rock'):r.id==='fen'?(v<.32?'bareTree':v<.77?'bush':'rock'):r.id==='wasteland'?(v<.7?'rock':'bareTree'):(v<.045?'tree':v<.46?'bush':v<.73?'flower':'rock');objects.push({id:i,x,y,type,size:.8+v*.5})}
+for(let i=4400;i<8500;i++){const r=expandedRegions[i%expandedRegions.length],x=r.x+60+seeded(i*3)*(r.w-120),y=r.y+60+seeded(i*3+1)*(r.h-120),v=seeded(i*3+2);if(islandDepth(x,y)<75||expandedRegion(x,y)!==r)continue;let type=(r.id==='desert'||r.id==='eastDunes')?(v<.23?'cactus':'rock'):r.id==='coast'?(v<.23?'palm':v<.65?'rock':'flower'):r.id==='rainforest'?(v<.68?'tree':'bush'):r.id==='snow'?(v<.35?'fir':'rock'):r.id==='fen'?(v<.32?'bareTree':v<.77?'bush':'rock'):r.id==='wasteland'?(v<.42?'bareTree':v<.72?'rock':'specter'):(v<.045?'tree':v<.46?'bush':v<.73?'flower':'rock');objects.push({id:i,x,y,type,size:.8+v*.5})}
 // V179: seeded regional habitat clusters. Stable IDs, no save migration or new sprite dependencies.
 for(let i=8500;i<15100;i++){
  const region=expandedRegions[(i-8500)%expandedRegions.length];
@@ -616,11 +626,13 @@ for(let i=8500;i<15100;i++){
  id==='snow'?(v<.67?'fir':v<.92?'rock':'bareTree'):
  id==='eastDunes'?(v<.53?'cactus':v<.91?'rock':'bareTree'):
  id==='desert'?(v<.3?'cactus':v<.8?'rock':'bush'):
- id==='wasteland'?(v<.58?'rock':v<.88?'bareTree':'stump'):
+ id==='wasteland'?(v<.30?'bareTree':v<.52?'rock':v<.68?'stump':'specter'):
  id==='coast'?(v<.33?'palm':v<.72?'rock':'bush'):
  (v<.14?'tree':v<.36?'rock':v<.73?'bush':'flower');
  objects.push({id:i,x,y,type,size:.65+seeded(seed+5)*.7});
 }
+// V181: remove inappropriate evergreen trees from the Ashen Expanse.
+for(const o of objects){if(expandedRegion(o.x,o.y)?.id==='wasteland'&&['fir','tree','palm','cactus'].includes(o.type))o.type='bareTree'}
 const pond={x:850,y:1700,rx:330,ry:240};function lakeRadius(a){return 1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2)}function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
 const campProtectionRadius=365;
 state.campClearingDone=state.campClearingDone===true||state.campTier>0;
