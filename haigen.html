@@ -6936,8 +6936,11 @@ if(state.campTier>0){
  const width=widths[tier]||330,height=heights[tier]||310;
  const halfWidth=width*.43,front=hy+13,back=hy-height*.78;
  // The approved art has its front step slightly left of centre at tier 1.
- const doorFractions=[0,.455,.48,.49,.50,.50];
- const doorX=hx+(doorFractions[tier]-.5)*width;
+ const doorFractions=[0,.36,.48,.49,.50,.50];
+ const exteriorDoorX=hx+(doorFractions[tier]-.5)*width;
+ // Interior stairs remain centred on their own artwork, independent of the exterior facade.
+ const interiorDoorX=hx+(.455-.5)*width;
+ const doorX=homeInside?interiorDoorX:exteriorDoorX;
  const doorHalf=26;
  const withinDoor=Math.abs(state.x-doorX)<=doorHalf;
  const crossedIn=!homeInside&&prevPlayerY>=front&&state.y<front&&withinDoor;
@@ -6950,11 +6953,11 @@ if(state.campTier>0){
  homeStairCooldown=Math.max(0,homeStairCooldown-dt);
  if(crossedIn){
   homeInside=true;homeFloor=0;homeDoorOpen=1;
-  state.x=doorX;state.y=front-20;homeStairCooldown=500;
+  state.x=interiorDoorX;state.y=front-20;homeStairCooldown=500;
   notify('🚪 Haigen opens the door and steps inside.');
  }else if(crossedOut){
   homeInside=false;homeFloor=0;homeDoorOpen=1;
-  state.x=doorX;state.y=front+20;homeStairCooldown=500;
+  state.x=exteriorDoorX;state.y=front+20;homeStairCooldown=500;
   notify('🚪 Haigen steps outside.');
  }else if(!homeInside){
   // Do not let the player bypass the entrance through walls or roof.
