@@ -469,7 +469,13 @@ function islandTerrainRGB(x,y){
  let red=145,green=183,blue=110,snow=0,waste=0,desert=0;
  const p=biomePosition(x,y);
  for(let i=0;i<biomePalette.length;i++){
-  const r=biomePalette[i],w=coastSmooth(-140,140,biomeMargin(r,p));
+  const r=biomePalette[i];
+  // V176: staggered pixel-cell biome borders, preserving detailed terrain within each region.
+  const cell=24,px=Math.floor(x/cell),py=Math.floor(y/cell);
+  const hash=(a,b)=>{let n=Math.imul(a,374761393)+Math.imul(b,668265263)+Math.imul(i+1,1442695041);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295};
+  const offset=(hash(px,py)-.5)*125;
+  const margin=biomeMargin(r,biomePosition((px+.5)*cell,(py+.5)*cell))+offset;
+  const w=coastSmooth(-36,36,margin);
   red+=(r.rgb[0]-red)*w;green+=(r.rgb[1]-green)*w;blue+=(r.rgb[2]-blue)*w;
   if(i===4)snow=w;if(i===3)waste=w;if(i===1)desert=w;
  }
@@ -529,7 +535,7 @@ function drawExpandedTerrain(night){
  const z=worldZoom();
  const left=cam.x-W/(2*z)-60,right=cam.x+W/(2*z)+60;
  const top=cam.y-H/(2*z)-60,bottom=cam.y+H/(2*z)+60;
- ctx.save();ctx.imageSmoothingEnabled=true;
+ ctx.save();ctx.imageSmoothingEnabled=false;
  for(let iy=Math.floor(top/islandChunkSize);iy<=Math.floor(bottom/islandChunkSize);iy++)
   for(let ix=Math.floor(left/islandChunkSize);ix<=Math.floor(right/islandChunkSize);ix++)
    ctx.drawImage(islandChunk(ix,iy),ix*islandChunkSize,iy*islandChunkSize,islandChunkSize,islandChunkSize);
