@@ -1,4 +1,4 @@
 {
-  "build": 161,
-  "notes": "V161: match winter coat's cream fur wrist cuff to the held-tool overlay, retaining dark gloves."
+  "build": 162,
+  "notes": "V162: unclipped procedural tree/rock rendering, six deterministic rock sizes and improved felled logs. Coastline and saves unchanged."
 }
