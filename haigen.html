@@ -658,6 +658,17 @@ for(let i=15100;i<23900;i++){
  (v<.10?'tree':v<.27?'rock':v<.64?'bush':'flower');
  objects.push({id:i,x,y,type,size:.65+seeded(seed+3)*.65});
 }
+// V183: Saltwick's small inland hamlet, west of the river on the Open Downs.
+const hamletCenter={x:1000,y:5850,name:'Saltwick Hamlet'};
+const hamletBuildings=[
+ [-260,-185,'house'],[-70,-240,'inn'],[170,-180,'house'],
+ [-310,85,'house'],[60,80,'market'],[265,100,'house'],
+ [-140,290,'barn'],[250,320,'well']
+];
+for(let j=0;j<hamletBuildings.length;j++){
+ const [dx,dy,kind]=hamletBuildings[j],x=hamletCenter.x+dx,y=hamletCenter.y+dy;
+ if(islandDepth(x,y)>300)objects.push({id:24000+j,x,y,type:'hamlet-'+kind,size:1});
+}
 const pond={x:850,y:1700,rx:330,ry:240};function lakeRadius(a){return 1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2)}function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
 const campProtectionRadius=365;
 state.campClearingDone=state.campClearingDone===true||state.campTier>0;
@@ -3307,7 +3318,35 @@ function worldSprite(kind,x,y,w,h,variant=0){
  ctx.drawImage(img,Math.round(x-w/2),Math.round(y-h),Math.round(w),Math.round(h));
  ctx.restore();return true;
 }
+function drawHamletScenery(o){
+ const kind=o.type.slice(7),x=o.x,y=o.y;
+ ctx.save();ctx.translate(x,y);
+ ctx.fillStyle='#343a3288';ctx.beginPath();ctx.ellipse(5,7,61,19,0,0,Math.PI*2);ctx.fill();
+ if(kind==='well'){
+  ctx.fillStyle='#777c7d';ctx.fillRect(-24,-20,48,26);ctx.fillStyle='#343d43';ctx.fillRect(-17,-16,34,16);
+  ctx.strokeStyle='#b5aaa0';ctx.lineWidth=5;ctx.strokeRect(-24,-20,48,26);
+  ctx.fillStyle='#77543c';ctx.fillRect(-27,-50,6,35);ctx.fillRect(21,-50,6,35);
+  ctx.fillStyle='#5b3c31';ctx.beginPath();ctx.moveTo(-34,-48);ctx.lineTo(0,-72);ctx.lineTo(34,-48);ctx.closePath();ctx.fill();
+ }else if(kind==='market'){
+  ctx.fillStyle='#876247';ctx.fillRect(-45,-38,90,42);ctx.fillStyle='#b9a37c';ctx.fillRect(-37,-33,74,24);
+  ctx.fillStyle='#e2c39a';ctx.fillRect(-49,-66,98,15);
+  for(let i=0;i<6;i++){ctx.fillStyle=i%2?'#f0ddc1':'#9c443d';ctx.fillRect(-49+i*16,-66,16,15)}
+  ctx.fillStyle='#6b4a33';ctx.fillRect(-43,-51,6,51);ctx.fillRect(37,-51,6,51);
+ }else{
+  const wide=kind==='inn'?76:kind==='barn'?70:58;
+  ctx.fillStyle='#5e4937';ctx.fillRect(-wide,-75,wide*2,80);
+  ctx.fillStyle=kind==='inn'?'#a88b66':'#b39b79';ctx.fillRect(-wide+7,-68,wide*2-14,66);
+  ctx.fillStyle='#463b40';ctx.beginPath();ctx.moveTo(-wide-15,-72);ctx.lineTo(0,-129);ctx.lineTo(wide+15,-72);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#786068';ctx.beginPath();ctx.moveTo(-wide+2,-75);ctx.lineTo(0,-117);ctx.lineTo(wide-2,-75);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#c3aa87';ctx.lineWidth=3;ctx.strokeRect(-wide+9,-64,wide*2-18,59);
+  ctx.fillStyle='#553927';ctx.fillRect(-12,-38,24,43);
+  for(const wx of [-wide+26,wide-43]){ctx.fillStyle='#f5c76b';ctx.fillRect(wx,-54,18,17);ctx.strokeStyle='#543f36';ctx.lineWidth=3;ctx.strokeRect(wx,-54,18,17)}
+  if(kind==='inn'){ctx.fillStyle='#e7cb8c';ctx.fillRect(-43,-86,86,13);ctx.fillStyle='#493428';ctx.font='bold 11px serif';ctx.textAlign='center';ctx.fillText('THE WAYFARER',0,-76)}
+ }
+ ctx.restore();
+}
 function worldArtScenery(o){
+ if(o.type.startsWith('hamlet-')){drawHamletScenery(o);return true}
  const type=o.type;
  const map={tree:'tree',fir:'fir',palm:'palm',bareTree:'bareTree',cactus:'cactus',
   rock:'rock',bush:'bush',flower:'flower',mushroom:'mushroom'};
