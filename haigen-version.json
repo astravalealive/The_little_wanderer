@@ -1,4 +1,4 @@
 {
-  "build": 150,
-  "notes": "V150: fixes stale V147 build counter and repeating update prompt; keeps illustrated butterflies and woodland birds visually airborne without ground-walking motion-sheet frames. Retains V149 expanded eastern dunes."
+  "build": 151,
+  "notes": "V151: butterflies use flapping wing rendering, hovering above the woodland and briefly settling; birds use actual airborne and grounded states rather than always being shown flying. Desert terrain redesign remains pending."
 }
