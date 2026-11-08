@@ -1240,7 +1240,7 @@ function drawUnifiedCreatureArt(sheet,cell,kind,x,y,dir,walking,anim,scale,sizeS
  const tilt=kind==='snake'&&active?pulse*.065:kind==='crab'&&active?pulse*.033:lean;
  const frame=creatureFrameFor(kind,action,active,anim);
  const row=motionSpecies.indexOf(kind);
- const motion=wildlifeMotionReady&&row>=0;
+ const motion=wildlifeMotionReady&&row>=0&&!flying; // Flying wildlife uses clean illustrated art, never walking motion-sheet frames.
  const src=motion?wildlifeMotionSheet:sheet;
  const ox=motion?frame*96:cell[0]*96,oy=motion?row*76:cell[1]*76;
  const facing=(dir==='up'||dir==='down'||dir==='left'||dir==='right')?dir:'right';
@@ -5300,9 +5300,9 @@ function updateBirds(dt){
 function drawBird(b){
  if(b.hiddenUntil&&time<b.hiddenUntil)return;
  if(illustratedFaunaReady){
-  const flying=b.air>.04,alt=flying?b.air*(52+Math.sin(time*.003+b.phase)*8):0;
+  const flying=true,alt=Math.max(.65,b.air)*(52+Math.sin(time*.003+b.phase)*8);
   drawIllustratedFauna('bird',b.x,b.y-alt,b.vx<0?'left':'right',
-   flying||Math.abs(b.vx)>.04,time+b.phase*200,.94,flying?'fly':'rest');
+   true,time+b.phase*200,.94,'fly');
   // The illustrated atlas already contains wings. Avoid drawing blue limb-like strokes.
   return;
  }
