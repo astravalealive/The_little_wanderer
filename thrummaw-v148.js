@@ -1,7 +1,7 @@
 /* V148 Thrummaw: original desert ambush boss. */
 (()=>{'use strict';
 const p=window.__gloamPort;if(!p)return;
-const {state,ctx}=p,X=8560,Y=1680,TAU=Math.PI*2;
+const {state,ctx}=p,X=1300,Y=6770,TAU=Math.PI*2;
 const s={hp:240,phase:'buried',alert:0,charge:0,turn:0,player:0,enemy:0,defend:false,cool:0,lock:false,shake:0,fx:[],wait:true};
 let last=0;const rocks=[[-220,-90],[-20,205],[235,75],[140,-235],[-310,180]].map(([x,y],i)=>({x:X+x,y:Y+y,r:36+i%3*9}));
 const safeRock=()=>rocks.some(r=>Math.hypot(state.x-r.x,state.y-r.y)<r.r+18);
