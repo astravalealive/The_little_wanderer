@@ -1,4 +1,4 @@
 {
-  "build": 230,
-  "notes": "Fix startup crash caused by referencing camera before initialization; preserve home preview and upgrade menu."
+  "build": 231,
+  "notes": "Larger homestead houses, persistent indoor state, doorway-only entry, wall collision and opening-door animation."
 }
