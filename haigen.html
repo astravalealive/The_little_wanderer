@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V235 · Interior Canvas Fix</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V236 · Upstairs and Furniture</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
 .mobile-menu,.stats-toggle{display:none}
 @media(max-width:600px),(pointer:coarse) and (max-height:600px){
  .hud{top:calc(env(safe-area-inset-top,0px) + 8px);right:84px}
@@ -4333,7 +4333,7 @@ async function loadApprovedHomes(){
  }catch(e){approvedHomes.error=String(e);console.warn('Approved artwork loading:',e);notify('House artwork could not load. Check connection and refresh.');}
 }
 loadApprovedHomes();
-let homeInside=false,homeDoorOpen=0;let housePreviewTier=1; // V227: visual preview only; never overwrites earned home progress.
+let homeInside=false,homeDoorOpen=0,homeFloor=0,homeStairCooldown=0;let housePreviewTier=1; // V227: visual preview only; never overwrites earned home progress.
 function drawCampHome(){
  const tier=housePreviewTier||state.campTier;if(tier<1)return;
  const x=cottage.x+35,y=cottage.y-10;
@@ -6936,11 +6936,11 @@ if(state.campTier>0){
  const crossedIn=!homeInside&&prevPlayerY>=front&&state.y<front&&withinDoor;
  const crossedOut=homeInside&&prevPlayerY<=front&&state.y>front&&withinDoor;
  if(crossedIn){
-  homeInside=true;homeDoorOpen=1;
+  homeInside=true;homeFloor=0;homeDoorOpen=1;
   state.x=doorX;state.y=front-15;
   notify('🚪 Haigen opens the door and steps inside.');
  }else if(crossedOut){
-  homeInside=false;homeDoorOpen=1;
+  homeInside=false;homeFloor=0;homeDoorOpen=1;
   state.x=doorX;state.y=front+17;
   notify('🚪 Haigen steps outside.');
  }else if(!homeInside){
@@ -6948,15 +6948,29 @@ if(state.campTier>0){
   const inFootprint=state.x>hx-halfWidth&&state.x<hx+halfWidth&&state.y>back&&state.y<front;
   if(inFootprint){state.x=prevPlayerX;state.y=prevPlayerY;}
  }else{
-  // Indoor furniture collision: bed to the left, hearth to the upper right.
-  // This is independent of exterior trees and companion movement.
+  // Room-relative collision zones match each approved interior tier.
   const roomX=(state.x-(hx-halfWidth))/(2*halfWidth);
   const roomY=(state.y-back)/(front-back);
-  const bedBlocked=roomX>.09&&roomX<.39&&roomY>.18&&roomY<.76;
-  const hearthBlocked=roomX>.61&&roomX<.94&&roomY>.08&&roomY<.46;
-  const beyondWalls=state.x<hx-halfWidth+17||state.x>hx+halfWidth-17||state.y<back+18;
-  if(beyondWalls||state.y>front||bedBlocked||hearthBlocked){
-   state.x=prevPlayerX;state.y=prevPlayerY;
+  homeStairCooldown=Math.max(0,homeStairCooldown-dt);
+  const stairs=tier>=3&&roomX>.06&&roomX<.23&&roomY>.10&&roomY<.51;
+  if(homeFloor===0&&stairs&&roomY<.23&&homeStairCooldown===0){
+   homeFloor=1;homeStairCooldown=900;
+   state.x=hx-halfWidth*.65;state.y=front-34;
+   notify('Haigen reaches the upstairs landing.');
+  }else if(homeFloor===1&&stairs&&roomY>.43&&homeStairCooldown===0){
+   homeFloor=0;homeStairCooldown=900;
+   state.x=hx-halfWidth*.65;state.y=back+(front-back)*.51;
+   notify('Haigen returns downstairs.');
+  }else{
+   const tableBlocked=tier>=2&&roomX>.39&&roomX<.77&&roomY>.43&&roomY<.77;
+   const bedBlocked=tier===1&&roomX>.09&&roomX<.39&&roomY>.18&&roomY<.76;
+   const hearthBlocked=roomX>.59&&roomX<.90&&roomY>.08&&roomY<.38;
+   const stairsWall=tier>=3&&roomX>.06&&roomX<.23&&roomY>.10&&roomY<.51&&roomX<.10;
+   const upstairsFurniture=homeFloor===1&&roomX>.57&&roomX<.86&&roomY>.20&&roomY<.58;
+   const beyondWalls=state.x<hx-halfWidth+17||state.x>hx+halfWidth-17||state.y<back+18;
+   if(beyondWalls||state.y>front||(homeFloor===0&&(tableBlocked||bedBlocked||hearthBlocked||stairsWall))||upstairsFurniture){
+    state.x=prevPlayerX;state.y=prevPlayerY;
+   }
   }
  }
  homeDoorOpen=Math.max(0,homeDoorOpen-dt/900);
@@ -7790,7 +7804,18 @@ function drawHomeInteriorScene(){
  const cw=ctx.canvas.width,ch=ctx.canvas.height;
  ctx.fillStyle='#151d19';ctx.fillRect(0,0,cw,ch);
  const size=Math.min(cw*.91,ch*.73),left=(cw-size)/2,top=(ch-size)/2;
- if(art&&art.complete&&art.naturalWidth){
+ if(homeFloor===1){
+  // Distinct upstairs floor: timber loft, bed, storage and return staircase.
+  ctx.fillStyle='#765436';ctx.fillRect(left,top,size,size);
+  ctx.strokeStyle='#aa8051';ctx.lineWidth=Math.max(2,size*.012);
+  for(let i=0;i<14;i++){ctx.beginPath();ctx.moveTo(left,top+i*size/14);ctx.lineTo(left+size,top+i*size/14);ctx.stroke();}
+  ctx.fillStyle='#38271d';ctx.fillRect(left+size*.05,top+size*.12,size*.19,size*.42);
+  ctx.fillStyle='#b18a54';for(let i=0;i<7;i++)ctx.fillRect(left+size*.075,top+size*(.15+i*.053),size*.14,size*.018);
+  ctx.fillStyle='#543d2a';ctx.fillRect(left+size*.61,top+size*.20,size*.25,size*.31);
+  ctx.fillStyle='#d9bc86';ctx.fillRect(left+size*.64,top+size*.23,size*.19,size*.24);
+  ctx.fillStyle='#cda367';ctx.fillRect(left+size*.32,top+size*.15,size*.16,size*.12);
+  ctx.fillStyle='#e9c783';ctx.font='bold '+Math.round(size*.035)+'px Georgia';ctx.fillText('DOWN',left+size*.145,top+size*.60);
+ }else if(art&&art.complete&&art.naturalWidth){
   const mx=art.naturalWidth*.075,my=art.naturalHeight*.075;
   ctx.imageSmoothingEnabled=false;
   ctx.drawImage(art,mx,my,art.naturalWidth-mx*2,art.naturalHeight-my*2,left,top,size,size);
@@ -7801,9 +7826,9 @@ function drawHomeInteriorScene(){
  character(0,0,'boy');ctx.restore();
  ctx.font='bold '+Math.max(15,Math.round(cw/36))+'px Georgia';
  ctx.fillStyle='#f3d9a1';ctx.textAlign='center';
- ctx.fillText('HAIGEN’S HOME · LEVEL '+tier,cw/2,top-18);
+ ctx.fillText('HAIGEN’S HOME · LEVEL '+tier+(homeFloor?' · UPSTAIRS':''),cw/2,top-18);
  ctx.font=Math.max(12,Math.round(cw/52))+'px Georgia';
- ctx.fillText('Walk to the bottom doorway to leave',cw/2,top+size+28);
+ ctx.fillText(homeFloor?'Use the left staircase to go downstairs':tier>=3?'Use the left stairs to reach upstairs · Door to leave':'Walk to the bottom doorway to leave',cw/2,top+size+28);
  ctx.restore();
 }
 function frame(now){
