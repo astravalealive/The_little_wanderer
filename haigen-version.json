@@ -1,4 +1,4 @@
 {
-  "build": 138,
-  "notes": "V138 LIVE: Environment Sprite Atlas QA/cleanup. Root cause: stale neighbour artwork included by oversized environmental source rects. Generated and integrated a transparent isolated original-art sprite atlas, removing contamination from rocks (old log fragments), firs, bushes, stumps, mushrooms, tents, flowers, ore and timber. Realigned resulting sprites to prop anchors, preserved original atlas as fallback, audited other game image assets. Unchanged: world positions, controls, combat, Gloamjaw V136 VFX and V137 revival, saves, Skolli/Dylan, approved character art and Ember."
+  "build": 145,
+  "notes": "V145 LIVE: Clean original adult duck and duckling sprite artwork used for all swimming and land rendering. In-water sprites are cropped at the source to hide only legs, preserving body and head above the surface; ducklings use correctly scaled dedicated sprites. Flight has filled feather-shaped wings rather than noodle-like strokes. HUD and corner build counter updated from stale V138 to V145. Preserves the existing saves, duck lifecycle and other game systems."
 }
