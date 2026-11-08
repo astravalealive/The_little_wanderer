@@ -3149,7 +3149,8 @@ function worldArtScenery(o){
  const isTree=type==='tree'||type==='fir';
  const campNear=isTree&&Math.hypot(o.x-cottage.x,o.y-cottage.y)<420;
  const canopyScale=isTree?(campNear?.70:.77)+seeded(id*43+78)*.16:1;
- worldSprite(spriteName,o.x,o.y,w*size*canopyScale*rockScale,h*size*canopyScale*rockScale,v);
+ if(type==='rock')rbDrawRock(o);
+ else worldSprite(spriteName,o.x,o.y,w*size*canopyScale*rockScale,h*size*canopyScale*rockScale,v);
  if(type==='rock'){
   const hits=Number(state.boulderHits[o.id])||0;
   if(hits){ctx.save();ctx.strokeStyle='#282f35';ctx.lineWidth=2.5;ctx.beginPath();
