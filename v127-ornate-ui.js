@@ -69,6 +69,16 @@ el.innerHTML=[
  '<button id="v127CloseSettings">Close</button></aside>'
 ].join('');
 document.body.appendChild(el);
+// V217: portrait acts as a camera locator, not a teleport.
+const haigenPortrait=el.querySelector('.v127-portrait');
+haigenPortrait.setAttribute('role','button');
+haigenPortrait.setAttribute('tabindex','0');
+haigenPortrait.setAttribute('aria-label','Find Haigen on the map');
+haigenPortrait.style.cursor='pointer';
+haigenPortrait.style.pointerEvents='auto';
+const focusHaigen=()=>window.__v127Bridge?.focusHaigen?.();
+haigenPortrait.addEventListener('click',focusHaigen);
+haigenPortrait.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();focusHaigen()}});
 // Keep the iPad landscape readable, while allowing the full objective panel
 // to open from its large + target. Desktop keeps the quest visible.
 if(window.innerWidth<=600){
