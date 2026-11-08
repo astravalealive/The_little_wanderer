@@ -743,7 +743,7 @@ const pond={x:850,y:1700,rx:330,ry:240};function lakeRadius(a){
  // Keep the original western and northern shores, camp-facing edge and pond centre intact.
  const base=1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2);
  const angularDistance=Math.atan2(Math.sin(a-.77),Math.cos(a-.77));
- const easternBay=.66*Math.exp(-Math.pow(angularDistance/.53,2));
+ const easternBay=3.35*Math.exp(-Math.pow(angularDistance/.86,2))*(1+.065*Math.sin(a*11+1.3)+.045*Math.cos(a*17-0.7));
  return base+easternBay;
 }function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
 // V228: open near the homestead for immediate testing; do not overwrite saved location.
