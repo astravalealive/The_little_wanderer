@@ -1,9 +1,10 @@
 /* V148 Thrummaw: original desert ambush boss. */
 (()=>{'use strict';
 const p=window.__gloamPort;if(!p)return;
-const {state,ctx}=p,X=6930,Y=1680,TAU=Math.PI*2;
+const {state,ctx}=p,X=8560,Y=1680,TAU=Math.PI*2;
 const s={hp:240,phase:'buried',alert:0,charge:0,turn:0,player:0,enemy:0,defend:false,cool:0,lock:false,shake:0,fx:[],wait:true};
-let last=0;
+let last=0;const rocks=[[-220,-90],[-20,205],[235,75],[140,-235],[-310,180]].map(([x,y],i)=>({x:X+x,y:Y+y,r:36+i%3*9}));
+const safeRock=()=>rocks.some(r=>Math.hypot(state.x-r.x,state.y-r.y)<r.r+18);
 const distance=()=>Math.hypot(state.x-X,state.y-Y),now=()=>p.snapshot().time;
 const hud=document.createElement('div');hud.id='thrummawHud';
 hud.style.cssText='display:none;position:fixed;z-index:39;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(95vw,540px);box-sizing:border-box;padding:12px;background:#28202aef;color:#ffe5ae;border:2px solid #b9925b;border-radius:12px;font:13px Georgia,serif;box-shadow:0 4px 25px #000a';
@@ -36,7 +37,7 @@ function update(dt){
  if(s.lock&&d>540)s.lock=false;
  if(s.phase==='retreat'){if(!s.lock)s.phase='buried';return}
  if(s.phase==='buried'){
-  if(d<460){s.alert=Math.min(100,s.alert+step*(state.resting?.002:.016));if(d<220)s.alert+=step*.055}
+  if(d<560){s.alert=Math.min(100,s.alert+step*(safeRock()?.001:state.resting?.002:.016));if(d<260&&!safeRock())s.alert+=step*.055}
   else s.alert=Math.max(0,s.alert-step*.013);
   if(s.alert>=100&&!s.lock)emerge();
  }else if(s.phase==='rising'){if(t-s.shake>1550)begin()}
@@ -44,7 +45,7 @@ function update(dt){
   if(d>660||p.snapshot().collapsed){s.phase='retreat';s.lock=true;end();return}
   s.player=Math.min(2200,s.player+step);
   if(!(s.wait&&s.player>=2200&&!state.autonomy))s.enemy+=step;
-  if(s.enemy>=3900){s.enemy=0;const hits=[['a crushing jaw strike',22],['a spray of sand',11],['a whipping sensory tendril',16],['a subterranean shockwave',18]],h=hits[s.turn++%hits.length],damage=s.defend?Math.ceil(h[1]*.35):h[1];s.defend=false;p.takeDamage(damage,'Thrummaw '+h[0],false,{x:X,y:Y});message('Thrummaw attacks with '+h[0]+'! '+damage+' damage.')}
+  if(s.enemy>=3900){s.enemy=0;const hits=[['a crushing jaw strike',22],['a spray of sand',11],['a whipping sensory tendril',16],['a subterranean shockwave',18]],h=hits[s.turn++%hits.length],damage=s.defend?Math.ceil(h[1]*.35):h[1];s.defend=false;if(safeRock()){message('Thrummaw slams into the stone refuge! Haigen is safe.');}else p.takeDamage(damage,'Thrummaw '+h[0],false,{x:X,y:Y});if(!safeRock())message('Thrummaw attacks with '+h[0]+'! '+damage+' damage.')}
   if(state.autonomy&&s.player>=2200)act(state.health<45&&state.potions?'heal':'attack');
   document.getElementById('thrumHealth').textContent=Math.ceil(s.hp)+' / 240';
   document.getElementById('thrumHp').style.width=s.hp/240*100+'%';
@@ -58,6 +59,7 @@ function ground(){
  const t=now(),d=distance(),pulse=Math.sin(t*.009)*3;
  ctx.save();
  for(let i=0;i<13;i++){const a=i*2.4,r=65+(i%4)*38;ellipse(X+Math.cos(a)*r,Y+Math.sin(a)*r*.6,9+i%3*3,3,'#c1a26c')}
+ for(const r of rocks){ellipse(r.x,r.y+8,r.r+8,13,'#a78960');ellipse(r.x,r.y,r.r,r.r*.52,'#6f6860');ellipse(r.x-8,r.y-8,r.r*.63,r.r*.28,'#aaa18b')}
  if(s.phase==='buried'&&s.alert>12){for(let k=0;k<3;k++){ctx.strokeStyle='rgba(124,84,45,'+(s.alert/180)+')';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(X,Y,35+k*24+pulse,15+k*10,0,0,TAU);ctx.stroke()}}
  if(s.phase==='rising'){const q=Math.min(1,(t-s.shake)/1550);for(let k=0;k<4;k++){ctx.strokeStyle='rgba(120,77,43,'+(1-q)*.7+')';ctx.lineWidth=3+k;ctx.beginPath();ctx.ellipse(X,Y,30+q*170+k*12,12+q*75+k*7,0,0,TAU);ctx.stroke()}}
  ctx.restore();
@@ -74,5 +76,5 @@ function creature(){
  ellipse(-51,-43,8,7,'#d7a24c');ellipse(51,-43,8,7,'#d7a24c');ellipse(-51,-43,3,3,'#21151a');ellipse(51,-43,3,3,'#21151a');
  ctx.restore();
 }
-window.__thrummaw={update,ground,creature,snapshot:()=>({...s})};
+window.__thrummaw={update,ground,creature,y:Y,snapshot:()=>({...s,rocks})};
 })();
