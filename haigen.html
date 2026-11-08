@@ -4845,8 +4845,8 @@ function updateDucks(dt){
 function drawDuckWater132(x,y,phase,size=1){
  ctx.save();ctx.translate(x,y);ctx.scale(size,size);
  const paddle=Math.sin(phase*1.7);
- ellipse(-9,4+paddle*2,6,2,'#d3a36b40');
- ellipse(10,4-paddle*2,6,2,'#d3a36b40');
+ ellipse(-9,4+paddle*2,6,2,'#438eae25');
+ ellipse(10,4-paddle*2,6,2,'#438eae25');
  ellipse(0,-3,30,5,'#438eae55');
  ctx.strokeStyle='#d8f6e4bd';ctx.lineWidth=1.65;
  ctx.beginPath();ctx.ellipse(0,1,30+Math.sin(phase)*2,7,0,0,Math.PI*2);ctx.stroke();
@@ -4856,11 +4856,12 @@ function drawDuckWater132(x,y,phase,size=1){
  ctx.restore();
 }
 function drawDuck(d){
- if(d.air<.08&&lakeLevel(d.x,d.y)<.91){
+ if(d.air<.08&&lakeLevel(d.x,d.y)<1){
   const dir=Math.cos(d.heading)<-.45?'left':Math.cos(d.heading)>.45?'right':Math.sin(d.heading)<0?'up':'down';
-  ctx.save();ctx.beginPath();ctx.rect(d.x-95,d.y-108,190,102);ctx.clip();
+  ctx.save();ctx.beginPath();// Waterline cuts away the complete lower body and all sprite feet.
+  ctx.rect(d.x-95,d.y-120,190,99);ctx.clip();
   worldFaunaDraw('duck',d.x,d.y+Math.sin(time*.004+d.phase)*2,dir,true,time*.43+d.phase*1000,
-   1.02*d.size,d.foraging?'forage':'walk');
+   1.02*d.size,d.foraging?'forage':'rest');
   ctx.restore();
   drawDuckWater132(d.x,d.y,time*.006+d.phase,d.size);
   window.__v132DuckWater={feetHidden:true,dir};
@@ -4921,11 +4922,11 @@ function drawDuckNest(f){
 function drawDuckling(ch){
  const growth=Math.min(1,ch.age),scale=.47+growth*.43;
  if(illustratedExtraReady){
-  const water=!ch.flying&&!ch.departAlt&&lakeLevel(ch.x,ch.y)<.91;
-  if(water){ctx.save();ctx.beginPath();ctx.rect(ch.x-45,ch.y-58,90,52);ctx.clip()}
+  const water=!ch.flying&&!ch.departAlt&&lakeLevel(ch.x,ch.y)<1;
+  if(water){ctx.save();ctx.beginPath();ctx.rect(ch.x-45,ch.y-75,90,55);ctx.clip()}
   drawIllustratedExtraFauna('duckling',ch.x,ch.y-(ch.departAlt||0),
     ch.vx<0?'left':'right',ch.alarmed||ch.foraging,
-    time+ch.phase*1000,.36+growth*.32,ch.foraging?'forage':ch.alarmed?'flee':'walk');
+    time+ch.phase*1000,.36+growth*.32,water?'rest':ch.foraging?'forage':ch.alarmed?'flee':'walk');
   if(water){ctx.restore();drawDuckWater132(ch.x,ch.y,time*.008+ch.phase,.39+growth*.28)}
   return;
  }
