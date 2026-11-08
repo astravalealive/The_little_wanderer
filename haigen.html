@@ -6653,5 +6653,37 @@ offlineProgress();devInitialAccess();$('artBtn').textContent=rbEnabled?'🎨 Cla
   toolCanvas:id=>haigenToolSprite(id),
   refreshTools:()=>renderHotbar()
  };
+
+// V163 frog passenger HUD: visible catch status and one-tap habitat release.
+const frogHud=document.createElement('div');
+frogHud.id='frogPassengerHud';
+frogHud.setAttribute('aria-live','polite');
+frogHud.style.cssText='position:fixed;right:12px;top:22%;z-index:10020;display:none;align-items:center;gap:9px;padding:8px 10px;border:2px solid #b5c6a2;border-radius:9px;background:rgba(21,38,33,.93);color:#f1e9cc;font:600 13px system-ui,sans-serif;box-shadow:0 3px 12px #0008;max-width:180px;pointer-events:auto';
+const frogIcon=document.createElement('canvas');frogIcon.width=40;frogIcon.height=40;frogIcon.setAttribute('aria-label','Frog in net');frogIcon.setAttribute('role','img');
+const fg=frogIcon.getContext('2d');fg.imageSmoothingEnabled=false;
+fg.fillStyle='#304d42';fg.fillRect(0,0,40,40);
+fg.fillStyle='#668d51';fg.fillRect(8,16,24,15);fg.fillRect(12,12,16,9);fg.fillRect(5,22,8,9);fg.fillRect(27,22,8,9);
+fg.fillStyle='#91ad6b';fg.fillRect(12,15,16,9);fg.fillRect(8,26,24,4);
+fg.fillStyle='#e4d7a4';fg.fillRect(12,12,6,6);fg.fillRect(23,12,6,6);
+fg.fillStyle='#1b2b28';fg.fillRect(14,13,3,4);fg.fillRect(25,13,3,4);
+fg.fillStyle='#3d5a42';fg.fillRect(18,23,4,2);
+const frogText=document.createElement('div');frogText.textContent='Frog in net';
+const frogRelease=document.createElement('button');frogRelease.type='button';frogRelease.textContent='Release frog';frogRelease.style.cssText='display:none;min-height:44px;padding:8px;border:1px solid #b5c6a2;border-radius:6px;background:#53764d;color:white;font:700 13px system-ui;cursor:pointer';
+frogRelease.addEventListener('click',()=>{if(state.carriedFrogId>=0)haigenUseNet();refreshFrogHud()});
+const frogInfo=document.createElement('div');frogInfo.style.cssText='display:flex;flex-direction:column;gap:5px';frogInfo.append(frogText,frogRelease);frogHud.append(frogIcon,frogInfo);document.body.appendChild(frogHud);
+let lastFrogReleaseReady=false;
+function refreshFrogHud(){
+ const f=state.carriedFrogId>=0?frogs[state.carriedFrogId]:null;
+ frogHud.style.display=f?'flex':'none';
+ if(!f){lastFrogReleaseReady=false;return}
+ const desired={x:state.x+(playerMotion.dir==='left'?-52:52),y:state.y+12};
+ const pos=frogReturnPoint(f,desired.x,desired.y);
+ const ready=Math.hypot(pos.x-state.x,pos.y-state.y)<=150;
+ frogRelease.style.display=ready?'block':'none';
+ frogText.textContent=ready?'Frog in net · Safe to release':'Frog in net · Find pond or marsh';
+ if(ready&&!lastFrogReleaseReady)notify('Frog habitat nearby. Tap Release frog!');
+ lastFrogReleaseReady=ready;
+}
+setInterval(refreshFrogHud,300);refreshFrogHud();
  requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
 </script><script src="./v127-ornate-ui.js?v=1"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><script src="./gloamjaw-v147.js?v=147"></script><script src="./thrummaw-v148.js?v=149"></script></body></html>
