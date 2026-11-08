@@ -7945,6 +7945,7 @@ offlineProgress();devInitialAccess();$('artBtn').textContent=rbEnabled?'🎨 Cla
  snapshot:()=>({time,x:state.x,y:state.y,worldZoom:worldZoom(),cameraX:cam.x,cameraY:cam.y,width:W,height:H,dir:playerMotion.dir,collapsed:collapseRemaining>0}),
  animalAlive,hurtAnimal,takeDamage,notify,memory,save,equipTool,renderHotbar,startHaigenAction,soundEffect,close};
  window.__v127Bridge={
+  focusHaigen:()=>{cam.x=state.x;cam.y=state.y;cameraDetached=true;return true},
   snapshot:()=>{
    const t=Math.max(0,Number(state.daytime)||0);
    return {
@@ -7996,4 +7997,4 @@ function refreshFrogHud(){
 }
 setInterval(refreshFrogHud,300);refreshFrogHud();
  requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./v127-ornate-ui.js?v=1"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><script src="./gloamjaw-v147.js?v=147"></script><script src="./thrummaw-v148.js?v=167"></script></body></html>
+</script><script src="./v127-ornate-ui.js?v=217"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><script src="./gloamjaw-v147.js?v=147"></script><script src="./thrummaw-v148.js?v=167"></script></body></html>
