@@ -135,6 +135,14 @@ function enemyTurn(){
 }
 function update(dt){
  const r=distance(),t=time();
+ const hud=$('gloamBossHud');
+ if(hud){
+  const showing=(data.awakened||f.rising)&&!data.defeated&&r<520;
+  hud.style.display=showing?'block':'none';
+  if(showing){hud.setAttribute('aria-valuenow',String(Math.ceil(data.hp)));
+   $('gloamBossFill').style.width=Math.max(0,data.hp/MAX*100)+'%';
+   $('gloamBossValue').textContent=Math.ceil(data.hp)+' / '+MAX;}
+ }
  if(data.defeated){if(f.active)endBattle();return}
  if(f.retreatLock&&r>445)f.retreatLock=false;
  if(!data.awakened){
