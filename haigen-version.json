@@ -1,4 +1,4 @@
 {
-  "build": 149,
-  "notes": "V149: expands the desert eastward to x10400 while retaining existing woodland and old save coordinates. Thrummaw moves into new eastern dunes at x8560, y1680; stone refuges provide protection during its subterranean pursuit and ATB attacks. Existing duck families, Gloamjaw, and Ember remain unchanged."
+  "build": 150,
+  "notes": "V150: fixes stale V147 in-game build counter and repeating update prompt. V149 eastern dunes retained. Wildlife flight improvements pending."
 }
