@@ -6935,8 +6935,9 @@ if(state.campTier>0){
  const widths=[0,330,365,405,485,560],heights=[0,310,335,355,385,420];
  const width=widths[tier]||330,height=heights[tier]||310;
  const halfWidth=width*.43,front=hy+13,back=hy-height*.78;
- // The approved art has its front step slightly left of centre at tier 1.
- const doorFractions=[0,.36,.48,.49,.50,.50];
+ // Tier 1 approved cottage artwork has its door at ~30% of the facade width (not 36%).
+ // Keep interior staircase geometry independent so the working room collision remains intact.
+ const doorFractions=[0,.30,.48,.49,.50,.50];
  const exteriorDoorX=hx+(doorFractions[tier]-.5)*width;
  // Interior stairs remain centred on their own artwork, independent of the exterior facade.
  const interiorDoorX=hx+(.455-.5)*width;
