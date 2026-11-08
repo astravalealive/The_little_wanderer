@@ -1,4 +1,4 @@
 {
-  "build": 175,
-  "notes": "Restore synchronized version counter and update detection."
+  "build": 193,
+  "notes": "Visual World Editor in DEV KIT: place, move, erase, paint paths, save, export/import and undo."
 }
