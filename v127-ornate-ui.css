@@ -196,3 +196,57 @@ body.v127-rpg .slot .rpg-item-svg svg{width:100%;height:100%;display:block}
  .v127-quest[data-collapsed="true"]{padding:7px 9px;min-height:36px}
  .v127-quest[data-collapsed="true"] h3{margin:2px 18px 1px 0;font-size:13px}
 }
+
+/* V210: shared responsive HUD for iPhone portrait, iPad and landscape.
+   Do not change world canvas, sprite rendering or touch controls. */
+body.v127-rpg #v127Root .v127-quest{
+ box-sizing:border-box;max-width:calc(100vw - 24px);
+ max-height:min(44dvh,330px);overflow-y:auto;overscroll-behavior:contain;
+ touch-action:pan-y;
+}
+body.v127-rpg #v127Root .v127-quest[data-collapsed="true"] ul{display:none}
+body.v127-rpg #v127Root .v127-quest .v127-quest-toggle{
+ display:block!important;position:absolute;right:5px;top:4px;
+ min-width:30px;min-height:30px;pointer-events:auto;
+ border:0;background:transparent;color:#f5d79c;font:bold 18px Georgia,serif;
+}
+body.v127-rpg #v127Root .v127-quest{pointer-events:auto}
+body.v127-rpg #v127Root .v127-quest h3{padding-right:27px}
+body.v127-rpg #frogPassengerHud{
+ box-sizing:border-box!important;max-width:min(190px,44vw)!important;
+ width:max-content!important;height:auto!important;min-height:0!important;
+}
+body.v127-rpg #frogPassengerHud canvas{
+ position:static!important;inset:auto!important;
+ width:40px!important;height:40px!important;max-width:40px!important;
+ min-width:40px!important;flex:0 0 40px!important;
+}
+@media(min-width:601px) and (max-width:1100px){
+ .v127-quest{right:185px;width:clamp(205px,27vw,300px);min-width:0}
+ .v127-head{transform:scale(.88);transform-origin:top left}
+ .v127-mini{width:130px;height:130px}
+ body.v127-rpg .hotbar{max-width:min(calc(100vw - 210px),790px)}
+ body.v127-rpg #frogPassengerHud{top:calc(env(safe-area-inset-top,0px) + 205px)}
+}
+@media(max-width:600px){
+ body.v127-rpg #v127Root .v127-quest{
+  top:calc(env(safe-area-inset-top,0px) + 115px);
+  width:min(170px,46vw);max-height:30dvh;
+ }
+ body.v127-rpg #frogPassengerHud{
+  top:calc(env(safe-area-inset-top,0px) + 235px);
+  right:8px;max-width:min(172px,46vw)!important;
+  padding:5px!important;gap:5px!important;
+ }
+ body.v127-rpg .toast{max-width:min(260px,calc(100vw - 24px))}
+}
+@media(max-height:550px) and (orientation:landscape){
+ body.v127-rpg #v127Root .v127-quest{
+  top:calc(env(safe-area-inset-top,0px) + 45px);
+  max-height:35dvh;
+ }
+ body.v127-rpg #frogPassengerHud{
+  top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 125px);
+ }
+ body.v127-rpg .hotbar{max-width:calc(100vw - 190px)}
+}
