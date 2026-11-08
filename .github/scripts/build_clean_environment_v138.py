@@ -67,6 +67,23 @@ def isolate(name,src):
  rgba=np.asarray(src).copy()
  rgba[:,:,3]=np.minimum(rgba[:,:,3],np.asarray(smooth))
  result=Image.fromarray(rgba,'RGBA')
+ # The ore tile has an extra dark horizontal fragment below the main rock.
+ # Trim only that known lower-left stray line; keep the valuable glint details.
+ if name=='ore':
+  px=np.asarray(result).copy()
+  px[69:,:72,3]=0
+  result=Image.fromarray(px,'RGBA')
+ # Remove now-clear surrounding empty frame space. Keep the ORIGINAL bitmap
+ # size and drawing semantics, but re-centre the silhouette on its prop anchor.
+ box=result.getchannel('A').getbbox()
+ if box:
+  sprite=result.crop(box)
+  scale=min(1.0,(src.width-6)/sprite.width,(src.height-3)/sprite.height)
+  if scale<1:
+   sprite=sprite.resize((max(1,round(sprite.width*scale)),max(1,round(sprite.height*scale))),Image.Resampling.LANCZOS)
+  centered=Image.new('RGBA',src.size,(0,0,0,0))
+  centered.alpha_composite(sprite,((src.width-sprite.width)//2,src.height-sprite.height-1))
+  result=centered
  orig_count=int(np.count_nonzero(alpha>=48))
  clean_count=int(np.count_nonzero(np.asarray(result.getchannel('A'))>=48))
  stats={
