@@ -101,13 +101,13 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 // The original 4200-unit woodland remains in its exact location for old saves and story quests.
 const expandedRegions=[
  {id:'downs',name:'The Open Downs',x:-5500,y:3050,w:8000,h:2350,color:'#b8c77e',animals:['🦬','🐇','🦊']},
- {id:'desert',name:'The Sunscorched Dunes',x:-5000,y:5400,w:10000,h:2800,color:'#e2c681',animals:['🦂','🦎','🐍']},
- {id:'coast',name:'The Shimmering Coast',x:-4000,y:8200,w:9500,h:1500,color:'#efd49c',animals:['🦀','🐢','🕊️']},
- {id:'wasteland',name:'The Ashen Expanse',x:2500,y:3100,w:5700,h:2400,color:'#958b80',animals:['🦅','🐀','🦎']},
+ {id:'desert',name:'The Dry Lands',x:2400,y:5050,w:4300,h:2650,color:'#e2c681',animals:['🦂','🦎','🐍']},
+ {id:'coast',name:'Saltwick Haven Coast',x:-4000,y:6900,w:9500,h:2200,color:'#efd49c',animals:['🦀','🐢','🕊️']},
+ {id:'wasteland',name:'The Ashen Expanse',x:3000,y:1600,w:4100,h:3200,color:'#958b80',animals:['🦅','🐀','🦎']},
  {id:'snow',name:'The Frostbound Highlands',x:-8200,y:-8200,w:19500,h:6650,color:'#dce9e9',animals:['🦌','🐇','🐐']},
  {id:'fen',name:'The Forgotten Swamps',x:-3950,y:-1550,w:2450,h:4750,color:'#698976',animals:['🐸','🦆','🪿']},
  {id:'rainforest',name:'Western Rainforest',x:-6500,y:-1550,w:2550,h:6000,color:'#487c5c',animals:['🐸','🦦','🪿']},
- {id:'eastDunes',name:'Eastern Dunes',x:4800,y:-1550,w:5500,h:4650,color:'#dcba7d',animals:['🦂','🦎','🐍']}
+ {id:'eastDunes',name:'Eastern Dunes',x:7550,y:-950,w:2600,h:5150,color:'#dcba7d',animals:['🦂','🦎','🐍']}
 ];
 // The ground and wardrobe sample the same gently curved biome borders.
 function biomePosition(x,y){
@@ -425,18 +425,19 @@ function coastWaterline(y){return coastRegion.x+coastRegion.w*(.715+.038*Math.si
 function biomeColor(r,night){return mixColour(r.color,regionalNightPalette[r.id]||'#647568',night*.87)}
 // V98: one rounded island, continuous beach, naturally blended biome boundaries.
 function islandDepth(x,y){
- // V170: mainland with fjords, headlands and two navigable offshore islands.
- // Preserve the established woodland and camp coordinates near (1500,1500).
- const dx=(x-1350)/6400,dy=(y-1350)/8000;
- const angle=Math.atan2(dy,dx);
- const coast=1+.095*Math.sin(3*angle+.7)+.067*Math.cos(5*angle-.4)+.043*Math.sin(9*angle+1.2)+.024*Math.cos(15*angle);
- const northCape=.14*Math.exp(-Math.pow((x+700)/2100,2))*Math.max(0,-dy);
- const southBays=.12*Math.exp(-Math.pow((x-2800)/1450,2))*Math.max(0,dy);
- const mainland=(coast+northCape-southBays-Math.hypot(dx,dy))*6400;
- const jungleAngle=Math.atan2((y-1150)/2300,(x+5950)/1400);
- const jungle=(1+.09*Math.sin(5*jungleAngle)-Math.hypot((x+5950)/1400,(y-1150)/2300))*1400;
- const easternAngle=Math.atan2((y-1900)/2250,(x-8750)/1450);
- const eastern=(1+.08*Math.sin(4*easternAngle+.4)-Math.hypot((x-8750)/1450,(y-1900)/2250))*1450;
+ // V177: broad, irregular mainland; independent western rainforest and eastern dunes islands.
+ // Existing woodland coordinates and saves remain in place.
+ const smooth=(v)=>Math.max(0,Math.min(1,v));
+ const irregular=(a)=>.052*Math.sin(5*a+.8)+.038*Math.cos(9*a-1.1)+.023*Math.sin(15*a+.5);
+ const dx=(x-1200)/6500,dy=(y-900)/7800,a=Math.atan2(dy,dx);
+ const north=.18*Math.exp(-Math.pow((x+700)/3000,2))*smooth((-y+1700)/3800);
+ const southern=.12*Math.exp(-Math.pow((x+900)/3500,2))*smooth((y-4200)/3500);
+ const eastBight=.17*Math.exp(-Math.pow((y-2200)/2500,2))*smooth((x-4000)/2500);
+ const mainland=(1+irregular(a)+north+southern-eastBight-Math.hypot(dx,dy))*6300;
+ const ja=Math.atan2((y-1050)/2400,(x+6000)/1350);
+ const jungle=(1+.08*Math.sin(5*ja+.3)+.035*Math.cos(9*ja)-Math.hypot((x+6000)/1350,(y-1050)/2400))*1350;
+ const ea=Math.atan2((y-1600)/2500,(x-8800)/1300);
+ const eastern=(1+.075*Math.sin(5*ea-.6)+.045*Math.cos(8*ea)-Math.hypot((x-8800)/1300,(y-1600)/2500))*1300;
  return Math.max(mainland,jungle,eastern);
 }
 function coastSmooth(a,b,v){const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t)}
