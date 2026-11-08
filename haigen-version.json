@@ -1,4 +1,4 @@
 {
-  "build": 159,
-  "notes": "V159: winter gloves and sleeves now match the equipped winter outfit when holding or using tools. Coastline remains under investigation."
+  "build": 160,
+  "notes": "V160: glove colours now apply to green downs/fen cold-weather outfits as well as snow; held-tool sleeves follow outfit palette."
 }
