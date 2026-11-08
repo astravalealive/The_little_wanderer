@@ -667,7 +667,7 @@ const hamletBuildings=[
 ];
 for(let j=0;j<hamletBuildings.length;j++){
  const [dx,dy,kind]=hamletBuildings[j],x=hamletCenter.x+dx,y=hamletCenter.y+dy;
- if(islandDepth(x,y)>300)objects.push({id:24000+j,x,y,type:'hamlet-'+kind,size:1});
+ if(islandDepth(x,y)>100)objects.push({id:24000+j,x,y,type:'hamlet-'+kind,size:1});
 }
 const pond={x:850,y:1700,rx:330,ry:240};function lakeRadius(a){return 1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2)}function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
 const campProtectionRadius=365;
@@ -3382,6 +3382,7 @@ function worldArtScenery(o){
 }
 
 function drawSceneryNearHaigen(o){
+ if(o.type.startsWith('hamlet-')){drawHamletScenery(o);return}
  if(rbEnabled){const alpha=foliageVisibility(o);ctx.save();ctx.globalAlpha*=alpha;const rendered=worldArtScenery(o);ctx.restore();if(rendered)return;}
  const woodland=rbEnabled&&rbWoodland(o.x,o.y);
  const renderer={tree:woodland?rbDrawTree:tree,rock:woodland?rbDrawRock:rock,bush:woodland?rbDrawBush:bush,flower:woodland?rbDrawFlower:flower,mushroom:woodland?rbDrawMushroom:mushroomPatch,
