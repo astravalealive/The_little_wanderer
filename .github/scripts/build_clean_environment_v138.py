@@ -17,6 +17,18 @@ frames={
  "ore":(101,322,91,76),"logs":(202,322,105,75),
  "barrel":(319,321,75,89),"campfire":(404,324,100,85)
 }
+# Expand each source crop only into the transparent gutters up to the next prop.
+# This also restores tree branches, foliage and cottage chimney tips clipped
+# by the old hard-coded rectangles. Components discard neighbouring art.
+sourceRects={
+ 'tree':(0,0,144,160),'fir':(144,0,261,168),
+ 'bush':(260,0,368,94),'rock':(368,0,512,82),
+ 'stump':(262,93,361,173),'mushroom':(361,82,512,173),
+ 'tent':(0,165,211,315),'cottage':(211,160,512,321),
+ 'flowerBush':(0,311,100,416),'ore':(100,318,201,416),
+ 'logs':(201,318,318,416),'barrel':(317,318,403,416),
+ 'campfire':(403,318,512,416)
+}
 im=Image.open(old).convert('RGBA')
 assert im.size==(512,416)
 dst=Image.new('RGBA',im.size,(0,0,0,0))
@@ -71,23 +83,24 @@ def isolate(name,src):
  # Trim only that known lower-left stray line; keep the valuable glint details.
  if name=='ore':
   px=np.asarray(result).copy()
-  px[69:,:72,3]=0
+  px[73:,:75,3]=0
   result=Image.fromarray(px,'RGBA')
  # Remove now-clear surrounding empty frame space. Keep the ORIGINAL bitmap
  # size and drawing semantics, but re-centre the silhouette on its prop anchor.
  box=result.getchannel('A').getbbox()
  if box:
   sprite=result.crop(box)
-  scale=min(1.0,(src.width-6)/sprite.width,(src.height-3)/sprite.height)
+  target_width,target_height=frames[name][2:]
+  scale=min(1.0,(target_width-6)/sprite.width,(target_height-3)/sprite.height)
   if scale<1:
    sprite=sprite.resize((max(1,round(sprite.width*scale)),max(1,round(sprite.height*scale))),Image.Resampling.LANCZOS)
-  centered=Image.new('RGBA',src.size,(0,0,0,0))
-  centered.alpha_composite(sprite,((src.width-sprite.width)//2,src.height-sprite.height-1))
+  centered=Image.new('RGBA',(target_width,target_height),(0,0,0,0))
+  centered.alpha_composite(sprite,((target_width-sprite.width)//2,target_height-sprite.height-1))
   result=centered
  orig_count=int(np.count_nonzero(alpha>=48))
  clean_count=int(np.count_nonzero(np.asarray(result.getchannel('A'))>=48))
  stats={
-  'rect':frames[name],"components":[{'size':c['size'],'bbox':c['bbox']} for c in comps[:9]],
+  'rect':frames[name],'expanded_source_rect':sourceRects[name],"components":[{'size':c['size'],'bbox':c['bbox']} for c in comps[:9]],
   'kept_component_ids':kept,'removed_visible_pixels':orig_count-clean_count,
   'original_visible_pixels':orig_count,
   'removed_fraction':round((orig_count-clean_count)/max(1,orig_count),4),
@@ -101,7 +114,7 @@ def isolate(name,src):
 before=Image.new('RGBA',(1100,1200),(46,54,52,255))
 after=Image.new('RGBA',(1100,1200),(46,54,52,255))
 for i,(name,(x,y,w,h)) in enumerate(frames.items()):
- raw=im.crop((x,y,x+w,y+h))
+ raw=im.crop(sourceRects[name])
  clean,stats=isolate(name,raw)
  report['frames'][name]=stats
  dst.alpha_composite(clean,(x,y))
