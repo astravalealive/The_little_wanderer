@@ -5024,7 +5024,7 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  const status=haigenSpriteStatus();
  const newSheet=haigenMovementReady;
  const base=newSheet?haigenMovementAtlas:haigenApprovedWalkAtlas||haigenApprovedAtlas;
- const spriteAtlas=haigenCostumeAtlas(base,deepWater?'beach':status.outfit); // No baked-in duplicate snorkel from the old swim sheet.
+ const spriteAtlas=haigenCostumeAtlas(base,deepWater?'swim':status.outfit); // Use the approved swimming sprite; legacy drawn-on snorkel overlay stays removed.
  const motion=actor||playerMotion,dir=motion.dir||'down',moving=!!motion.moving;
  const frame=status.knock?1+Math.floor((performance.now()-status.knock.started)/85)%2: moving?Math.floor((motion.anim||0)/150)%4:0;
  // Very short three-quarter turn-in frames, only when crossing an axis.
@@ -6838,7 +6838,7 @@ function blockedBySolid(x,y){if(window.__gloamAddon?.arena(x,y))return false;
  if(easternRiverWalkBlocked(x,y))return true;
  if(worldEditorBuildingBlocks(x,y))return true;
  if(islandDepth(x,y)<-105)return true; // V157: generous walkable shallows, deep sea still gated by flippers
- if(walkingLakeLevel(x,y)<.49)return true; // Match pond artwork: middle-blue ring spans .48-.79, only darkest centre (<.48) is blocked
+ if(walkingLakeLevel(x,y)<.475)return true; // Match darkest pond fill at .48, with small tolerance for pixel-snapped shoreline
  if(blockedByHomestead(x,y))return true;
  const cx=Math.floor(x/solidCellSize),cy=Math.floor(y/solidCellSize);
  for(let ix=cx-1;ix<=cx+1;ix++)for(let iy=cy-1;iy<=cy+1;iy++){
