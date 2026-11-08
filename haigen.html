@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V175 · Version Counter</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V198 · World Editor Cleanup</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
 .mobile-menu,.stats-toggle{display:none}
 @media(max-width:600px),(pointer:coarse) and (max-height:600px){
  .hud{top:calc(env(safe-area-inset-top,0px) + 8px);right:84px}
@@ -535,37 +535,8 @@ function drawPaddleSplash(){
  ctx.lineTo(state.x+Math.cos(a)*(rr+9),state.y+Math.sin(a)*9-5);ctx.stroke()}
  ctx.restore();
 }
-// V190: walkable village lanes, shared river crossing, central squares and vegetable gardens.
-function drawRiverwatchTownGround(left,right,top,bottom){
- const cy=5510,river=easternRiverX(cy);
- if(right<3150||left>5800||bottom<4800||top>6350)return;
- ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
- const path=(pts,width=34)=>{
-  ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
-  ctx.strokeStyle='#66563d';ctx.lineWidth=width+8;ctx.stroke();
-  ctx.strokeStyle='#c6a776';ctx.lineWidth=width;ctx.stroke();
-  ctx.strokeStyle='#e2c79a';ctx.lineWidth=3;ctx.setLineDash([5,16]);ctx.stroke();ctx.setLineDash([]);
- };
- for(const cx of [riverwatchWestBank.x,borderVillage.x]){
-  path([[cx-390,cy-490],[cx-160,cy-250],[cx,cy],[cx+180,cy+250],[cx+340,cy+460]],36);
-  path([[cx-480,cy-65],[cx-220,cy-65],[cx+30,cy-65],[cx+345,cy-65]],31);
-  path([[cx-330,cy+190],[cx-100,cy+170],[cx+240,cy+190]],28);
-  ctx.fillStyle='#b79c74';ctx.beginPath();ctx.ellipse(cx,cy+20,116,80,0,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='#e0c99f';ctx.lineWidth=7;ctx.stroke();
-  // Small fenced allotments, deliberately set away from building footprints.
-  for(const gx of [cx-420,cx+350]){
-   const gy=cy+335;
-   ctx.fillStyle='#73563b';ctx.fillRect(gx-66,gy-52,132,104);
-   for(let j=0;j<4;j++){
-    ctx.fillStyle='#a87e52';ctx.fillRect(gx-55+j*29,gy-43,20,84);
-    for(let k=0;k<5;k++){ctx.fillStyle=(j+k)%2?'#527f39':'#76a14c';ctx.beginPath();ctx.ellipse(gx-45+j*29,gy-34+k*17,8,6,0,0,Math.PI*2);ctx.fill()}
-   }
-   ctx.strokeStyle='#d5b58a';ctx.lineWidth=4;ctx.strokeRect(gx-69,gy-55,138,110);
-  }
- }
- path([[riverwatchWestBank.x+250,cy+20],[river-120,cy+20],[river+120,cy+20],[borderVillage.x-330,cy+20]],30);
- ctx.restore();
-}
+// V198: remove the autogenerated Riverwatch roads, squares and allotments; retain terrain and crossings.
+function drawRiverwatchTownGround(left,right,top,bottom){}
 // V195: animated lighthouse with stepped masonry, balcony and beacon glass.
 function drawRiverwatchLighthouse(x=6100,y=6600){
  if(Math.abs(x-cam.x)>W/worldZoom()/2+300||Math.abs(y-cam.y)>H/worldZoom()/2+320)return;
@@ -753,50 +724,9 @@ for(let j=0;j<hamletBuildings.length;j++){
  const [dx,dy,kind]=hamletBuildings[j],x=hamletCenter.x+dx,y=hamletCenter.y+dy;
  objects.push({id:24000+j,x,y,type:'hamlet-'+kind,size:1});
 }
-// V190: Riverwatch occupies BOTH grassy banks in the exact river-to-beach clearing.
+// V198: Riverwatch's unwanted autogenerated buildings removed. The player controls future placement through World Editor.
 const borderVillage={x:4930,y:5510,name:'Riverwatch'};
 const riverwatchWestBank={x:4070,y:5510};
-const riverwatchBuildings=[
- [-310,-340,'house'],[-90,-360,'inn'],[165,-315,'house'],
- [-365,-95,'barn'],[-85,-100,'well'],[195,-80,'market'],
- [-315,170,'house'],[-45,165,'house'],[215,170,'house'],
- [-160,390,'barn'],[165,385,'house']
-];
-const riverwatchWestBuildings=[
- [-310,-330,'house'],[-75,-335,'house'],[175,-300,'barn'],
- [-315,-75,'barn'],[-70,-65,'market'],[170,-75,'well'],
- [-300,190,'house'],[-40,190,'house'],[190,205,'house'],
- [-90,395,'barn']
-];
-for(let j=0;j<riverwatchBuildings.length;j++){
- const [dx,dy,kind]=riverwatchBuildings[j];
- objects.push({id:24100+j,x:borderVillage.x+dx,y:borderVillage.y+dy,type:'hamlet-'+kind,size:1});
-}
-for(let j=0;j<riverwatchWestBuildings.length;j++){
- const [dx,dy,kind]=riverwatchWestBuildings[j];
- objects.push({id:24200+j,x:riverwatchWestBank.x+dx,y:riverwatchWestBank.y+dy,type:'hamlet-'+kind,size:1});
-}
-
-// V191: fill the red-marked town lots along both riverbanks, continuing south.
-const riverwatchLots=[
- [3600,5160,'house'],[3900,5130,'shop'],[4130,5270,'house'],
- [3510,5440,'house'],[3830,5470,'market'],[4110,5550,'shop'],
- [3500,5770,'house'],[3780,5790,'house'],[4070,5900,'barn'],
- [3480,6080,'shop'],[3770,6150,'house'],[4110,6250,'house'],
- [3550,6460,'house'],[3890,6480,'shop'],[4160,6640,'house'],
- [3680,6840,'barn'],[4020,6860,'house'],
- [4900,5160,'shop'],[5230,5140,'house'],[5500,5320,'house'],
- [4900,5470,'market'],[5200,5510,'shop'],[5470,5600,'house'],
- [4920,5780,'house'],[5190,5870,'house'],[5470,5910,'shop'],
- [4930,6140,'house'],[5240,6190,'market'],[5460,6290,'house'],
- [4920,6490,'shop'],[5210,6520,'house'],[5440,6630,'barn'],
- [5070,6800,'house'],[5330,6830,'shop']
-];
-for(let j=0;j<riverwatchLots.length;j++){
- const [x,y,kind]=riverwatchLots[j];
- if(easternRiverDepth(x,y)>125&&islandDepth(x,y)>160)
-  objects.push({id:24300+j,x,y,type:'hamlet-'+kind,size:1});
-}
 const pond={x:850,y:1700,rx:330,ry:240};function lakeRadius(a){return 1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2)}function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
 const campProtectionRadius=365;
 state.campClearingDone=state.campClearingDone===true||state.campTier>0;
