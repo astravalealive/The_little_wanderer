@@ -566,8 +566,7 @@ function drawRiverwatchTownGround(left,right,top,bottom){
  path([[riverwatchWestBank.x+250,cy+20],[river-120,cy+20],[river+120,cy+20],[borderVillage.x-330,cy+20]],30);
  ctx.restore();
 }
-function drawRiverwatchLighthouse(){
- const x=6100,y=6600;
+function drawRiverwatchLighthouse(x=6100,y=6600){
  if(Math.abs(x-cam.x)>W/worldZoom()/2+260||Math.abs(y-cam.y)>H/worldZoom()/2+280)return;
  ctx.save();ctx.translate(x,y);
  ellipse(0,12,100,33,'#344c50aa');
@@ -596,6 +595,7 @@ function drawExpandedTerrain(night){
    ctx.drawImage(islandChunk(ix,iy),ix*islandChunkSize,iy*islandChunkSize,islandChunkSize,islandChunkSize);
  if(night>.01){ctx.fillStyle='rgba(20,31,55,'+(night*.26)+')';ctx.fillRect(left,top,right-left,bottom-top)}
  drawRiverwatchTownGround(left,right,top,bottom);
+ worldEditorGround(left,right,top,bottom);
  drawEasternBridges(left,right,top,bottom);
  // V156: animated foam contours follow actual land depth instead of rectangular map edges.
  ctx.save();ctx.strokeStyle=night>.5?'rgba(184,223,225,.52)':'rgba(247,253,233,.72)';ctx.lineWidth=3;ctx.lineCap='round';
@@ -3493,7 +3493,7 @@ function drawSceneryNearHaigen(o){
  if(rbEnabled){const alpha=foliageVisibility(o);ctx.save();ctx.globalAlpha*=alpha;const rendered=worldArtScenery(o);ctx.restore();if(rendered)return;}
  const woodland=rbEnabled&&rbWoodland(o.x,o.y);
  const renderer={tree:woodland?rbDrawTree:tree,rock:woodland?rbDrawRock:rock,bush:woodland?rbDrawBush:bush,flower:woodland?rbDrawFlower:flower,mushroom:woodland?rbDrawMushroom:mushroomPatch,
-  cactus:drawRegionalScenery,palm:drawRegionalScenery,
+  cactus:drawRegionalScenery,palm:drawRegionalScenery,specter:drawRegionalScenery,
   fir:drawRegionalScenery,bareTree:drawRegionalScenery}[o.type];
  if(!renderer)return;
  const alpha=foliageVisibility(o);
@@ -5912,9 +5912,9 @@ for(let i=0;i<11;i++){
  ctx.beginPath();ctx.arc(px+Math.sin(time*.003+i)*5,py-travel,2+(i%3),0,Math.PI*2);ctx.stroke();
  ctx.restore();
 }
-for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();const visible=objects.filter(o=>!state.removed.includes(o.id)&&canPlaceScenery(o)&&flowerHasHabitat(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);homesteadPlots.forEach(p=>{drawHomesteadPlotGround(p);drawLifeConstruction(p,false)});const drawables=[...homesteadPlots.filter(p=>homesteadTier(p)>0&&p.kind!=='jetty').map(p=>({y:homesteadSortY(p),draw:()=>drawHomesteadPlotForeground(p)})),...homesteadPlots.filter(p=>state.lifeProject?.kind===p.kind&&homesteadTier(p)===0).map(p=>({y:homesteadSortY(p),draw:()=>drawLifeConstruction(p,true)})),...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.meatDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawMeatDrop(o)})),...state.stoneDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawStonePiece(o)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.save();ctx.translate(o.x,o.y);ctx.rotate((Math.abs(o.x*7+o.y*3)%9-4)*.035);ctx.fillStyle='#302f29';ctx.fillRect(-26,-10,54,22);ctx.fillStyle='#79563b';ctx.fillRect(-24,-9,49,19);ctx.fillStyle='#a47a50';ctx.fillRect(-22,-8,46,5);ctx.fillStyle='#56432f';for(let j=0;j<4;j++)ctx.fillRect(-18+j*11,-2+(j%2)*5,3,7);ellipse(25,1,10,11,'#3b322a');ellipse(25,1,8,9,'#d0ad79');ellipse(25,1,5,6,'#96734f');ellipse(25,1,2,3,'#d0ad79');ctx.restore()}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>drawSceneryNearHaigen(o)})),{y:6600,draw:drawRiverwatchLighthouse},...objects.filter(o=>o.type.startsWith('hamlet-')&&Math.abs(o.x-cam.x)<W/zoom/2+190&&Math.abs(o.y-cam.y)<H/zoom/2+190).map(o=>({y:o.y,draw:()=>drawHamletScenery(o)})),...woodlandDetails.filter(o=>(o.kind!=='fungi'||woodlandFungiReady(o))&&canPlaceScenery(o)&&!campsiteProtected(o)&&!homesteadPlots.some(p=>Math.hypot(o.x-p.x,o.y-p.y)<120)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),...(window.__gloamAddon?[{y:window.__gloamAddon.y,draw:()=>window.__gloamAddon.drawBoss()}]:[]),...(window.__thrummaw?[{y:window.__thrummaw.y,draw:()=>window.__thrummaw.creature()}]:[]),{y:state.y,draw:()=>{ctx.save();
+for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();const visible=objects.filter(o=>!worldEditorHidden.has(o.id)&&!o.type.startsWith('hamlet-')&&!state.removed.includes(o.id)&&canPlaceScenery(o)&&flowerHasHabitat(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);homesteadPlots.forEach(p=>{drawHomesteadPlotGround(p);drawLifeConstruction(p,false)});const drawables=[...homesteadPlots.filter(p=>homesteadTier(p)>0&&p.kind!=='jetty').map(p=>({y:homesteadSortY(p),draw:()=>drawHomesteadPlotForeground(p)})),...homesteadPlots.filter(p=>state.lifeProject?.kind===p.kind&&homesteadTier(p)===0).map(p=>({y:homesteadSortY(p),draw:()=>drawLifeConstruction(p,true)})),...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.meatDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawMeatDrop(o)})),...state.stoneDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawStonePiece(o)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.save();ctx.translate(o.x,o.y);ctx.rotate((Math.abs(o.x*7+o.y*3)%9-4)*.035);ctx.fillStyle='#302f29';ctx.fillRect(-26,-10,54,22);ctx.fillStyle='#79563b';ctx.fillRect(-24,-9,49,19);ctx.fillStyle='#a47a50';ctx.fillRect(-22,-8,46,5);ctx.fillStyle='#56432f';for(let j=0;j<4;j++)ctx.fillRect(-18+j*11,-2+(j%2)*5,3,7);ellipse(25,1,10,11,'#3b322a');ellipse(25,1,8,9,'#d0ad79');ellipse(25,1,5,6,'#96734f');ellipse(25,1,2,3,'#d0ad79');ctx.restore()}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.map(o=>({y:o.y,draw:()=>drawSceneryNearHaigen(o)})),...worldEditorData.placed.filter(o=>!worldEditorGroundKinds.has(o.type)&&Math.abs(o.x-cam.x)<W/zoom/2+250&&Math.abs(o.y-cam.y)<H/zoom/2+250).map(o=>({y:o.y,draw:()=>worldEditorSprite(o)})),{y:6600,draw:drawRiverwatchLighthouse},...objects.filter(o=>o.type.startsWith('hamlet-')&&!worldEditorHidden.has(o.id)&&Math.abs(o.x-cam.x)<W/zoom/2+190&&Math.abs(o.y-cam.y)<H/zoom/2+190).map(o=>({y:o.y,draw:()=>drawHamletScenery(o)})),...woodlandDetails.filter(o=>(o.kind!=='fungi'||woodlandFungiReady(o))&&canPlaceScenery(o)&&!campsiteProtected(o)&&!homesteadPlots.some(p=>Math.hypot(o.x-p.x,o.y-p.y)<120)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:cottage.y-10,draw:drawCampHome}]:[]),...(window.__gloamAddon?[{y:window.__gloamAddon.y,draw:()=>window.__gloamAddon.drawBoss()}]:[]),...(window.__thrummaw?[{y:window.__thrummaw.y,draw:()=>window.__thrummaw.creature()}]:[]),{y:state.y,draw:()=>{ctx.save();
  if(collapseRemaining<=0&&time<damageFlashUntil)ctx.globalAlpha*=Math.floor(time/95)%2===0?.34:1;
- const depth=walkingLakeLevel(state.x,state.y),seaDepth=islandDepth(state.x,state.y);if(depth>=1&&seaDepth<0){character(state.x,state.y,'boy');ctx.save();ctx.fillStyle='rgba(58,157,179,'+Math.min(.62,.16+(-seaDepth/62)*.38)+')';ctx.beginPath();ctx.ellipse(state.x,state.y+3,24,10,0,Math.PI,Math.PI*2);ctx.lineTo(state.x+24,state.y+4);ctx.ellipse(state.x,state.y+4,24,9,0,0,Math.PI);ctx.fill();ctx.strokeStyle='#d8f6edaa';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,27,7,0,0,Math.PI*2);ctx.stroke();ctx.restore()}else if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));trollHabitats.forEach((t,i)=>{if(t.pos&&Math.abs(t.pos.x-cam.x)<1050&&Math.abs(t.pos.y-cam.y)<800)drawables.push({y:t.pos.y,draw:()=>drawTroll(t,i)})});drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+ const depth=walkingLakeLevel(state.x,state.y),seaDepth=islandDepth(state.x,state.y);if(depth>=1&&seaDepth<0){character(state.x,state.y,'boy');ctx.save();ctx.fillStyle='rgba(58,157,179,'+Math.min(.62,.16+(-seaDepth/62)*.38)+')';ctx.beginPath();ctx.ellipse(state.x,state.y+3,24,10,0,Math.PI,Math.PI*2);ctx.lineTo(state.x+24,state.y+4);ctx.ellipse(state.x,state.y+4,24,9,0,0,Math.PI);ctx.fill();ctx.strokeStyle='#d8f6edaa';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,27,7,0,0,Math.PI*2);ctx.stroke();ctx.restore()}else if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));trollHabitats.forEach((t,i)=>{if(t.pos&&Math.abs(t.pos.x-cam.x)<1050&&Math.abs(t.pos.y-cam.y)<800)drawables.push({y:t.pos.y,draw:()=>drawTroll(t,i)})});drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());worldEditorOutline();drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();if(!state.removed.includes(runeGuardianId)){ctx.save();ctx.shadowColor='#f6d77d';ctx.shadowBlur=16+Math.sin(time*.003)*5;ctx.font='bold 26px serif';ctx.textAlign='center';ctx.fillStyle='#fff1a4';ctx.fillText('ᚠ',ruins.x,ruins.y-36);ctx.restore()}else{ellipse(ruins.x+15,ruins.y+43,16,7,'#6d513b');ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillStyle='#f3d89a';ctx.fillText('Rune stone revealed',ruins.x,ruins.y-95)}for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
@@ -5971,15 +5971,273 @@ for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a
  moon.addColorStop(0,'rgba(143,185,240,'+(darkness*.15)+')');
  moon.addColorStop(1,'rgba(143,185,240,0)');
  ctx.fillStyle=moon;ctx.fillRect(state.x-155,state.y-155,310,310);ctx.restore();
-} ctx.restore();ctx.restore();const regionLabel=$('regionName');if(regionLabel){const place=expandedRegion(state.x,state.y)?.name||'Haigen’s Woodlands';regionLabel.textContent=place+(state.autonomy&&autoJobLabel?' · 🤖 '+autoJobLabel:'');}const day=1+Math.floor(state.daytime/180),phase=['Morning','Afternoon','Evening','Night'][Math.floor(state.daytime%180/45)];$('day').textContent=`Day ${day} • ${phase} • ${state.weather.mode==='rain'?'🌧️ Showers':'🌤️ Clear'}`;$('resources').textContent=`🪵 ${state.wood}   🪨 ${state.stone}   🍓 ${state.berries}   🪓 ${state.tools.axe}   🔦 ${state.tools.torch}   🍲 ${state.food}   🌿 ${state.twigs}   🍃 ${state.leaves}   🥚 ${state.eggs}   🍄 ${state.mushrooms}   🌼 ${Object.values(state.herbs).reduce((a,b)=>a+b,0)}   🧪 ${state.potions}`;}function controllerMove(){if(!navigator.getGamepads)return {x:0,y:0};const pad=Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);if(!pad)return {x:0,y:0};const axis=i=>Math.abs(pad.axes[i]||0)>.18?pad.axes[i]:0;const down=i=>pad.buttons[i]&&pad.buttons[i].pressed?1:0;let x=axis(0),y=axis(1);if(pad.mapping==='standard'){x+=down(15)-down(14);y+=down(13)-down(12)}return {x,y}}const playerMotion={dir:'down',moving:false,anim:0};function trackMotion(m,x0,y0,x1,y1,dt){const dx=x1-x0,dy=y1-y0,amount=Math.hypot(dx,dy);m.moving=amount>.25;if(m.moving){m.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');m.anim=(m.anim||0)+dt}else m.anim=0}let idleTime=0;// Solid objects use a small spatial hash for efficient iPad collision checks.
+} ctx.restore();ctx.restore();const regionLabel=$('regionName');if(regionLabel){const place=expandedRegion(state.x,state.y)?.name||'Haigen’s Woodlands';regionLabel.textContent=place+(state.autonomy&&autoJobLabel?' · 🤖 '+autoJobLabel:'');}const day=1+Math.floor(state.daytime/180),phase=['Morning','Afternoon','Evening','Night'][Math.floor(state.daytime%180/45)];$('day').textContent=`Day ${day} • ${phase} • ${state.weather.mode==='rain'?'🌧️ Showers':'🌤️ Clear'}`;$('resources').textContent=`🪵 ${state.wood}   🪨 ${state.stone}   🍓 ${state.berries}   🪓 ${state.tools.axe}   🔦 ${state.tools.torch}   🍲 ${state.food}   🌿 ${state.twigs}   🍃 ${state.leaves}   🥚 ${state.eggs}   🍄 ${state.mushrooms}   🌼 ${Object.values(state.herbs).reduce((a,b)=>a+b,0)}   🧪 ${state.potions}`;}function controllerMove(){if(!navigator.getGamepads)return {x:0,y:0};const pad=Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);if(!pad)return {x:0,y:0};const axis=i=>Math.abs(pad.axes[i]||0)>.18?pad.axes[i]:0;const down=i=>pad.buttons[i]&&pad.buttons[i].pressed?1:0;let x=axis(0),y=axis(1);if(pad.mapping==='standard'){x+=down(15)-down(14);y+=down(13)-down(12)}return {x,y}}const playerMotion={dir:'down',moving:false,anim:0};function trackMotion(m,x0,y0,x1,y1,dt){const dx=x1-x0,dy=y1-y0,amount=Math.hypot(dx,dy);m.moving=amount>.25;if(m.moving){m.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');m.anim=(m.anim||0)+dt}else m.anim=0}// V192: on-device visual world editor. Layout is separate from story saves.
+const worldEditorKindGroups=[
+ ['Buildings',[
+  ['hamlet-house','Cottage'],['hamlet-shop','Shop'],['hamlet-inn','Inn'],
+  ['hamlet-market','Market'],['hamlet-barn','Barn'],['hamlet-well','Well'],
+  ['lighthouse','Lighthouse'],['bridge','Bridge'],['lantern','Lantern']
+ ]],
+ ['Nature',[
+  ['tree','Broadleaf tree'],['fir','Pine tree'],['bareTree','Dead tree'],
+  ['palm','Palm'],['rock','Boulder'],['bush','Bush'],
+  ['flower','Wildflowers'],['mushroom','Mushrooms'],['cactus','Cactus'],['specter','Specter']
+ ]],
+ ['Ground & gardens',[
+  ['path','Dirt path'],['cobble','Cobblestones'],['grass','Meadow patch'],['garden','Vegetable bed']
+ ]]
+];
+const worldEditorValidKinds=new Set(worldEditorKindGroups.flatMap(g=>g[1].map(k=>k[0])));
+const worldEditorGroundKinds=new Set(['path','cobble','grass','garden','bridge']);
+const worldEditorStorageKey='haigenWorldEditorLayoutV1';
+const worldEditorBuiltinById=new Map(objects.map(o=>[o.id,o]));
+const worldEditorBuiltinBuildings=objects.filter(o=>o.type.startsWith('hamlet-'));
+function worldEditorNormalise(raw){
+ const result={format:'haigen-world-layout',version:1,placed:[],hidden:[],moves:{}};
+ if(!raw||typeof raw!=='object')return result;
+ if(Array.isArray(raw.placed)){
+  const used=new Set();
+  for(const v of raw.placed.slice(0,2200)){
+   if(!v||!worldEditorValidKinds.has(v.type)||!Number.isFinite(v.x)||!Number.isFinite(v.y))continue;
+   const id=Number(v.id);
+   if(!Number.isInteger(id)||id<30000||used.has(id))continue;
+   used.add(id);
+   result.placed.push({id,type:v.type,x:clamp(v.x,WORLD_MIN,WORLD),y:clamp(v.y,WORLD_MIN,WORLD),size:1});
+  }
+ }
+ if(Array.isArray(raw.hidden))result.hidden=raw.hidden.filter(id=>Number.isInteger(id)&&id!==runeGuardianId&&worldEditorBuiltinById.has(id)).slice(0,10000);
+ if(raw.moves&&typeof raw.moves==='object'){
+  for(const [key,v] of Object.entries(raw.moves).slice(0,3000)){
+   const id=Number(key);
+   if(id===runeGuardianId||!worldEditorBuiltinById.has(id)||!v||![v.x,v.y,v.ox,v.oy].every(Number.isFinite))continue;
+   result.moves[key]={x:clamp(v.x,WORLD_MIN,WORLD),y:clamp(v.y,WORLD_MIN,WORLD),ox:v.ox,oy:v.oy};
+  }
+ }
+ return result;
+}
+let worldEditorData=(()=>{try{return worldEditorNormalise(JSON.parse(localStorage.getItem(worldEditorStorageKey)||'null'))}catch(_){return worldEditorNormalise(null)}})();
+let worldEditorHidden=new Set(worldEditorData.hidden);
+for(const [id,record] of Object.entries(worldEditorData.moves)){
+ const o=worldEditorBuiltinById.get(Number(id));if(o){o.x=record.x;o.y=record.y}
+}
+let worldEditorActive=false,worldEditorMode='place',worldEditorKind='hamlet-house',worldEditorMinimised=false,worldEditorPanel=null,worldEditorDrag=null,worldEditorSelected=null;
+const worldEditorUndo=[];
+function worldEditorSave(){
+ try{localStorage.setItem(worldEditorStorageKey,JSON.stringify(worldEditorData));return true}
+ catch(err){notify('Editor storage is full. Export your layout before continuing.');return false}
+}
+function worldEditorHistory(){worldEditorUndo.push(JSON.stringify(worldEditorData));if(worldEditorUndo.length>30)worldEditorUndo.shift()}
+function worldEditorRefresh(){
+ worldEditorHidden=new Set(worldEditorData.hidden);
+ if(typeof rebuildWorldEditorSolids==='function')rebuildWorldEditorSolids();
+ worldEditorSave();
+ if(worldEditorPanel)worldEditorDrawPanel();
+}
+function worldEditorReplace(raw){
+ for(const [id,m] of Object.entries(worldEditorData.moves)){
+  const o=worldEditorBuiltinById.get(Number(id));if(o){o.x=m.ox;o.y=m.oy}
+ }
+ worldEditorData=worldEditorNormalise(raw);
+ for(const [id,m] of Object.entries(worldEditorData.moves)){
+  const o=worldEditorBuiltinById.get(Number(id));if(o){o.x=m.x;o.y=m.y}
+ }
+ worldEditorSelected=null;
+ worldEditorRefresh();
+}
+function worldEditorScreenPoint(e){
+ const r=gameCanvas.getBoundingClientRect(),z=worldZoom();
+ return {x:clamp(cam.x+((e.clientX-r.left)*W/r.width-W/2)/z,WORLD_MIN,WORLD),
+         y:clamp(cam.y+((e.clientY-r.top)*H/r.height-H/2)/z,WORLD_MIN,WORLD)};
+}
+function worldEditorPick(x,y){
+ const z=worldZoom();
+ let best=null,score=34;
+ const pick=o=>{
+  if(worldEditorHidden.has(o.id)||state.removed.includes(o.id)||o.id===runeGuardianId)return;
+  const d=Math.hypot((o.x-x)*z,(o.y-y)*z);
+  if(d<score){score=d;best=o}
+ };
+ for(const o of worldEditorData.placed)pick(o);
+ for(const o of objects)if(Math.abs(o.x-x)<140/z&&Math.abs(o.y-y)<140/z&&Math.hypot(o.x-cottage.x,o.y-cottage.y)>380)pick(o);
+ return best;
+}
+function worldEditorPlace(x,y,kind){
+ if(worldEditorData.placed.length>=2200){notify('Editor object limit reached. Export or delete objects.');return null}
+ if(!worldEditorGroundKinds.has(kind)&&kind!=='lighthouse'&&(islandDepth(x,y)<70||easternRiverDepth(x,y)<80)){
+  notify('Place buildings and scenery on dry land.');return null;
+ }
+ const id=Math.max(29999,...worldEditorData.placed.map(o=>o.id))+1;
+ const o={id,type:kind,x,y,size:1};worldEditorData.placed.push(o);worldEditorSelected=o;
+ return o;
+}
+function worldEditorMove(o,x,y){
+ if(!o)return;
+ if(worldEditorBuiltinById.has(o.id)){
+  const key=String(o.id);
+  if(!worldEditorData.moves[key])worldEditorData.moves[key]={ox:o.x,oy:o.y,x:o.x,y:o.y};
+  worldEditorData.moves[key].x=x;worldEditorData.moves[key].y=y;
+ }
+ o.x=x;o.y=y;
+}
+function worldEditorErase(o){
+ if(!o)return;
+ worldEditorHistory();
+ if(worldEditorBuiltinById.has(o.id)){
+  if(!worldEditorData.hidden.includes(o.id))worldEditorData.hidden.push(o.id);
+ }else worldEditorData.placed=worldEditorData.placed.filter(p=>p.id!==o.id);
+ worldEditorSelected=null;worldEditorRefresh();
+}
+function worldEditorGround(left,right,top,bottom){
+ for(const o of worldEditorData.placed){
+  if(!worldEditorGroundKinds.has(o.type)||o.x<left-90||o.x>right+90||o.y<top-90||o.y>bottom+90)continue;
+  ctx.save();ctx.translate(o.x,o.y);
+  if(o.type==='path'||o.type==='cobble'){
+   ctx.fillStyle=o.type==='path'?'#987a51':'#746d64';
+   ctx.beginPath();ctx.ellipse(0,0,32,24,0,0,Math.PI*2);ctx.fill();
+   for(let i=0;i<7;i++){
+    const dx=(seeded(o.id*41+i)*2-1)*27,dy=(seeded(o.id*59+i)*2-1)*18;
+    ctx.fillStyle=o.type==='path'?'#c4a574':'#bbb0a0';
+    ctx.fillRect(dx,dy,5+seeded(i+o.id)*7,4+seeded(o.id+i*3)*4);
+   }
+  }else if(o.type==='grass'){
+   ctx.fillStyle='#6d9e4b';for(let i=0;i<19;i++){
+    const dx=(seeded(o.id*17+i)*2-1)*36,dy=(seeded(o.id*23+i)*2-1)*26;
+    ctx.fillRect(dx,dy,3,5+seeded(i*3+o.id)*9);
+   }
+  }else if(o.type==='garden'){
+   ctx.fillStyle='#795238';ctx.fillRect(-43,-30,86,60);
+   for(let row=0;row<3;row++)for(let k=0;k<5;k++){
+    ctx.fillStyle=(row+k)%2?'#77a34b':'#4e783a';
+    ctx.beginPath();ctx.ellipse(-29+k*15,-18+row*19,7,5,0,0,Math.PI*2);ctx.fill();
+   }
+   ctx.strokeStyle='#d7bd86';ctx.lineWidth=4;ctx.strokeRect(-47,-34,94,68);
+  }else if(o.type==='bridge'){
+   ctx.fillStyle='#5a432c';ctx.fillRect(-108,-37,216,74);
+   for(let i=-97;i<=96;i+=18){
+    ctx.fillStyle=(Math.floor(i/18)%2)?'#a57b49':'#c39b66';
+    ctx.fillRect(i,-30,16,60);
+   }
+   ctx.fillStyle='#65482e';ctx.fillRect(-111,-43,222,8);ctx.fillRect(-111,35,222,8);
+  }
+  ctx.restore();
+ }
+}
+function worldEditorSprite(o){
+ if(o.type.startsWith('hamlet-'))drawHamletScenery(o);
+ else if(o.type==='lighthouse')drawRiverwatchLighthouse(o.x,o.y);
+ else if(o.type==='lantern'){
+  ctx.save();ctx.translate(o.x,o.y);
+  ctx.strokeStyle='#493c2e';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-90);ctx.stroke();
+  ctx.fillStyle='#e9b96b';ctx.fillRect(-12,-100,24,27);
+  ctx.strokeStyle='#533e2d';ctx.lineWidth=5;ctx.strokeRect(-12,-100,24,27);
+  ctx.fillStyle='#43372e';ctx.fillRect(-17,-107,34,6);ctx.restore();
+ }else if(o.type==='specter')drawRegionalScenery(o);
+ else if(!worldEditorGroundKinds.has(o.type))drawSceneryNearHaigen(o);
+}
+function worldEditorOutline(){
+ if(!worldEditorActive||!worldEditorSelected)return;
+ const o=worldEditorSelected;
+ ctx.save();ctx.strokeStyle='#ffe477';ctx.lineWidth=3/worldZoom();
+ ctx.setLineDash([12/worldZoom(),8/worldZoom()]);ctx.beginPath();ctx.ellipse(o.x,o.y,65,34,0,0,Math.PI*2);ctx.stroke();
+ ctx.setLineDash([]);ctx.restore();
+}
+function worldEditorBuildingBlocks(x,y){
+ const relevant=worldEditorBuiltinBuildings.concat(worldEditorData.placed);
+ for(const o of relevant){
+  if(worldEditorHidden.has(o.id)||!o.type.startsWith('hamlet-')&&o.type!=='lighthouse')continue;
+  const w=o.type==='lighthouse'?35:o.type==='hamlet-inn'?72:55,h=o.type==='lighthouse'?40:42;
+  if(Math.abs(x-o.x)<w+8&&y<o.y+6&&y>o.y-h-12)return true;
+ }
+ return false;
+}
+function worldEditorDrawPanel(){
+ if(!worldEditorPanel)return;
+ const pos=worldEditorSelected?' · '+Math.round(worldEditorSelected.x)+', '+Math.round(worldEditorSelected.y):'';
+ const html=['<div style="display:flex;align-items:center;gap:5px;justify-content:space-between"><b>🗺️ WORLD EDITOR</b>',
+ '<button data-editor-action="min" style="font-size:14px">',worldEditorMinimised?'Expand':'Minimise','</button>',
+ '<button data-editor-action="close">Done ✓</button></div>',
+ '<div style="font-size:12px;margin:5px 0">',worldEditorMode==='place'?'Tap to place · drag to position':worldEditorMode==='move'?'Drag a building or scenery':worldEditorMode==='erase'?'Tap an object to remove':'Drag to pan · pinch to zoom',pos,'</div>',
+ '<div style="display:flex;gap:4px;flex-wrap:wrap">'];
+ for(const [mode,label] of [['place','➕ Place'],['move','✥ Move'],['erase','✕ Erase'],['pan','✋ Pan']])
+  html.push('<button data-editor-mode="'+mode+'" style="background:'+(worldEditorMode===mode?'#8a6a35':'#38433a')+'">'+label+'</button>');
+ html.push('<button data-editor-action="undo" '+(worldEditorUndo.length?'':'disabled')+'>↶ Undo</button></div>');
+ if(!worldEditorMinimised){
+  for(const [group,kinds] of worldEditorKindGroups){
+   html.push('<div style="margin:7px 0 3px;font-size:12px;color:#f4d99f">'+group+'</div><div style="display:flex;flex-wrap:wrap;gap:4px">');
+   for(const [kind,label] of kinds)
+    html.push('<button data-editor-kind="'+kind+'" style="background:'+(worldEditorKind===kind?'#84632d':'#38433a')+'">'+label+'</button>');
+   html.push('</div>');
+  }
+  html.push('<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:10px">',
+   '<button data-editor-action="save">💾 Save</button>',
+   '<button data-editor-action="export">⬇ Export JSON</button>',
+   '<button data-editor-action="import">⬆ Import JSON</button>',
+   '<button data-editor-action="reset">Reset layout</button></div>',
+   '<p style="font-size:11px;color:#ddcdb0;margin:7px 0 0">Saved only in this browser. Export a JSON backup to share or publish it later. Original game saves stay separate.</p>');
+ }
+ worldEditorPanel.innerHTML=html.join('');
+ worldEditorPanel.querySelectorAll('button').forEach(btn=>{
+  btn.style.cssText+=';border:1px solid #967d54;color:#fff2d1;border-radius:6px;padding:7px 8px;font:12px system-ui;cursor:pointer';
+  btn.onclick=()=>{
+   if(btn.dataset.editorMode){worldEditorMode=btn.dataset.editorMode;worldEditorDrawPanel();return}
+   if(btn.dataset.editorKind){worldEditorKind=btn.dataset.editorKind;worldEditorMode='place';worldEditorMinimised=true;worldEditorDrawPanel();return}
+   const action=btn.dataset.editorAction;
+   if(action==='close'){worldEditorClose();return}
+   if(action==='min'){worldEditorMinimised=!worldEditorMinimised;worldEditorDrawPanel();return}
+   if(action==='save'){worldEditorSave();notify('World layout saved on this device.');return}
+   if(action==='undo'){const h=worldEditorUndo.pop();if(h){worldEditorReplace(JSON.parse(h));notify('Last edit undone.')}return}
+   if(action==='reset'){
+    if(confirm('Reset just the world editor layout? Haigen’s progress will not be deleted.')){
+     worldEditorHistory();worldEditorReplace(null);notify('Custom layout reset.');
+    }
+    return;
+   }
+   if(action==='export'){
+    const json=JSON.stringify(worldEditorData,null,2),blob=new Blob([json],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='haigens-world-layout.json';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);notify('Layout exported as JSON.');return;
+   }
+   if(action==='import'){
+    const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
+    input.onchange=async()=>{
+     try{const file=input.files[0];if(!file)return;const parsed=JSON.parse(await file.text());
+      if(parsed.format!=='haigen-world-layout')throw new Error('Not a Haigen world editor layout.');
+      if(!confirm('Replace the current editor layout with this file?'))return;
+      worldEditorHistory();worldEditorReplace(parsed);notify('World layout imported.');
+     }catch(error){notify('Could not import layout: '+String(error.message||error))}
+    };input.click();
+   }
+  };
+ });
+}
+function worldEditorOpen(){
+ if(worldEditorActive)return;
+ close();worldEditorActive=true;cameraDetached=true;worldEditorMinimised=false;
+ worldEditorPanel=document.createElement('div');
+ worldEditorPanel.id='haigenWorldEditor';
+ worldEditorPanel.style.cssText='position:fixed;z-index:9999;left:8px;top:29%;width:min(338px,calc(100vw - 16px));max-height:55vh;overflow-y:auto;box-sizing:border-box;background:rgba(22,32,28,.96);color:#f4e9d1;border:2px solid #b58b50;border-radius:12px;padding:10px;box-shadow:0 7px 22px #0009;font:13px system-ui;touch-action:pan-y';
+ document.body.appendChild(worldEditorPanel);worldEditorDrawPanel();
+ notify('World Editor: choose a feature, then tap the map to place it.');
+}
+function worldEditorClose(){
+ worldEditorActive=false;worldEditorDrag=null;worldEditorSelected=null;cameraDetached=true;
+ worldEditorSave();if(worldEditorPanel)worldEditorPanel.remove();worldEditorPanel=null;
+ notify('World Editor closed. Layout saved on this device.');
+}
+let idleTime=0;// Solid objects use a small spatial hash for efficient iPad collision checks.
 const solidCellSize=128,solidCells=new Map();
 const solidTypes=new Set(['tree','rock','fir','palm','bareTree','cactus']);
-for(const o of objects){
- if(!solidTypes.has(o.type))continue;
- const key=Math.floor(o.x/solidCellSize)+','+Math.floor(o.y/solidCellSize);
- if(!solidCells.has(key))solidCells.set(key,[]);
- solidCells.get(key).push(o);
+function rebuildWorldEditorSolids(){
+ solidCells.clear();
+ for(const o of objects.concat(worldEditorData.placed)){
+  if(!solidTypes.has(o.type)||worldEditorHidden.has(o.id))continue;
+  const key=Math.floor(o.x/solidCellSize)+','+Math.floor(o.y/solidCellSize);
+  if(!solidCells.has(key))solidCells.set(key,[]);
+  solidCells.get(key).push(o);
+ }
 }
+rebuildWorldEditorSolids();
 function solidRadius(o){
  const v=seeded(o.id*31+13),size=o.size||1;
  if(o.type==='rock')return (24+Math.abs(o.id%6)*3.8)*(.78+Math.abs(o.id%6)*.12)*size;
@@ -6002,6 +6260,7 @@ function blockedByHomestead(x,y){
 }
 
 function blockedBySolid(x,y){if(window.__gloamAddon?.arena(x,y))return false;
+ if(worldEditorBuildingBlocks(x,y))return true;
  if(islandDepth(x,y)<-105)return true; // V157: generous walkable shallows, deep sea still gated by flippers
  if(walkingLakeLevel(x,y)<.76)return true; // V153: central pond depths inaccessible until the Frog King's reward
  if(blockedByHomestead(x,y))return true;
@@ -6092,7 +6351,7 @@ trackMotion(c,oldX,oldY,c.x,c.y,dt);
 const draggingCamera=cameraTouches.size>0;
 if(playerInput)cameraDetached=false;
 const cameraHolding=!draggingCamera&&performance.now()-cameraReleaseAt<950;
-if(!draggingCamera&&!cameraHolding&&!cameraDetached){
+if(!draggingCamera&&!cameraHolding&&!cameraDetached&&!worldEditorActive){
  const follow=1-Math.exp(-dt/1250);
  cam.x+=(clamp(state.x+look.x,WORLD_MIN,WORLD)-cam.x)*follow;
  cam.y+=(clamp(state.y+look.y,WORLD_MIN,WORLD)-cam.y)*follow;
@@ -6533,10 +6792,11 @@ function devKit(){
  const items=devStock.map(([kind,label,,qty])=>'<div class="item"><span>'+label+' <b>× '+Math.max(0,Math.floor(Number(state[kind])||0))+'</b></span><button class="btn" data-dev-item="'+kind+'">+'+qty+'</button></div>').join('');
  const minerals=devMinerals.map(k=>'<div class="item"><span>'+safe(k)+' × '+Math.max(0,Number(state.minerals[k])||0)+'</span><button class="btn" data-dev-mineral="'+k+'">+8</button></div>').join('');
  const gear=toolSlots.map(t=>'<button class="btn" style="margin:3px;min-width:102px" data-dev-equip="'+t.id+'">'+safe(t.name)+(state.equipped===t.id?' ✓':'')+'</button>').join('');
- open('<h2>🧰 DEV KIT · V137</h2><p class="small">Development sandbox: every weapon and item is available immediately. Boss testing can be reset without changing the quest or your saved world.</p>'+
+ open('<h2>🧰 DEV KIT · World Builder</h2><p class="small">Development sandbox: every weapon and item is available immediately. Boss testing can be reset without changing the quest or your saved world.</p>'+
  '<p><b>Access:</b> '+(state.devKitEnabled?'Enabled':'Disabled')+'</p>'+
  '<button class="btn" data-dev-action="toggle">'+(state.devKitEnabled?'Disable new developer grants':'Enable developer access')+'</button> '+
  '<button class="btn" data-dev-action="everything">Unlock all tools + refill items</button>'+ 
+ '<div class="item"><div><b>🗺️ Visual World Editor</b><div class="small">Tap to place, drag to move, draw roads, erase, undo, save or export your map.</div></div><button class="btn" data-dev-action="worldEditor">Edit World</button></div>'+ 
  '<h3>🌿 Boss testing</h3><div class="item"><div><b>Gloamjaw</b><div class="small">Restore his 180 HP, clear the previous attack and reset his awareness. Reusable after every defeat.</div></div><button class="btn" data-dev-action="reviveGloamjaw">Revive Boss</button></div>'+
  '<h3>⚔️ Weapons & tools</h3><div style="display:flex;flex-wrap:wrap;gap:4px">'+gear+'</div>'+
  '<p class="small">Bow and crossbow are upgraded to level 3. No boss defeat is required while developing.</p>'+
@@ -6567,6 +6827,7 @@ function devKit(){
    state.devKitEnabled=!state.devKitEnabled;setCameraZoom(cameraZoom);
    if(state.devKitEnabled)devProvisionEquipment();
   }else if(!state.devKitEnabled)return;
+  else if(action==='worldEditor'){worldEditorOpen();return}
   else if(action==='everything'){devProvisionEquipment();devRefillStock();}
   else if(action==='reviveGloamjaw'){
    if(!window.__gloamAddon?.revive?.()){notify('🌿 Gloamjaw is not ready yet.');return}
@@ -6693,6 +6954,46 @@ const cameraTouches=new Map();
 let pinchDistance=0;
 const gameCanvas=$('game');
 gameCanvas.style.touchAction='none';
+// Editor gestures run before ordinary camera and homestead controls.
+const editorPointerPoint=e=>worldEditorScreenPoint(e);
+gameCanvas.addEventListener('pointerdown',e=>{
+ if(!worldEditorActive||worldEditorMode==='pan')return;
+ e.preventDefault();e.stopImmediatePropagation();
+ gameCanvas.setPointerCapture(e.pointerId);
+ const p=editorPointerPoint(e);
+ worldEditorDrag={pointerId:e.pointerId,last:p,mode:worldEditorMode,painted:false};
+ if(worldEditorMode==='place'){
+  worldEditorHistory();const o=worldEditorPlace(p.x,p.y,worldEditorKind);
+  if(o){worldEditorDrag.object=o;worldEditorDrag.painted=true}
+ }else{
+  const o=worldEditorPick(p.x,p.y);worldEditorSelected=o;
+  if(worldEditorMode==='move'&&o){
+   worldEditorHistory();worldEditorDrag.object=o;
+  }else if(worldEditorMode==='erase'&&o){
+   worldEditorErase(o);worldEditorDrag=null;
+  }
+ }
+ worldEditorDrawPanel();
+},true);
+gameCanvas.addEventListener('pointermove',e=>{
+ if(!worldEditorActive||!worldEditorDrag||worldEditorDrag.pointerId!==e.pointerId)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const p=editorPointerPoint(e),d=worldEditorDrag;
+ if(d.mode==='move'&&d.object)worldEditorMove(d.object,p.x,p.y);
+ if(d.mode==='place'){
+  if(d.object&&!worldEditorGroundKinds.has(worldEditorKind))worldEditorMove(d.object,p.x,p.y);
+  else if(worldEditorGroundKinds.has(worldEditorKind)&&Math.hypot(p.x-d.last.x,p.y-d.last.y)>46){
+   const o=worldEditorPlace(p.x,p.y,worldEditorKind);if(o)d.painted=true;d.last=p;
+  }
+ }
+},true);
+const finishEditorPointer=e=>{
+ if(!worldEditorActive||!worldEditorDrag||worldEditorDrag.pointerId!==e.pointerId)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ worldEditorDrag=null;worldEditorRefresh();
+};
+gameCanvas.addEventListener('pointerup',finishEditorPointer,true);
+gameCanvas.addEventListener('pointercancel',finishEditorPointer,true);
 gameCanvas.addEventListener('pointerdown',e=>{
  if(e.pointerType==='mouse'&&e.button!==0)return;
  cameraReleaseAt=-1e9;
