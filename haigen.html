@@ -101,7 +101,7 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 // The original 4200-unit woodland remains in its exact location for old saves and story quests.
 const expandedRegions=[
  {id:'downs',name:'The Open Downs',x:-5500,y:3050,w:8800,h:4100,color:'#b8c77e',animals:['🦬','🐇','🦊']},
- {id:'desert',name:'The Dry Lands',x:3450,y:3650,w:3100,h:2550,color:'#e2c681',animals:['🦂','🦎','🐍']},
+ {id:'desert',name:'The Dry Lands',x:5900,y:4200,w:1450,h:1650,color:'#e2c681',animals:['🦂','🦎','🐍']},
  {id:'coast',name:'Saltwick Haven Coast',x:-5500,y:6850,w:10500,h:2450,color:'#efd49c',animals:['🦀','🐢','🕊️']},
  {id:'wasteland',name:'The Ashen Expanse',x:3000,y:1600,w:4100,h:3200,color:'#958b80',animals:['🦅','🐀','🦎']},
  {id:'snow',name:'The Frostbound Highlands',x:-8200,y:-8200,w:19500,h:6650,color:'#dce9e9',animals:['🦌','🐇','🐐']},
@@ -476,7 +476,7 @@ function islandTerrainRGB(x,y){
   const hash=(a,b)=>{let n=Math.imul(a,374761393)+Math.imul(b,668265263)+Math.imul(i+1,1442695041);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295};
   const offset=(hash(px,py)-.5)*125;
   const margin=biomeMargin(r,biomePosition((px+.5)*cell,(py+.5)*cell))+offset;
-  const w=coastSmooth(-36,36,margin);
+  const w=(r.id==='desert'&&x<5800)?0:coastSmooth(-36,36,margin);
   red+=(r.rgb[0]-red)*w;green+=(r.rgb[1]-green)*w;blue+=(r.rgb[2]-blue)*w;
   if(i===4)snow=w;if(i===3)waste=w;if(i===1)desert=w;
  }
