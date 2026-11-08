@@ -1,4 +1,4 @@
 {
-  "build": 135,
-  "notes": "V135 LIVE: Gloamjaw defaults to a front/camera-facing idle pose, senses Haigen only nearby or in a forward sight cone, tracks him around the clearing once aware and forgets him when he escapes. Being struck also alerts the boss. No attacks without awareness. Approved art, V134 DEV KIT/autonomy, saves, worlds and Ember unchanged."
+  "build": 136,
+  "notes": "V136 LIVE: high-fidelity Gloamjaw attack VFX including textured thorn-vine swipe, organic spore pods/projectiles, erupting barky roots, bite saliva/snapping, impact sparks/debris. Replaces circular platform with cached, faded, irregular rooted forest-floor artwork. Separate visual-only addon, retaining telegraph timings, damage/hitboxes, approved 28-pose boss sprites, Skolli/Dylan, Haigen independence, DEV KIT, saves and Ember."
 }

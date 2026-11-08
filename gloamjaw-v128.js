@@ -445,5 +445,7 @@ function drawEffects(){
 }
 window.__gloamAddon={y:y+10,arena,update,drawGround,drawBoss,drawEffects,craftLocked,crafted,useTool,
  snapshot:()=>({build:135,hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length,artReady:gloamArtLoaded,artError:gloamArtError,artPose:gloamPose(),aware:gloamAttention.aware,facing:gloamFacing(),attentionReason:gloamAttention.reason,senseRadius:GLOAM_NEAR_SENSE,sightRadius:GLOAM_SIGHT})};
+// Visual-only bridge for V136. Live combat timing, damage and attack rules remain here.
+window.__gloamFxInput={ctx,combat,state,data,x,y,rx,ry,time:()=>P.snapshot().time};
 window.__gloamQA=window.__gloamAddon.snapshot;
 })();
