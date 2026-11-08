@@ -1,4 +1,4 @@
 {
-  "build": 148,
-  "notes": "V148 LIVE: Thrummaw, original desert underground predator in Sunscorched Dunes. Footstep vibration detection, sand ripple warning, ground eruption, illustrated jaw/tendril creature, boss-only ATB with Attack, Tool, Heal, Defend, Distract, Retreat and Wait/Active modes. Existing Gloamjaw, duck families, saves and wildlife preserved."
+  "build": 149,
+  "notes": "V149: expands the desert eastward to x10400 while retaining existing woodland and old save coordinates. Thrummaw moves into new eastern dunes at x8560, y1680; stone refuges provide protection during its subterranean pursuit and ATB attacks. Existing duck families, Gloamjaw, and Ember remain unchanged."
 }
