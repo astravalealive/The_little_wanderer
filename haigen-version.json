@@ -1,4 +1,4 @@
 {
-  "build": 156,
-  "notes": "V156: wider sand beach transitions, animated surf foam tracking shoreline, and movement-based splashes while Haigen paddles in shallow sea. Deep sea remains locked."
+  "build": 157,
+  "notes": "V157: cleared solid coastal obstacles, expanded accessible shallows, slowed wading, and corrected splash detection to accumulate movement across frames. Deep water remains gated."
 }
