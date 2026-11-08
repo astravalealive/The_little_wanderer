@@ -1,4 +1,4 @@
 {
-  "build": 153,
-  "notes": "V153: naturalized eastern desert shoreline with curved edge and wider beach blending; lake center now blocks Haigen until flippers unlock in a future quest. Existing V152 coastal paddling remains."
+  "build": 154,
+  "notes": "V154: remove obsolete island-outline clipping that covered expanded coastline and characters; replace rectangular sea overlay with curved water mask. V153 shoreline and pond depth retained."
 }
