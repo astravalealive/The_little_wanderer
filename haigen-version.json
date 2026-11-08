@@ -1,4 +1,4 @@
 {
-  "build": 157,
-  "notes": "V157: cleared solid coastal obstacles, expanded accessible shallows, slowed wading, and corrected splash detection to accumulate movement across frames. Deep water remains gated."
+  "build": 158,
+  "notes": "V158: synchronised visible version labels, runtime build and update manifest. Shoreline access still requires live testing."
 }
