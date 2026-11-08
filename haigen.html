@@ -416,13 +416,15 @@ const islandOutline=Array.from({length:160},(_,i)=>{
  return {x:c+dx*lo,y:c+dy*lo};
 });
 function islandClipPath(g){g.beginPath();for(let i=0;i<islandOutline.length;i++){const p=islandOutline[i];if(!i)g.moveTo(p.x,p.y);else g.lineTo(p.x,p.y)}g.closePath()}
-let lastPaddleX=null,lastPaddleY=null,lastPaddleTime=0;
+let lastPaddleX=null,lastPaddleY=null,lastPaddleTime=0,lastSplashX=null,lastSplashY=null;
 function drawPaddleSplash(){
  const d=islandDepth(state.x,state.y),now=time;
- const moving=lastPaddleX!==null&&Math.hypot(state.x-lastPaddleX,state.y-lastPaddleY)>2.5;
+ const moving=lastSplashX!==null&&Math.hypot(state.x-lastSplashX,state.y-lastSplashY)>7;
  lastPaddleX=state.x;lastPaddleY=state.y;
- if(d>=0||d< -62||!moving||now-lastPaddleTime<145)return;
- lastPaddleTime=now;
+ if(d>=0||d< -105){lastSplashX=null;lastSplashY=null;return;}
+ if(lastSplashX===null){lastSplashX=state.x;lastSplashY=state.y;return;}
+ if(!moving||now-lastPaddleTime<110)return;
+ lastSplashX=state.x;lastSplashY=state.y;lastPaddleTime=now;
  ctx.save();ctx.strokeStyle='rgba(226,252,247,.9)';ctx.lineWidth=2.2;
  for(let k=0;k<5;k++){const a=k*1.256+now*.007,rr=12+(k%2)*8;
  ctx.beginPath();ctx.moveTo(state.x+Math.cos(a)*rr,state.y+Math.sin(a)*5);
@@ -510,6 +512,9 @@ function flowerHasHabitat(o){
  return !state.structures.some(f=>f.kind==='campfire'&&Math.hypot(o.x-f.x,o.y-f.y)<100);
 }
 for(let i=objects.length-1;i>=0;i--)if(!flowerHasHabitat(objects[i]))objects.splice(i,1);
+// V157: remove solid obstacles from the actual coastal approach and ankle-deep surf.
+// Keep inland rocks and dedicated Thrummaw refuges intact.
+for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(['rock','tree','fir','palm','bareTree','cactus'].includes(o.type)&&islandDepth(o.x,o.y)<380)objects.splice(i,1)}
 
 // Construction plots remain unobstructed without renumbering surviving resource IDs.
 for(let i=objects.length-1;i>=0;i--)if(homesteadPlots.some(p=>Math.hypot(objects[i].x-p.x,objects[i].y-p.y)<(p.kind==='jetty'?105:125)))objects.splice(i,1);
@@ -5632,7 +5637,7 @@ function blockedByHomestead(x,y){
 }
 
 function blockedBySolid(x,y){if(window.__gloamAddon?.arena(x,y))return false;
- if(islandDepth(x,y)<-62)return true; // V153: shoreline shallows; deeper sea reserved for flippers
+ if(islandDepth(x,y)<-105)return true; // V157: generous walkable shallows, deep sea still gated by flippers
  if(lakeLevel(x,y)<.76)return true; // V153: central pond depths inaccessible until the Frog King's reward
  if(blockedByHomestead(x,y))return true;
  const cx=Math.floor(x/solidCellSize),cy=Math.floor(y/solidCellSize);
@@ -5658,7 +5663,7 @@ function resolveSolidMovement(startX,startY,endX,endY){
  return {x,y};
 }
 
-function update(dt){updateSurvival(dt);if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>90000){idleTime=0;setAutonomy(true);notify('🌲 Haigen is off exploring while you are away.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput)setAutonomy(false);if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=lakeLevel(state.x,state.y)<.8;state.x=clamp(state.x+dx*dt*(swim?.115:.19),50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:.19),50,WORLD-50);state.steps+=dt*.19}const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;trackMotion(playerMotion,prevPlayerX,prevPlayerY,state.x,state.y,dt);if(window.__gloamAddon)window.__gloamAddon.update(dt);if(window.__thrummaw)window.__thrummaw.update(dt);
+function update(dt){updateSurvival(dt);if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>90000){idleTime=0;setAutonomy(true);notify('🌲 Haigen is off exploring while you are away.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput)setAutonomy(false);if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=lakeLevel(state.x,state.y)<.8,sea=islandDepth(state.x,state.y)<0;state.x=clamp(state.x+dx*dt*(swim?.115:sea?.135:.19),50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:sea?.135:.19),50,WORLD-50);state.steps+=dt*.19}const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;trackMotion(playerMotion,prevPlayerX,prevPlayerY,state.x,state.y,dt);if(window.__gloamAddon)window.__gloamAddon.update(dt);if(window.__thrummaw)window.__thrummaw.update(dt);
 // With a joystick/gamepad, face the requested direction, not the axis
 // selected by wall-slide collision. AI walking still follows real motion.
 if(!state.autonomy&&!state.resting&&playerMotion.moving&&mag>.13){
@@ -6433,7 +6438,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=156;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Sandy beach, lapping surf and paddling splashes';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=157;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Accessible beaches, shallow paddling and visible step splashes';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
