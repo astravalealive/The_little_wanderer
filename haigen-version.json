@@ -1,4 +1,4 @@
 {
-  "build": 146,
-  "notes": "V146 LIVE: Ducklings swim in a loose, winding line along their mother's actual path with individual wandering, collision spacing and natural regrouping when she pauses or slows. Families pause periodically; fathers keep a separate position. Mother ducks receive a cached brown mottled hen variant of the existing illustrated mallard sprite, preserving pixel-art detail in swimming, walking and flying. Version badge, title and update manifest all set to 146. Existing saves and duck lifecycle preserved."
+  "build": 147,
+  "notes": "V147 LIVE: Gloamjaw now appears as a special woodland flower until Haigen approaches. A 1.55-second rupture reveal precedes a boss-only Active Time Battle prototype with Attack, Tool, Heal, Defend, Retreat and Wait/Active mode; the original illustrated boss sprite and world exploration are preserved. Defeat still unlocks crossbow crafting. Development revive resets the reveal. V146 duck families remain unchanged."
 }
