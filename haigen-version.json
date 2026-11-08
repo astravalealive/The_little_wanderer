@@ -1,4 +1,4 @@
 {
-  "build": 152,
-  "notes": "V152: first coastline pass: Haigen can paddle into shallow sea up to a depth boundary; coastal water now overlays only his lower body with a wading ripple. Deep sea remains blocked. Frog King and lake depth progression are upcoming."
+  "build": 153,
+  "notes": "V153: naturalized eastern desert shoreline with curved edge and wider beach blending; lake center now blocks Haigen until flippers unlock in a future quest. Existing V152 coastal paddling remains."
 }
