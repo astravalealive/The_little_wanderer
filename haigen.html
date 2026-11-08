@@ -7724,7 +7724,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=197;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Tap-select + long-press editor with upgraded artwork';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=209;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Tap-select + long-press editor with upgraded artwork';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
@@ -7910,8 +7910,8 @@ offlineProgress();devInitialAccess();$('artBtn').textContent=rbEnabled?'🎨 Cla
 const frogHud=document.createElement('div');
 frogHud.id='frogPassengerHud';
 frogHud.setAttribute('aria-live','polite');
-frogHud.style.cssText='position:fixed;right:12px;top:22%;z-index:10020;display:none;align-items:center;gap:9px;padding:8px 10px;border:2px solid #b5c6a2;border-radius:9px;background:rgba(21,38,33,.93);color:#f1e9cc;font:600 13px system-ui,sans-serif;box-shadow:0 3px 12px #0008;max-width:180px;pointer-events:auto';
-const frogIcon=document.createElement('canvas');frogIcon.width=40;frogIcon.height=40;frogIcon.setAttribute('aria-label','Frog in net');frogIcon.setAttribute('role','img');
+frogHud.style.cssText='position:fixed;right:max(10px,env(safe-area-inset-right));top:clamp(175px,29dvh,310px);z-index:10020;display:none;box-sizing:border-box;align-items:center;gap:8px;padding:7px 9px;border:2px solid #b5c6a2;border-radius:9px;background:rgba(21,38,33,.95);color:#f1e9cc;font:600 12px system-ui,sans-serif;box-shadow:0 3px 12px #0008;width:max-content;max-width:min(190px,45vw);min-width:0;pointer-events:auto;overflow:hidden';
+const frogIcon=document.createElement('canvas');frogIcon.width=40;frogIcon.height=40;frogIcon.style.cssText='display:block;position:static;inset:auto;width:40px;height:40px;min-width:40px;max-width:40px;flex:0 0 40px;object-fit:contain';frogIcon.setAttribute('aria-label','Frog in net');frogIcon.setAttribute('role','img');
 const fg=frogIcon.getContext('2d');fg.imageSmoothingEnabled=false;
 fg.fillStyle='#304d42';fg.fillRect(0,0,40,40);
 fg.fillStyle='#668d51';fg.fillRect(8,16,24,15);fg.fillRect(12,12,16,9);fg.fillRect(5,22,8,9);fg.fillRect(27,22,8,9);
@@ -7920,9 +7920,9 @@ fg.fillStyle='#e4d7a4';fg.fillRect(12,12,6,6);fg.fillRect(23,12,6,6);
 fg.fillStyle='#1b2b28';fg.fillRect(14,13,3,4);fg.fillRect(25,13,3,4);
 fg.fillStyle='#3d5a42';fg.fillRect(18,23,4,2);
 const frogText=document.createElement('div');frogText.textContent='Frog in net';
-const frogRelease=document.createElement('button');frogRelease.type='button';frogRelease.textContent='Release frog';frogRelease.style.cssText='display:none;min-height:44px;padding:8px;border:1px solid #b5c6a2;border-radius:6px;background:#53764d;color:white;font:700 13px system-ui;cursor:pointer';
+const frogRelease=document.createElement('button');frogRelease.type='button';frogRelease.textContent='Release frog';frogRelease.style.cssText='display:none;min-height:38px;padding:6px;max-width:100%;white-space:normal;border:1px solid #b5c6a2;border-radius:6px;background:#53764d;color:white;font:700 13px system-ui;cursor:pointer';
 frogRelease.addEventListener('click',()=>{if(state.carriedFrogId>=0)haigenUseNet();refreshFrogHud()});
-const frogInfo=document.createElement('div');frogInfo.style.cssText='display:flex;flex-direction:column;gap:5px';frogInfo.append(frogText,frogRelease);frogHud.append(frogIcon,frogInfo);document.body.appendChild(frogHud);
+const frogInfo=document.createElement('div');frogInfo.style.cssText='display:flex;flex-direction:column;gap:5px;min-width:0;max-width:125px;overflow-wrap:anywhere';frogInfo.append(frogText,frogRelease);frogHud.append(frogIcon,frogInfo);document.body.appendChild(frogHud);
 let lastFrogReleaseReady=false;
 function refreshFrogHud(){
  const f=state.carriedFrogId>=0?frogs[state.carriedFrogId]:null;
