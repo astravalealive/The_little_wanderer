@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V232 · Interior Layer Fix</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V233 · Doorway Boundary Fix</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
 .mobile-menu,.stats-toggle{display:none}
 @media(max-width:600px),(pointer:coarse) and (max-height:600px){
  .hud{top:calc(env(safe-area-inset-top,0px) + 8px);right:84px}
@@ -6923,21 +6923,34 @@ function update(dt){updateSurvival(dt);updateWastelandGhosts(dt);if(ghostStunMs>
 // Homestead collision and persistent entry/exit. Door is the only passage.
 if(state.campTier>0){
  const hx=cottage.x+35,hy=cottage.y-10,tier=housePreviewTier||state.campTier;
- const doorX=hx-(tier===1?33:tier===2?35:tier===3?38:tier===4?32:28);
- const hw=(tier===1?330:tier===2?365:tier===3?405:tier===4?485:560)*.40;
- const front=hy+6,back=hy-245;
- const doorway=Math.abs(state.x-doorX)<29;
- const wasInside=homeInside;
- const crossedIn=!wasInside&&prevPlayerY>=front&&state.y<front&&doorway;
- const crossedOut=wasInside&&prevPlayerY<=front&&state.y>front&&doorway;
- if(crossedIn){homeInside=true;homeDoorOpen=1;notify('🚪 Haigen opens the door and steps inside.')}
- else if(crossedOut){homeInside=false;homeDoorOpen=1;notify('🚪 Haigen steps outside.')}
- else if(!homeInside){
-  const enteredWall=state.x>hx-hw&&state.x<hx+hw&&state.y>back&&state.y<front;
-  if(enteredWall){state.x=prevPlayerX;state.y=prevPlayerY;}
+ // V233: all entrance coordinates come from the same artwork-relative geometry.
+ // The feet of the character, not the sprite centre, are used for doorway collision.
+ const widths=[0,330,365,405,485,560],heights=[0,310,335,355,385,420];
+ const width=widths[tier]||330,height=heights[tier]||310;
+ // Normalised doorway centres for each approved exterior image (left to right).
+ const doorFractions=[0,.455,.48,.49,.50,.50];
+ const doorX=hx+(doorFractions[tier]-.5)*width;
+ const halfWidth=width*.43,front=hy+13,back=hy-height*.78;
+ const doorHalf=25;
+ const withinDoor=Math.abs(state.x-doorX)<=doorHalf;
+ const crossedIn=!homeInside&&prevPlayerY>=front&&state.y<front&&withinDoor;
+ const crossedOut=homeInside&&prevPlayerY<=front&&state.y>front&&withinDoor;
+ if(crossedIn){
+  homeInside=true;homeDoorOpen=1;
+  state.x=doorX;state.y=front-15;
+  notify('🚪 Haigen opens the door and steps inside.');
+ }else if(crossedOut){
+  homeInside=false;homeDoorOpen=1;
+  state.x=doorX;state.y=front+17;
+  notify('🚪 Haigen steps outside.');
+ }else if(!homeInside){
+  // Solid facade and side walls. Only the actual front doorway permits entry.
+  const inFootprint=state.x>hx-halfWidth&&state.x<hx+halfWidth&&state.y>back&&state.y<front;
+  if(inFootprint){state.x=prevPlayerX;state.y=prevPlayerY;}
  }else{
-  // Keep Haigen within the playable interior, apart from its front doorway.
-  if(state.x<hx-hw+12||state.x>hx+hw-12||state.y<back+12||(state.y>front&&!doorway)){
+  // Keep the indoor character inside the interior floor plan. No side-wall escapes.
+  const beyondWalls=state.x<hx-halfWidth+17||state.x>hx+halfWidth-17||state.y<back+18;
+  if(beyondWalls||state.y>front){
    state.x=prevPlayerX;state.y=prevPlayerY;
   }
  }
@@ -7779,7 +7792,7 @@ function drawHomeInteriorScene(){
   ctx.drawImage(art,mx,my,art.naturalWidth-mx*2,art.naturalHeight-my*2,left,top,size,size);
  }else{ctx.fillStyle='#6d5239';ctx.fillRect(left,top,size,size)}
  const hx=cottage.x+35,hy=cottage.y-10;
- const px=left+size*(.5+(state.x-hx)/290),py=top+size*(.83+(state.y-(hy+6))/310);
+ const px=left+size*(.5+(state.x-hx)/Math.max(290,([0,330,365,405,485,560][tier]||330)*.9)),py=top+size*(.82+(state.y-(hy+13))/Math.max(310,([0,310,335,355,385,420][tier]||310)*.95));
  ctx.save();ctx.translate(px,py);ctx.scale(Math.max(1.15,size/360),Math.max(1.15,size/360));
  character(0,0,'boy');ctx.restore();
  ctx.font='bold '+Math.max(15,Math.round(cw/36))+'px Georgia';
