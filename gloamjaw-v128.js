@@ -35,6 +35,21 @@ style.textContent+='#gloamAmmo{position:fixed;z-index:23;right:calc(env(safe-are
 const bar=document.createElement('div');bar.id='gloamBossHud';bar.setAttribute('role','progressbar');bar.setAttribute('aria-label','Gloamjaw boss health');bar.setAttribute('aria-valuemin','0');bar.setAttribute('aria-valuemax',String(MAX));
 bar.innerHTML='<div class="title-line"><span>GLOAMJAW · HUNGRY BLOOM</span><span id="gloamBossValue">180 / 180</span></div><div class="track"><div id="gloamBossFill"></div></div>';document.body.append(bar);const ammo=document.createElement('div');ammo.id='gloamAmmo';ammo.setAttribute('aria-live','off');document.body.append(ammo);
 const combat={mode:'idle',timer:1350,turn:0,attack:'',aim:{x,y},angle:0,hit:false,arrows:[],spores:[],lastShot:-1e6,lastMelee:-1e6};
+// V137: reusable developer-only boss respawn. Saves, rewards and the rest of
+// Haigen's World are not reset. Combat resets so attacks start from idle.
+function reviveGloamjaw(){
+ if(!state.devKitEnabled)return false;
+ data.defeated=false;data.hp=MAX;
+ combat.mode='idle';combat.timer=1350;combat.turn=0;combat.attack='';
+ combat.aim={x,y};combat.angle=0;combat.hit=false;
+ combat.arrows.length=0;combat.spores.length=0;
+ combat.lastShot=-1e6;combat.lastMelee=-1e6;
+ gloamAttention.aware=false;gloamAttention.facing=0;
+ gloamAttention.detectedAt=-1e9;gloamAttention.holdUntil=-1e9;gloamAttention.reason='idle';
+ lastGloamHitAt=-1e9;
+ P.save();P.notify('🌿 Gloamjaw has regrown! Full health. Ready for another test.');
+ return true;
+}
 
 // Illustrated 16-bit sprite atlas. Each pose is rasterized once at 192px to
 // match Haigen's crisp animation. This affects artwork only, not encounter logic.
@@ -443,9 +458,15 @@ function drawEffects(){
  }
  ctx.restore();
 }
-window.__gloamAddon={y:y+10,arena,update,drawGround,drawBoss,drawEffects,craftLocked,crafted,useTool,
- snapshot:()=>({build:135,hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length,artReady:gloamArtLoaded,artError:gloamArtError,artPose:gloamPose(),aware:gloamAttention.aware,facing:gloamFacing(),attentionReason:gloamAttention.reason,senseRadius:GLOAM_NEAR_SENSE,sightRadius:GLOAM_SIGHT})};
+window.__gloamAddon={y:y+10,arena,update,drawGround,drawBoss,drawEffects,craftLocked,crafted,useTool,revive:reviveGloamjaw,
+ snapshot:()=>({build:137,hp:data.hp,defeated:data.defeated,discovered:data.discovered,position:{x,y},arrows:state.arrows,bow:state.tools.bow,crossbow:state.tools.crossbow,combat:combat.mode,shots:combat.arrows.length,spores:combat.spores.length,artReady:gloamArtLoaded,artError:gloamArtError,artPose:gloamPose(),aware:gloamAttention.aware,facing:gloamFacing(),attentionReason:gloamAttention.reason,senseRadius:GLOAM_NEAR_SENSE,sightRadius:GLOAM_SIGHT})};
 // Visual-only bridge for V136. Live combat timing, damage and attack rules remain here.
 window.__gloamFxInput={ctx,combat,state,data,x,y,rx,ry,time:()=>P.snapshot().time};
+// Once per V137 dev build, restore a previously defeated Gloamjaw automatically.
+// Future kills remain defeated until the developer taps Revive again.
+if(state.devKitEnabled&&state.gloamTestRevivedBuild!==137){
+ state.gloamTestRevivedBuild=137;
+ if(data.defeated)reviveGloamjaw();else P.save();
+}
 window.__gloamQA=window.__gloamAddon.snapshot;
 })();

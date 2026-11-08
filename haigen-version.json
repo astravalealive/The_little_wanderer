@@ -1,4 +1,4 @@
 {
-  "build": 136,
-  "notes": "V136 LIVE: high-fidelity Gloamjaw attack VFX including textured thorn-vine swipe, organic spore pods/projectiles, erupting barky roots, bite saliva/snapping, impact sparks/debris. Replaces circular platform with cached, faded, irregular rooted forest-floor artwork. Separate visual-only addon, retaining telegraph timings, damage/hitboxes, approved 28-pose boss sprites, Skolli/Dylan, Haigen independence, DEV KIT, saves and Ember."
+  "build": 137,
+  "notes": "V137 LIVE: Restore defeated Gloamjaw automatically once in DEV mode on V137 load; repeatable Revive Boss in DEV KIT resets boss HP to 180, attack state, spores/projectiles and awareness without modifying world progression, saves, approved boss art, V136 attack FX or timings. Existing Ember game untouched."
 }
