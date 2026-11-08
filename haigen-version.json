@@ -1,4 +1,4 @@
 {
-  "build": 154,
-  "notes": "V154: remove obsolete island-outline clipping that covered expanded coastline and characters; replace rectangular sea overlay with curved water mask. V153 shoreline and pond depth retained."
+  "build": 155,
+  "notes": "V155: fixes hard rectangular black border where terrain reached world x=0/y=0. Terrain chunks now render beyond original world bounds as sea, with viewport-wide ocean background. V154 player layering remains."
 }
