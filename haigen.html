@@ -1285,7 +1285,7 @@ function drawIllustratedExtraFauna(kind,x,y,dir='right',walking=false,anim=0,sca
 }
 
 const illustratedFaunaSizes={
- butterfly:.73,squirrel:.78,bird:.63,duck:.96,fish:.83,
+ butterfly:.73,squirrel:.78,bird:.63,duck:.78,fish:.83,
  wolf:.94,boar:.94,scorpion:.83,snake:.89,crab:.82,lizard:.84
 };
 function drawIllustratedFauna(kind,x,y,dir='right',walking=false,anim=0,scale=1,activity='auto'){
@@ -4860,7 +4860,7 @@ function drawDuck(d){
   const dir=Math.cos(d.heading)<-.45?'left':Math.cos(d.heading)>.45?'right':Math.sin(d.heading)<0?'up':'down';
   ctx.save();ctx.beginPath();ctx.rect(d.x-95,d.y-108,190,102);ctx.clip();
   worldFaunaDraw('duck',d.x,d.y+Math.sin(time*.004+d.phase)*2,dir,true,time*.43+d.phase*1000,
-   1.23*d.size,d.foraging?'forage':'walk');
+   1.02*d.size,d.foraging?'forage':'walk');
   ctx.restore();
   drawDuckWater132(d.x,d.y,time*.006+d.phase,d.size);
   window.__v132DuckWater={feetHidden:true,dir};
@@ -4869,7 +4869,7 @@ function drawDuck(d){
  const flying=d.air>.08,alt=d.air*(42+Math.sin(time*.002+d.phase)*5);
  if(illustratedFaunaReady){
   drawIllustratedFauna('duck',d.x,d.y-alt,Math.cos(d.heading)<0?'left':'right',
-    flying||Math.abs(d.speed||0)>.02,time+d.phase*1000,1.23*d.size);
+    flying||Math.abs(d.speed||0)>.02,time+d.phase*1000,1.02*d.size);
   if(flying){
    ctx.save();ctx.strokeStyle='#a1afa2';ctx.lineWidth=3;ctx.lineCap='square';
    const flap=Math.sin(d.wing)*12;
@@ -4879,9 +4879,9 @@ function drawDuck(d){
   }
   return;
  }
- const male=d.kind==='mallard',size=d.size;
+ const male=d.kind==='mallard',size=d.size*.84;
  if(rbEnabled&&rbWoodland(d.x,d.y)){
-  rbDrawCreature('duck',d.x,d.y-alt,Math.cos(d.heading)<0?'left':'right',flying||Math.abs(d.speed||0)>.02,time+d.phase*1000,1.7*size);return;
+  rbDrawCreature('duck',d.x,d.y-alt,Math.cos(d.heading)<0?'left':'right',flying||Math.abs(d.speed||0)>.02,time+d.phase*1000,1.42*size);return;
  }
  ctx.save();ctx.translate(d.x,d.y-alt);ctx.scale(size*(Math.cos(d.heading)<0?-1:1),size);
  ctx.save();ctx.globalAlpha=flying?.3:.65;ctx.strokeStyle='#d1f0ee';ctx.lineWidth=1.5;
@@ -4974,7 +4974,7 @@ function mixColour(day,night,amount){
 function drawWoodlandCritter(c){
  if(c.hiddenUntil&&time<c.hiddenUntil)return;
  if(illustratedFaunaReady&&['squirrel','butterfly'].includes(c.kind)){
-  worldFaunaDraw(c.kind,c.x,c.y,Math.sin(time*.0011+c.phase)<0?'left':'right',time<c.scaredUntil,time+c.phase*220,.8,time<c.scaredUntil?'flee':c.kind==='butterfly'?'fly':'forage');return;
+  worldFaunaDraw(c.kind,c.x+Math.sin(time*.0013+c.phase)*22,c.y-(c.kind==='butterfly'?38+Math.sin(time*.004+c.phase)*13:0),Math.sin(time*.0011+c.phase)<0?'left':'right',time<c.scaredUntil||c.kind==='butterfly',time+c.phase*220,.8,time<c.scaredUntil?'flee':c.kind==='butterfly'?'fly':'forage');return;
  }
  const scared=time<c.scaredUntil,wiggle=Math.sin(time*.004+c.phase);
  if(c.kind==='squirrel'){
@@ -5194,23 +5194,17 @@ function updateBirds(dt){
    if(b.x<15||b.x>WORLD-15||b.y<15||b.y>WORLD-15){b.hiddenUntil=time+14000+seeded(b.phase)*9000;b.air=0;b.vx=0;b.vy=0;continue;}
   }else{
    b.air=Math.max(0,b.air-step*1.5);
-   if(b.air===0){b.vx=0;b.vy=0;if(Math.hypot(b.x-state.x)<120&&Math.abs(b.y-state.y)<120)b.flightUntil=time+2600}
+   if(b.air===0){b.vx=0;b.vy=0;if(Math.hypot(b.x-state.x,b.y-state.y)<120||Math.sin(time*.0007+b.phase)>.995)b.flightUntil=time+2600}
   }
  }
 }
 function drawBird(b){
  if(b.hiddenUntil&&time<b.hiddenUntil)return;
  if(illustratedFaunaReady){
-  const flying=b.air>.04,alt=flying?b.air*(35+Math.sin(time*.003+b.phase)*7):0;
+  const flying=b.air>.04,alt=flying?b.air*(52+Math.sin(time*.003+b.phase)*8):0;
   drawIllustratedFauna('bird',b.x,b.y-alt,b.vx<0?'left':'right',
-   flying||Math.abs(b.vx)>.04,time+b.phase*200,.94,flying?'fly':'forage');
-  if(flying){
-   const flap=Math.sin(time*.022+b.phase)*11;
-   ctx.save();ctx.strokeStyle='#a1b4ad';ctx.lineWidth=2.8;ctx.lineCap='square';
-   ctx.beginPath();ctx.moveTo(b.x-6,b.y-alt-14);ctx.lineTo(b.x-16,b.y-alt-27-flap);
-   ctx.moveTo(b.x+5,b.y-alt-14);ctx.lineTo(b.x+16,b.y-alt-25+flap);
-   ctx.stroke();ctx.restore();
-  }
+   flying||Math.abs(b.vx)>.04,time+b.phase*200,.94,flying?'fly':'rest');
+  // The illustrated atlas already contains wings. Avoid drawing blue limb-like strokes.
   return;
  }
  const wing=Math.sin(time*.022+b.phase),flying=b.air>.04,alt=flying?b.air*(35+Math.sin(time*.003+b.phase)*7):0;
