@@ -5070,15 +5070,7 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  if(displayDir!=='up'&&status.equip)haigenDrawPixelTool(status.equip,displayDir,frame,status.action,scale,left,top);
  if(!status.equip&&status.action&&['eat','medicine','cook'].includes(status.action.kind))
   haigenDrawPixelTool('hands',displayDir,frame,status.action,scale,left,top);
- // Snorkel kit only when swimming. The coast itself keeps shorts and trainers.
- if(deepWater){
-  const px=displayDir==='left'?left+16:displayDir==='right'?left+26:left+19,py=top+27*scale;
-  ctx.strokeStyle='#5f999f';ctx.lineWidth=3;
-  ctx.strokeRect(px,py,17,8);
-  ctx.beginPath();ctx.moveTo(px+17,py+3);ctx.lineTo(px+23,py+3);ctx.lineTo(px+23,py-18);ctx.stroke();
-  ctx.fillStyle='#dfb966';ctx.fillRect(px+20,py-19,7,3);
-  ellipse(x,y-46,5,3,'#c1dfd1');
- }
+ // Swimming visuals come exclusively from the approved swim sprite atlas.
  if(status.knock){
   ctx.fillStyle='#fff4ad';
   for(let i=0;i<3;i++){
@@ -5259,7 +5251,7 @@ function character(x,y,type,actor,deepWater=false){
    else if(kind==='torch'){ctx.fillStyle='#ffb54b';ctx.beginPath();ctx.arc(2,-35,9+Math.sin(time*.015)*2,0,Math.PI*2);ctx.fill()}
    ctx.restore();
   }
-  if(deepWater)drawHaigenSnorkelLocal(dir);
+  // No legacy snorkel overlay: the swim sprite already contains its equipment.
  }else if(type==='rabbit'){
   // Dylan: round marshmallow body, expressive ears and twitchy little nose.
   const twitch=Math.sin(time*.028+phase*.004)*1.4;
