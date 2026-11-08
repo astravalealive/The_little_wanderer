@@ -1,4 +1,4 @@
 {
-  "build": 229,
-  "notes": "Restore dedicated home upgrade menu when tapping Haigen's house; retain five-level art preview."
+  "build": 230,
+  "notes": "Fix startup crash caused by referencing camera before initialization; preserve home preview and upgrade menu."
 }
