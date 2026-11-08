@@ -5982,8 +5982,9 @@ trackMotion(c,oldX,oldY,c.x,c.y,dt);
 // Pan feels direct under the finger. Release holds the view briefly before a gentle recenter.
 // Direct pan: no following force while fingers are on the canvas.
 const draggingCamera=cameraTouches.size>0;
+if(playerInput)cameraDetached=false;
 const cameraHolding=!draggingCamera&&performance.now()-cameraReleaseAt<950;
-if(!draggingCamera&&!cameraHolding){
+if(!draggingCamera&&!cameraHolding&&!cameraDetached){
  const follow=1-Math.exp(-dt/1250);
  cam.x+=(clamp(state.x+look.x,WORLD_MIN,WORLD)-cam.x)*follow;
  cam.y+=(clamp(state.y+look.y,WORLD_MIN,WORLD)-cam.y)*follow;
@@ -6579,6 +6580,7 @@ function setCameraZoom(value){
 let cameraZoom=1;
 function worldZoom(){return baseCameraScale()*cameraZoom}
 let cameraReleaseAt=-1e9;
+let cameraDetached=false; // V184: free camera stays where player pans during autonomous play.
 const cameraTouches=new Map();
 let pinchDistance=0;
 const gameCanvas=$('game');
@@ -6600,6 +6602,7 @@ gameCanvas.addEventListener('pointermove',e=>{
   pinchDistance=distance;
  }else if(p.length===1){
   const scale=worldZoom();
+  if(Math.hypot(e.clientX-prev.x,e.clientY-prev.y)>0.5)cameraDetached=true;
   // Move the camera exactly with the drag, at the current zoom level.
   cam.x=clamp(cam.x-(e.clientX-prev.x)/scale,WORLD_MIN,WORLD);
   cam.y=clamp(cam.y-(e.clientY-prev.y)/scale,WORLD_MIN,WORLD);
