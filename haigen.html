@@ -893,7 +893,42 @@ function drawLakeHabitat(){
   ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+Math.sin(n*1.9)*5,p.y-h);ctx.stroke();
  }
 }
-function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
+// V274: permanent mountain-fed river connecting Frostbound Highlands to the Great Lake.
+// Its meanders are deterministic; water collision, world rendering and overview use one course.
+const mountainRiverMouth=lakeEdgePoint(-1.96,.96);
+const mountainRiverPoints=Array.from({length:43},(_,i)=>{
+ const t=i/42;
+ return {x:mountainRiverMouth.x-390*(1-t)+Math.sin(t*11.5)*115+Math.sin(t*23)*25,
+  y:mountainRiverMouth.y-2650*(1-t),w:32+43*t};
+});
+function mountainRiverDistance(x,y){
+ let best=Infinity,width=0;
+ for(let i=1;i<mountainRiverPoints.length;i++){
+  const a=mountainRiverPoints[i-1],b=mountainRiverPoints[i],dx=b.x-a.x,dy=b.y-a.y;
+  const t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy)));
+  const d=Math.hypot(x-a.x-dx*t,y-a.y-dy*t);
+  if(d<best){best=d;width=a.w+(b.w-a.w)*t}
+ }
+ return best-width;
+}
+function drawMountainRiver(nightMix){
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ const course=()=>{ctx.beginPath();mountainRiverPoints.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y))};
+ course();ctx.strokeStyle='#a39e83';ctx.lineWidth=164;ctx.stroke();
+ course();ctx.strokeStyle=mixColour('#79b8c4','#526b91',nightMix);ctx.lineWidth=133;ctx.stroke();
+ course();ctx.strokeStyle=mixColour('#3b90af','#34577e',nightMix);ctx.lineWidth=94;ctx.stroke();
+ course();ctx.strokeStyle='#b8dce1';ctx.globalAlpha=.42;ctx.lineWidth=3;ctx.setLineDash([22,34]);ctx.lineDashOffset=-time*.022;ctx.stroke();ctx.setLineDash([]);
+ for(let i=2;i<mountainRiverPoints.length-2;i+=5){
+  const p=mountainRiverPoints[i],q=mountainRiverPoints[i+1],a=Math.atan2(q.y-p.y,q.x-p.x);
+  const side=i%2?1:-1,nx=-Math.sin(a),ny=Math.cos(a);
+  for(let j=0;j<3;j++){
+   const x=p.x+nx*side*(76+j*9),y=p.y+ny*side*(76+j*9);
+   ellipse(x,y,10+j*3,5+j,'#87918b');
+  }
+ }
+ ctx.restore();
+}
+function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))||mountainRiverDistance(x,y)<margin};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
 // V228: open near the homestead for immediate testing; do not overwrite saved location.
 state.x=cottage.x+30;state.y=cottage.y+155;state.autonomy=false; // camera initializes later from state position
 const campProtectionRadius=365;
@@ -6394,7 +6429,7 @@ function draw(){const energyHud=$('energyMeter');if(energyHud)energyHud.textCont
  const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(cam.x-W/(2*zoom)-120,cam.y-H/(2*zoom)-120,W/zoom+240,H/zoom+240);drawExpandedTerrain(nightMix);ctx.save();/* V154: do not clip actors and shoreline to obsolete original-island outline; expanded coast lies beyond it. */if(rbEnabled)rbDrawGround();for(let i=0;i<410;i++){let x=WORLD_MIN+seeded(i+950)*WORLD_SPAN,y=WORLD_MIN+seeded(i+1200)*WORLD_SPAN;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850||expandedRegion(x,y)||(rbEnabled&&rbWoodland(x,y)))continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
 const tint=ctx.createRadialGradient(0,0,.04,0,0,1),shade=l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564';
 tint.addColorStop(0,shade+'cc');tint.addColorStop(.67,shade+'77');tint.addColorStop(1,shade+'00');
-ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(let j=0;j<24;j++){const a=j*2.399,r=Math.sqrt((j+1)/25),px=l.x+Math.cos(a)*r*390,py=l.y+Math.sin(a)*r*245;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],j%3?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,j%2?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,j%2?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();drawWetGround();if(window.__gloamAddon)window.__gloamAddon.drawGround();if(window.__thrummaw)window.__thrummaw.ground();clearingGround(cottage.x,cottage.y);drawCampDecor();if(!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80)){ellipse(firstFire.x,firstFire.y,47,25,'#76674a');for(let j=0;j<8;j++)ellipse(firstFire.x+Math.cos(j*Math.PI/4)*33,firstFire.y+Math.sin(j*Math.PI/4)*17,8,6,'#a7a18c')}lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();// V266: the cabin's eastern approach is a broad shallow shelf; depths migrate west.
+ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(let j=0;j<24;j++){const a=j*2.399,r=Math.sqrt((j+1)/25),px=l.x+Math.cos(a)*r*390,py=l.y+Math.sin(a)*r*245;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],j%3?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,j%2?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,j%2?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();drawWetGround();if(window.__gloamAddon)window.__gloamAddon.drawGround();if(window.__thrummaw)window.__thrummaw.ground();clearingGround(cottage.x,cottage.y);drawCampDecor();drawMountainRiver(nightMix);if(!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80)){ellipse(firstFire.x,firstFire.y,47,25,'#76674a');for(let j=0;j<8;j++)ellipse(firstFire.x+Math.cos(j*Math.PI/4)*33,firstFire.y+Math.sin(j*Math.PI/4)*17,8,6,'#a7a18c')}lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();// V266: the cabin's eastern approach is a broad shallow shelf; depths migrate west.
 lakeShape();ctx.clip();
 ctx.save();ctx.translate(-360,-110);
 lakeShape(.73);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();
@@ -8284,7 +8319,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=273;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=274;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
