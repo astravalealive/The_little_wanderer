@@ -2,13 +2,13 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Haigen's World · Looking Glass 3D P1</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101c20;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}canvas{display:block}#hud{position:fixed;top:12px;left:12px;background:#142620cc;border:1px solid #8fb5a35c;border-radius:12px;padding:11px 13px;pointer-events:none;max-width:260px}#hud strong{display:block;font-size:15px}#hud small{display:block;color:#b6d7ca;margin-top:4px}#mode{position:fixed;top:12px;right:12px;background:#263e39e8;border:1px solid #b6d7ca;border-radius:11px;color:white;padding:12px;font-size:14px}#joy{position:fixed;bottom:24px;left:24px;width:125px;height:125px;border:2px solid #d6e8d577;background:#294d4870;border-radius:50%;touch-action:none}#nub{position:absolute;left:40px;top:40px;width:42px;height:42px;background:#d6e8d5ad;border-radius:50%;pointer-events:none}#look{position:fixed;right:15px;bottom:20px;width:42%;height:35%;border:1px dashed #b6d7ca55;border-radius:15px;touch-action:none}#look span{position:absolute;right:12px;bottom:12px;color:#dce7e0aa;font-size:12px;pointer-events:none}#help{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;color:#dce7e0cc;pointer-events:none;white-space:nowrap}#error{display:none;position:fixed;inset:25%;background:#1c2929;padding:20px;border-radius:12px;z-index:10}@media(max-width:600px){#hud{max-width:210px;font-size:12px}#hud strong{font-size:12px}#mode{top:82px;padding:9px}#help{display:none}}</style></head>
-<body><div id="hud"><strong>HAIGEN'S WORLD · LOOKING GLASS</strong><small id="status">3D prototype P1 · loading…</small><small>Independent prototype · no existing saves accessed</small></div><button id="mode">📷 Overhead view</button><div id="joy"><div id="nub"></div></div><div id="look"><span>DRAG TO LOOK ↔</span></div><div id="help">WASD / left stick: move · mouse drag / right stick: look · C / right stick press: switch camera</div><div id="error"></div>
+<body><div id="hud"><strong>HAIGEN'S WORLD · LOOKING GLASS</strong><small id="status">LOOKING GLASS · VISUAL V2</small><small>Independent prototype · no existing saves accessed</small></div><button id="mode">📷 Overhead view</button><div id="joy"><div id="nub"></div></div><div id="look"><span>DRAG TO LOOK ↔</span></div><div id="help">WASD / left stick: move · mouse drag / right stick: look · C / right stick press: switch camera</div><div id="error"></div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
 const status=document.querySelector('#status'),modeButton=document.querySelector('#mode');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9cb9b6);scene.fog=new THREE.Fog(0x9cb9b6,32,95);
 const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,180);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;document.body.prepend(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xd9edff,0x425a3e,2.15));const sun=new THREE.DirectionalLight(0xffe5b5,2.6);sun.position.set(-18,32,15);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-36;sun.shadow.camera.right=36;sun.shadow.camera.top=36;sun.shadow.camera.bottom=-36;scene.add(sun);
 const mat=(color,opts={})=>new THREE.MeshStandardMaterial({color,roughness:.95,...opts});
 const grass=mat(0x638f65),pathMat=mat(0xbaa57a),wood=mat(0x70513c),leaf=mat(0x326d50),darkLeaf=mat(0x27563f),stone=mat(0x788989),blue=mat(0x8aeaff,{emissive:0x267eab,emissiveIntensity:1.5});
@@ -41,6 +41,35 @@ mesh(new THREE.BoxGeometry(.5,.48,1),mat(0xb95e30),0,.55,0,fox);
 mesh(new THREE.ConeGeometry(.36,.62,4),mat(0xd67839),0,.8,-.55,fox).rotation.x=-Math.PI/2;
 mesh(new THREE.ConeGeometry(.3,1,6),mat(0xe9d9b7),0,.68,.8,fox).rotation.x=Math.PI/2;
 for(const x of [-.18,.18])for(const z of [-.3,.3])mesh(new THREE.BoxGeometry(.13,.4,.15),mat(0x382d2b),x,.22,z,fox);
+// Looking Glass V2 visual pass: procedural scenery, water, flowers, rocks, atmosphere.
+function seeded(n){let a=Math.sin(n*127.1+47.6)*43758.5453;return a-Math.floor(a)}
+const greens=[mat(0x71935a),mat(0x496f4b),mat(0x8ba46a)],petals=[mat(0xf3d7a3),mat(0xbda4de),mat(0xf1b2a4)];
+const blade=new THREE.ConeGeometry(.075,.42,3),rockGeo=new THREE.DodecahedronGeometry(.35,0);
+for(let i=0;i<900;i++){let x=(seeded(i*3)-.5)*84,z=(seeded(i*3+1)-.5)*84;if(Math.abs(x)<3&&z>-24&&z<20)continue;
+const o=mesh(i%7===0?rockGeo:blade,i%7===0?stone:greens[i%3],x,i%7===0?.13:.2,z);
+o.rotation.y=seeded(i+9)*6.28;o.scale.setScalar(.55+seeded(i+31)*1.1);if(i%7===0)o.scale.y*=.5;o.castShadow=false}
+for(let i=0;i<110;i++){const x=(seeded(i*13+6)-.5)*65,z=(seeded(i*13+8)-.5)*65;if(Math.abs(x)<3&&z>-24&&z<20)continue;
+mesh(new THREE.CylinderGeometry(.02,.025,.34,4),greens[1],x,.17,z).castShadow=false;
+mesh(new THREE.IcosahedronGeometry(.12,0),petals[i%3],x,.36,z).castShadow=false}
+for(let i=0;i<30;i++){const x=(seeded(i*19+4)-.5)*57,z=(seeded(i*19+7)-.5)*57;if(Math.abs(x)<3&&z>-24&&z<20)continue;
+mesh(new THREE.CylinderGeometry(.08,.09,.29,6),mat(0xe5d6bd),x,.15,z);
+const cap=mesh(new THREE.SphereGeometry(.22,8,5),mat(i%3===0?0xa94438:0x927557),x,.34,z);cap.scale.y=.5}
+const waterMat=new THREE.MeshPhysicalMaterial({color:0x3886a0,metalness:.12,roughness:.2,transparent:true,opacity:.87,clearcoat:1});
+const lake=mesh(new THREE.CircleGeometry(7.5,48),waterMat,24,.06,14);lake.rotation.x=-Math.PI/2;lake.scale.set(1.5,.85,1);
+for(let i=0;i<50;i++){const a=i*Math.PI*2/50,x=24+Math.cos(a)*11.6,z=14+Math.sin(a)*6.8;
+const r=mesh(rockGeo,stone,x,.13,z);r.scale.set(.7,.35,.6)}
+for(let i=0;i<70;i++){const a=seeded(i+200)*6.28,x=24+Math.cos(a)*11.8,z=14+Math.sin(a)*6.9;if(x<12)continue;
+mesh(new THREE.CylinderGeometry(.025,.03,.6+seeded(i+20)*.5,4),greens[1],x,.45,z).castShadow=false}
+for(let i=0;i<13;i++){const a=i*6.283/13,r=2.6+seeded(i+5)*.5;
+const p=mesh(rockGeo,stone,11+Math.cos(a)*r,.13,-7+Math.sin(a)*r);p.scale.y=.4}
+for(const x of [-11,-7]){mesh(new THREE.BoxGeometry(.9,.9,.12),mat(0xecc481,{emissive:0x8e5320,emissiveIntensity:.7}),x,2.2,1.4);
+mesh(new THREE.BoxGeometry(.12,.98,.17),wood,x,2.2,1.33);mesh(new THREE.BoxGeometry(.98,.12,.17),wood,x,2.2,1.33)}
+for(const [x,z] of [[-3,1],[5,-9],[13,-2]]){mesh(new THREE.CylinderGeometry(.07,.1,2.5,6),wood,x,1.25,z);
+mesh(new THREE.BoxGeometry(.38,.45,.38),mat(0xffcb83,{emissive:0xffa43d,emissiveIntensity:1.4}),x,2.5,z);
+const l=new THREE.PointLight(0xffb66b,1.2,9);l.position.set(x,2.5,z);scene.add(l)}
+const motes=[];const moteMat=new THREE.MeshBasicMaterial({color:0xe4f6b6,transparent:true,opacity:.75});
+for(let i=0;i<32;i++){const x=(seeded(i*23+3)-.5)*36,z=(seeded(i*23+4)-.5)*36;
+const m=mesh(new THREE.SphereGeometry(.055,5,5),moteMat,x,.8+seeded(i+22)*2,z);m.castShadow=false;motes.push({m,phase:seeded(i+5)*6.28})}
 const keys=new Set();addEventListener('keydown',e=>{keys.add(e.code);if(e.code==='KeyC'&&!e.repeat)toggleCamera()});addEventListener('keyup',e=>keys.delete(e.code));
 let overhead=true,yaw=0,joyX=0,joyY=0,lookDrag=null,joyPointer=null,oldPadToggle=false;
 function toggleCamera(){overhead=!overhead;modeButton.textContent=overhead?'📷 Overhead view':'🎥 Third-person view'}modeButton.onclick=toggleCamera;
@@ -56,9 +85,9 @@ if(keys.has('KeyQ'))yaw+=dt*1.7;if(keys.has('KeyE'))yaw-=dt*1.7;
 const length=Math.hypot(x,y);if(length>.06){x/=Math.max(1,length);y/=Math.max(1,length);const dx=(x*Math.cos(yaw)+y*Math.sin(yaw))*dt*5,dz=(y*Math.cos(yaw)-x*Math.sin(yaw))*dt*5;const nx=THREE.MathUtils.clamp(haigen.position.x+dx,-46,46),nz=THREE.MathUtils.clamp(haigen.position.z+dz,-46,46);if(!obstacles.some(o=>Math.hypot(nx-o.x,nz-o.z)<o.r+.4)){haigen.position.x=nx;haigen.position.z=nz}haigen.rotation.y=Math.atan2(dx,dz)}
 // Fox patrols the runestone and comes near Haigen only within its local clearing.
 const foxTarget=Math.hypot(haigen.position.x-11,haigen.position.z+7)<7?haigen.position:new THREE.Vector3(10+Math.sin(performance.now()*.0003)*1.8,0,-5+Math.cos(performance.now()*.0003)*1.8);const fx=foxTarget.x-fox.position.x,fz=foxTarget.z-fox.position.z,fd=Math.hypot(fx,fz);if(fd>1.7){fox.position.x+=fx/fd*dt*2.1;fox.position.z+=fz/fd*dt*2.1;fox.rotation.y=Math.atan2(fx,fz)}
-runeLight.intensity=1.1+Math.sin(performance.now()*.002)*.4;fire.scale.y=.85+Math.sin(performance.now()*.012)*.12;
+runeLight.intensity=1.1+Math.sin(performance.now()*.002)*.4;fire.scale.y=.85+Math.sin(performance.now()*.012)*.12;for(const p of motes)p.m.position.y+=Math.sin(performance.now()*.0017+p.phase)*dt*.055;
 const h=haigen.position;cameraTarget.set(h.x,1.15,h.z);if(overhead)cameraPosition.set(h.x+Math.sin(yaw)*13,20,h.z+Math.cos(yaw)*13);else cameraPosition.set(h.x+Math.sin(yaw)*5.6,3.9,h.z+Math.cos(yaw)*5.6);
 camera.position.lerp(cameraPosition,Math.min(1,dt*5));const lookAt=overhead?cameraTarget:new THREE.Vector3(h.x,1.35,h.z);camera.lookAt(lookAt);
-status.textContent=(overhead?'Overhead':'Third-person')+' · Haigen '+Math.round(h.x)+', '+Math.round(h.z)+' · P1';renderer.render(scene,camera)}
+status.textContent=(overhead?'Overhead':'Third-person')+' · Haigen '+Math.round(h.x)+', '+Math.round(h.z)+' · VISUAL V2';renderer.render(scene,camera)}
 tick();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script></body></html>
