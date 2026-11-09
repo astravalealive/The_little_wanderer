@@ -1,4 +1,4 @@
 {
-  "build": 263,
-  "notes": "Fix JavaScript syntax error from stray brace after lake habitat renderer."
+  "build": 264,
+  "notes": "Lake coastline follows approved red map outline with rounded spline shoreline; existing pond, island and frog habitats retained."
 }
