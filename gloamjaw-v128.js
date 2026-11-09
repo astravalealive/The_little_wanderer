@@ -468,5 +468,24 @@ if(state.devKitEnabled&&state.gloamTestRevivedBuild!==137){
  state.gloamTestRevivedBuild=137;
  if(data.defeated)reviveGloamjaw();else P.save();
 }
+// One-shot filming reset. Only Gloamjaw's encounter is replayed; all other progress stays intact.
+try{
+ const url=new URL(location.href);
+ if(url.searchParams.get('replayGloamjaw')==='1'){
+  url.searchParams.delete('replayGloamjaw');
+  history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+  data.discovered=false;
+  if(!reviveGloamjaw()){
+   data.defeated=false;data.hp=MAX;combat.mode='idle';combat.timer=1350;combat.turn=0;
+   combat.attack='';combat.spores.length=0;combat.arrows.length=0;
+   gloamAttention.aware=false;gloamAttention.detectedAt=-1e9;
+   gloamAttention.holdUntil=-1e9;gloamAttention.reason='idle';
+  }
+  // Start south of the hollow, beyond his detection radius, for a clean approach on camera.
+  state.x=x;state.y=y+535;
+  P.save();
+  setTimeout(()=>P.notify('🎬 Gloamjaw reset for filming. Walk north into the hollow to wake him!'),650);
+ }
+}catch(e){console.warn('Gloamjaw replay link unavailable',e)}
 window.__gloamQA=window.__gloamAddon.snapshot;
 })();
