@@ -481,10 +481,10 @@ try{
    gloamAttention.aware=false;gloamAttention.detectedAt=-1e9;
    gloamAttention.holdUntil=-1e9;gloamAttention.reason='idle';
   }
-  // Start south of the hollow, beyond his detection radius, for a clean approach on camera.
-  state.x=x;state.y=y+535;
+  // Keep the opening camera and Haigen at the homestead; only reset the boss encounter.
+  state.x=1530;state.y=1655;
   P.save();
-  setTimeout(()=>P.notify('🎬 Gloamjaw reset for filming. Walk north into the hollow to wake him!'),650);
+  setTimeout(()=>P.notify('🎬 Gloamjaw reset for filming. Travel to the southern woodland hollow when ready to film!'),650);
  }
 }catch(e){console.warn('Gloamjaw replay link unavailable',e)}
 window.__gloamQA=window.__gloamAddon.snapshot;
