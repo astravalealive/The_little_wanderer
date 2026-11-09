@@ -6516,8 +6516,8 @@ ctx.strokeStyle=mixColour('#398eaa','#37577c',nightMix);ctx.lineWidth=150;ctx.st
 ctx.restore();
 for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawLakeHabitat();drawFrogNursery();drawPondMist(nightMix);// V290: persistent schooling fish. Positions and headings are advanced incrementally;
 // no trigonometric location resets, teleports, or edge-based pop-in/pop-out.
-if(!drawLakeFish.schools){
- drawLakeFish.schools=Array.from({length:6},(_,s)=>{
+if(!draw.lakeFishSchools){
+ draw.lakeFishSchools=Array.from({length:6},(_,s)=>{
   const a=s*2.399963+.25, r=.28+.06*(s%3);
   const x=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*r;
   const y=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*r;
@@ -6528,13 +6528,13 @@ if(!drawLakeFish.schools){
     heading,phase:s*3.1+j*1.4,size:.7+seeded(s*37+j+221)*.4
    }))};
  });
- drawLakeFish.lastTime=time;
+ draw.lakeFishLastTime=time;
 }
 drawLakeFish();
 function drawLakeFish(){
- const schools=drawLakeFish.schools;
- const dt=Math.max(0,Math.min(50,time-drawLakeFish.lastTime||0))/1000;
- drawLakeFish.lastTime=time;
+ const schools=draw.lakeFishSchools;
+ const dt=Math.max(0,Math.min(50,time-draw.lakeFishLastTime||0))/1000;
+ draw.lakeFishLastTime=time;
  const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
  const safe=(x,y,margin=.87)=>lakeLevel(x,y)<margin&&!onLakeIsland(x,y);
  for(let s=0;s<schools.length;s++){
