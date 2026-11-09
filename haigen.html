@@ -74,7 +74,7 @@ body:not(.rebirth-art) canvas#game{image-rendering:auto}
 body:has(.mobile-menu[open]) .haigen-speech,
 body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 @media (max-width:410px){.haigen-speech{font-size:14px;max-width:min(288px,calc(100vw - 22px));padding:9px 11px}}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=210"><style>#modalBody button.pad-choice{outline:3px solid #ffda74;outline-offset:-3px;background:#ffedb5;color:#23251b;box-shadow:inset 7px 0 #a56320}</style></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V304</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v210 live</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • View mark / hold for playtest • D-pad select • A confirm • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=210"><style>#modalBody button.pad-choice{outline:3px solid #ffda74;outline-offset:-3px;background:#ffedb5;color:#23251b;box-shadow:inset 7px 0 #a56320}</style></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V305</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v210 live</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • View mark / hold for playtest • D-pad select • A confirm • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -1009,7 +1009,7 @@ const runeGuardianId=9001;for(let i=objects.length-1;i>=0;i--){const o=objects[i
 const coopPlot={kind:'coop',x:1295,y:1385,name:'Chicken Coop'},
  woodPlot={kind:'woodstore',x:1770,y:1455,name:'Wood Storage'},
  jettyPlot={kind:'jetty',x:1050,y:1490,name:'Fishing Jetty'},
- gardenPlot={kind:'garden',x:1355,y:1645,name:'Kitchen Garden'};
+ gardenPlot={kind:'garden',x:1625,y:1170,name:'Kitchen Garden'};
 const homesteadPlots=[coopPlot,woodPlot,jettyPlot,gardenPlot];
 function flowerHasHabitat(o){
  if(o.type!=='flower')return true;
@@ -1023,7 +1023,7 @@ for(let i=objects.length-1;i>=0;i--)if(!flowerHasHabitat(objects[i]))objects.spl
 for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(['rock','tree','fir','palm','bareTree','cactus'].includes(o.type)&&islandDepth(o.x,o.y)<380)objects.splice(i,1)}
 
 // Construction plots remain unobstructed without renumbering surviving resource IDs.
-for(let i=objects.length-1;i>=0;i--)if(homesteadPlots.some(p=>Math.hypot(objects[i].x-p.x,objects[i].y-p.y)<(p.kind==='jetty'?105:125)))objects.splice(i,1);
+for(let i=objects.length-1;i>=0;i--)if(homesteadPlots.some(p=>Math.hypot(objects[i].x-p.x,objects[i].y-p.y)<(p.kind==='garden'?205:p.kind==='jetty'?105:125)))objects.splice(i,1);
 state.eggs=Number.isFinite(state.eggs)?state.eggs:0;
 state.nestEggs=Number.isFinite(state.nestEggs)?state.nestEggs:0; // Preserve uncollected legacy eggs.
 state.lastEggAt=Number.isFinite(state.lastEggAt)?state.lastEggAt:Date.now();
@@ -4309,24 +4309,61 @@ function worldDrawHomestead(p,tier){
  ctx.restore();return true;
 }
 function worldDrawGarden(p,tier){
- const x=p.x,y=p.y,w=89+tier*14,h=48+tier*7;
+ // V305: substantial raised allotment with visibly distinct crop stages.
+ const x=p.x,y=p.y,w=120+tier*17,h=77+tier*9;
+ const growth=gardenRipe()?1:Math.max(.03,Math.min(1,1-(state.gardenReadyAt-Date.now())/gardenGrowthMs()));
+ const sway=Math.sin(time*.0017)*Math.min(2.5,growth*2.5);
  ctx.save();ctx.imageSmoothingEnabled=false;
- ctx.fillStyle='#524834';ctx.fillRect(x-w-6,y-h-7,2*w+12,2*h+14);
- ctx.fillStyle='#8e774b';ctx.fillRect(x-w,y-h,2*w,2*h);
+ const rect=(xx,yy,ww,hh,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(xx),Math.round(yy),Math.round(ww),Math.round(hh))};
+ // Grass margin, compacted footpath and timber perimeter.
+ ellipse(x,y+8,w+18,h+15,'#304f2f66');
+ rect(x-w-9,y-h-9,w*2+18,h*2+18,'#554a34');
+ rect(x-w-4,y-h-4,w*2+8,h*2+8,'#aa8958');
+ rect(x-w+3,y-h+3,w*2-6,h*2-6,'#8c9b5b');
+ // Three long beds, separated by walkable-looking gravel aisles.
  for(let row=0;row<3;row++){
-  const yy=y-h+8+row*(2*h-12)/3;
-  ctx.fillStyle='#3d392e';ctx.fillRect(x-w+9,yy,2*w-18,23);
-  ctx.fillStyle='#644e35';ctx.fillRect(x-w+13,yy+3,2*w-26,17);
-  for(let j=0;j<7;j++){
-   const xx=x-w+25+j*(2*w-50)/6;
-   const growth=gardenRipe()?13:Math.max(3,10*(1-(state.gardenReadyAt-Date.now())/gardenGrowthMs()));
-   ctx.fillStyle='#42764d';ctx.fillRect(xx,yy+10-growth,3,growth);
-   ctx.fillStyle=j%2?'#74a85e':'#9dbc70';
-   ctx.fillRect(xx-5,yy+8-growth,10,6);
-   if(gardenRipe()&&row===1){ctx.fillStyle='#d49b57';ctx.fillRect(xx-2,yy+8,5,6)}
+  const yy=y-h+14+row*(2*h-26)/3,bh=(2*h-40)/3;
+  rect(x-w+11,yy-4,2*w-22,bh+8,'#493b2c');
+  rect(x-w+15,yy,2*w-30,bh,'#61452e');
+  for(let k=0;k<9;k++){
+   const px=x-w+29+k*(2*w-58)/8;
+   const g=Math.max(.05,Math.min(1,growth+(k%3-1)*.045));
+   const stem=4+g*20,shift=sway*Math.sin(k*2.3+row);
+   // Distinct rows: carrots, leafy brassicas and climbing beans.
+   if(row===0){
+    rect(px-1+shift,yy+bh-8-stem,3,stem,'#3e8b43');
+    ellipse(px-5+shift,yy+bh-12-stem*.68,4+g*5,3+g*4,'#77b94e');
+    ellipse(px+4+shift,yy+bh-12-stem*.8,4+g*4,3+g*4,'#91c967');
+    if(g>.72){ellipse(px,yy+bh-8,3+g*3,3+g*4,'#e98e38');rect(px-2,yy+bh-8,4,3,'#f4b65e')}
+   }else if(row===1){
+    for(let leaf=0;leaf<4;leaf++){
+     const angle=leaf*Math.PI/2+time*.00016;
+     ellipse(px+Math.cos(angle)*g*5+shift,yy+bh-11+Math.sin(angle)*g*4,3+g*6,2+g*5,leaf%2?'#5a9d4b':'#84bd63');
+    }
+    if(g>.75)ellipse(px+shift,yy+bh-12,4+g*3,3+g*3,'#b5d47e');
+   }else{
+    rect(px-2,yy+bh-33,3,29,'#9c7950');
+    rect(px-3+shift,yy+bh-7-stem,3,stem,'#397a42');
+    ellipse(px-6+shift,yy+bh-10-stem*.7,5+g*3,3+g*3,'#74b65c');
+    ellipse(px+3+shift,yy+bh-15-stem*.5,5+g*3,3+g*3,'#4e9a50');
+    if(g>.62){ellipse(px+4+shift,yy+bh-11,3,5,'#7ab64b');ellipse(px-4+shift,yy+bh-19,3,5,'#a6cf65')}
+   }
   }
+  rect(x-w+9,yy-6,2*w-18,5,'#c39c66');
+  rect(x-w+9,yy+bh,2*w-18,5,'#6d4c30');
+  for(const xx of [x-w+10,x+w-16])rect(xx,yy-5,6,bh+11,'#b68b59');
  }
- ctx.strokeStyle='#c6a272';ctx.lineWidth=4;ctx.strokeRect(x-w,y-h,2*w,2*h);
+ // Fencing, water barrel and scarecrow grow with upgrades.
+ for(let xx=x-w-5;xx<=x+w;xx+=25){rect(xx,y-h-18,5,18,'#9a744d');rect(xx,y-h-20,5,5,'#d2af76')}
+ rect(x-w-6,y-h-13,2*w+12,4,'#b68e5f');
+ if(tier>=2){
+  rect(x+w-28,y+h-26,20,25,'#4a6570');rect(x+w-30,y+h-27,24,5,'#91a8a5');
+  rect(x+w-25,y+h-20,2,17,'#b5d0cf');
+ }
+ if(tier>=3){
+  rect(x-w+24,y-h-41,5,32,'#8c6a48');rect(x-w+10,y-h-33,33,5,'#b58d61');
+  ctx.fillStyle='#c7a15e';ctx.beginPath();ctx.moveTo(x-w+10,y-h-32);ctx.lineTo(x-w+39,y-h-32);ctx.lineTo(x-w+24,y-h-49);ctx.fill();
+ }
  ctx.restore();
 }
 function onJetty(x,y){
@@ -8817,7 +8854,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=304;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Runestone collision, proximity glow and knowledge research';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=305;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Runestone collision, proximity glow and knowledge research';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
