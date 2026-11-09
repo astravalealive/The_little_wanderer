@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Haigen's World · Looking Glass 3D P1</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101c20;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}canvas{display:block}#hud{position:fixed;top:12px;left:12px;background:#142620cc;border:1px solid #8fb5a35c;border-radius:12px;padding:11px 13px;pointer-events:none;max-width:260px}#hud strong{display:block;font-size:15px}#hud small{display:block;color:#b6d7ca;margin-top:4px}#mode{position:fixed;top:12px;right:12px;background:#263e39e8;border:1px solid #b6d7ca;border-radius:11px;color:white;padding:12px;font-size:14px}#joy{position:fixed;bottom:24px;left:24px;width:125px;height:125px;border:2px solid #d6e8d577;background:#294d4870;border-radius:50%;touch-action:none}#nub{position:absolute;left:40px;top:40px;width:42px;height:42px;background:#d6e8d5ad;border-radius:50%;pointer-events:none}#look{position:fixed;right:15px;bottom:20px;width:42%;height:35%;border:1px dashed #b6d7ca55;border-radius:15px;touch-action:none}#look span{position:absolute;right:12px;bottom:12px;color:#dce7e0aa;font-size:12px;pointer-events:none}#help{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;color:#dce7e0cc;pointer-events:none;white-space:nowrap}#error{display:none;position:fixed;inset:25%;background:#1c2929;padding:20px;border-radius:12px;z-index:10}@media(max-width:600px){#hud{max-width:210px;font-size:12px}#hud strong{font-size:12px}#mode{top:82px;padding:9px}#help{display:none}}</style></head>
+<body><div id="hud"><strong>HAIGEN'S WORLD · LOOKING GLASS</strong><small id="status">3D prototype P1 · loading…</small><small>Independent prototype · no existing saves accessed</small></div><button id="mode">📷 Overhead view</button><div id="joy"><div id="nub"></div></div><div id="look"><span>DRAG TO LOOK ↔</span></div><div id="help">WASD / left stick: move · mouse drag / right stick: look · C / right stick press: switch camera</div><div id="error"></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+const status=document.querySelector('#status'),modeButton=document.querySelector('#mode');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9cb9b6);scene.fog=new THREE.Fog(0x9cb9b6,32,95);
+const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,180);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xd9edff,0x425a3e,2.15));const sun=new THREE.DirectionalLight(0xffe5b5,2.6);sun.position.set(-18,32,15);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-36;sun.shadow.camera.right=36;sun.shadow.camera.top=36;sun.shadow.camera.bottom=-36;scene.add(sun);
+const mat=(color,opts={})=>new THREE.MeshStandardMaterial({color,roughness:.95,...opts});
+const grass=mat(0x638f65),pathMat=mat(0xbaa57a),wood=mat(0x70513c),leaf=mat(0x326d50),darkLeaf=mat(0x27563f),stone=mat(0x788989),blue=mat(0x8aeaff,{emissive:0x267eab,emissiveIntensity:1.5});
+function mesh(geo,m,x=0,y=0,z=0,parent=scene){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+mesh(new THREE.PlaneGeometry(100,100),grass,0,-.025,0).rotation.x=-Math.PI/2;
+for(let i=0;i<24;i++){const p=mesh(new THREE.BoxGeometry(2.5,.025,2.5),pathMat,Math.sin(i*.16)*2,.002,-23+i*2);p.rotation.y=Math.sin(i*.3)*.1}
+const obstacles=[];
+function tree(x,z,s=1){const trunk=mesh(new THREE.CylinderGeometry(.22*s,.35*s,2.8*s,7),wood,x,1.4*s,z);const canopy=mesh(new THREE.ConeGeometry(1.7*s,4*s,8),iRandom(x,z)>.5?leaf:darkLeaf,x,4.1*s,z);const top=mesh(new THREE.ConeGeometry(1.35*s,3.1*s,8),leaf,x,5.7*s,z);obstacles.push({x,z,r:.65*s});return trunk}
+function iRandom(x,z){return(Math.sin(x*12.9898+z*78.233)*43758.5453)%1}
+for(let i=0;i<95;i++){const a=i*2.39996,r=10+Math.sqrt(i/95)*34,x=Math.cos(a)*r,z=Math.sin(a)*r;if(Math.abs(x)<4&&z>-23&&z<18)continue;if(x>8&&x<17&&z>-13&&z<1)continue;tree(x,z,.7+Math.abs(iRandom(x,z))*.65)}
+// Cottage with pitched roof and visible door.
+mesh(new THREE.BoxGeometry(6,3.4,5),wood,-9,1.7,4);
+const roof=mesh(new THREE.ConeGeometry(5.1,2.8,4),mat(0x4e5356),-9,4.35,4);roof.rotation.y=Math.PI/4;
+mesh(new THREE.BoxGeometry(1.45,2.45,.13),mat(0x32251c),-9,1.22,1.43);
+obstacles.push({x:-9,z:4,r:3.5});
+// Campfire.
+for(let i=0;i<8;i++){const a=i*Math.PI/4;mesh(new THREE.DodecahedronGeometry(.27),stone,-4+Math.cos(a)*.8,.18,3+Math.sin(a)*.8)}
+const fire=mesh(new THREE.ConeGeometry(.48,1.2,5),mat(0xffa53c,{emissive:0xff6d1a,emissiveIntensity:1.5}),-4,.65,3);const fireLight=new THREE.PointLight(0xffab54,3,12);fireLight.position.set(-4,1.4,3);scene.add(fireLight);
+// Runestone with exactly the established inscription.
+const rune=mesh(new THREE.BoxGeometry(1.9,3.3,.8),stone,11,1.7,-7);rune.rotation.z=-.06;
+const runeCanvas=document.createElement('canvas');runeCanvas.width=256;runeCanvas.height=512;const ctx=runeCanvas.getContext('2d');ctx.clearRect(0,0,256,512);ctx.textAlign='center';ctx.fillStyle='#a7f3ff';ctx.shadowColor='#3bcfff';ctx.shadowBlur=18;ctx.font='35px serif';[...'ᚲᚾᛟᚹᛚᛖᛞᚷᛖ'].forEach((c,i)=>ctx.fillText(c,128,48+i*47));const runeTex=new THREE.CanvasTexture(runeCanvas);const runeFace=mesh(new THREE.PlaneGeometry(1.45,2.95),new THREE.MeshBasicMaterial({map:runeTex,transparent:true,depthWrite:false}),11,1.75,-6.585);runeFace.rotation.z=-.06;const runeLight=new THREE.PointLight(0x6edaff,1.2,8);runeLight.position.set(11,2,-6);scene.add(runeLight);obstacles.push({x:11,z:-7,r:1.4});
+// Simple 3D character stand-ins; replace with bespoke rigged models in phase 3.
+const haigen=new THREE.Group();scene.add(haigen);haigen.position.set(0,0,7);
+mesh(new THREE.CylinderGeometry(.34,.42,1,8),mat(0x446b8e),0,1.08,0,haigen);
+mesh(new THREE.SphereGeometry(.37,10,8),mat(0xf1c6a1),0,1.88,0,haigen);
+mesh(new THREE.SphereGeometry(.39,10,8,0,Math.PI*2,0,Math.PI*.46),mat(0xe4bd60),0,2.04,0,haigen);
+for(const x of [-.19,.19])mesh(new THREE.BoxGeometry(.19,.55,.26),mat(0x384450),x,.35,0,haigen);
+const fox=new THREE.Group();scene.add(fox);fox.position.set(9,0,-5);
+mesh(new THREE.BoxGeometry(.5,.48,1),mat(0xb95e30),0,.55,0,fox);
+mesh(new THREE.ConeGeometry(.36,.62,4),mat(0xd67839),0,.8,-.55,fox).rotation.x=-Math.PI/2;
+mesh(new THREE.ConeGeometry(.3,1,6),mat(0xe9d9b7),0,.68,.8,fox).rotation.x=Math.PI/2;
+for(const x of [-.18,.18])for(const z of [-.3,.3])mesh(new THREE.BoxGeometry(.13,.4,.15),mat(0x382d2b),x,.22,z,fox);
+const keys=new Set();addEventListener('keydown',e=>{keys.add(e.code);if(e.code==='KeyC'&&!e.repeat)toggleCamera()});addEventListener('keyup',e=>keys.delete(e.code));
+let overhead=true,yaw=0,joyX=0,joyY=0,lookDrag=null,joyPointer=null,oldPadToggle=false;
+function toggleCamera(){overhead=!overhead;modeButton.textContent=overhead?'📷 Overhead view':'🎥 Third-person view'}modeButton.onclick=toggleCamera;
+const joy=document.querySelector('#joy'),nub=document.querySelector('#nub');function moveJoy(e){const r=joy.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),len=Math.max(1,Math.hypot(dx,dy)),k=Math.min(1,len/45);joyX=dx/len*k;joyY=dy/len*k;nub.style.transform='translate('+(joyX*40)+'px,'+(joyY*40)+'px)'}
+joy.addEventListener('pointerdown',e=>{joyPointer=e.pointerId;joy.setPointerCapture(e.pointerId);moveJoy(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyPointer)moveJoy(e)});function endJoy(e){if(e.pointerId!==joyPointer)return;joyPointer=null;joyX=joyY=0;nub.style.transform=''}joy.addEventListener('pointerup',endJoy);joy.addEventListener('pointercancel',endJoy);
+const look=document.querySelector('#look');look.addEventListener('pointerdown',e=>{lookDrag={id:e.pointerId,x:e.clientX};look.setPointerCapture(e.pointerId)});look.addEventListener('pointermove',e=>{if(lookDrag?.id===e.pointerId){yaw-=(e.clientX-lookDrag.x)*.009;lookDrag.x=e.clientX}});look.addEventListener('pointerup',()=>lookDrag=null);look.addEventListener('pointercancel',()=>lookDrag=null);
+let mouseX=null;renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')mouseX=e.clientX});renderer.domElement.addEventListener('pointermove',e=>{if(mouseX!==null&&e.buttons){yaw-=(e.clientX-mouseX)*.008;mouseX=e.clientX}});addEventListener('pointerup',()=>mouseX=null);
+const clock=new THREE.Clock();const cameraTarget=new THREE.Vector3();const cameraPosition=new THREE.Vector3();
+function tick(){requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.05);let x=joyX,y=joyY;let pad=null;try{pad=[...(navigator.getGamepads?.()||[])].find(p=>p&&p.connected)}catch{}
+if(pad){const ax=pad.axes[0]||0,ay=pad.axes[1]||0;if(Math.hypot(ax,ay)>.17){x=ax;y=ay}if(Math.abs(pad.axes[2]||0)>.16)yaw-=pad.axes[2]*dt*2.2;const pressed=!!pad.buttons[11]?.pressed;if(pressed&&!oldPadToggle)toggleCamera();oldPadToggle=pressed}
+if(keys.has('KeyW')||keys.has('ArrowUp'))y=-1;if(keys.has('KeyS')||keys.has('ArrowDown'))y=1;if(keys.has('KeyA')||keys.has('ArrowLeft'))x=-1;if(keys.has('KeyD')||keys.has('ArrowRight'))x=1;
+if(keys.has('KeyQ'))yaw+=dt*1.7;if(keys.has('KeyE'))yaw-=dt*1.7;
+const length=Math.hypot(x,y);if(length>.06){x/=Math.max(1,length);y/=Math.max(1,length);const dx=(x*Math.cos(yaw)+y*Math.sin(yaw))*dt*5,dz=(y*Math.cos(yaw)-x*Math.sin(yaw))*dt*5;const nx=THREE.MathUtils.clamp(haigen.position.x+dx,-46,46),nz=THREE.MathUtils.clamp(haigen.position.z+dz,-46,46);if(!obstacles.some(o=>Math.hypot(nx-o.x,nz-o.z)<o.r+.4)){haigen.position.x=nx;haigen.position.z=nz}haigen.rotation.y=Math.atan2(dx,dz)}
+// Fox patrols the runestone and comes near Haigen only within its local clearing.
+const foxTarget=Math.hypot(haigen.position.x-11,haigen.position.z+7)<7?haigen.position:new THREE.Vector3(10+Math.sin(performance.now()*.0003)*1.8,0,-5+Math.cos(performance.now()*.0003)*1.8);const fx=foxTarget.x-fox.position.x,fz=foxTarget.z-fox.position.z,fd=Math.hypot(fx,fz);if(fd>1.7){fox.position.x+=fx/fd*dt*2.1;fox.position.z+=fz/fd*dt*2.1;fox.rotation.y=Math.atan2(fx,fz)}
+runeLight.intensity=1.1+Math.sin(performance.now()*.002)*.4;fire.scale.y=.85+Math.sin(performance.now()*.012)*.12;
+const h=haigen.position;cameraTarget.set(h.x,1.15,h.z);if(overhead)cameraPosition.set(h.x+Math.sin(yaw)*13,20,h.z+Math.cos(yaw)*13);else cameraPosition.set(h.x+Math.sin(yaw)*5.6,3.9,h.z+Math.cos(yaw)*5.6);
+camera.position.lerp(cameraPosition,Math.min(1,dt*5));const lookAt=overhead?cameraTarget:new THREE.Vector3(h.x,1.35,h.z);camera.lookAt(lookAt);
+status.textContent=(overhead?'Overhead':'Third-person')+' · Haigen '+Math.round(h.x)+', '+Math.round(h.z)+' · P1';renderer.render(scene,camera)}
+tick();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script></body></html>
