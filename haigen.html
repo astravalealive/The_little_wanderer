@@ -789,6 +789,65 @@ function lakeEdgePoint(a,level=.91){
  return {x:pond.x+Math.cos(a)*pond.rx*r,y:pond.y+Math.sin(a)*pond.ry*r};
 }
 const lakeFrogZones=[-2.85,-2.35,-1.9,-1.48,2.3,2.75,3.12].map(a=>lakeEdgePoint(a,.89));
+const lakeReedBeds=[...lakeFrogZones];
+for(let i=0;i<18;i++){
+ const a=-Math.PI+(i+.4)*Math.PI*2/18;
+ lakeReedBeds.push(lakeEdgePoint(a,.88));
+}
+function nearestLakeReeds(x,y){
+ let best=lakeReedBeds[0],d=Infinity;
+ for(const p of lakeReedBeds){const v=Math.hypot(p.x-x,p.y-y);if(v<d){d=v;best=p}}
+ return best;
+}
+function safeLakeShallows(x,y){return lakeLevel(x,y)>.73&&lakeLevel(x,y)<.98&&!onLakeIsland(x,y)}
+function drawFrogNursery(){
+ const now=Date.now(),clutches=state.frogLifecycle||[];
+ for(const c of clutches){
+  const age=now-c.born,stage=age<120000?0:age<300000?1:2;
+  if(stage===2)continue;
+  const count=stage===0?8:6;
+  for(let k=0;k<count;k++){
+   const angle=k*2.39996+c.id,dist=4+Math.sqrt(k)*5;
+   const x=c.x+Math.cos(angle)*dist,y=c.y+Math.sin(angle)*dist;
+   if(!safeLakeShallows(x,y))continue;
+   if(stage===0){
+    ellipse(x,y,3.2,2.7,'#c8dfd2b9');ellipse(x,y,.9,.9,'#334b42');
+   }else{
+    const wiggle=Math.sin(time*.008+k+c.id)*3;
+    ellipse(x+wiggle,y,3.6,2.3,'#435f46');
+    ctx.strokeStyle='#526b4b';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(x-2+wiggle,y);ctx.lineTo(x-9+wiggle,y+Math.sin(time*.012+k)*3);ctx.stroke();
+   }
+  }
+ }
+}
+function updateFrogLifecycle(){
+ if(!Array.isArray(state.frogLifecycle))state.frogLifecycle=[];
+ const now=Date.now();
+ for(const c of state.frogLifecycle){
+  if(c.hatched||now-c.born<300000)continue;
+  c.hatched=true;
+  if(frogs.length>=38)continue;
+  const p=nearestLakeReeds(c.x,c.y);
+  for(let k=0;k<2&&frogs.length<38;k++){
+   const id=1000+c.id*2+k,sex=k===0?'male':'female';
+   if(frogs.some(f=>f.id===id))continue;
+   frogs.push({id,x:p.x,y:p.y,homeX:p.x,homeY:p.y,phase:id*.73,hopAt:time+1000+k*900,
+    hopUntil:0,fromX:p.x,fromY:p.y,toX:p.x,toY:p.y,habitat:'pond',
+    lakeZoneReady:true,sex,colour:sex==='male'?'#63a64b':'#a18a54'});
+  }
+ }
+ // Limit old records and prevent unbounded populations.
+ state.frogLifecycle=state.frogLifecycle.filter(c=>now-c.born<86400000).slice(-24);
+ if(now<(state.nextFrogMateAt||0)||frogs.length>=38)return;
+ const adults=frogs.filter(f=>f.habitat==='pond'&&f.lakeZoneReady&&!f.hopUntil);
+ const female=adults.find(f=>f.sex==='female'&&adults.some(m=>m.sex==='male'&&Math.hypot(m.x-f.x,m.y-f.y)<160));
+ if(!female)return;
+ const p=nearestLakeReeds(female.x,female.y);
+ const id=(state.frogClutchSerial||0)+1;state.frogClutchSerial=id;
+ state.frogLifecycle.push({id,x:p.x,y:p.y,born:now});
+ state.nextFrogMateAt=now+180000+seeded(id)*120000;
+}
+
 function drawLakeHabitat(){
  // A small grassy island in the widened western basin.
  ctx.save();ctx.translate(lakeIsland.x,lakeIsland.y);
@@ -796,9 +855,9 @@ function drawLakeHabitat(){
  ctx.fillStyle='#d5c49a';ctx.fill();ctx.save();ctx.scale(.88,.81);ctx.fillStyle='#6b9959';ctx.fill();ctx.restore();
  ellipse(-20,-8,18,9,'#53804d');ellipse(34,14,12,7,'#4b7c46');ctx.restore();
  // Reeds and lilies are concentrated in separate sheltered shoreline pockets.
- for(let z=0;z<lakeFrogZones.length;z++){
-  const p=lakeFrogZones[z];
-  for(let n=0;n<7;n++){
+ for(let z=0;z<lakeReedBeds.length;z++){
+  const p=lakeReedBeds[z];
+  for(let n=0;n<11;n++){
    const a=z*2.4+n*2.39996,px=p.x+Math.cos(a)*(9+n*3),py=p.y+Math.sin(a)*(8+n*2);
    if(!inPond(px,py)||onLakeIsland(px,py))continue;
    ellipse(px,py,9+(n%3)*3,5+(n%2)*2,n%3===0?'#578c55':'#4c9a62');
@@ -5834,7 +5893,7 @@ function drawDuckling(ch){
  window.__v145DucklingLastFrame={afloat,flying,waterline:ch.y,scale,feetVisible:!afloat&&!flying};
 }
 
-const frogs=[];for(let i=0;i<22;i++){const a=i*2.39996,edge=i<15;const x=edge?pond.x+Math.cos(a)*pond.rx*(.82+seeded(9900+i)*.32):2100+Math.cos(a)*240;const y=edge?pond.y+Math.sin(a)*pond.ry*(.82+seeded(9950+i)*.32):2420+Math.sin(a)*150;frogs.push({id:i,x,y,homeX:x,homeY:y,phase:i*1.7,hopAt:i*420,hopUntil:0,fromX:x,fromY:y,toX:x,toY:y,colour:i%4===0?'#a18a54':'#63a64b'})}
+const frogs=[];for(let i=0;i<22;i++){const a=i*2.39996,edge=i<15;const x=edge?pond.x+Math.cos(a)*pond.rx*(.82+seeded(9900+i)*.32):2100+Math.cos(a)*240;const y=edge?pond.y+Math.sin(a)*pond.ry*(.82+seeded(9950+i)*.32):2420+Math.sin(a)*150;frogs.push({id:i,x,y,homeX:x,homeY:y,phase:i*1.7,hopAt:i*420,hopUntil:0,fromX:x,fromY:y,toX:x,toY:y,sex:i%2===0?'male':'female',colour:i%2===0?'#63a64b':'#a18a54'})}
 for(let i=0;i<235;i++){
  const area=i<165?'woodland':i<210?'downs':'fen';
  const x=area==='woodland'?240+seeded(8000+i*3)*3640:area==='downs'?4390+seeded(8000+i*3)*1440:3760+seeded(8000+i*3)*1800;
@@ -6048,11 +6107,14 @@ function frogReturnPoint(f,x,y){
  return {x:f.x,y:f.y};
 }
 function updateFrogs(){
+ updateFrogLifecycle();
  for(const f of frogs){
   if(state.carriedFrogId===f.id)continue;
   if(!f.habitat)f.habitat=Math.hypot(f.homeX-2100,f.homeY-2420)<330?'marsh':'pond';
+  if(!f.sex)f.sex=f.id%2===0?'male':'female';
+  f.colour=f.sex==='male'?'#63a64b':'#a18a54';
   if(f.habitat==='pond'&&!f.lakeZoneReady){
-   const p=lakeFrogZones[f.id%lakeFrogZones.length];
+   const p=lakeReedBeds[f.id%lakeReedBeds.length];
    f.homeX=p.x;f.homeY=p.y;f.x=p.x;f.y=p.y;f.fromX=p.x;f.fromY=p.y;f.toX=p.x;f.toY=p.y;
    f.hopUntil=0;f.lakeZoneReady=true;
   }
@@ -6255,7 +6317,7 @@ lakeShape(.73);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();
 ctx.restore();
 ctx.save();ctx.translate(-610,-160);
 lakeShape(.44);ctx.fillStyle=mixColour('#236c91','#243c68',nightMix);ctx.fill();
-ctx.restore();ctx.restore();for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawLakeHabitat();drawPondMist(nightMix);drawSilentPond();drawStoryClues();// Fish are below the water's coloured surface; only the rare leap is above it.
+ctx.restore();ctx.restore();for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawLakeHabitat();drawFrogNursery();drawPondMist(nightMix);drawSilentPond();drawStoryClues();// Fish are below the water's coloured surface; only the rare leap is above it.
 for(let i=0;i<17;i++){
  const phase=time*.00032*(.66+seeded(i+301)*.5)+seeded(i+190)*Math.PI*2;
  const fx=pond.x+Math.sin(phase)*(.16+seeded(i+211)*.54)*pond.rx;
@@ -8123,7 +8185,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=266;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=267;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
