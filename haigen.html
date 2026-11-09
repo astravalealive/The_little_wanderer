@@ -6219,7 +6219,8 @@ function updateBirds(dt){
   const isFlying=b.air>.03||time>b.groundedUntil||nearby;
   if(isFlying){
    if(b.air<.03){b.targetX=plan.x;b.targetY=plan.y;b.flightUntil=time+24000;}
-   b.air=Math.min(1,b.air+step*1.7);
+   // Climb only while travelling; allow a complete descent at the destination.
+   if(Math.hypot(plan.x-b.x,plan.y-b.y)>55||nearby)b.air=Math.min(1,b.air+step*1.7);
    const mates=birds.filter(other=>other!==b&&other.flock===b.flock);
    const index=birds.filter(other=>other.flock===b.flock).indexOf(b);
    const row=Math.floor(index/2),side=index%2===0?-1:1;
@@ -6237,7 +6238,7 @@ function updateBirds(dt){
    b.x=Math.max(WORLD_MIN+35,Math.min(WORLD-35,b.x+b.vx*step));
    b.y=Math.max(WORLD_MIN+35,Math.min(WORLD-35,b.y+b.vy*step));
    b.heading=Math.atan2(b.vy,b.vx);
-   if(distance<36&&!nearby&&birdLandingSuitable(b.x,b.y)){
+   if(distance<55&&!nearby&&birdLandingSuitable(b.x,b.y)){
     b.air=Math.max(0,b.air-step*1.5);
     if(b.air<.04){b.air=0;b.groundedUntil=time+7500+seeded(b.phase+Math.floor(time/1000))*11000;b.vx=0;b.vy=0}
    }
