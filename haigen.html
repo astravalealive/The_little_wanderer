@@ -5569,9 +5569,18 @@ const ducks=Array.from({length:7},(_,i)=>{const a=i*2.399,r=.27+(i%4)*.1;return 
  phase:i*1.73,heading:a,air:0,flightUntil:0,flightCooldown:5000+i*1500,
  wing:0,kind:i===0||i===2||i===4?'female':'mallard',size:i===6?.85:1
 }});
-const duckNestSites=[{x:pond.x+pond.rx*1.02,y:pond.y-pond.ry*.16},{x:pond.x-pond.rx*.82,y:pond.y+pond.ry*.47}];
+const duckNestSites=[
+ {x:lakeIsland.x-28,y:lakeIsland.y+7},
+ ...[2.55,-2.38,1.98,-1.75].map(a=>lakeEdgePoint(a,.94))
+];
+function chooseDuckNestSite(family,generation){return duckNestSites[(family+generation*2)%duckNestSites.length]}
+function duckLakeDestination(seed,phase,level=.67){
+ const a=phase+seed*.53,r=lakeRadius(a)*level;
+ const x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;
+ return onLakeIsland(x,y)?{x:lakeIsland.x+lakeIsland.rx+38,y:lakeIsland.y}:{x,y};
+}
 function newPondFamily(i){return {stage:'gather',elapsed:0,generation:1,eggs:0,clutch:8+i*2,
- nestX:duckNestSites[i].x,nestY:duckNestSites[i].y,twigs:0,reeds:0,
+ nestX:chooseDuckNestSite(i,1).x,nestY:chooseDuckNestSite(i,1).y,twigs:0,reeds:0,
  chicks:[],hatchCount:0,parentsLeaving:false};}
 if(!Array.isArray(state.pondFamilies)||state.pondFamilies.length!==2)state.pondFamilies=[newPondFamily(0),newPondFamily(1)];
 for(let i=0;i<2;i++){
@@ -5619,7 +5628,7 @@ function updateDucks(dt){
   if(f.stage==='gather'){
    if(f.elapsed>6500){f.elapsed-=6500;f.twigs=Math.min(7,f.twigs+1);f.reeds=Math.min(7,f.reeds+1)}
    const a=time*.001+familyIndex*2.5;
-   const target=pondPoint(f.nestX+Math.sin(a)*75,f.nestY+Math.cos(a)*48,.73);
+   const target=pondPoint(f.nestX+Math.sin(a)*75,f.nestY+Math.cos(a)*48,.94);
    moveDuckToward(mum,target.x,target.y,step,29);
    moveDuckToward(dad,mum.x+20,mum.y+12,step,23);
    mum.carry=f.twigs<7?'twig':'reed';
@@ -5652,8 +5661,8 @@ function updateDucks(dt){
    const alert=Math.hypot(mum.x-state.x,mum.y-state.y)<140;
    const a=time*(rain>.55?.000055:.00012)+familyIndex*2.8;
    const centre=rain>.55
-    ?pondPoint(f.nestX+(pond.x-f.nestX)*.30,f.nestY+(pond.y-f.nestY)*.30,.72)
-    :pondPoint(pond.x+Math.cos(a)*pond.rx*.47,pond.y+Math.sin(a)*pond.ry*.45);
+    ?pondPoint(f.nestX+(pond.x-f.nestX)*.18,f.nestY+(pond.y-f.nestY)*.18,.89)
+    :duckLakeDestination(familyIndex,a,.63+.16*Math.sin(time*.000041+familyIndex));
    const oldX=mum.x,oldY=mum.y;
    // Short pauses break up the artificial perpetual procession.
    const pausePhase=(time*.001+familyIndex*14.7)%34;
@@ -5734,7 +5743,8 @@ function updateDucks(dt){
     dad.x=pond.x+(familyIndex?-.25:.25)*pond.rx;dad.y=pond.y-35;
     mum.air=0;dad.air=0;mum.kind='female';dad.kind='mallard';
     const nextGen=(f.generation||1)+1,site=newPondFamily(familyIndex);
-    Object.assign(f,site,{generation:nextGen,clutch:8+((nextGen+familyIndex)%3)});
+    const newNest=chooseDuckNestSite(familyIndex,nextGen);
+    Object.assign(f,site,{generation:nextGen,nestX:newNest.x,nestY:newNest.y,clutch:8+((nextGen+familyIndex)%3)});
     mum.flightCooldown=time+16000;dad.flightCooldown=time+16000;
    }
   }
@@ -5742,7 +5752,7 @@ function updateDucks(dt){
  // Unpaired visiting ducks continue to explore and graze independently.
  for(let i=4;i<ducks.length;i++){
   const d=ducks[i],a=time*.00017+d.phase;
-  const point=pondPoint(pond.x+Math.cos(a)*pond.rx*.55,pond.y+Math.sin(a)*pond.ry*.43);
+  const point=duckLakeDestination(i,a,.67+.18*Math.sin(time*.000043+i));
   moveDuckToward(d,point.x,point.y,step,18);
  }
  for(let i=0;i<ducks.length;i++){
@@ -8211,7 +8221,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=268;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=269;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
