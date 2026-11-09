@@ -6401,7 +6401,7 @@ lakeShape(.73);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();
 ctx.restore();
 ctx.save();ctx.translate(-610,-160);
 lakeShape(.44);ctx.fillStyle=mixColour('#236c91','#243c68',nightMix);ctx.fill();
-ctx.restore();ctx.restore();for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawLakeHabitat();drawFrogNursery();drawPondMist(nightMix);drawSilentPond();drawStoryClues();// Fish are below the water's coloured surface; only the rare leap is above it.
+ctx.restore();ctx.restore();for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawLakeHabitat();drawFrogNursery();drawPondMist(nightMix);// Fish are below the water's coloured surface; only the rare leap is above it.
 for(let i=0;i<17;i++){
  const phase=time*.00032*(.66+seeded(i+301)*.5)+seeded(i+190)*Math.PI*2;
  const fx=pond.x+Math.sin(phase)*(.16+seeded(i+211)*.54)*pond.rx;
@@ -7268,6 +7268,15 @@ if(!draggingCamera&&!cameraHolding&&!cameraDetached&&!worldEditorActive){
 // Chapter I: The Silent Pond. Persistent, gentle narrative embedded in the sandbox.
 if(!state.story||typeof state.story!=='object')state.story={chapter:1,stage:0,trust:0,wardenSeen:false};
 state.story.stage=Math.max(0,Math.min(6,Number(state.story.stage)||0));
+// V273: retire the obsolete blocked-stream quest after the lake expansion.
+// Preserve the prior chapter stage for a future mountain-river storyline.
+if(!state.story.oldStreamQuestRetired){
+ state.story.oldStreamStage=state.story.stage;
+ state.story.oldStreamQuestRetired=true;
+}
+state.story.stage=6;
+state.story.boarHelp=false;
+state.story.boarArrived=false;
 state.story.trust=Math.max(0,Number(state.story.trust)||0);
 // Preserve already-completed chapter progress when adding Bristleback's role.
 state.story.boarHelp=state.story.stage>=5||!!state.story.boarHelp;
@@ -7287,6 +7296,7 @@ const storySteps=[
  {title:'The Silent Pond is restored',objective:'The water flows again. Explore freely; the Warden is watching.',place:storyPlaces.heart}
 ];
 function storyStep(){
+ if(state.story.oldStreamQuestRetired)return {title:'The Great Lake',objective:'Explore the lake and its wildlife. A future river will flow from the icy mountains.',place:{x:pond.x,y:pond.y}};
  if(state.story.stage===4&&!state.story.boarHelp){
   const boar=beasts.find(b=>b.kind==='boar');
   return {title:'A friend with tremendous shoulders',objective:'Find Bristleback in Mossfen Marsh and ask him to help move the roots. Press Collect nearby.',place:{x:boar.x,y:boar.y}};
@@ -7314,6 +7324,7 @@ function storyNearbyPoint(){
  return null;
 }
 function storyInteract(){
+ if(state.story.oldStreamQuestRetired)return false;
  const stage=state.story.stage,node=storyNearbyPoint();
  if(!node||dist(state,node.point)>100)return false;
  if(stage===1){
@@ -7366,6 +7377,7 @@ function storyInteract(){
  return false;
 }
 function storyTick(){
+ if(state.story.oldStreamQuestRetired)return;
  if(state.story.stage===0&&dist(state,{x:1180,y:1640})<260){
   storyAdvance(1,'That part of the pond is far too quiet. Dylan, what did you see?',
    'The eastern inlet of the pond had gone silent. Haigen began to investigate.');
@@ -7393,6 +7405,7 @@ function storyJournal(){
 }
 // Physical evidence is visible before it is collected, not just text in a menu.
 function drawStoryClues(){
+ if(state.story.oldStreamQuestRetired)return;
  const stage=state.story.stage;
  if(stage===0||stage>4)return;
  ctx.save();
@@ -7425,6 +7438,7 @@ function drawStoryClues(){
  ctx.restore();
 }
 function drawSilentPond(){
+ if(state.story.oldStreamQuestRetired)return;
  const stage=state.story.stage,restored=stage>=5,wet=state.weather?.rain||0;
  const restoredAt=Number.isFinite(state.story.restoredAt)?state.story.restoredAt:-12000;
  const healing=restored?Math.max(0,Math.min(1,(time-restoredAt)/6500)):0;
@@ -7475,6 +7489,7 @@ function drawSilentPond(){
  ctx.restore();
 }
 function drawStoryMarker(){
+ if(state.story.oldStreamQuestRetired)return;
  const stage=state.story.stage;
  if(stage>=6)return;
  const p=storyStep().place,hover=Math.sin(time*.004)*4;
@@ -8269,7 +8284,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=272;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=273;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
