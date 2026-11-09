@@ -744,29 +744,45 @@ const pond={x:850,y:1700,rx:330,ry:240};// V257: shoreline traced from the appro
 // V258: slightly wider west/northwest shore, smooth coast, untouched camp bank.
 // V262: smooth continuous shoreline. No polygon ray intersections or angular seams.
 // Western and northern basins remain large; the camp-facing east bank stays original.
-const lakeCoastKnots=[
- [-Math.PI,4.70],[-2.84,4.72],[-2.58,4.55],[-2.30,4.15],
- [-2.00,3.75],[-1.72,3.18],[-1.42,2.42],[-1.16,1.58],
- [-.94,1.03],[-.45,1.00],[.45,1.00],[.98,1.02],
- [1.32,1.12],[1.65,1.35],[1.95,1.77],[2.23,2.55],
- [2.52,3.55],[2.80,4.33],[Math.PI,4.70]
-];
+// V264: the approved red hand-drawn shore, softened with a closed Catmull-Rom spline.
+// Screenshot map reference: original pond centre (463,875), 4.4 world units / pixel.
+// Keep the original pond as a union, preserving the camp-facing east bank.
+const lakeShoreGuide=[
+ [475,835],[450,806],[430,778],[407,751],[405,706],[405,631],
+ [382,613],[352,599],[329,598],[312,604],[301,576],
+ [288,551],[274,544],[258,550],[241,560],[218,593],
+ [216,640],[218,705],[191,738],[169,758],[152,791],
+ [145,832],[141,868],[166,887],[201,901],[254,923],
+ [278,905],[319,899],[343,924],[363,939],[386,918],
+ [408,905],[430,895]
+].map(([px,py])=>[(px-463)*4.4/330,(py-875)*4.4/240]);
+const smoothLakeShore=[];
+for(let n=0;n<lakeShoreGuide.length;n++){
+ const p0=lakeShoreGuide[(n-1+lakeShoreGuide.length)%lakeShoreGuide.length];
+ const p1=lakeShoreGuide[n],p2=lakeShoreGuide[(n+1)%lakeShoreGuide.length];
+ const p3=lakeShoreGuide[(n+2)%lakeShoreGuide.length];
+ for(let k=0;k<10;k++){
+  const t=k/10,t2=t*t,t3=t2*t;
+  const point=axis=>.5*((2*p1[axis])+(-p0[axis]+p2[axis])*t+
+   (2*p0[axis]-5*p1[axis]+4*p2[axis]-p3[axis])*t2+
+   (-p0[axis]+3*p1[axis]-3*p2[axis]+p3[axis])*t3);
+  smoothLakeShore.push([point(0),point(1)]);
+ }
+}
 function lakeRadius(a){
  const base=1+.12*Math.sin(a*3+.6)+.10*Math.cos(a*5-1)+.055*Math.sin(a*9+2);
- const angle=Math.atan2(Math.sin(a),Math.cos(a));
- for(let n=1;n<lakeCoastKnots.length;n++){
-  const p=lakeCoastKnots[n-1],q=lakeCoastKnots[n];
-  if(angle<=q[0]){
-   let t=Math.max(0,Math.min(1,(angle-p[0])/(q[0]-p[0])));
-   t=t*t*(3-2*t);
-   const smooth=p[1]+(q[1]-p[1])*t;
-   const west=Math.max(0,Math.min(1,(smooth-1)/2));
-   const natural=.035*west*(Math.sin(7*angle+.4)+.5*Math.sin(13*angle-1.1));
-   return Math.max(base,smooth+natural);
-  }
+ const dx=Math.cos(a),dy=Math.sin(a);
+ let outer=0;
+ for(let n=0;n<smoothLakeShore.length;n++){
+  const p=smoothLakeShore[n],q=smoothLakeShore[(n+1)%smoothLakeShore.length];
+  const ex=q[0]-p[0],ey=q[1]-p[1],cross=dx*ey-dy*ex;
+  if(Math.abs(cross)<1e-9)continue;
+  const t=(p[0]*ey-p[1]*ex)/cross,u=(p[0]*dy-p[1]*dx)/cross;
+  if(t>0&&u>=0&&u<=1&&t>outer)outer=t;
  }
- return Math.max(base,lakeCoastKnots[lakeCoastKnots.length-1][1]);
-}const lakeIsland={x:-170,y:1390,rx:104,ry:64};
+ return Math.max(base,outer);
+}
+const lakeIsland={x:-170,y:1390,rx:104,ry:64};
 function onLakeIsland(x,y){return Math.hypot((x-lakeIsland.x)/lakeIsland.rx,(y-lakeIsland.y)/lakeIsland.ry)<1}
 function lakeEdgePoint(a,level=.91){
  const r=lakeRadius(a)*level;
@@ -8100,7 +8116,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=263;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=264;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
