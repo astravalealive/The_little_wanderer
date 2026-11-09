@@ -1,4 +1,4 @@
 {
-  "build": 262,
-  "notes": "Smooth natural lake shoreline without angular polygon edges; preserve island, reeds, lily pads and frog behaviour."
+  "build": 263,
+  "notes": "Fix JavaScript syntax error from stray brace after lake habitat renderer."
 }
