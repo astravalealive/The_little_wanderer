@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V289 · Fish Syntax Repair</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V290 · Natural Fish Schools</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
 .mobile-menu,.stats-toggle{display:none}
 @media(max-width:600px),(pointer:coarse) and (max-height:600px){
  .hud{top:calc(env(safe-area-inset-top,0px) + 8px);right:84px}
@@ -74,7 +74,7 @@ body:not(.rebirth-art) canvas#game{image-rendering:auto}
 body:has(.mobile-menu[open]) .haigen-speech,
 body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 @media (max-width:410px){.haigen-speech{font-size:14px;max-width:min(288px,calc(100vw - 22px));padding:9px 11px}}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=210"><style>#modalBody button.pad-choice{outline:3px solid #ffda74;outline-offset:-3px;background:#ffedb5;color:#23251b;box-shadow:inset 7px 0 #a56320}</style></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V289</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v210 live</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • View mark / hold for playtest • D-pad select • A confirm • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=210"><style>#modalBody button.pad-choice{outline:3px solid #ffda74;outline-offset:-3px;background:#ffedb5;color:#23251b;box-shadow:inset 7px 0 #a56320}</style></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V290</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v210 live</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • View mark / hold for playtest • D-pad select • A confirm • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -6514,54 +6514,89 @@ const mouth=mountainRiverPoints.slice(-8);
 ctx.beginPath();mouth.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
 ctx.strokeStyle=mixColour('#398eaa','#37577c',nightMix);ctx.lineWidth=150;ctx.stroke();
 ctx.restore();
-for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawLakeHabitat();drawFrogNursery();drawPondMist(nightMix);// V288: free-roaming fish schools across the whole Great Lake.
- // Each shoal drifts independently; individual fish weave, turn and tail-beat.
- const shoalCount=6;
- for(let s=0;s<shoalCount;s++){
-  const phase=time*(.000075+.000014*s)+s*2.39996;
-  const angle=phase+Math.sin(phase*.73+s)*.65;
-  const reach=.27+.48*(.5+.5*Math.sin(phase*.49+s*1.7));
-  let cx=pond.x+Math.cos(angle)*pond.rx*lakeRadius(angle)*reach;
-  let cy=pond.y+Math.sin(angle)*pond.ry*lakeRadius(angle)*reach;
-  // Wander to other parts of the lake if a path approaches an island or bank.
-  if(lakeLevel(cx,cy)>.84||onLakeIsland(cx,cy)){
-   const alt=angle+1.1;
-   cx=pond.x+Math.cos(alt)*pond.rx*lakeRadius(alt)*.43;
-   cy=pond.y+Math.sin(alt)*pond.ry*lakeRadius(alt)*.43;
+for(let i=0;i<5;i++)ellipse(pond.x-90+i*40,pond.y+65+(i%2)*11,13,6,'#5c9d5b');drawLakeHabitat();drawFrogNursery();drawPondMist(nightMix);// V290: persistent schooling fish. Positions and headings are advanced incrementally;
+// no trigonometric location resets, teleports, or edge-based pop-in/pop-out.
+if(!drawLakeFish.schools){
+ drawLakeFish.schools=Array.from({length:6},(_,s)=>{
+  const a=s*2.399963+.25, r=.28+.06*(s%3);
+  const x=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*r;
+  const y=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*r;
+  const heading=a+Math.PI/2;
+  return {x,y,heading,turn:0,wander:s*1.73,
+   fish:Array.from({length:5+s%4},(_,j)=>({
+    x:x+Math.cos(j*2.4)*j*7,y:y+Math.sin(j*2.4)*j*7,
+    heading,phase:s*3.1+j*1.4,size:.7+seeded(s*37+j+221)*.4
+   }))};
+ });
+ drawLakeFish.lastTime=time;
+}
+drawLakeFish();
+function drawLakeFish(){
+ const schools=drawLakeFish.schools;
+ const dt=Math.max(0,Math.min(50,time-drawLakeFish.lastTime||0))/1000;
+ drawLakeFish.lastTime=time;
+ const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
+ const safe=(x,y,margin=.87)=>lakeLevel(x,y)<margin&&!onLakeIsland(x,y);
+ for(let s=0;s<schools.length;s++){
+  const school=schools[s];
+  if(dt){
+   school.wander+=dt*(.13+.025*s);
+   const wanderTurn=Math.sin(school.wander*1.4+s)*.55+
+    Math.sin(school.wander*.71+s*2.1)*.36;
+   let desired=school.heading+wanderTurn*dt*1.7;
+   // Look ahead, steer away from banks and the island before reaching them.
+   const look=200;
+   const aheadX=school.x+Math.cos(school.heading)*look;
+   const aheadY=school.y+Math.sin(school.heading)*look;
+   if(!safe(aheadX,aheadY,.80)){
+    const towardCentre=Math.atan2(pond.y-school.y,pond.x-school.x);
+    const left=school.heading+.85,right=school.heading-.85;
+    const leftSafe=safe(school.x+Math.cos(left)*look,school.y+Math.sin(left)*look,.87);
+    const rightSafe=safe(school.x+Math.cos(right)*look,school.y+Math.sin(right)*look,.87);
+    desired=leftSafe&&!rightSafe?left:rightSafe&&!leftSafe?right:towardCentre;
+   }
+   // Smoothly rotate rather than reverse or jump to a new location.
+   school.heading+=Math.max(-1.15*dt,Math.min(1.15*dt,wrap(desired-school.heading)));
+   const speed=44+7*Math.sin(school.wander*.8+s);
+   const nx=school.x+Math.cos(school.heading)*speed*dt;
+   const ny=school.y+Math.sin(school.heading)*speed*dt;
+   if(safe(nx,ny,.91)){school.x=nx;school.y=ny}
+   else school.heading+=1.5*dt;
   }
-  const heading=angle+Math.PI/2+.25*Math.sin(phase*1.8);
-  const count=5+s%4;
+  const count=school.fish.length;
   for(let j=0;j<count;j++){
-   const lag=(j-(count-1)/2)*24;
-   const sway=Math.sin(time*.0013+j*1.8+s)*11;
-   const fx=cx-Math.cos(heading)*lag-Math.sin(heading)*sway;
-   const fy=cy-Math.sin(heading)*lag+Math.cos(heading)*sway;
-   if(lakeLevel(fx,fy)>.91||onLakeIsland(fx,fy))continue;
-   const size=.65+seeded(s*31+j+201)*.4;
-   const beat=Math.sin(time*.016+j*1.4+s)*5;
+   const fish=school.fish[j];
+   // Offset positions give a loose, fluid shoal instead of a rigid formation.
+   const rank=j-(count-1)/2;
+   const lateral=rank*17+Math.sin(time*.0011+fish.phase)*8;
+   const trailing=10+Math.abs(rank)*10+Math.cos(time*.0008+fish.phase)*9;
+   let tx=school.x-Math.cos(school.heading)*trailing-Math.sin(school.heading)*lateral;
+   let ty=school.y-Math.sin(school.heading)*trailing+Math.cos(school.heading)*lateral;
+   if(!safe(tx,ty,.95)){tx=school.x;ty=school.y}
+   if(dt){
+    const dx=tx-fish.x,dy=ty-fish.y;
+    const distance=Math.hypot(dx,dy);
+    const targetAngle=distance>2?Math.atan2(dy,dx):school.heading;
+    fish.heading+=Math.max(-2.8*dt,Math.min(2.8*dt,wrap(targetAngle-fish.heading)));
+    const velocity=Math.min(105,Math.max(22,distance*1.6));
+    const nx=fish.x+Math.cos(fish.heading)*velocity*dt;
+    const ny=fish.y+Math.sin(fish.heading)*velocity*dt;
+    if(safe(nx,ny,.96)){fish.x=nx;fish.y=ny}
+    else fish.heading+=1.8*dt;
+   }
    const body=(s+j)%3===0?'#d3b78d':(s+j)%3===1?'#8bb1b7':'#a2c4a7';
-   ctx.save();ctx.translate(fx,fy);ctx.rotate(heading);ctx.scale(size,size);
-   ctx.globalAlpha=.56+.12*Math.sin(time*.002+j);
-   ellipse(0,5,14,5,'#21496966');
-   poly([[-11,0],[-22,-7+beat],[-22,7+beat]],body);
-   ellipse(0,0,14,6.5,body);
-   poly([[-4,-4],[2,-10],[7,-4]],body);
-   ellipse(9,-1.5,1.5,1.5,'#213d48');
+   const beat=Math.sin(time*.014+fish.phase)*4.8;
+   ctx.save();ctx.translate(fish.x,fish.y);ctx.rotate(fish.heading);
+   ctx.scale(fish.size,fish.size);ctx.globalAlpha=.7;
+   ellipse(0,5,13,4,'#21496966');
+   poly([[-11,0],[-21,-6+beat],[-21,6+beat]],body);
+   ellipse(0,0,14,6,body);
+   poly([[-3,-4],[2,-10],[7,-4]],body);
+   ellipse(9,-1,1.4,1.4,'#213d48');
    ctx.restore();
   }
  }
- // Occasional surface activity, independent of the schools.
- for(let i=0;i<3;i++){
-  const cycle=(time+i*8300)%29000;
-  if(cycle>600)continue;
-  const a=i*2.4+time*.00008,r=.35+i*.12;
-  const fx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*r;
-  const fy=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*r;
-  if(onLakeIsland(fx,fy))continue;
-  const arc=Math.sin(Math.PI*cycle/600);
-  ctx.save();ctx.translate(fx,fy-arc*23);ctx.rotate(-.3+arc*.6);
-  ellipse(0,0,12,5,'#b6c8b4');poly([[-9,0],[-18,-5],[-18,5]],'#b6c8b4');ctx.restore();
- }
+}
 // Sparse rising bubbles, anchored to the actual pond rather than the whole world.
 for(let i=0;i<11;i++){
  const a=i*2.399,px=pond.x+Math.cos(a)*pond.rx*(.12+(i%4)*.13);
@@ -8416,7 +8451,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=289;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Eastern shoreline and reed updates';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=290;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Eastern shoreline and reed updates';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
