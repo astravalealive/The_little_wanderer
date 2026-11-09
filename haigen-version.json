@@ -1,4 +1,4 @@
 {
-  "build": 272,
-  "notes": "Fix wild birds visibly flying with flapping wings, faster takeoff, slowing to land, then ground foraging."
+  "build": 273,
+  "notes": "Retire obsolete blocked stream mission and obstruction visuals; release Bristleback; preserve quest history for a future icy-mountain river storyline."
 }
