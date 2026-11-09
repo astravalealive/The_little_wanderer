@@ -74,7 +74,7 @@ body:not(.rebirth-art) canvas#game{image-rendering:auto}
 body:has(.mobile-menu[open]) .haigen-speech,
 body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 @media (max-width:410px){.haigen-speech{font-size:14px;max-width:min(288px,calc(100vw - 22px));padding:9px 11px}}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=210"><style>#modalBody button.pad-choice{outline:3px solid #ffda74;outline-offset:-3px;background:#ffedb5;color:#23251b;box-shadow:inset 7px 0 #a56320}</style></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V305</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v210 live</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • View mark / hold for playtest • D-pad select • A confirm • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=210"><style>#modalBody button.pad-choice{outline:3px solid #ffda74;outline-offset:-3px;background:#ffedb5;color:#23251b;box-shadow:inset 7px 0 #a56320}</style></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V306</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">v210 live</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • View mark / hold for playtest • D-pad select • A confirm • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -1052,16 +1052,33 @@ if(oldGardenBuilt)state.structures=state.structures.filter(q=>q.kind!=='garden')
 state.lifeProject=state.lifeProject&&typeof state.lifeProject==='object'&&['coop','garden','woodstore'].includes(state.lifeProject.kind)?state.lifeProject:null;
 if(state.lifeProject){state.lifeProject.stage=clamp(Math.floor(Number(state.lifeProject.stage)||0),0,2);state.lifeProject.work=clamp(Number(state.lifeProject.work)||0,0,2500)}
 state.lifeProjectsDone=Array.isArray(state.lifeProjectsDone)?state.lifeProjectsDone.filter(k=>['coop','garden','woodstore'].includes(k)).slice(0,3):[];
+// V306: independent harvest cycles and four named crops, migrated from legacy garden timer.
+const gardenCrops=['cabbage','tomatoes','carrots','potatoes'];
+state.gardenCropReady=state.gardenCropReady&&typeof state.gardenCropReady==='object'?state.gardenCropReady:{};
+for(const crop of gardenCrops)if(!Number.isFinite(state.gardenCropReady[crop]))state.gardenCropReady[crop]=Number(state.gardenReadyAt)||Date.now()+105000;
+const gardenHarvestBursts=[];
 function gardenGrowthMs(){return [0,105000,70000,45000][state.gardenTier]||105000}
-function gardenRipe(){return !!state.gardenTier&&Date.now()>=state.gardenReadyAt}
+function gardenCropGrowth(crop){return gardenGrowthMs()*({cabbage:1.25,tomatoes:1.1,carrots:.85,potatoes:1.15}[crop]||1)}
+function gardenCropProgress(crop){return Math.max(0,Math.min(1,1-(state.gardenCropReady[crop]-Date.now())/gardenCropGrowth(crop)))}
+function gardenCropRipe(crop){return !!state.gardenTier&&Date.now()>=state.gardenCropReady[crop]}
+function gardenRipe(){return gardenCrops.some(gardenCropRipe)}
 function gardenHarvestAmount(){return [0,3,5,8][state.gardenTier]||0}
-function harvestGarden(){
+function harvestGarden(crop){
  if(!state.gardenTier){notify('🥕 Build your kitchen garden first.');return false}
- if(!gardenRipe()){notify('🌱 The vegetables are growing. Come back once the beds are ready.');return false}
+ crop=crop||gardenCrops.find(gardenCropRipe);
+ if(!gardenCrops.includes(crop)||!gardenCropRipe(crop)){notify('🌱 That crop is still growing.');return false}
  const amount=gardenHarvestAmount();
- state.vegetables+=amount;state.gardenReadyAt=Date.now()+gardenGrowthMs();
- notify('🥕 Picked '+amount+' vegetables! The garden will regrow.');
+ state.vegetables+=amount;state.gardenCropReady[crop]=Date.now()+gardenCropGrowth(crop);
+ state.gardenReadyAt=Math.min(...gardenCrops.map(c=>state.gardenCropReady[c]));
+ gardenHarvestBursts.push({x:gardenPlot.x,y:gardenPlot.y-20,at:time,crop,amount});
+ notify('🌾 Harvested '+amount+' '+crop+'! The bed is growing again.');
+ if(typeof mindWrite==='function')mindWrite('I harvested '+crop+' from our garden. Watching things grow teaches me patience.','observation');
  save();return true;
+}
+function gardenHarvestMenu(){
+ open('<h2>🌱 Kitchen Garden</h2><p>Choose a ripe crop to pick. Each bed grows independently.</p>'+
+ gardenCrops.map(c=>'<div class="item"><b>'+safeText(c[0].toUpperCase()+c.slice(1))+'</b><span>'+ (gardenCropRipe(c)?'Ready to harvest':Math.ceil(Math.max(0,state.gardenCropReady[c]-Date.now())/1000)+'s until ready')+'</span> <button class="btn" data-pick="'+c+'" '+(gardenCropRipe(c)?'':'disabled')+'>Pick</button></div>').join(''));
+ document.querySelectorAll('[data-pick]').forEach(btn=>btn.onclick=()=>{harvestGarden(btn.dataset.pick);gardenHarvestMenu()});
 }
 const woodCarryLimit=999999;
 function woodStoreLimit(){return [0,80,170,340][state.woodStorageTier]}
@@ -4309,60 +4326,71 @@ function worldDrawHomestead(p,tier){
  ctx.restore();return true;
 }
 function worldDrawGarden(p,tier){
- // V305: substantial raised allotment with visibly distinct crop stages.
- const x=p.x,y=p.y,w=120+tier*17,h=77+tier*9;
- const growth=gardenRipe()?1:Math.max(.03,Math.min(1,1-(state.gardenReadyAt-Date.now())/gardenGrowthMs()));
- const sway=Math.sin(time*.0017)*Math.min(2.5,growth*2.5);
- ctx.save();ctx.imageSmoothingEnabled=false;
+ const x=p.x,y=p.y,w=120+tier*17,h=100+tier*9;
  const rect=(xx,yy,ww,hh,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(xx),Math.round(yy),Math.round(ww),Math.round(hh))};
- // Grass margin, compacted footpath and timber perimeter.
- ellipse(x,y+8,w+18,h+15,'#304f2f66');
- rect(x-w-9,y-h-9,w*2+18,h*2+18,'#554a34');
- rect(x-w-4,y-h-4,w*2+8,h*2+8,'#aa8958');
- rect(x-w+3,y-h+3,w*2-6,h*2-6,'#8c9b5b');
- // Three long beds, separated by walkable-looking gravel aisles.
- for(let row=0;row<3;row++){
-  const yy=y-h+14+row*(2*h-26)/3,bh=(2*h-40)/3;
-  rect(x-w+11,yy-4,2*w-22,bh+8,'#493b2c');
-  rect(x-w+15,yy,2*w-30,bh,'#61452e');
-  for(let k=0;k<9;k++){
-   const px=x-w+29+k*(2*w-58)/8;
-   const g=Math.max(.05,Math.min(1,growth+(k%3-1)*.045));
-   const stem=4+g*20,shift=sway*Math.sin(k*2.3+row);
-   // Distinct rows: carrots, leafy brassicas and climbing beans.
-   if(row===0){
-    rect(px-1+shift,yy+bh-8-stem,3,stem,'#3e8b43');
-    ellipse(px-5+shift,yy+bh-12-stem*.68,4+g*5,3+g*4,'#77b94e');
-    ellipse(px+4+shift,yy+bh-12-stem*.8,4+g*4,3+g*4,'#91c967');
-    if(g>.72){ellipse(px,yy+bh-8,3+g*3,3+g*4,'#e98e38');rect(px-2,yy+bh-8,4,3,'#f4b65e')}
-   }else if(row===1){
-    for(let leaf=0;leaf<4;leaf++){
-     const angle=leaf*Math.PI/2+time*.00016;
-     ellipse(px+Math.cos(angle)*g*5+shift,yy+bh-11+Math.sin(angle)*g*4,3+g*6,2+g*5,leaf%2?'#5a9d4b':'#84bd63');
+ const oval=(xx,yy,rx,ry,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(xx,yy,Math.max(.1,rx),Math.max(.1,ry),0,0,Math.PI*2);ctx.fill()};
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ oval(x,y+9,w+17,h+14,'#27492f88');
+ rect(x-w-9,y-h-9,2*w+18,2*h+18,'#4d4630');
+ rect(x-w-5,y-h-5,2*w+10,2*h+10,'#ac9060');
+ rect(x-w+2,y-h+2,2*w-4,2*h-4,'#a5a078');
+ const crops=['cabbage','tomatoes','carrots','potatoes'];
+ crops.forEach((crop,row)=>{
+  const bh=(2*h-32)/4,top=y-h+12+row*bh,g=gardenCropProgress(crop);
+  rect(x-w+13,top-4,2*w-26,bh-2,'#533d2d');
+  rect(x-w+18,top+1,2*w-36,bh-12,'#6e4b31');
+  // Soil furrows and wet highlights give each raised bed physical depth.
+  for(let j=0;j<3;j++)rect(x-w+22,top+5+j*8,2*w-44,2,'#493523');
+  for(let k=0;k<8;k++){
+   const px=x-w+35+k*(2*w-70)/7,py=top+bh*.55;
+   const phase=Math.max(.03,Math.min(1,g+(k%3-1)*.045));
+   const sway=Math.sin(time*.002+k*1.9+row)*phase*2;
+   const height=3+phase*23,green=phase>.6?'#6eb74f':'#5d9b46';
+   oval(px+3,py+5,9*phase+2,3*phase+1,'#2c392b77');
+   if(crop==='cabbage'){
+    for(let leaf=0;leaf<5;leaf++){
+     const angle=leaf*Math.PI*2/5;
+     oval(px+Math.cos(angle)*phase*8+sway,py+Math.sin(angle)*phase*5-height*.35,3+phase*8,2+phase*6,leaf%2?'#458d50':'#83bd64');
     }
-    if(g>.75)ellipse(px+shift,yy+bh-12,4+g*3,3+g*3,'#b5d47e');
+    if(phase>.65){oval(px+sway,py-height*.45,5+phase*6,4+phase*5,'#b1d68c');oval(px-2+sway,py-height*.48,2+phase*3,2+phase*3,'#d0e3a5')}
+   }else if(crop==='tomatoes'){
+    rect(px-1,py-height,3,height+4,'#5d8e45');
+    rect(px-8,py-height*.65,17,2,'#438c45');
+    for(const side of [-1,1]){oval(px+side*7+sway,py-height*.7,4+phase*4,2+phase*3,green);
+     if(phase>.55){oval(px+side*6+sway,py-height*.32,2+phase*4,2+phase*4,phase>.83?'#e74c38':'#e6a94d');oval(px+side*6+sway,py-height*.32-3,2,2,'#347d3b')}
+    }
+   }else if(crop==='carrots'){
+    rect(px-1+sway,py-height*.8,3,height*.8,'#438c3e');
+    for(const side of [-1,1])oval(px+side*5+sway,py-height*.65,3+phase*5,2+phase*3,'#7ebd53');
+    if(phase>.68){oval(px,py+2,3+phase*2,4+phase*4,'#ed963e');rect(px-2,py+2,4,3,'#f5b65c')}
    }else{
-    rect(px-2,yy+bh-33,3,29,'#9c7950');
-    rect(px-3+shift,yy+bh-7-stem,3,stem,'#397a42');
-    ellipse(px-6+shift,yy+bh-10-stem*.7,5+g*3,3+g*3,'#74b65c');
-    ellipse(px+3+shift,yy+bh-15-stem*.5,5+g*3,3+g*3,'#4e9a50');
-    if(g>.62){ellipse(px+4+shift,yy+bh-11,3,5,'#7ab64b');ellipse(px-4+shift,yy+bh-19,3,5,'#a6cf65')}
+    rect(px+sway,py-height*.8,3,height*.8,'#5a9848');
+    for(const side of [-1,1])oval(px+side*5+sway,py-height*.52,4+phase*5,3+phase*4,side===1?'#76b453':'#4f9648');
+    if(phase>.7){for(const side of [-1,1])oval(px+side*5,py+2,3+phase*3,2+phase*3,'#a68a55')}
+    if(phase>.85)oval(px,py-height*.62,2,2,'#d9d7a4');
+   }
+   // Sparkles appear only over fully ripe crops, not permanently.
+   if(g>=1&&((Math.floor(time/380)+k*3+row*7)%11===0)){
+    ctx.globalAlpha=.55+.4*Math.sin(time*.012+k);rect(px+9,py-height-7,3,3,'#fff3b1');ctx.globalAlpha=1;
    }
   }
-  rect(x-w+9,yy-6,2*w-18,5,'#c39c66');
-  rect(x-w+9,yy+bh,2*w-18,5,'#6d4c30');
-  for(const xx of [x-w+10,x+w-16])rect(xx,yy-5,6,bh+11,'#b68b59');
- }
- // Fencing, water barrel and scarecrow grow with upgrades.
- for(let xx=x-w-5;xx<=x+w;xx+=25){rect(xx,y-h-18,5,18,'#9a744d');rect(xx,y-h-20,5,5,'#d2af76')}
- rect(x-w-6,y-h-13,2*w+12,4,'#b68e5f');
- if(tier>=2){
-  rect(x+w-28,y+h-26,20,25,'#4a6570');rect(x+w-30,y+h-27,24,5,'#91a8a5');
-  rect(x+w-25,y+h-20,2,17,'#b5d0cf');
- }
- if(tier>=3){
-  rect(x-w+24,y-h-41,5,32,'#8c6a48');rect(x-w+10,y-h-33,33,5,'#b58d61');
-  ctx.fillStyle='#c7a15e';ctx.beginPath();ctx.moveTo(x-w+10,y-h-32);ctx.lineTo(x-w+39,y-h-32);ctx.lineTo(x-w+24,y-h-49);ctx.fill();
+  rect(x-w+12,top-7,2*w-24,5,'#d3ac71');
+  rect(x-w+12,top+bh-7,2*w-24,6,'#795337');
+  for(const xx of [x-w+12,x+w-18])rect(xx,top-6,6,bh,'#b68d5e');
+ });
+ for(let xx=x-w-5;xx<=x+w;xx+=24){rect(xx,y-h-19,5,18,'#9d754e');rect(xx,y-h-20,5,4,'#e1b77d')}
+ rect(x-w-7,y-h-14,2*w+14,4,'#bd9863');
+ if(tier>=2){rect(x+w-30,y+h-26,22,26,'#4c6c72');rect(x+w-32,y+h-29,26,5,'#9bb8b5')}
+ if(tier>=3){rect(x-w+20,y-h-43,5,31,'#896444');rect(x-w+7,y-h-34,32,5,'#b28b58')}
+ // Harvest burst: rising produce label and a spray of glowing particles.
+ for(let i=gardenHarvestBursts.length-1;i>=0;i--){
+  const fx=gardenHarvestBursts[i],age=time-fx.at;
+  if(age>1400){gardenHarvestBursts.splice(i,1);continue}
+  const t=age/1400;ctx.save();ctx.globalAlpha=1-t;
+  ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillStyle='#fff4c0';ctx.shadowColor='#f4c86d';ctx.shadowBlur=8;
+  ctx.fillText('+'+fx.amount+' '+fx.crop,fx.x,fx.y-32-t*40);
+  for(let k=0;k<14;k++){const angle=k*2.399,rad=12+t*(25+k%4*9);oval(fx.x+Math.cos(angle)*rad,fx.y-15+Math.sin(angle)*rad-t*26,2+(k%3),2+(k%3),k%2?'#eecf6e':'#8ed66a')}
+  ctx.restore();
  }
  ctx.restore();
 }
@@ -4397,7 +4425,7 @@ function worldDrawDock(p){
 function drawHomesteadPlotGround(p){
  if(Math.abs(p.x-cam.x)>950||Math.abs(p.y-cam.y)>750)return;
  const tier=homesteadTier(p),x=p.x,y=p.y;
- if(rbEnabled&&tier&&p.kind==='garden'){worldDrawGarden(p,tier);return}
+ if(tier&&p.kind==='garden'){worldDrawGarden(p,tier);return}
  if(tier&&p.kind==='jetty'){
   worldDrawDock(p);
   if(state.castAt){
@@ -4618,7 +4646,7 @@ function homesteadMenu(kind){
    info='Build permanent raised vegetable beds beside the cabin. Upgrade them to grow more vegetables more quickly.';
    items.push(['Build kitchen garden · 6 wood, 2 stone, 3 twigs',()=>{
     if(!homesteadCost(6,2,3))return;
-    state.gardenTier=1;state.gardenReadyAt=Date.now()+gardenGrowthMs();
+    state.gardenTier=1;state.gardenReadyAt=Date.now()+gardenGrowthMs();for(const crop of gardenCrops)state.gardenCropReady[crop]=Date.now()+gardenCropGrowth(crop);
     notify('🥕 Kitchen garden built. The first vegetables are growing.');
     save();homesteadMenu(kind)
    }]);
@@ -4626,9 +4654,7 @@ function homesteadMenu(kind){
    const remaining=Math.max(0,Math.ceil((state.gardenReadyAt-Date.now())/1000));
    info='Level '+state.gardenTier+' · '+(gardenRipe()?'Harvest ready!':'Next harvest in '+remaining+' seconds')+
     ' · '+gardenHarvestAmount()+' vegetables per harvest · '+state.vegetables+' in supplies.';
-   items.push(['Harvest '+gardenHarvestAmount()+' vegetables',()=>{
-    harvestGarden();homesteadMenu(kind)
-   }]);
+   items.push(['Pick ripe crops',()=>gardenHarvestMenu()]);
    if(state.gardenTier<3){
     const wood=state.gardenTier===1?10:16,stone=state.gardenTier===1?4:7,twigs=state.gardenTier===1?2:4;
     items.push(['Upgrade garden to Level '+(state.gardenTier+1)+' · '+wood+' wood, '+stone+' stone, '+twigs+' twigs',()=>{
@@ -4669,8 +4695,8 @@ function interactHomestead(){
  if(state.coopTier&&Math.hypot(state.x-chickenNest.x,state.y-chickenNest.y)<56&&state.nestEggs){
   const n=state.nestEggs;state.eggs+=n;state.nestEggs=0;notify('🥚 Collected '+n+' eggs!');save();return true;
  }
- if(state.gardenTier&&gardenRipe()&&Math.hypot(state.x-gardenPlot.x,state.y-gardenPlot.y)<100){harvestGarden();return true}
- const p=homesteadPlots.filter(p=>Math.hypot(state.x-p.x,state.y-p.y)<(p.kind==='garden'?145:108)).sort((a,b)=>Math.hypot(state.x-a.x,state.y-a.y)-Math.hypot(state.x-b.x,state.y-b.y))[0];
+ if(state.gardenTier&&Math.abs(state.x-gardenPlot.x)<225&&Math.abs(state.y-gardenPlot.y)<155){gardenHarvestMenu();return true}
+ const p=homesteadPlots.filter(p=>Math.hypot(state.x-p.x,state.y-p.y)<(p.kind==='garden'?235:108)).sort((a,b)=>Math.hypot(state.x-a.x,state.y-a.y)-Math.hypot(state.x-b.x,state.y-b.y))[0];
  if(p){homesteadMenu(p.kind);return true}return false;
 }
 
@@ -8854,7 +8880,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=305;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Runestone collision, proximity glow and knowledge research';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=306;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Runestone collision, proximity glow and knowledge research';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
