@@ -790,8 +790,8 @@ function lakeEdgePoint(a,level=.91){
 }
 const lakeFrogZones=[-2.85,-2.35,-1.9,-1.48,2.3,2.75,3.12].map(a=>lakeEdgePoint(a,.89));
 const lakeReedBeds=[...lakeFrogZones];
-for(let i=0;i<18;i++){
- const a=-Math.PI+(i+.4)*Math.PI*2/18;
+for(let i=0;i<42;i++){
+ const a=-Math.PI+(i+.4)*Math.PI*2/42;
  lakeReedBeds.push(lakeEdgePoint(a,.88));
 }
 function nearestLakeReeds(x,y){
@@ -854,15 +854,41 @@ function drawLakeHabitat(){
  ctx.beginPath();for(let n=0;n<=36;n++){const a=n*Math.PI*2/36,r=1+.07*Math.sin(5*a)+.045*Math.cos(9*a);const x=Math.cos(a)*lakeIsland.rx*r,y=Math.sin(a)*lakeIsland.ry*r;n?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath();
  ctx.fillStyle='#d5c49a';ctx.fill();ctx.save();ctx.scale(.88,.81);ctx.fillStyle='#6b9959';ctx.fill();ctx.restore();
  ellipse(-20,-8,18,9,'#53804d');ellipse(34,14,12,7,'#4b7c46');ctx.restore();
- // Reeds and lilies are concentrated in separate sheltered shoreline pockets.
+ // V268: sheltered reed sanctuary, with broad clusters of rushes, cattails and lilies.
+ // Deterministic positions keep the vegetation stable between frames.
  for(let z=0;z<lakeReedBeds.length;z++){
   const p=lakeReedBeds[z];
-  for(let n=0;n<11;n++){
-   const a=z*2.4+n*2.39996,px=p.x+Math.cos(a)*(9+n*3),py=p.y+Math.sin(a)*(8+n*2);
-   if(!inPond(px,py)||onLakeIsland(px,py))continue;
-   ellipse(px,py,9+(n%3)*3,5+(n%2)*2,n%3===0?'#578c55':'#4c9a62');
-   if(n%2===0){ctx.strokeStyle='#42754b';ctx.lineWidth=2;for(let k=0;k<3;k++){ctx.beginPath();ctx.moveTo(px+k*4-4,py);ctx.lineTo(px+k*4-8,py-16-(k%2)*9);ctx.stroke()}}
+  const colony=z%4===0?24:z%3===0?20:15;
+  for(let n=0;n<colony;n++){
+   const a=z*2.4+n*2.399963,rad=8+Math.sqrt(n/colony)*76;
+   const px=p.x+Math.cos(a)*rad,py=p.y+Math.sin(a)*rad*.67;
+   if(!safeLakeShallows(px,py))continue;
+   const lily=n%4===0||n%7===0;
+   if(lily){
+    ellipse(px,py,10+(n%4)*2,5+(n%3),'#4c9259');
+    ellipse(px+3,py-1,3,1.5,'#76b56b');
+    if(n%13===0){ellipse(px,py-2,3.5,3,'#f4d2df');ellipse(px,py-2,1.2,1.2,'#f6df8d')}
+   }else{
+    const stalks=3+n%3;
+    for(let k=0;k<stalks;k++){
+     const ox=(k-(stalks-1)/2)*5;
+     const height=17+(n*7+k*11)%24;
+     ctx.strokeStyle=k%2?'#4e8248':'#69964b';ctx.lineWidth=2.5;
+     ctx.beginPath();ctx.moveTo(px+ox,py+2);ctx.quadraticCurveTo(px+ox-4,py-height*.65,px+ox+(k%2?4:-3),py-height);ctx.stroke();
+     if((n+k)%4===0){
+      ctx.fillStyle='#795f3b';ctx.fillRect(px+ox+(k%2?3:-4)-2,py-height-7,4,10);
+     }
+    }
+   }
   }
+ }
+ // Extra shallow cover near the cabin-side eastern shore for frogspawn.
+ for(let n=0;n<75;n++){
+  const a=-.82+n*.022,p=lakeEdgePoint(a,.92);
+  if(!safeLakeShallows(p.x,p.y))continue;
+  const h=16+n%4*5;
+  ctx.strokeStyle=n%3===0?'#6a9c54':'#467a49';ctx.lineWidth=2.4;
+  ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+Math.sin(n*1.9)*5,p.y-h);ctx.stroke();
  }
 }
 function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return Math.hypot(dx,dy)/lakeRadius(Math.atan2(dy,dx))}const inPond=(x,y,margin=0)=>{const dx=(x-pond.x)/(pond.rx+margin),dy=(y-pond.y)/(pond.ry+margin);return Math.hypot(dx,dy)<lakeRadius(Math.atan2(dy,dx))};function lakeShape(scale=1){ctx.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,r=lakeRadius(a)*scale;let x=pond.x+Math.cos(a)*pond.rx*r,y=pond.y+Math.sin(a)*pond.ry*r;if(rbEnabled){x=Math.round(x/6)*6;y=Math.round(y/6)*6}i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()}const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
@@ -8185,7 +8211,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=267;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=268;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
