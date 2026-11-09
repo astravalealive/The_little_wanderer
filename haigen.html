@@ -790,11 +790,12 @@ function lakeEdgePoint(a,level=.91){
 }
 // V270: reeds belong to the sheltered eastern bank only.
 // North, west and southwest shores stay open, with no reed colonies.
-const lakeFrogZones=[-.95,-.55,-.15,.25,.65,1.05].map(a=>lakeEdgePoint(a,.89));
+// Follow the complete east-facing shoreline, from northeast to southeast.
+const lakeFrogZones=Array.from({length:12},(_,i)=>lakeEdgePoint(-1.48+i*2.96/11,.92));
 const lakeReedBeds=[...lakeFrogZones];
-for(let i=0;i<35;i++){
- const a=-1.18+(i+.4)*2.36/35;
- lakeReedBeds.push(lakeEdgePoint(a,.90));
+for(let i=0;i<110;i++){
+ const a=-1.48+(i+.5)*2.96/110;
+ lakeReedBeds.push(lakeEdgePoint(a,.925));
 }
 function nearestLakeReeds(x,y){
  let best=lakeReedBeds[0],d=Infinity;
@@ -864,7 +865,7 @@ function drawLakeHabitat(){
   for(let n=0;n<colony;n++){
    const a=z*2.4+n*2.399963,rad=8+Math.sqrt(n/colony)*76;
    const px=p.x+Math.cos(a)*rad,py=p.y+Math.sin(a)*rad*.67;
-   if(!safeLakeShallows(px,py)||Math.cos(Math.atan2(py-pond.y,px-pond.x))<.32)continue;
+   if(!safeLakeShallows(px,py)||Math.cos(Math.atan2(py-pond.y,px-pond.x))<.06)continue;
    const lily=n%4===0||n%7===0;
    if(lily){
     ellipse(px,py,10+(n%4)*2,5+(n%3),'#4c9259');
@@ -885,8 +886,8 @@ function drawLakeHabitat(){
   }
  }
  // Extra shallow cover near the cabin-side eastern shore for frogspawn.
- for(let n=0;n<100;n++){
-  const a=-1.05+n*.021,p=lakeEdgePoint(a,.92);
+ for(let n=0;n<230;n++){
+  const a=-1.48+n*2.96/229,p=lakeEdgePoint(a,.92);
   if(!safeLakeShallows(p.x,p.y))continue;
   const h=16+n%4*5;
   ctx.strokeStyle=n%3===0?'#6a9c54':'#467a49';ctx.lineWidth=2.4;
@@ -7711,7 +7712,8 @@ function menuController(){
  gamepadStartHeld=start;gamepadBHeld=back;menuAHeld=accept;
 }
 function checkActions(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const x=!!(p&&p.buttons&&p.buttons[2]&&p.buttons[2].pressed),rt=!!(p&&p.buttons&&p.buttons[7]&&(p.buttons[7].pressed||p.buttons[7].value>.55));if(x&&!gamepadXHeld){if(state.autonomy)setAutonomy(false);interact()}if(rt&&!gamepadRTHeld)useTool();gamepadXHeld=x;gamepadRTHeld=rt}function call(){for(let c of companions){c.target={x:clamp(state.x+rand(-60,60),WORLD_MIN+60,WORLD-60),y:clamp(state.y+rand(-60,60),WORLD_MIN+60,WORLD-60)};c.mode='called';c.t=7000}notify('📣 You called Dylan and Skölli! Skölli may take his time...')}let mapZoom=1,mapBase=null;function showMap(){mapZoom=1;open('<h2>🗺️ Haigen’s World</h2><p class="small">Right stick up/down zooms. Press Xbox B to exit.</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin:10px 0"><button class="btn" id="mapCloseBtn" type="button">✕ Close map (B)</button><div><button class="btn" id="mapZoomOut" type="button">−</button> <span id="mapZoomLabel">1.0×</span> <button class="btn" id="mapZoomIn" type="button">+</button></div></div><canvas id="worldMap" width="560" height="560" style="width:100%;height:auto;aspect-ratio:1;background:#93b47b;border:2px solid #e8d4a1;border-radius:12px"></canvas><p class="small">🏕️ First Clearing · 🐟 Lake · ᚠ Rune stone · ⛰️ Highlands · 🌳 Grove · 🌿 Marsh</p><h3>🌍 Explore the expanded world</h3><p class="small">Choose a region to preview its scenery, wildlife and outfit. Return to the woodland whenever you like.</p><div id="regionTravel" style="display:flex;flex-wrap:wrap;gap:7px"></div>');$('mapCloseBtn').onclick=close;const canvas=$('worldMap'),g=canvas.getContext('2d'),sc=canvas.width/WORLD_SPAN;const mini=islandOverview();g.drawImage(mini,0,0,560,560);g.save();g.translate(-WORLD_MIN*sc,-WORLD_MIN*sc);
-for(const r of expandedRegions){g.fillStyle='#35483f';g.font='bold 9px system-ui';g.textAlign='center';g.fillText(r.name,(r.x+r.w*.5)*sc,(r.y+r.h*.5)*sc);g.textAlign='left'}for(const l of landmarks){g.beginPath();g.ellipse(l.x*sc,l.y*sc,(l.kind==='highlands'?620:510)*sc,(l.kind==='highlands'?400:360)*sc,0,0,Math.PI*2);g.fillStyle=l.kind==='highlands'?'#85928a':l.kind==='marsh'?'#6a9b87':'#51865b';g.fill()}g.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,rad=lakeRadius(a),x=(pond.x+Math.cos(a)*pond.rx*rad)*sc,y=(pond.y+Math.sin(a)*pond.ry*rad)*sc;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fillStyle='#448caa';g.fill();for(const o of objects){if(o.type!=='tree'||o.x>4200||o.y>4200||islandDepth(o.x,o.y)<25||state.removed.includes(o.id))continue;g.fillStyle='#4d8051';g.fillRect(o.x*sc,o.y*sc,2,2)}for(const [p,label,color] of [[cottage,'CAMP','#f9e6a0'],[ruins,'RUNE','#e5c6f7'],[landmarks[0],'HIGHLANDS','#e7e4d4'],[storyStep().place,'QUEST','#f9bd64']]){if(!p)continue;g.fillStyle=color;g.beginPath();g.arc(p.x*sc,p.y*sc,4,0,Math.PI*2);g.fill();g.font='bold 10px system-ui';g.fillText(label,p.x*sc+7,p.y*sc-6)}for(const l of landmarks.slice(1)){g.fillStyle='#f4eed3';g.font='bold 10px system-ui';g.fillText(l.name,l.x*sc+6,l.y*sc-6)}for(const b of state.structures){g.fillStyle=b.kind==='campfire'?'#efaa5a':'#fff0bc';g.fillRect(b.x*sc-2,b.y*sc-2,4,4)}for(const bridge of easternBridges){const bx=easternRiverX(bridge.y)*sc,by=bridge.y*sc;g.fillStyle='#dfb678';g.fillRect(bx-7,by-2,14,4)}g.restore();mapBase=document.createElement('canvas');mapBase.width=560;mapBase.height=560;mapBase.getContext('2d').drawImage(canvas,0,0);const destinations=regionDestinations();const travel=$('regionTravel');for(const dest of destinations){const btn=document.createElement('button');btn.className='btn';btn.textContent=dest.name;btn.onclick=()=>{state.x=dest.x;state.y=dest.y;state.resting=false;cam.x=state.x;cam.y=state.y;save();close();notify('🗺️ Arrived at '+dest.name);};travel.appendChild(btn)}$('mapZoomIn').onclick=()=>changeMapZoom(.5);$('mapZoomOut').onclick=()=>changeMapZoom(-.5);drawMapZoom()}$('regionsQuickBtn').onclick=showMap;
+for(const r of expandedRegions){g.fillStyle='#35483f';g.font='bold 9px system-ui';g.textAlign='center';g.fillText(r.name,(r.x+r.w*.5)*sc,(r.y+r.h*.5)*sc);g.textAlign='left'}for(const l of landmarks){g.beginPath();g.ellipse(l.x*sc,l.y*sc,(l.kind==='highlands'?620:510)*sc,(l.kind==='highlands'?400:360)*sc,0,0,Math.PI*2);g.fillStyle=l.kind==='highlands'?'#85928a':l.kind==='marsh'?'#6a9b87':'#51865b';g.fill()}g.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,rad=lakeRadius(a),x=(pond.x+Math.cos(a)*pond.rx*rad)*sc,y=(pond.y+Math.sin(a)*pond.ry*rad)*sc;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fillStyle='#448caa';g.fill();
+g.save();g.lineCap='round';g.lineJoin='round';g.beginPath();mountainRiverPoints.forEach((p,i)=>i?g.lineTo(p.x*sc,p.y*sc):g.moveTo(p.x*sc,p.y*sc));g.strokeStyle='#3f9fba';g.lineWidth=Math.max(2,110*sc);g.stroke();g.restore();for(const o of objects){if(o.type!=='tree'||o.x>4200||o.y>4200||islandDepth(o.x,o.y)<25||state.removed.includes(o.id))continue;g.fillStyle='#4d8051';g.fillRect(o.x*sc,o.y*sc,2,2)}for(const [p,label,color] of [[cottage,'CAMP','#f9e6a0'],[ruins,'RUNE','#e5c6f7'],[landmarks[0],'HIGHLANDS','#e7e4d4'],[storyStep().place,'QUEST','#f9bd64']]){if(!p)continue;g.fillStyle=color;g.beginPath();g.arc(p.x*sc,p.y*sc,4,0,Math.PI*2);g.fill();g.font='bold 10px system-ui';g.fillText(label,p.x*sc+7,p.y*sc-6)}for(const l of landmarks.slice(1)){g.fillStyle='#f4eed3';g.font='bold 10px system-ui';g.fillText(l.name,l.x*sc+6,l.y*sc-6)}for(const b of state.structures){g.fillStyle=b.kind==='campfire'?'#efaa5a':'#fff0bc';g.fillRect(b.x*sc-2,b.y*sc-2,4,4)}for(const bridge of easternBridges){const bx=easternRiverX(bridge.y)*sc,by=bridge.y*sc;g.fillStyle='#dfb678';g.fillRect(bx-7,by-2,14,4)}g.restore();mapBase=document.createElement('canvas');mapBase.width=560;mapBase.height=560;mapBase.getContext('2d').drawImage(canvas,0,0);const destinations=regionDestinations();const travel=$('regionTravel');for(const dest of destinations){const btn=document.createElement('button');btn.className='btn';btn.textContent=dest.name;btn.onclick=()=>{state.x=dest.x;state.y=dest.y;state.resting=false;cam.x=state.x;cam.y=state.y;save();close();notify('🗺️ Arrived at '+dest.name);};travel.appendChild(btn)}$('mapZoomIn').onclick=()=>changeMapZoom(.5);$('mapZoomOut').onclick=()=>changeMapZoom(-.5);drawMapZoom()}$('regionsQuickBtn').onclick=showMap;
 setInterval(()=>{if($('worldMap')&&mapBase)drawMapZoom()},220);
 function changeMapZoom(delta){if(!mapBase||!$('worldMap'))return;mapZoom=clamp(mapZoom+delta,1,6);drawMapZoom()}function drawMapZoom(){const c=$('worldMap');if(!c||!mapBase)return;const g=c.getContext('2d'),size=560/mapZoom,sc=560/WORLD_SPAN,cx=clamp((state.x-WORLD_MIN)*sc-size/2,0,560-size),cy=clamp((state.y-WORLD_MIN)*sc-size/2,0,560-size);g.clearRect(0,0,560,560);g.imageSmoothingEnabled=true;g.drawImage(mapBase,cx,cy,size,size,0,0,560,560);const px=((state.x-WORLD_MIN)*sc-cx)*560/size,py=((state.y-WORLD_MIN)*sc-cy)*560/size,pulse=2+Math.sin(Date.now()*.006)*1.5;g.fillStyle='#ffe46e';g.strokeStyle='#1d302b';g.lineWidth=2;g.beginPath();g.arc(px,py,6+pulse,0,Math.PI*2);g.fill();g.stroke();g.fillStyle='#fff5d7';g.font='bold 12px system-ui';g.fillText('HAIGEN',Math.min(490,px+12),Math.max(15,py-9));$('mapZoomLabel').textContent=mapZoom.toFixed(1)+'×'}function safeText(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function mood(){if(state.health<35)return 'hurt';if(state.energy<25)return 'sleepy';if(state.hunger<25)return 'hungry';if(state.fun<25)return 'bored';if(state.health>75&&state.energy>55&&state.hunger>45&&state.fun>55)return 'happy';return 'thoughtful'}
@@ -7892,6 +7894,7 @@ function drawWideCamera(zoom){
   if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);
  }
  ctx.closePath();ctx.fillStyle='#448caa';ctx.fill();
+ drawMountainRiver(0);
  ctx.font='bold '+(12/zoom)+'px system-ui';ctx.textAlign='center';ctx.lineWidth=3/zoom;ctx.strokeStyle='#26382c';
  for(const p of regionDestinations()){
   ctx.strokeText(p.name,p.x,p.y-12/zoom);ctx.fillStyle='#fff4dc';ctx.fillText(p.name,p.x,p.y-12/zoom);
@@ -8319,7 +8322,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=274;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=275;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
