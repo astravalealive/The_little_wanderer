@@ -7279,8 +7279,8 @@ state.story.boarHelp=false;
 state.story.boarArrived=false;
 state.story.trust=Math.max(0,Number(state.story.trust)||0);
 // Preserve already-completed chapter progress when adding Bristleback's role.
-state.story.boarHelp=state.story.stage>=5||!!state.story.boarHelp;
-state.story.boarArrived=state.story.stage>=5||!!state.story.boarArrived;
+state.story.boarHelp=state.story.oldStreamQuestRetired?false:(state.story.stage>=5||!!state.story.boarHelp);
+state.story.boarArrived=state.story.oldStreamQuestRetired?false:(state.story.stage>=5||!!state.story.boarArrived);
 const storyPlaces={
  tracks:{x:1195,y:1605},
  blockage:{x:1135,y:1908},
