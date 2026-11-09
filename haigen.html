@@ -6184,30 +6184,75 @@ function updateFrogs(){
   f.hopAt=time+(scared?500:wet?850+seeded(f.phase+Math.floor(time/1900))*1150:2600+seeded(f.phase+Math.floor(time/3000))*3600);
  }
 }
+// V271: flocking birds fly between suitable habitats, land and forage for worms.
+const birdFlockPlans=new Map();
+function birdLandingSuitable(x,y){
+ return x>WORLD_MIN+120&&x<WORLD-120&&y>WORLD_MIN+120&&y<WORLD-120
+  &&!inPond(x,y,70)&&!onLakeIsland(x,y)
+  &&Math.hypot(x-cottage.x,y-cottage.y)>120;
+}
+function chooseBirdLanding(flock,originX,originY){
+ for(let k=0;k<28;k++){
+  const seed=flock*197+k*31+Math.floor(time/18000)*7;
+  const a=seeded(seed)*Math.PI*2,r=400+seeded(seed+1)*1600;
+  const x=Math.max(WORLD_MIN+130,Math.min(WORLD-130,originX+Math.cos(a)*r));
+  const y=Math.max(WORLD_MIN+130,Math.min(WORLD-130,originY+Math.sin(a)*r));
+  if(birdLandingSuitable(x,y))return {x,y};
+ }
+ return {x:originX,y:originY};
+}
 function updateBirds(dt){
  const step=Math.min(dt,50)/1000;
  for(const b of birds){
-  if(b.hiddenUntil&&time<b.hiddenUntil)continue;
-  if(b.hiddenUntil&&time>=b.hiddenUntil){b.hiddenUntil=0;b.x=b.homeX;b.y=b.homeY;b.air=0;b.vx=0;b.vy=0;b.flightUntil=0;}
-  const nearby=Math.hypot(b.x-state.x,b.y-state.y)<145;
-  if((state.weather?.rain||0)>.6&&b.air<.05)b.flightUntil=Math.max(b.flightUntil,time+1700);
-  const flockAlert=birds.some(other=>other!==b&&other.flock===b.flock&&other.flightUntil>time&&Math.hypot(other.x-b.x,other.y-b.y)<190);
-  if((nearby||flockAlert)&&b.flightUntil<time+1200){b.flightUntil=time+3400+seeded(b.phase)*1700;b.heading=nearby?Math.atan2(b.y-state.y,b.x-state.x):b.heading;b.landAt=b.flightUntil}
-  if(time<b.flightUntil){
-   b.air=Math.min(1,b.air+step*2.4);
-   const mates=birds.filter(other=>other!==b&&other.flock===b.flock&&Math.hypot(other.x-b.x,other.y-b.y)<240);
-   let ax=Math.cos(b.heading)*65,ay=Math.sin(b.heading)*65;
-
-   for(const m of mates){const dx=m.x-b.x,dy=m.y-b.y,d=Math.max(1,Math.hypot(dx,dy));if(d<35){ax-=dx/d*42;ay-=dy/d*42}else{ax+=dx/d*7;ay+=dy/d*7}}
-   if(nearby){const dx=b.x-state.x,dy=b.y-state.y,d=Math.max(1,Math.hypot(dx,dy));ax+=dx/d*110;ay+=dy/d*110}
-   const length=Math.max(1,Math.hypot(ax,ay));const speed=95;
-   b.vx+=(ax/length*speed-b.vx)*Math.min(1,step*2.2);b.vy+=(ay/length*speed-b.vy)*Math.min(1,step*2.2);
-   b.x+=b.vx*step;b.y+=b.vy*step;
-   // Birds vanish as they fly beyond the visible woodland edge, then return later.
-   if(b.x<WORLD_MIN+15||b.x>WORLD-15||b.y<WORLD_MIN+15||b.y>WORLD-15){b.hiddenUntil=time+14000+seeded(b.phase)*9000;b.air=0;b.vx=0;b.vy=0;continue;}
+  if(!b.birdReady){
+   b.birdReady=true;b.groundedUntil=time+2500+seeded(b.phase)*9000;
+   b.flightUntil=0;b.air=0;b.targetX=b.x;b.targetY=b.y;
+  }
+  const nearby=Math.hypot(b.x-state.x,b.y-state.y)<155;
+  let plan=birdFlockPlans.get(b.flock);
+  if(!plan||time>plan.until){
+   const leader=birds.find(other=>other.flock===b.flock)||b;
+   const target=chooseBirdLanding(b.flock,leader.x,leader.y);
+   plan={x:target.x,y:target.y,until:time+22000+seeded(b.flock+Math.floor(time/18000))*14000};
+   birdFlockPlans.set(b.flock,plan);
+  }
+  const isFlying=b.air>.03||time>b.groundedUntil||nearby;
+  if(isFlying){
+   if(b.air<.03){b.targetX=plan.x;b.targetY=plan.y;b.flightUntil=time+24000;}
+   b.air=Math.min(1,b.air+step*1.7);
+   const mates=birds.filter(other=>other!==b&&other.flock===b.flock);
+   const index=birds.filter(other=>other.flock===b.flock).indexOf(b);
+   const row=Math.floor(index/2),side=index%2===0?-1:1;
+   const tx=plan.x+side*(row+1)*28,ty=plan.y+row*28;
+   let dx=tx-b.x,dy=ty-b.y;
+   for(const m of mates){
+    const ox=b.x-m.x,oy=b.y-m.y,d=Math.hypot(ox,oy);
+    if(d>0&&d<27){dx+=ox/d*(27-d)*3;dy+=oy/d*(27-d)*3}
+   }
+   if(nearby){dx+=(b.x-state.x)*1.2;dy+=(b.y-state.y)*1.2}
+   const distance=Math.hypot(dx,dy),speed=125;
+   const desiredX=distance>1?dx/distance*speed:0,desiredY=distance>1?dy/distance*speed:0;
+   b.vx+=(desiredX-b.vx)*Math.min(1,step*2.4);
+   b.vy+=(desiredY-b.vy)*Math.min(1,step*2.4);
+   b.x=Math.max(WORLD_MIN+35,Math.min(WORLD-35,b.x+b.vx*step));
+   b.y=Math.max(WORLD_MIN+35,Math.min(WORLD-35,b.y+b.vy*step));
+   b.heading=Math.atan2(b.vy,b.vx);
+   if(distance<36&&!nearby&&birdLandingSuitable(b.x,b.y)){
+    b.air=Math.max(0,b.air-step*1.5);
+    if(b.air<.04){b.air=0;b.groundedUntil=time+7500+seeded(b.phase+Math.floor(time/1000))*11000;b.vx=0;b.vy=0}
+   }
   }else{
-   b.air=Math.max(0,b.air-step*1.5);
-   if(b.air===0){b.vx=0;b.vy=0;if(Math.hypot(b.x-state.x,b.y-state.y)<120||Math.sin(time*.0007+b.phase)>.995)b.flightUntil=time+2600}
+   b.air=0;b.vx=0;b.vy=0;
+   // Slow ground foraging, not a walking migration.
+   if(birdLandingSuitable(b.x,b.y)){
+    const peck=Math.sin(time*.007+b.phase);
+    b.pecking=peck>.42;
+    if(b.pecking&&time>(b.nextWormAt||0)){
+     b.wormUntil=time+600;b.nextWormAt=time+4500+seeded(b.phase+Math.floor(time/4000))*6500;
+    }
+    b.x+=Math.sin(time*.001+b.phase)*step*2;
+    b.y+=Math.cos(time*.0011+b.phase)*step*2;
+   }else b.groundedUntil=time;
   }
  }
 }
@@ -6216,7 +6261,7 @@ function drawBird(b){
  if(illustratedFaunaReady){
   const flying=b.air>.04,alt=flying?b.air*(52+Math.sin(time*.003+b.phase)*8):0;
   drawIllustratedFauna('bird',b.x,b.y-alt,b.vx<0?'left':'right',
-   flying,time+b.phase*200,.94,flying?'fly':'rest');
+   flying,time+b.phase*200,.94,flying?'fly':b.pecking?'peck':'rest');
   // The illustrated atlas already contains wings. Avoid drawing blue limb-like strokes.
   return;
  }
@@ -6227,7 +6272,7 @@ function drawBird(b){
  if(flying){ctx.strokeStyle='#6c7890';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-3,-8);ctx.quadraticCurveTo(-12,-18-wing*9,-20,-11-wing*13);ctx.moveTo(3,-8);ctx.quadraticCurveTo(12,-18-wing*9,20,-11-wing*13);ctx.stroke()}
  ellipse(0,-7,11,7,b.flock%3===0?'#9c7659':'#738e99');ellipse(-5,-10,7,3,b.flock%3===0?'#d4b58e':'#b5c8d0');ellipse(7,-12,6,6,b.flock%3===0?'#b88b65':'#9db0ba');ellipse(8,-16,4,2,b.flock%3===0?'#e1c9a2':'#dce7e4');
  ellipse(9,-13,1.5,1.5,'#243c3c');poly([[12,-11],[19,-9],[12,-7]],'#d4ad62');
- if(!flying){ctx.strokeStyle='#a8794c';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-3,-1);ctx.lineTo(-3,6);ctx.moveTo(3,-1);ctx.lineTo(3,6);ctx.stroke();if(Math.sin(time*.007+b.phase)>.72){ctx.save();ctx.translate(6,-10);ctx.rotate(.42);ellipse(1,2,6,6,b.flock%3===0?'#b88b65':'#9db0ba');ellipse(7,4,1.5,1.5,'#243c3c');ctx.restore()}}
+ if(!flying){ctx.strokeStyle='#a8794c';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-3,-1);ctx.lineTo(-3,6);ctx.moveTo(3,-1);ctx.lineTo(3,6);ctx.stroke();if(b.pecking||b.wormUntil>time){ctx.save();ctx.translate(6,-10);ctx.rotate(.42);ellipse(1,2,6,6,b.flock%3===0?'#b88b65':'#9db0ba');ellipse(7,4,1.5,1.5,'#243c3c');ctx.restore()}}
  ctx.restore();
 }
 // Gentle fictional weather cycle; saved alongside Haigen's other world state.
@@ -8223,7 +8268,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=270;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=271;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Western lake expansion';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
