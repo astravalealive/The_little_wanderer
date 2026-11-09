@@ -824,7 +824,7 @@ function updateFrogLifecycle(){
  if(!Array.isArray(state.frogLifecycle))state.frogLifecycle=[];
  const now=Date.now();
  for(const c of state.frogLifecycle){
-  if(c.hatched||now-c.born<300000)continue;
+  if(now-c.born<300000)continue;
   c.hatched=true;
   if(frogs.length>=38)continue;
   const p=nearestLakeReeds(c.x,c.y);
