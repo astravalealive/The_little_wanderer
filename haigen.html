@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V330 · Troll Walk Cycles</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183b32"><title>Haigen's World V331 · Cave Residents</title><link rel="icon" href="data:,"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#122b25;font-family:system-ui,-apple-system,sans-serif;color:#f7f0db;touch-action:none}canvas{display:block;width:100%;height:100%;position:absolute;inset:0}.hud{z-index:5;position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;gap:8px}.panel{background:#173b32e8;border:2px solid #bba66c;border-radius:15px;padding:9px 12px;box-shadow:0 4px 0 #081b17a0;pointer-events:auto}.title{font-weight:900;font-size:16px}.small{font-size:12px;color:#d5d3b4}.resources{font-size:13px;margin-top:4px}.right{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto;position:relative;z-index:2}.right .btn{pointer-events:auto}.btn{background:#e8d4a1;color:#263b2c;border:2px solid #fff2c5;border-radius:12px;font-weight:800;padding:9px 11px;box-shadow:0 3px 0 #8d7142;cursor:pointer;touch-action:manipulation}.btn:active{transform:translateY(2px)}.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.joystick{width:128px;height:128px;border-radius:50%;background:#14392e9c;border:3px solid #e5d6a278;position:relative;pointer-events:auto;touch-action:none}.stick{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#e8d4a1;border:4px solid #fff1cb;box-shadow:0 3px 8px #0007}.actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:auto}.action{border-radius:24px;padding:13px 17px;font-size:15px}.toast{position:absolute;top:115px;left:50%;transform:translateX(-50%);max-width:min(90vw,440px);padding:10px 15px;background:#132e28ed;border:2px solid #e5d6a2;border-radius:14px;text-align:center;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}.overlay{position:absolute;inset:0;background:#071a16c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10;touch-action:pan-y}.overlay.open{display:flex}.modal{width:min(96vw,540px);max-height:84vh;overflow:auto;background:#24493d;border:3px solid #d9c18a;border-radius:20px;padding:18px;box-shadow:0 15px 50px #0008;touch-action:pan-y}.modal h2{margin:0 0 8px}.modal p{line-height:1.5}.item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #ffffff24;padding:10px 0}.item .btn{white-space:nowrap}.close{float:right}.hotbar{position:absolute;z-index:4;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;border-radius:14px;background:#173b32e8;border:2px solid #bba66c;pointer-events:auto}.slot{min-width:52px;min-height:51px;border:2px solid #ad9e74;border-radius:10px;background:#e8d4a1;color:#263b2c;font-size:21px;touch-action:manipulation}.slot.selected{border:3px solid #fff;background:#c9f0b5;box-shadow:0 0 0 2px #f3c65b}.slot:disabled{opacity:.4}.slot small{display:block;font-size:9px}.update-banner{position:absolute;z-index:30;top:calc(env(safe-area-inset-top,0px) + 85px);left:50%;transform:translateX(-50%);width:min(92vw,420px);padding:12px;border:2px solid #f3d37b;border-radius:14px;background:#173b32;color:#fff5d8;text-align:center;box-shadow:0 8px 30px #0009;display:none;pointer-events:auto}.update-banner.show{display:block}.update-banner button{margin:6px 4px 0}.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);left:50%;transform:translateX(-50%);font-size:11px;color:#fff7d2b9;pointer-events:none;white-space:nowrap}@media(max-width:600px){.title{font-size:13px}.small{font-size:10px}.panel{padding:7px 9px}.resources{font-size:11px}.right .btn{font-size:12px;padding:7px}.joystick{width:110px;height:110px}.stick{left:32px;top:32px}.action{padding:11px 14px;font-size:13px}.toast{top:100px}}
 .mobile-menu,.stats-toggle{display:none}
 @media(max-width:600px),(pointer:coarse) and (max-height:600px){
  .hud{top:calc(env(safe-area-inset-top,0px) + 8px);right:84px}
@@ -74,7 +74,7 @@ body:not(.rebirth-art) canvas#game{image-rendering:auto}
 body:has(.mobile-menu[open]) .haigen-speech,
 body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
 @media (max-width:410px){.haigen-speech{font-size:14px;max-width:min(288px,calc(100vw - 22px));padding:9px 11px}}
-.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=210"><style>#modalBody button.pad-choice{outline:3px solid #ffda74;outline-offset:-3px;background:#ffedb5;color:#23251b;box-shadow:inset 7px 0 #a56320}</style></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V330</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">V318</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • View mark / hold for playtest • D-pad select • A confirm • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
+.dev-version{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:7;pointer-events:none;color:#f5edddab;background:#142c2694;border:1px solid #dac89b35;border-radius:5px;padding:2px 5px;font:600 10px/1.3 ui-monospace,SFMono-Regular,monospace;letter-spacing:.03em}</style><link rel="stylesheet" href="./v127-ornate-ui.css?v=210"><style>#modalBody button.pad-choice{outline:3px solid #ffda74;outline-offset:-3px;background:#ffedb5;color:#23251b;box-shadow:inset 7px 0 #a56320}</style></head><body><canvas id="game"></canvas><div id="haigenSpeech" class="haigen-speech" aria-live="off" role="note"></div><div class="dev-version" id="devVersion" aria-label="Game build version">V331</div><div class="hud"><div class="panel"><div class="title">🌲 HAIGEN'S WORLD <span style="color:#ffe7a3;font-size:12px">V318</span></div><div class="small" id="regionName">The Ancient Woodland</div><div class="small" id="day">Day 1 • Morning</div><div id="energyMeter" style="font-weight:700;color:#c3dcfa">💤 Energy 85/100</div><div id="hungerMeter" style="font-weight:700;color:#f3d18b">🍲 Hunger 85/100</div><div id="lifeMeter" role="progressbar" aria-label="Haigen health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="margin:5px 0;font-size:12px;font-weight:bold">❤️ Health 100/100<div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div id="lifeFill" style="height:100%;width:100%;background:#73c977;transition:width .2s"></div></div></div><div class="small" id="padDebug" style="background:#102e28;border-radius:6px;padding:4px;margin-top:4px">🎮 Checking controller…</div><div class="resources" id="resources">🪵 0 &nbsp; 🪨 0 &nbsp; 🍓 0</div><div class="small" id="campQuestHud" style="margin-top:5px;color:#f7dca5"></div><div class="small" id="homesteadHud" style="margin-top:4px;color:#d2e9c6"></div></div><div class="right"><button class="btn" id="modeBtn">🤖 Let Haigen play</button><button class="btn" id="packBtn">🎒 Backpack</button><button class="btn" id="storyBtn">📜 Story</button><button class="btn" id="mapBtn">🗺️ Map</button><button class="btn" id="journalBtn">📖 Journal</button><button class="btn" id="craftBtn">🔨 Build</button><button class="btn" id="artBtn">🎨 Classic look</button><button class="btn" id="helpBtn">❔</button></div></div><button class="btn" id="devKitBtn" type="button" aria-label="Open developer weapons and inventory" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 177px);right:calc(env(safe-area-inset-right,0px) + 12px);z-index:29;padding:8px 12px;background:linear-gradient(160deg,#614b36,#1b2523);color:#ffecbb;border:2px ridge #e2b56e;border-radius:9px;box-shadow:0 3px 14px #000a;font:700 12px Georgia,serif;letter-spacing:.04em">🧰 DEV KIT</button><button class="btn" id="regionsQuickBtn" style="position:absolute;top:calc(env(safe-area-inset-top, 8px) + 64px);right:12px;z-index:8;font-size:13px;box-shadow:0 3px 10px #0006">🌍 Explore World</button><div class="toast" id="toast"></div><div class="update-banner" id="updateBanner"><b>🌲 A new Haigen’s World update is ready!</b><div class="small">Your adventure will be saved before refreshing.</div><button class="btn" id="applyUpdateBtn">✨ Update now</button><button class="btn" id="laterUpdateBtn">Later</button></div><div class="bottom"><div class="joystick" id="joy"><div class="stick" id="stick"></div></div><div class="actions"><button class="btn action" id="autoTouchBtn" style="background:#c9f0b5;min-width:155px;min-height:55px">🤖 Let Haigen play</button><button class="btn action" id="eatBtn">🍲 Eat</button><button class="btn action" id="healBtn">🌿 Heal</button><button class="btn action" id="restBtn">💤 Rest</button><button class="btn action" id="styleBtn">💇 Hair</button><button class="btn action" id="mailBtn">🧠 Haigen’s Notes</button><button class="btn action" id="cookBtn">🔥 Cook & mix</button><button class="btn action" id="interactBtn">✋ X Collect</button><button class="btn action" id="useBtn">🪓 RT Use tool</button><button class="btn action" id="callBtn">🦊 Call friends</button></div></div><div class="hotbar" id="hotbar" aria-label="Equipped tools"><button class="slot selected" data-equip="hands">✋<small>Hands</small></button><button class="slot" disabled data-equip="axe">🪓<small>Axe</small></button><button class="slot" disabled data-equip="torch">🔦<small>Torch</small></button></div><div class="hint">Move with joystick / Xbox controller / WASD • X collect • RT use tool • LB/RB equip • Start map • View mark / hold for playtest • D-pad select • A confirm • B back • Right stick look • Autosaves</div><div class="overlay" id="overlay"><div class="modal"><button class="btn close" id="closeBtn">✕</button><div id="modalBody"></div></div></div><div id="worldError" role="alert" style="display:none;position:fixed;z-index:50;top:46%;left:8%;right:8%;border:2px solid #f9bd78;border-radius:14px;background:#382b2bf0;color:#fff0d5;padding:15px;font:600 14px system-ui;text-align:center;overflow-wrap:anywhere"></div><script>
 (function(){
   window.__haigenWorldReady=false;
   function showStartupError(message){
@@ -179,6 +179,7 @@ const trollSprites=[
 function updateTrolls(dt){
  const step=Math.min(50,Math.max(0,dt))/1000,now=Date.now();
  for(const [i,t] of trollHabitats.entries()){
+  if(caveTrolls.find(r=>r.sprite===i).room!=='habitat')continue;
   if(Math.hypot(state.x-t.x,state.y-t.y)>950)continue;
   if(!t.pos){
    for(let n=0;n<120;n++){
@@ -7302,7 +7303,7 @@ for(let i=0;i<11;i++){
 for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();function trollDoorwayTree(o){return (o.type==='tree'||o.type==='fir'||o.type==='bareTree'||o.kind==='tree'||o.kind==='fir')&&Math.abs(o.x-trollStumpHome.x)<310&&o.y>trollStumpHome.y-120&&o.y<trollStumpHome.y+310;}
 const visible=objects.filter(o=>!trollDoorwayTree(o)&&!worldEditorHidden.has(o.id)&&!o.type.startsWith('hamlet-')&&!state.removed.includes(o.id)&&canPlaceScenery(o)&&flowerHasHabitat(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);homesteadPlots.forEach(p=>{drawHomesteadPlotGround(p);drawLifeConstruction(p,false)});drawHaigenLookout();const drawables=[...homesteadPlots.filter(p=>homesteadTier(p)>0&&p.kind!=='jetty').map(p=>({y:homesteadSortY(p),draw:()=>drawHomesteadPlotForeground(p)})),...homesteadPlots.filter(p=>state.lifeProject?.kind===p.kind&&homesteadTier(p)===0).map(p=>({y:homesteadSortY(p),draw:()=>drawLifeConstruction(p,true)})),...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.meatDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawMeatDrop(o)})),...state.stoneDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawStonePiece(o)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.save();ctx.translate(o.x,o.y);ctx.rotate((Math.abs(o.x*7+o.y*3)%9-4)*.035);ctx.fillStyle='#302f29';ctx.fillRect(-26,-10,54,22);ctx.fillStyle='#79563b';ctx.fillRect(-24,-9,49,19);ctx.fillStyle='#a47a50';ctx.fillRect(-22,-8,46,5);ctx.fillStyle='#56432f';for(let j=0;j<4;j++)ctx.fillRect(-18+j*11,-2+(j%2)*5,3,7);ellipse(25,1,10,11,'#3b322a');ellipse(25,1,8,9,'#d0ad79');ellipse(25,1,5,6,'#96734f');ellipse(25,1,2,3,'#d0ad79');ctx.restore()}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.filter(o=>o.type!=='specter'||spectorsActive()).map(o=>({y:o.type==='specter'?o.y+145:o.y,draw:()=>drawSceneryNearHaigen(o)})),...worldEditorData.placed.filter(o=>!worldEditorGroundKinds.has(o.type)&&Math.abs(o.x-cam.x)<W/zoom/2+250&&Math.abs(o.y-cam.y)<H/zoom/2+250).map(o=>({y:o.y,draw:()=>worldEditorSprite(o)})),{y:6600,draw:drawRiverwatchLighthouse},...objects.filter(o=>o.type.startsWith('hamlet-')&&!worldEditorHidden.has(o.id)&&Math.abs(o.x-cam.x)<W/zoom/2+190&&Math.abs(o.y-cam.y)<H/zoom/2+190).map(o=>({y:o.y,draw:()=>drawHamletScenery(o)})),...woodlandDetails.filter(o=>!trollDoorwayTree(o)&&(o.kind!=='fungi'||woodlandFungiReady(o))&&canPlaceScenery(o)&&!campsiteProtected(o)&&!homesteadPlots.some(p=>Math.hypot(o.x-p.x,o.y-p.y)<120)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:cottage.y-10,draw:()=>startingClearing(cottage.x,cottage.y)},{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:homeInside?-999999:cottage.y-10,draw:drawCampHome}]:[]),...(window.__gloamAddon?[{y:window.__gloamAddon.y,draw:()=>window.__gloamAddon.drawBoss()}]:[]),...(window.__thrummaw?[{y:window.__thrummaw.y,draw:()=>window.__thrummaw.creature()}]:[]),...(travelCamp&&state.resting?[{y:travelCamp.y+1,draw:drawTravelCamp}]:[]),{y:state.y,draw:()=>{ctx.save();
  if(collapseRemaining<=0&&time<damageFlashUntil)ctx.globalAlpha*=Math.floor(time/95)%2===0?.34:1;
- const depth=walkingLakeLevel(state.x,state.y),seaDepth=islandDepth(state.x,state.y);if(depth>=1&&seaDepth<0){character(state.x,state.y,'boy');ctx.save();ctx.fillStyle='rgba(58,157,179,'+Math.min(.62,.16+(-seaDepth/62)*.38)+')';ctx.beginPath();ctx.ellipse(state.x,state.y+3,24,10,0,Math.PI,Math.PI*2);ctx.lineTo(state.x+24,state.y+4);ctx.ellipse(state.x,state.y+4,24,9,0,0,Math.PI);ctx.fill();ctx.strokeStyle='#d8f6edaa';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,27,7,0,0,Math.PI*2);ctx.stroke();ctx.restore()}else if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));trollHabitats.forEach((t,i)=>{if(t.pos&&Math.abs(t.pos.x-cam.x)<1050&&Math.abs(t.pos.y-cam.y)<800)drawables.push({y:t.pos.y,draw:()=>drawTroll(t,i)})});drawables.push({y:trollStumpHome.y-2,draw:drawTrollStump});drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());worldEditorOutline();drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+ const depth=walkingLakeLevel(state.x,state.y),seaDepth=islandDepth(state.x,state.y);if(depth>=1&&seaDepth<0){character(state.x,state.y,'boy');ctx.save();ctx.fillStyle='rgba(58,157,179,'+Math.min(.62,.16+(-seaDepth/62)*.38)+')';ctx.beginPath();ctx.ellipse(state.x,state.y+3,24,10,0,Math.PI,Math.PI*2);ctx.lineTo(state.x+24,state.y+4);ctx.ellipse(state.x,state.y+4,24,9,0,0,Math.PI);ctx.fill();ctx.strokeStyle='#d8f6edaa';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,27,7,0,0,Math.PI*2);ctx.stroke();ctx.restore()}else if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));trollHabitats.forEach((t,i)=>{if(caveTrolls.find(r=>r.sprite===i).room==='habitat'&&t.pos&&Math.abs(t.pos.x-cam.x)<1050&&Math.abs(t.pos.y-cam.y)<800)drawables.push({y:t.pos.y,draw:()=>drawTroll(t,i)})});for(const t of caveTrolls){if(t.room==='woods'&&Math.abs(t.x-cam.x)<1050&&Math.abs(t.y-cam.y)<800)drawables.push({y:t.y,draw:()=>drawTrollSprite(t.sprite,t.x,t.y,48,t.dir,t.walking,t.clock)});}drawables.push({y:trollStumpHome.y-2,draw:drawTrollStump});drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());worldEditorOutline();drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
@@ -7979,7 +7980,7 @@ function recoverAutonomousHaigen(dt,oldX,oldY){
  }
  autoDestination=null;autoPause=1800;
 }
-function update(dt){if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(trollStumpInside){const pad=controllerMove();checkShoulders();checkActions();let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00024,ny=trollRoomPlayer.y+dy*dt*.00024;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
+function update(dt){updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(trollStumpInside){const pad=controllerMove();checkShoulders();checkActions();let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00024,ny=trollRoomPlayer.y+dy*dt*.00024;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
  if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=174/600){
  changeTrollChamber(true);
@@ -8444,8 +8445,8 @@ const treasureFloorOutline=[
  [465,309],[498,318],[483,327],[464,321],[441,326],[417,321],
  [389,323],[360,316],[334,324],[314,341],[313,387]
 ];
-function trollRoomWalkable(x,y){
- if(inTreasureCave)return caveContains(treasureFloorOutline,x*600,y*400);
+function trollRoomWalkable(x,y,vault=inTreasureCave){
+ if(vault)return caveContains(treasureFloorOutline,x*600,y*400);
  const px=x*547,py=y*600;
  if(!caveContains(caveFloorOutline,px,py)||caveContains(caveTableOutline,px,py))return false;
  const hearth=((px-181)/52)**2+((py-265)/42)**2;
@@ -8457,22 +8458,182 @@ function enterTrollRoom(){
  trollStumpInside=true;trollDoorCooldown=1300;state.autonomy=false;
  notify('Entered the troll home. Walk down the front steps to leave.');
 }
-// Each pair of endpoints stays on a clear strip of floor in the room artwork.
-const caveTrolls=[
- {sprite:2,vault:false,from:[124,299],to:[126,245],offset:1},
- {sprite:4,vault:false,from:[295,363],to:[388,362],offset:4},
- {sprite:3,vault:true,from:[180,232],to:[255,230],offset:7},
- {sprite:5,vault:true,from:[420,287],to:[348,287],offset:2}
+// Reference-art pixels. A few common aisle points let residents pass around the hearth and table.
+const indoorAisles=[
+ [[119,326],[123,228],[239,224],[240,305],[235,359],[293,231],[410,235],[430,315],[419,356],[294,367],[262,391],[262,421],[284,218],[303,200]],
+ [[161,251],[220,287],[300,250],[386,236],[391,299],[298,323],[298,348]]
 ];
-function indoorTrollPose(t){
- const phase=(time*.00017+t.offset)%2;
- const progress=Math.max(0,Math.min(1,((phase<1?phase:2-phase)-.16)/.68));
- const x=t.from[0]+(t.to[0]-t.from[0])*progress;
- const y=t.from[1]+(t.to[1]-t.from[1])*progress;
- const sign=phase<1?1:-1;
- return {x:x/(t.vault?600:547),y:y/(t.vault?400:600),
-  dir:trollFacing(sign*(t.to[0]-t.from[0]),sign*(t.to[1]-t.from[1])),
-  walking:progress>0&&progress<1};
+function indoorResident(sprite,vault,speed,places){
+ const [x,y,dir]=places[0];
+ return {sprite,vault,speed,places,x,y,dir,walking:false,clock:Math.random()*400,
+  wait:1200+Math.random()*4500,route:[],last:0,previous:-1};
+}
+const caveTrolls=[
+ indoorResident(2,false,19,[[124,283,'right'],[204,215,'up'],[239,274,'left'],[272,235,'right'],[212,327,'up']]),
+ indoorResident(4,false,28,[[355,363,'up'],[432,298,'right'],[238,310,'right'],[158,346,'down'],[389,230,'down']]),
+ indoorResident(3,true,17,[[180,232,'up'],[149,216,'left'],[263,221,'up'],[333,238,'up'],[224,288,'left']]),
+ indoorResident(5,true,23,[[420,287,'right'],[384,222,'up'],[301,313,'down'],[211,266,'up'],[440,304,'right']])
+];
+function indoorClear(t,x,y){
+ const w=t.vault?600:547,h=t.vault?400:600;
+ return [[0,0],[-3,0],[3,0],[0,-2],[0,2]].every(([dx,dy])=>trollRoomWalkable((x+dx)/w,(y+dy)/h,t.vault));
+}
+function indoorLane(t,a,b){
+ const count=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/3));
+ for(let i=1;i<=count;i++){
+  const f=i/count;
+  if(!indoorClear(t,a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f))return false;
+ }
+ return true;
+}
+const aisleVisibility=[new Map(),new Map()];
+function indoorRoute(t,end){
+ const nodes=[[t.x,t.y],end,...indoorAisles[Number(t.vault)]];
+ if(indoorLane(t,nodes[0],end))return [end];
+ const cost=nodes.map(()=>Infinity),parent=[],visited=new Set();cost[0]=0;
+ while(true){
+  let best=-1;
+  for(let i=0;i<nodes.length;i++)if(!visited.has(i)&&cost[i]<Infinity&&(best<0||cost[i]<cost[best]))best=i;
+  if(best<0)return [];
+  if(best===1)break;
+  visited.add(best);
+  for(let i=1;i<nodes.length;i++){
+   if(visited.has(i))continue;
+   const length=cost[best]+Math.hypot(nodes[i][0]-nodes[best][0],nodes[i][1]-nodes[best][1]);
+   if(length>=cost[i])continue;
+   const fixed=i>=2&&best>=2,cache=aisleVisibility[Number(t.vault)];
+   const key=Math.min(i,best)*32+Math.max(i,best);
+   let clear=fixed?cache.get(key):undefined;
+   if(clear===undefined){clear=indoorLane(t,nodes[best],nodes[i]);if(fixed)cache.set(key,clear);}
+   if(clear){cost[i]=length;parent[i]=best;}
+  }
+ }
+ const route=[];
+ for(let i=1;i!==0;i=parent[i])route.unshift(nodes[i]);
+ return route;
+}
+// Interests lead each resident to different parts of the rooms and woodland.
+const trollInterests=[
+ ['bush','tree'],['rock','ore'],['mushroom','bush'],['rock','stump'],
+ ['fallen','mushroom'],['tree','rock']
+];
+const indoorInterests=[
+ [[125,239,'left'],[210,214,'up'],[238,312,'right'],[285,365,'up'],[206,348,'down']],
+ [[167,231,'left'],[250,222,'up'],[335,236,'up'],[415,277,'right'],[298,314,'down']]
+];
+const trollDoors={
+ home:[{x:303,y:171,to:'vault'},{x:262,y:452,to:'woods'}],
+ vault:[{x:298,y:375,to:'home'}]
+};
+for(const t of caveTrolls){t.homeVault=t.vault;t.room=t.vault?'vault':'home';}
+for(let sprite=0;sprite<2;sprite++){
+ const native=trollHabitats[sprite];
+ const t=indoorResident(sprite,false,sprite===0?28:19,indoorInterests[0]);
+ Object.assign(t,{room:'habitat',x:native.x,y:native.y,wait:25000+Math.random()*65000});
+ caveTrolls.push(t);
+}
+function changeTrollLocation(t,room){
+ const old=t.room;t.room=room;t.vault=room==='vault';
+ const point=room==='vault'?[298,335]:room==='woods'?[trollStumpHome.x,trollStumpHome.y+97]:
+  old==='vault'?[303,193]:[262,411];
+ [t.x,t.y]=point;t.dir=room==='vault'||old==='woods'?'up':'down';
+ t.route=[];t.goal=null;t.to=null;t.previous=-1;t.last=-1;t.walking=false;
+ t.wait=900+Math.random()*2400;t.stops=0;
+}
+function chooseIndoorGoal(t){
+ const doors=trollDoors[t.room];
+ if(t.stops>=1&&Math.random()<Math.min(.8,.14+.075*t.stops)){
+  const door=doors[Math.floor(Math.random()*doors.length)];
+  t.route=indoorRoute(t,[door.x,door.y]);
+  if(t.route.length)t.to=door.to;
+ }else{
+  const spots=t.vault===t.homeVault?t.places:indoorInterests[Number(t.vault)];
+  const choices=spots.map((_,i)=>i).filter(i=>i!==t.last&&i!==t.previous);
+  const index=choices[Math.floor(Math.random()*choices.length)],spot=spots[index];
+  t.route=indoorRoute(t,[spot[0]+(Math.random()-.5)*12,spot[1]+(Math.random()-.5)*10]);
+  if(t.route.length){t.previous=t.last;t.last=index;t.look=spot[2];}
+ }
+ if(!t.route.length)t.wait=600;
+ t.pace=t.speed*(.8+Math.random()*.45);
+}
+function stepIndoorResident(t,dt){
+ if(!t.route.length)chooseIndoorGoal(t);
+ if(!t.route.length)return;
+ const [x,y]=t.route[0],dx=x-t.x,dy=y-t.y,d=Math.hypot(dx,dy);
+ const step=Math.min(d,t.pace*dt/1000);
+ if(d>0){
+  const nx=t.x+dx/d*step,ny=t.y+dy/d*step;
+  if(!indoorClear(t,nx,ny)){t.route=[];t.to=null;t.wait=300;return;}
+  t.x=nx;t.y=ny;t.dir=trollFacing(dx,dy);t.walking=true;t.clock+=step*42;
+ }
+ if(step<d)return;
+ t.route.shift();
+ if(t.route.length)return;
+ if(t.to){changeTrollLocation(t,t.to);return;}
+ t.walking=false;t.dir=t.look;t.stops=(t.stops||0)+1;
+ t.wait=1800+Math.random()*Math.random()*13500;
+}
+function outdoorGoal(t){
+ const home=trollStumpHome, native=trollHabitats[t.sprite];
+ if(t.headingHome||((t.stops||0)>1&&Math.random()<.55)){
+  if(native&&!t.headingHome&&Math.random()<.25)return {x:native.x,y:native.y,to:'habitat'};
+  return {x:home.x,y:home.y+45,to:'home'};
+ }
+ const items=objects.filter(o=>trollInterests[t.sprite].includes(o.type)&&
+  Math.hypot(o.x-t.x,o.y-t.y)<480&&!state.removed.includes(o.id));
+ const item=items[Math.floor(Math.random()*items.length)];
+ const angle=Math.random()*Math.PI*2,r=item?55:80+Math.random()*145;
+ return {x:(item?.x??t.x)+Math.cos(angle)*r,y:(item?.y??t.y)+Math.sin(angle)*r,item};
+}
+function stepWoodlandResident(t,dt){
+ if(!t.goal){t.goal=outdoorGoal(t);t.leg=null;}
+ const goal=t.goal,dx=goal.x-t.x,dy=goal.y-t.y,range=Math.hypot(dx,dy);
+ if(range<(goal.to?24:9)){
+  if(goal.to==='home'){t.headingHome=false;changeTrollLocation(t,'home');return;}
+  if(goal.to==='habitat'){
+   t.room='habitat';const native=trollHabitats[t.sprite];native.pos={x:t.x,y:t.y};native.scuttle=null;
+   t.wait=30000+Math.random()*60000;
+  }else{
+   if(goal.item)t.dir=trollFacing(goal.item.x-t.x,goal.item.y-t.y);
+   t.stops=(t.stops||0)+1;t.wait=1500+Math.random()*5500;
+  }
+  t.goal=null;return;
+ }
+ if(!t.leg||Math.hypot(t.leg.x-t.x,t.leg.y-t.y)<1){
+  const angle=Math.atan2(dy,dx),side=t.detour||1;
+  t.leg=null;
+  for(const offset of [0,.55,-.55,1.10,-1.10,1.57,-1.57,2.2,-2.2]){
+   const a=angle+offset*side,r=Math.min(range,34);
+   if([.25,.5,.75,1].every(f=>!blockedBySolid(t.x+Math.cos(a)*r*f,t.y+Math.sin(a)*r*f))){
+    t.leg={x:t.x+Math.cos(a)*r,y:t.y+Math.sin(a)*r};break;
+   }
+  }
+  if(!t.leg){t.goal=null;t.wait=1000;t.detour=-side;return;}
+ }
+ const lx=t.leg.x-t.x,ly=t.leg.y-t.y,d=Math.hypot(lx,ly),step=Math.min(d,dt*t.speed*.003);
+ const nx=t.x+lx/d*step,ny=t.y+ly/d*step;
+ if(blockedBySolid(nx,ny)){t.leg=null;t.goal=null;t.wait=600;return;}
+ t.x=nx;t.y=ny;t.dir=trollFacing(lx,ly);t.walking=true;t.clock+=step*16;
+}
+function updateCaveResidents(dt){
+ for(const t of caveTrolls){
+  t.walking=false;
+  if(t.wait>0){
+   t.wait-=dt;
+   if(trollStumpInside&&t.room===(inTreasureCave?'vault':'home')&&Math.random()<dt/3600){
+    const dx=trollRoomPlayer.x*(t.vault?600:547)-t.x,dy=trollRoomPlayer.y*(t.vault?400:600)-t.y;
+    if(Math.hypot(dx,dy)<65)t.dir=trollFacing(dx,dy);
+   }
+   continue;
+  }
+  if(t.room==='habitat'){
+   const native=trollHabitats[t.sprite];
+   if(!native.pos||native.scuttle?.scaredUntil>Date.now()){t.wait=5000;continue;}
+   t.x=native.pos.x;t.y=native.pos.y;t.room='woods';t.headingHome=true;t.goal=null;t.leg=null;
+  }
+  if(t.room==='woods')stepWoodlandResident(t,dt);
+  else stepIndoorResident(t,dt);
+ }
 }
 function drawTrollStumpInterior(){
  if(!trollStumpInside)return;
@@ -8491,8 +8652,8 @@ function drawTrollStumpInterior(){
  const px=ox+iw*trollRoomPlayer.x,py=oy+ih*trollRoomPlayer.y;
  // Render the actual Haigen actor with the same game character renderer, not a static picture.
  trollRoomPlayer.anim=trollRoomPlayer.steps;
- const residents=caveTrolls.filter(t=>t.vault===inTreasureCave).map(t=>({...indoorTrollPose(t),sprite:t.sprite})).sort((a,b)=>a.y-b.y);
- const paintResident=t=>drawTrollSprite(t.sprite,ox+t.x*iw,oy+t.y*ih,iw*(inTreasureCave?.078:.086),t.dir,t.walking,time+t.sprite*137);
+ const residents=caveTrolls.filter(t=>t.room===(inTreasureCave?'vault':'home')).map(t=>({...t,x:t.x/(t.vault?600:547),y:t.y/(t.vault?400:600)})).sort((a,b)=>a.y-b.y);
+ const paintResident=t=>drawTrollSprite(t.sprite,ox+t.x*iw,oy+t.y*ih,iw*(inTreasureCave?.078:.086),t.dir,t.walking,t.clock);
  for(const t of residents)if(t.y<=trollRoomPlayer.y)paintResident(t);
  ctx.save();ctx.translate(px,py);const scale=Math.max(1.15,Math.min(1.9,iw/650));ctx.scale(scale,scale);
  if(!drawApprovedHaigen(0,0,trollRoomPlayer,false))character(0,0,'boy',trollRoomPlayer,false);ctx.restore();
