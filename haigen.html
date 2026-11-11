@@ -202,6 +202,36 @@ function updateTrolls(dt){
    if(!t.pos)continue;
   }
   const p=t.pos,d=dist(p,state),mossroot=i===0||i>=2;
+  if(mossroot){
+   t.errandMs=(t.errandMs===undefined?4500+i*1100:t.errandMs)-dt;
+   if(t.insideStump){
+    t.insideMs-=dt;t.walking=false;
+    if(t.insideMs<=0){
+     t.insideStump=false;t.pos={x:trollStump.doorX+(i%3-1)*9,y:trollStump.doorY+12};
+     t.carrying=null;t.errandMs=10000+i*1600;
+    }
+    continue;
+   }
+   if(t.returningHome){
+    const dx=trollStump.doorX-p.x,dy=trollStump.doorY-p.y,distHome=Math.hypot(dx,dy);
+    if(distHome<20){
+     t.insideStump=true;t.insideMs=3000+i*350;t.returningHome=false;
+     if(t.carrying)trollStash[t.carrying]=(trollStash[t.carrying]||0)+1;
+     continue;
+    }
+    const travel=Math.min(distHome,Math.min(dt,50)*.12);
+    const next=resolveSolidMovement(p.x,p.y,p.x+dx/distHome*travel,p.y+dy/distHome*travel);
+    t.walking=Math.hypot(next.x-p.x,next.y-p.y)>.1;
+    if(Math.abs(next.x-p.x)>.1)t.face=Math.sign(next.x-p.x);
+    t.pos=next;
+    if(!t.walking)t.errandMs=0;
+    continue;
+   }
+   if(t.errandMs<=0){
+    t.carrying=['wood','stone','mushrooms','berries'][i%4];
+    t.returningHome=true;
+   }
+  }
   t.walking=false;
   if(!mossroot){
    const phase=time*.00028+i*2;
@@ -277,6 +307,29 @@ function updateTrolls(dt){
 }
 // The ancient stump is the woodland clan's shared home, not a cut-down modern tree.
 const trollStump={x:2320,y:1955,doorX:2320,doorY:2008};
+let trollRoomOpen=false;
+const trollStash={wood:8,stone:5,mushrooms:4,berries:3};
+function drawTrollRoom(){
+ if(!trollRoomOpen)return;
+ ctx.save();ctx.setTransform(1,0,0,1,0,0);
+ const w=ctx.canvas.width,h=ctx.canvas.height,cx=w/2,cy=h/2;
+ ctx.fillStyle='#161b13';ctx.fillRect(0,0,w,h);
+ const rw=Math.min(w*.88,h*1.35),rh=Math.min(h*.77,w*.8);
+ ctx.fillStyle='#55402a';ctx.beginPath();ctx.ellipse(cx,cy,rw/2,rh/2,0,0,Math.PI*2);ctx.fill();
+ for(let j=0;j<7;j++){ctx.strokeStyle=j%2?'#7a5937':'#3b3021';ctx.lineWidth=Math.max(2,rw*.007);ctx.beginPath();ctx.ellipse(cx,cy,rw*(.46-j*.055),rh*(.46-j*.055),0,0,Math.PI*2);ctx.stroke()}
+ ctx.fillStyle='#2b2118';ctx.beginPath();ctx.ellipse(cx,cy+rh*.12,rw*.29,rh*.25,0,0,Math.PI*2);ctx.fill();
+ // Shared stash chest and loose piles, updated by returning gatherers.
+ ctx.fillStyle='#9a7040';ctx.fillRect(cx-rw*.19,cy-rh*.03,rw*.38,rh*.19);
+ ctx.fillStyle='#4b3525';ctx.fillRect(cx-rw*.19,cy-rh*.06,rw*.38,rh*.075);
+ ctx.fillStyle='#d6b46a';ctx.fillRect(cx-5,cy-rh*.04,10,16);
+ ctx.font=Math.max(13,Math.min(25,w*.035))+'px system-ui';ctx.textAlign='center';ctx.fillStyle='#f1e3b6';
+ ctx.fillText('THE ROOT-HOLLOW',cx,cy-rh*.32);
+ ctx.font=Math.max(12,Math.min(21,w*.027))+'px system-ui';
+ ctx.fillText('🪵 '+trollStash.wood+'    🪨 '+trollStash.stone+'    🍄 '+trollStash.mushrooms+'    🫐 '+trollStash.berries,cx,cy+rh*.28);
+ ctx.fillText('Tap anywhere to leave',cx,cy+rh*.39);
+ ctx.restore();
+}
+
 function drawTrollStump(){
  const x=trollStump.x,y=trollStump.y;
  ctx.save();ctx.translate(x,y);
@@ -314,6 +367,7 @@ function drawTrollStump(){
 }
 function drawTroll(t,i){
  const p=t.pos,stride=t.walking?Math.sin(time*.009):0,pixel=2.8;
+ if(t.insideStump)return;
  ellipse(p.x,p.y+1,18,5,'#26362955');
  ctx.save();ctx.translate(Math.round(p.x),Math.round(p.y));ctx.scale(t.face||1,1);
  for(const side of [-1,1]){
@@ -324,6 +378,10 @@ function drawTroll(t,i){
  trollSprites[i===1?1:0].forEach((row,y)=>{for(let x=0;x<row.length;x++)if(row[x]!==' '){
   ctx.fillStyle=colours[row[x]];ctx.fillRect(x*pixel,y*pixel,pixel+.2,pixel+.2);
  }});
+ if(t.carrying){
+  ctx.fillStyle=t.carrying==='berries'?'#ad5264':t.carrying==='mushrooms'?'#e0d0a1':t.carrying==='stone'?'#9a9b91':'#9a713d';
+  ctx.beginPath();ctx.arc(16,-20,7,0,Math.PI*2);ctx.fill();
+ }
  ctx.restore();
 }
 
@@ -8342,6 +8400,16 @@ const editorCanvasPan=(dx,dy)=>{
  cam.y=clamp(cam.y-dy*H/bounds.height/z,WORLD_MIN,WORLD);
  cameraDetached=true;
 };
+// Tap the stump entrance to inspect its shared stores; tap again to return outdoors.
+gameCanvas.addEventListener('pointerdown',e=>{
+ if(worldEditorActive)return;
+ if(trollRoomOpen){trollRoomOpen=false;e.preventDefault();e.stopImmediatePropagation();return}
+ const p=worldEditorScreenPoint(e);
+ if(Math.hypot(state.x-trollStump.doorX,state.y-trollStump.doorY)<145&&
+    Math.hypot(p.x-trollStump.doorX,p.y-trollStump.doorY)<65){
+  trollRoomOpen=true;e.preventDefault();e.stopImmediatePropagation();
+ }
+},true);
 let editorPinchDistance=0;
 gameCanvas.addEventListener('pointerdown',e=>{
  if(!worldEditorActive||worldEditorMode==='pan')return;
@@ -8566,6 +8634,7 @@ function frame(now){
   if(!Number.isFinite(cam.x)||!Number.isFinite(cam.y)){cam.x=Number(state.x)||1250;cam.y=Number(state.y)||1310;}
   draw();
   drawHomeInteriorScene();
+  drawTrollRoom();
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
  }catch(error){reportWorldError(error);}
