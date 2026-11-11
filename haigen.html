@@ -223,6 +223,15 @@ function updateTrolls(dt){
   if(d<105&&!acquainted){
    state.discoveries.push(t.name);think(t.thought,5200,true);save();
   }
+  // Every few minutes, three neighbours quietly meet around a woodland mushroom patch.
+  // The gathering dissolves naturally when Haigen approaches.
+  const gatheringCycle=Math.floor(time/105000);
+  const gatheringActive=(time%105000)<35000;
+  const gatheringMembers=[0,2,4]; // Mossroot, Bramble and Fernwhisk
+  const gatheringSpot={x:2310,y:1995};
+  const gatheringIndex=gatheringMembers.indexOf(i);
+  const gatheringAllowed=gatheringActive&&gatheringIndex>=0&&
+   Math.hypot(state.x-gatheringSpot.x,state.y-gatheringSpot.y)>230;
   t.nextDecision=(t.nextDecision||0)-dt;
   const fearDistance=t.temperament==='curious'?(acquainted?50:100):t.temperament==='skittish'?(acquainted?105:205):(acquainted?75:175);
   if(d<fearDistance){
@@ -232,13 +241,26 @@ function updateTrolls(dt){
    t.targetX=clamp(p.x+Math.cos(angle)*125,WORLD_MIN+35,WORLD-35);
    t.targetY=clamp(p.y+Math.sin(angle)*125,WORLD_MIN+35,WORLD-35);
    t.nextDecision=Math.max(t.nextDecision,650);
-  }else if(t.nextDecision<=0||!Number.isFinite(t.targetX)||!Number.isFinite(t.targetY)){
-   const cycle=Math.floor(time/1900),seed=seeded(739+cycle*17);
-   const angle=seed*Math.PI*2,range=25+seeded(937+cycle*23)*(t.range||125);
+  }else if(gatheringAllowed){
+   // Each troll has its own place in a loose circle; never stack sprites.
+   const angle=gatheringIndex*Math.PI*2/3+gatheringCycle*.45;
+   t.targetX=gatheringSpot.x+Math.cos(angle)*44;
+   t.targetY=gatheringSpot.y+Math.sin(angle)*34;
+   t.behaviour='gather';
+   t.nextDecision=350;
+  }else if(t.nextDecision<=0||!Number.isFinite(t.targetX)||!Number.isFinite(t.targetY)||t.behaviour==='gather'){
+   const cycle=Math.floor(time/1900),seed=seeded(739+i*131+cycle*17);
+   const angle=seed*Math.PI*2,range=25+seeded(937+i*47+cycle*23)*(t.range||125);
    t.targetX=clamp(t.x+Math.cos(angle)*range,WORLD_MIN+35,WORLD-35);
    t.targetY=clamp(t.y+Math.sin(angle)*range,WORLD_MIN+35,WORLD-35);
    t.behaviour=t.temperament==='nocturnal'&&Math.sin(state.daytime*Math.PI*2)>0?'watch':d<360&&t.temperament!=='busy'?'watch':seed>.75?'forage':'scuttle';
-   t.nextDecision=1200+seeded(113+cycle*29)*2100;
+   t.nextDecision=1200+seeded(113+i*73+cycle*29)*2100;
+  }
+  if(t.behaviour==='gather'&&Math.hypot(t.targetX-p.x,t.targetY-p.y)<9){
+   // At the meeting, look toward the centre and exchange tiny animated nods.
+   t.face=gatheringSpot.x<p.x?-1:1;
+   t.walking=false;
+   continue;
   }
   if(t.behaviour==='watch'&&d>210){t.face=state.x<p.x?-1:1;continue}
   const dx=t.targetX-p.x,dy=t.targetY-p.y,remaining=Math.hypot(dx,dy);
