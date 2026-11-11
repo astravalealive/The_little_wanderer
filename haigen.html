@@ -258,7 +258,7 @@ function updateTrolls(dt){
   const gatheringCycle=Math.floor(time/105000);
   const gatheringActive=(time%105000)<35000;
   const gatheringMembers=[0,2,4]; // Mossroot, Bramble and Fernwhisk
-  const gatheringSpot={x:2310,y:1995};
+  const gatheringSpot={x:2410,y:1950};
   const gatheringIndex=gatheringMembers.indexOf(i);
   const gatheringAllowed=gatheringActive&&gatheringIndex>=0&&
    Math.hypot(state.x-gatheringSpot.x,state.y-gatheringSpot.y)>230;
@@ -306,7 +306,7 @@ function updateTrolls(dt){
  }
 }
 // The ancient stump is the woodland clan's shared home, not a cut-down modern tree.
-const trollStump={x:2320,y:1955,doorX:2320,doorY:2008};
+const trollStump={x:2410,y:1850,doorX:2410,doorY:1903};
 let trollRoomOpen=false;
 const trollStash={wood:8,stone:5,mushrooms:4,berries:3};
 function drawTrollRoom(){
