@@ -176,7 +176,9 @@ const trollSprites=[
  ['     tt  t     ','   ttggtggt    ','  tggggggggt   ','   gghhhhhh    ',' hhhhehhehhhhh ','  hhhhnhhhhhh  ','    hhnnnhh    ','   gggghgggg   ','  hgggggggggh  ',' hh ggggggg hh ',' hh  ggggg  hh '],
  ['   s     s     ','   ss   ss     ','   ssgggss     ','  gghhhhhgg    ',' sshhehhehhss  ','  shhhnnhhhs   ','    hhnnnhh    ','  ssgggggggss  ',' shgggtgggtghs ',' hh ggggggg hh ',' hh  ggggg  hh ']
 ];
+// Mossroot is a shy, curious woodland resident, not an enemy or a world editor.
 function updateTrolls(dt){
+ const step=Math.min(dt,50)/1000;
  for(const [i,t] of trollHabitats.entries()){
   if(Math.hypot(state.x-t.x,state.y-t.y)>950)continue;
   if(!t.pos){
@@ -186,19 +188,56 @@ function updateTrolls(dt){
    }
    if(!t.pos)continue;
   }
-  const p=t.pos,d=dist(p,state),phase=time*.00028+i*2;
+  const p=t.pos,d=dist(p,state),mossroot=i===0;
   t.walking=false;
-  if(d>95){
-   const dx=t.x+Math.sin(phase)*65-p.x,dy=t.y+Math.cos(phase*.8)*42-p.y;
-   const scale=Math.min(1,dt*.025/Math.max(1,Math.hypot(dx,dy)));
-   const next=resolveSolidMovement(p.x,p.y,p.x+dx*scale,p.y+dy*scale);
-   t.walking=Math.hypot(next.x-p.x,next.y-p.y)>.03;
-   if(Math.abs(next.x-p.x)>.02)t.face=Math.sign(next.x-p.x);
-   t.pos=next;
-  }else{
-   t.face=state.x<p.x?-1:1;
-   if(!state.discoveries.includes(t.name)){state.discoveries.push(t.name);think(t.thought,5200,true);save()}
+  if(!mossroot){
+   const phase=time*.00028+i*2;
+   if(d>95){
+    const dx=t.x+Math.sin(phase)*65-p.x,dy=t.y+Math.cos(phase*.8)*42-p.y;
+    const scale=Math.min(1,dt*.025/Math.max(1,Math.hypot(dx,dy)));
+    const next=resolveSolidMovement(p.x,p.y,p.x+dx*scale,p.y+dy*scale);
+    t.walking=Math.hypot(next.x-p.x,next.y-p.y)>.03;
+    if(Math.abs(next.x-p.x)>.02)t.face=Math.sign(next.x-p.x);
+    t.pos=next;
+   }else{
+    t.face=state.x<p.x?-1:1;
+    if(!state.discoveries.includes(t.name)){state.discoveries.push(t.name);think(t.thought,5200,true);save()}
+   }
+   continue;
   }
+  // Persistent trust is derived from an existing discovery, without altering save format.
+  const acquainted=state.discoveries.includes(t.name);
+  if(d<105&&!acquainted){
+   state.discoveries.push(t.name);think(t.thought,5200,true);save();
+  }
+  t.nextDecision=(t.nextDecision||0)-dt;
+  const fearDistance=acquainted?75:175;
+  if(d<fearDistance){
+   t.behaviour='hide';
+   // Dash away from Haigen and duck behind the nearest patch of woodland.
+   const angle=Math.atan2(p.y-state.y,p.x-state.x);
+   t.targetX=clamp(p.x+Math.cos(angle)*125,WORLD_MIN+35,WORLD-35);
+   t.targetY=clamp(p.y+Math.sin(angle)*125,WORLD_MIN+35,WORLD-35);
+   t.nextDecision=Math.max(t.nextDecision,650);
+  }else if(t.nextDecision<=0||!Number.isFinite(t.targetX)||!Number.isFinite(t.targetY)){
+   const cycle=Math.floor(time/1900),seed=seeded(739+cycle*17);
+   const angle=seed*Math.PI*2,range=35+seeded(937+cycle*23)*125;
+   t.targetX=clamp(t.x+Math.cos(angle)*range,WORLD_MIN+35,WORLD-35);
+   t.targetY=clamp(t.y+Math.sin(angle)*range,WORLD_MIN+35,WORLD-35);
+   t.behaviour=d<360?'watch':seed>.75?'forage':'scuttle';
+   t.nextDecision=1200+seeded(113+cycle*29)*2100;
+  }
+  if(t.behaviour==='watch'&&d>210){t.face=state.x<p.x?-1:1;continue}
+  const dx=t.targetX-p.x,dy=t.targetY-p.y,remaining=Math.hypot(dx,dy);
+  if(remaining>5){
+   const speed=t.behaviour==='hide'?170:t.behaviour==='scuttle'?115:65;
+   const distance=Math.min(remaining,speed*step);
+   const next=resolveSolidMovement(p.x,p.y,p.x+dx/remaining*distance,p.y+dy/remaining*distance);
+   t.walking=Math.hypot(next.x-p.x,next.y-p.y)>.15;
+   if(Math.abs(next.x-p.x)>.1)t.face=Math.sign(next.x-p.x);
+   t.pos=next;
+   if(!t.walking)t.nextDecision=0; // Find another route if a tree blocks him.
+  }else t.nextDecision=Math.min(t.nextDecision,250);
  }
 }
 function drawTroll(t,i){
