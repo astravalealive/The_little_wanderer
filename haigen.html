@@ -8284,11 +8284,13 @@ gameCanvas.addEventListener('pointermove',e=>{
  d.lastX=e.clientX;d.lastY=e.clientY;
  const movement=Math.hypot(e.clientX-d.startX,e.clientY-d.startY),p=editorPointerPoint(e);
  if(d.object){
-  if(d.held){
-   if(!d.changed&&movement>2){worldEditorHistory();d.changed=true}
-   if(d.changed){
-    const nx=clamp(p.x+d.offsetX,WORLD_MIN+20,WORLD-20),ny=clamp(p.y+d.offsetY,WORLD_MIN+20,WORLD-20);
-    if(worldEditorGroundKinds.has(d.object.type)||d.object.type==='lighthouse'||(islandDepth(nx,ny)>=70&&easternRiverDepth(nx,ny)>=80))worldEditorMove(d.object,nx,ny);
+  if(d.held&&movement>2){
+   const nx=clamp(p.x+d.offsetX,WORLD_MIN+20,WORLD-20),ny=clamp(p.y+d.offsetY,WORLD_MIN+20,WORLD-20);
+   const valid=worldEditorGroundKinds.has(d.object.type)||d.object.type==='lighthouse'||(islandDepth(nx,ny)>=70&&easternRiverDepth(nx,ny)>=80);
+   if(valid&&(Math.abs(nx-d.object.x)>.01||Math.abs(ny-d.object.y)>.01)){
+    // Snapshot only once, immediately before the first valid move.
+    if(!d.changed){worldEditorHistory();d.changed=true}
+    worldEditorMove(d.object,nx,ny);
    }
   }else if(d.scrolled){
    editorCanvasPan(dx,dy);
@@ -8316,6 +8318,8 @@ const finishEditorPointer=e=>{
  if(worldEditorTouches.size){worldEditorDrag=null;return}
  editorPinchDistance=0;worldEditorDrag=null;
  if(!d||d.pointerId!==e.pointerId)return;
+ // Restore the full palette after a hold-to-drag gesture finishes.
+ if(d.held)worldEditorMinimised=false;
  // A cancelled touch (app switch, interrupted gesture) must not save a half-dragged layout.
  if(e.type==='pointercancel'){
   if(d.changed&&worldEditorUndo.length){
