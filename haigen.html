@@ -5275,7 +5275,18 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  const status=haigenSpriteStatus();
  const newSheet=haigenMovementReady;
  const base=newSheet?haigenMovementAtlas:haigenApprovedWalkAtlas||haigenApprovedAtlas;
- const spriteAtlas=haigenCostumeAtlas(base,deepWater?'swim':status.outfit); // Use the approved swimming sprite; legacy drawn-on snorkel overlay stays removed.
+ const spriteAtlas=haigenCostumeAtlas(base,deepWater?'swim':status.outfit);
+ // Visibility safeguard: a transparent/empty costume frame must never hide Haigen.
+ // Fall back to the original loaded atlas, then the procedural sprite renderer.
+ const visibleFrame=(sheet,row,frame)=>{
+  try{const probe=document.createElement('canvas');probe.width=48;probe.height=72;
+   const g=probe.getContext('2d',{willReadFrequently:true});
+   g.drawImage(sheet,frame*48,row*72,48,72,0,0,48,72);
+   const d=g.getImageData(0,0,48,72).data;let count=0;
+   for(let i=3;i<d.length;i+=4)if(d[i]>60)count++;
+   return count>80;
+  }catch(e){return false}
+ }; // Use the approved swimming sprite; legacy drawn-on snorkel overlay stays removed.
  const motion=actor||playerMotion,dir=motion.dir||'down',moving=!!motion.moving;
  const frame=status.knock?1+Math.floor((performance.now()-status.knock.started)/85)%2: moving?Math.floor((motion.anim||0)/150)%4:0;
  // Very short three-quarter turn-in frames, only when crossing an axis.
@@ -5302,7 +5313,9 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  // Keep 3/4 right/left artwork, complete feet, and constant 48x72 sprite box.
  if(displayDir==='up'&&status.equip)haigenDrawPixelTool(status.equip,displayDir,frame,status.action,scale,left,top);
  // Draw from the baked left/right row with an identical foot baseline.
- ctx.drawImage(spriteAtlas,frame*48,row*72,48,72,left,top,w,h);
+ if(visibleFrame(spriteAtlas,row,frame))ctx.drawImage(spriteAtlas,frame*48,row*72,48,72,left,top,w,h);
+ else if(visibleFrame(base,row,frame))ctx.drawImage(base,frame*48,row*72,48,72,left,top,w,h);
+ else {ctx.restore();return false;}
  window.__haigenSpriteProbe={dir:displayDir,row,mirrored:false,bakedLeft:true,scale,frame};
  // Exact-pixel check of all four LEFT frames against mirrored RIGHT frames.
  window.__haigenAtlasQA=()=>{
