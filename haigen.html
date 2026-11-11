@@ -7870,7 +7870,7 @@ const trollStumpHome={x:2500,y:2200,width:390,height:265};
 const trollStumpImage=new Image();trollStumpImage.src='./assets/Stump.png';
 let trollStumpInside=false;
 let trollDoorCooldown=0;
-const trollInteriorArt=new Image();trollInteriorArt.src='./assets/a_top_down_pixel_art_game_map_interior_of_a_troll.png';
+const trollInteriorArt=new Image();trollInteriorArt.src='./a_top_down_pixel_art_game_map_interior_of_a_troll.png';
 function drawTrollStump(){const t=trollStumpHome;if(!trollStumpImage.complete||!trollStumpImage.naturalWidth)return;ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(trollStumpImage,t.x-t.width/2,t.y-t.height+24,t.width,t.height);ctx.restore();}
 function trollStumpDoorNear(){return Math.hypot(state.x-trollStumpHome.x,state.y-(trollStumpHome.y-12))<92;}
 // Independent, controllable room coordinates; never overwrite Haigen's outdoor position.
