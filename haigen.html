@@ -206,6 +206,8 @@ function updateTrolls(dt){
    t.errandMs=(t.errandMs===undefined?4500+i*1100:t.errandMs)-dt;
    if(t.insideStump){
     t.insideMs-=dt;t.walking=false;
+    // An indoor routine: arrive at the chest, linger, then rest or wander.
+    t.indoorAge=(t.indoorAge||0)+dt;
     if(t.insideMs<=0){
      t.insideStump=false;t.pos={x:trollStump.doorX+(i%3-1)*9,y:trollStump.doorY+12};
      t.carrying=null;t.errandMs=10000+i*1600;
@@ -215,8 +217,9 @@ function updateTrolls(dt){
    if(t.returningHome){
     const dx=trollStump.doorX-p.x,dy=trollStump.doorY-p.y,distHome=Math.hypot(dx,dy);
     if(distHome<20){
-     t.insideStump=true;t.insideMs=3000+i*350;t.returningHome=false;
-     if(t.carrying)trollStash[t.carrying]=(trollStash[t.carrying]||0)+1;
+     t.insideStump=true;t.insideMs=11000+i*1300;t.indoorAge=0;t.returningHome=false;
+     // Deliveries become visible at the chest before the item joins the stash.
+     t.pendingDeposit=t.carrying;t.depositDone=false;
      continue;
     }
     const travel=Math.min(distHome,Math.min(dt,50)*.12);
@@ -361,6 +364,28 @@ function drawTrollRoom(){
  ctx.fillText('THE ROOT-HOLLOW',cx,Math.max(28,y+rh*.08));
  ctx.font=Math.max(12,Math.min(20,w*.026))+'px system-ui';
  ctx.fillText('Wood '+trollStash.wood+'   Stone '+trollStash.stone+'   Mushrooms '+trollStash.mushrooms+'   Berries '+trollStash.berries,cx,cy+rh*.31);
+ // Living troll residents follow their own indoor routes and deposit at the chest.
+ for(const [i,t] of trollHabitats.entries()){
+  if(!t.insideStump)continue;
+  const age=t.indoorAge||0,resting=age>4800&&age<9000;
+  const bedSpots=[[.22,.32],[.76,.29],[.22,.67],[.78,.64]];
+  const bed=bedSpots[i%bedSpots.length];
+  let tx=.5,ty=.44;
+  if(age>2400){tx=resting?bed[0]:.45+Math.sin(age*.0008+i)*.12;ty=resting?bed[1]:.56+Math.cos(age*.0007+i)*.09}
+  const progress=Math.min(1,age/1800);
+  const ix=x+rw*(.5+(tx-.5)*progress),iy=y+rh*(.8+(ty-.8)*progress);
+  if(t.pendingDeposit&&!t.depositDone&&age>=2200){
+   trollStash[t.pendingDeposit]=(trollStash[t.pendingDeposit]||0)+1;
+   t.depositDone=true;t.pendingDeposit=null;
+  }
+  ctx.save();ctx.translate(ix,iy);
+  ctx.fillStyle='#241e18';ctx.beginPath();ctx.ellipse(0,6,12,5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=t.pelt;ctx.beginPath();ctx.ellipse(0,resting?1:-7,resting?14:11,resting?8:15,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=t.hide;ctx.beginPath();ctx.arc(resting?-7:0,resting?0:-17,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#20251c';ctx.fillRect(resting?-9:-4,resting?-2:-18,3,3);ctx.fillRect(resting?-4:3,resting?-2:-18,3,3);
+  if(t.pendingDeposit&&!t.depositDone){ctx.fillStyle='#c6a66a';ctx.beginPath();ctx.arc(13,-8,6,0,Math.PI*2);ctx.fill()}
+  ctx.restore();
+ }
  // Haigen is a controllable visitor inside, not merely an inventory overlay.
  const hx=x+trollRoomPlayer.x*rw,hy=y+trollRoomPlayer.y*rh;
  ctx.fillStyle='#e2caa0';ctx.beginPath();ctx.arc(hx,hy-15,8,0,Math.PI*2);ctx.fill();
