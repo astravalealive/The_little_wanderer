@@ -170,7 +170,20 @@ const trollHabitats=[
  {name:'Mossroot Troll',x:2350,y:1950,pelt:'#618055',hide:'#9ba576',trim:'#b4d477',
   thought:'That little troll has a whole cushion of moss growing on its back.'},
  {name:'Cinder Troll',x:3500,y:5350,pelt:'#585057',hide:'#93847c',trim:'#efa568',
-  thought:'Those orange specks are blinking. There’s a little troll under all that ash!'}
+  thought:'Those orange specks are blinking. There’s a little troll under all that ash!'},
+ // Woodland clan: different coats, silhouettes, temperaments and home ranges.
+ {name:'Bramble Troll',x:2170,y:1820,pelt:'#4d6942',hide:'#a8a27a',trim:'#a1b45b',temperament:'skittish',range:115,
+  thought:'Bramble wears a crown of thorny twigs and vanishes between the roots.'},
+ {name:'Pebble Troll',x:2510,y:1810,pelt:'#697b68',hide:'#b8ae92',trim:'#d3c6a0',temperament:'slow',range:65,
+  thought:'Pebble is almost indistinguishable from a mossy little stone.'},
+ {name:'Fernwhisk Troll',x:2240,y:2130,pelt:'#487c58',hide:'#a5ba83',trim:'#b5d78a',temperament:'curious',range:140,
+  thought:'Fernwhisk peeks out from behind the ferns to watch Haigen.'},
+ {name:'Thistledown Troll',x:2600,y:2070,pelt:'#78836d',hide:'#c5bb9d',trim:'#d6d3a5',temperament:'skittish',range:125,
+  thought:'Thistledown has a wild mop of pale leaves on his head.'},
+ {name:'Rootling Troll',x:2400,y:2290,pelt:'#685c40',hide:'#9b8764',trim:'#a8a06b',temperament:'busy',range:170,
+  thought:'Rootling is always scurrying around, inspecting mushrooms and fallen branches.'},
+ {name:'Glowcap Troll',x:2020,y:1990,pelt:'#3e6866',hide:'#a3b8a3',trim:'#a2d9c3',temperament:'nocturnal',range:100,
+  thought:'Glowcap has a pale, luminous mushroom cap tucked into his hair.'}
 ];
 const trollSprites=[
  ['     tt  t     ','   ttggtggt    ','  tggggggggt   ','   gghhhhhh    ',' hhhhehhehhhhh ','  hhhhnhhhhhh  ','    hhnnnhh    ','   gggghgggg   ','  hgggggggggh  ',' hh ggggggg hh ',' hh  ggggg  hh '],
@@ -188,7 +201,7 @@ function updateTrolls(dt){
    }
    if(!t.pos)continue;
   }
-  const p=t.pos,d=dist(p,state),mossroot=i===0;
+  const p=t.pos,d=dist(p,state),mossroot=i===0||i>=2;
   t.walking=false;
   if(!mossroot){
    const phase=time*.00028+i*2;
@@ -211,7 +224,7 @@ function updateTrolls(dt){
    state.discoveries.push(t.name);think(t.thought,5200,true);save();
   }
   t.nextDecision=(t.nextDecision||0)-dt;
-  const fearDistance=acquainted?75:175;
+  const fearDistance=t.temperament==='curious'?(acquainted?50:100):t.temperament==='skittish'?(acquainted?105:205):(acquainted?75:175);
   if(d<fearDistance){
    t.behaviour='hide';
    // Dash away from Haigen and duck behind the nearest patch of woodland.
@@ -221,16 +234,16 @@ function updateTrolls(dt){
    t.nextDecision=Math.max(t.nextDecision,650);
   }else if(t.nextDecision<=0||!Number.isFinite(t.targetX)||!Number.isFinite(t.targetY)){
    const cycle=Math.floor(time/1900),seed=seeded(739+cycle*17);
-   const angle=seed*Math.PI*2,range=35+seeded(937+cycle*23)*125;
+   const angle=seed*Math.PI*2,range=25+seeded(937+cycle*23)*(t.range||125);
    t.targetX=clamp(t.x+Math.cos(angle)*range,WORLD_MIN+35,WORLD-35);
    t.targetY=clamp(t.y+Math.sin(angle)*range,WORLD_MIN+35,WORLD-35);
-   t.behaviour=d<360?'watch':seed>.75?'forage':'scuttle';
+   t.behaviour=t.temperament==='nocturnal'&&Math.sin(state.daytime*Math.PI*2)>0?'watch':d<360&&t.temperament!=='busy'?'watch':seed>.75?'forage':'scuttle';
    t.nextDecision=1200+seeded(113+cycle*29)*2100;
   }
   if(t.behaviour==='watch'&&d>210){t.face=state.x<p.x?-1:1;continue}
   const dx=t.targetX-p.x,dy=t.targetY-p.y,remaining=Math.hypot(dx,dy);
   if(remaining>5){
-   const speed=t.behaviour==='hide'?170:t.behaviour==='scuttle'?115:65;
+   const speed=(t.behaviour==='hide'?170:t.behaviour==='scuttle'?115:65)*(t.temperament==='slow'?.55:t.temperament==='busy'?1.3:1);
    const distance=Math.min(remaining,speed*step);
    const next=resolveSolidMovement(p.x,p.y,p.x+dx/remaining*distance,p.y+dy/remaining*distance);
    t.walking=Math.hypot(next.x-p.x,next.y-p.y)>.15;
@@ -249,7 +262,7 @@ function drawTroll(t,i){
  }
  ctx.translate(-7.5*pixel,-36-Math.abs(stride)*2);
  const colours={g:t.pelt,h:t.hide,t:t.trim,s:'#454348',n:'#796956',e:'#242424'};
- trollSprites[i].forEach((row,y)=>{for(let x=0;x<row.length;x++)if(row[x]!==' '){
+ trollSprites[i===1?1:0].forEach((row,y)=>{for(let x=0;x<row.length;x++)if(row[x]!==' '){
   ctx.fillStyle=colours[row[x]];ctx.fillRect(x*pixel,y*pixel,pixel+.2,pixel+.2);
  }});
  ctx.restore();
