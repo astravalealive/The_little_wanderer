@@ -309,7 +309,7 @@ function updateTrolls(dt){
  }
 }
 // The ancient stump is the woodland clan's shared home, not a cut-down modern tree.
-const trollStump={x:2410,y:1850,doorX:2410,doorY:1903};
+const trollStump={x:2150,y:1770,doorX:2150,doorY:1834};
 let trollRoomOpen=false;
 const trollRoomPlayer={x:.5,y:.77,targetX:.5,targetY:.77};
 let trollChestOpen=false;
@@ -399,36 +399,22 @@ function drawTrollRoom(){
 function drawTrollStump(){
  const x=trollStump.x,y=trollStump.y;
  ctx.save();ctx.translate(x,y);
- // Great buttress roots stretch out into the forest floor.
- for(let i=0;i<9;i++){
-  const a=i*Math.PI*2/9+.17,len=100+(i%3)*24;
-  ctx.strokeStyle=i%2?'#58452c':'#765b38';ctx.lineWidth=18+(i%3)*5;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(Math.cos(a)*34,Math.sin(a)*25);
-  ctx.quadraticCurveTo(Math.cos(a)*75,Math.sin(a)*52,Math.cos(a)*len,Math.sin(a)*len*.66);ctx.stroke();
-  ctx.strokeStyle='#97764b';ctx.lineWidth=3;ctx.stroke();
+ // Giant ancient root-home: broad broken crown, layered bark, fungus and lanterns.
+ for(let i=0;i<13;i++){const a=i*Math.PI*2/13,len=125+(i%4)*22;
+  ctx.strokeStyle='#49351f';ctx.lineWidth=30+(i%3)*7;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(Math.cos(a)*38,Math.sin(a)*20);ctx.quadraticCurveTo(Math.cos(a)*92,Math.sin(a)*68,Math.cos(a)*len,Math.sin(a)*len*.65);ctx.stroke();
+  ctx.strokeStyle='#8b653a';ctx.lineWidth=5;ctx.stroke();
  }
- // Massive weathered trunk, hollowed by centuries.
- ctx.fillStyle='#302c21';ctx.beginPath();ctx.ellipse(0,-27,91,80,0,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#6d5133';ctx.beginPath();ctx.ellipse(0,-38,83,76,0,0,Math.PI*2);ctx.fill();
- for(let i=0;i<5;i++){
-  ctx.strokeStyle=i%2?'#a17d4c':'#493a28';ctx.lineWidth=5;
-  ctx.beginPath();ctx.ellipse(0,-42,71-i*13,61-i*10,-.13,0,Math.PI*2);ctx.stroke();
- }
- // Dark opening in the base, framed with living moss and a little wooden door.
- ctx.fillStyle='#241e19';ctx.beginPath();ctx.ellipse(0,39,26,38,0,Math.PI,0);ctx.lineTo(26,65);ctx.lineTo(-26,65);ctx.fill();
- ctx.fillStyle='#705337';ctx.fillRect(-19,30,38,34);
- for(let i=-12;i<=12;i+=12){ctx.strokeStyle='#392d23';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(i,32);ctx.lineTo(i,63);ctx.stroke()}
- ctx.fillStyle='#d4b76b';ctx.beginPath();ctx.arc(11,49,3,0,Math.PI*2);ctx.fill();
- // Thick moss, shelf fungi and a pair of warm windows.
- for(let i=0;i<16;i++){
-  const a=i*2.399,r=47+(i%4)*9;
-  ctx.fillStyle=i%3?'#557547':'#789358';ctx.beginPath();ctx.ellipse(Math.cos(a)*r,Math.sin(a)*r-43,13,7,a,0,Math.PI*2);ctx.fill();
- }
- for(const wx of [-46,46]){
-  ctx.fillStyle='#392d20';ctx.fillRect(wx-8,16,16,15);
-  ctx.fillStyle='#d9aa5a';ctx.fillRect(wx-5,19,10,9);
-  ctx.strokeStyle='#6b4b2c';ctx.lineWidth=2;ctx.strokeRect(wx-8,16,16,15);
- }
+ ctx.fillStyle='#2c2119';ctx.beginPath();ctx.ellipse(0,-47,110,101,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#735033';ctx.beginPath();ctx.ellipse(0,-53,101,92,0,0,Math.PI*2);ctx.fill();
+ for(let j=0;j<8;j++){ctx.strokeStyle=j%2?'#3c291d':'#a57a4b';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(0,-60,88-j*10,78-j*8,-.1,0,Math.PI*2);ctx.stroke()}
+ ctx.fillStyle='#211a16';ctx.beginPath();ctx.ellipse(0,-67,42,38,0,0,Math.PI*2);ctx.fill();
+ for(let i=0;i<22;i++){const a=i*2.399,r=67+(i%5)*8;ctx.fillStyle=i%3?'#66824a':'#a4a846';ctx.beginPath();ctx.ellipse(Math.cos(a)*r,Math.sin(a)*r-42,19,9,a,0,Math.PI*2);ctx.fill()}
+ for(let i=0;i<9;i++){const side=i%2?-1:1,px=side*(68+i%3*17),py=-30+i*12;ctx.fillStyle='#b87943';ctx.beginPath();ctx.ellipse(px,py,15,6,side*.3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e0b476';ctx.fillRect(px-7,py,13,3)}
+ ctx.fillStyle='#1a1512';ctx.beginPath();ctx.ellipse(0,48,31,43,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#60432a';ctx.fillRect(-24,34,7,47);ctx.fillRect(18,34,7,47);
+ for(const px of [-41,41]){ctx.fillStyle='#d6a54c';ctx.shadowColor='#ffc76c';ctx.shadowBlur=15;ctx.fillRect(px-6,25,12,18);ctx.shadowBlur=0;ctx.strokeStyle='#3b291c';ctx.lineWidth=3;ctx.strokeRect(px-6,25,12,18)}
+ ctx.fillStyle='#ad9570';for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse((i-2)*11,86+i%2*3,10,5,0,0,Math.PI*2);ctx.fill()}
  ctx.restore();
 }
 function drawTroll(t,i){
@@ -8721,6 +8707,8 @@ function frame(now){
   drawHomeInteriorScene();
   updateTrollRoom(dt);
   drawTrollRoom();
+  // Preview-only visibility marker while cross-origin artwork is being repaired.
+  if(!trollRoomOpen){ctx.save();ctx.translate(state.x,state.y);ctx.fillStyle='#e8c783';ctx.beginPath();ctx.arc(0,-42,13,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e8b94d';ctx.beginPath();ctx.ellipse(0,-52,15,8,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#487b58';ctx.fillRect(-11,-29,22,25);ctx.fillStyle='#40372e';ctx.fillRect(-9,-4,7,13);ctx.fillRect(2,-4,7,13);ctx.restore()}
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
  }catch(error){reportWorldError(error);}
