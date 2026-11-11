@@ -8669,7 +8669,7 @@ function reportWorldError(error){
  const message=error&&error.message?error.message:String(error);
  if(message!==lastWorldError){console.error('Haigen world rendering error',error);lastWorldError=message;}
  const panel=$('worldError');
- if(panel){panel.style.display='block';panel.textContent='⚠️ The woodland could not render: '+message+'. Please send a screenshot of this message.';}
+ if(panel){panel.style.display='block';panel.textContent='⚠️ Rendering error: '+message+'\n'+(error&&error.stack?String(error.stack).slice(0,850):'No stack available')+'\nPlease screenshot this diagnostic.';panel.style.whiteSpace='pre-wrap';panel.style.fontSize='12px';panel.style.maxHeight='45vh';panel.style.overflowY='auto';}
 }
 // V233: separate indoor scene, independent of the exterior camera and house size.
 function drawHomeInteriorScene(){
