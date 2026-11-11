@@ -308,25 +308,66 @@ function updateTrolls(dt){
 // The ancient stump is the woodland clan's shared home, not a cut-down modern tree.
 const trollStump={x:2410,y:1850,doorX:2410,doorY:1903};
 let trollRoomOpen=false;
+const trollRoomPlayer={x:.5,y:.77,targetX:.5,targetY:.77};
+let trollChestOpen=false;
+function updateTrollRoom(dt){
+ if(!trollRoomOpen)return;
+ const dx=trollRoomPlayer.targetX-trollRoomPlayer.x,dy=trollRoomPlayer.targetY-trollRoomPlayer.y,d=Math.hypot(dx,dy);
+ if(d>.003){const step=Math.min(d,dt*.00026);trollRoomPlayer.x+=dx/d*step;trollRoomPlayer.y+=dy/d*step}
+}
 const trollStash={wood:8,stone:5,mushrooms:4,berries:3};
 function drawTrollRoom(){
  if(!trollRoomOpen)return;
  ctx.save();ctx.setTransform(1,0,0,1,0,0);
  const w=ctx.canvas.width,h=ctx.canvas.height,cx=w/2,cy=h/2;
- ctx.fillStyle='#161b13';ctx.fillRect(0,0,w,h);
- const rw=Math.min(w*.88,h*1.35),rh=Math.min(h*.77,w*.8);
- ctx.fillStyle='#55402a';ctx.beginPath();ctx.ellipse(cx,cy,rw/2,rh/2,0,0,Math.PI*2);ctx.fill();
- for(let j=0;j<7;j++){ctx.strokeStyle=j%2?'#7a5937':'#3b3021';ctx.lineWidth=Math.max(2,rw*.007);ctx.beginPath();ctx.ellipse(cx,cy,rw*(.46-j*.055),rh*(.46-j*.055),0,0,Math.PI*2);ctx.stroke()}
- ctx.fillStyle='#2b2118';ctx.beginPath();ctx.ellipse(cx,cy+rh*.12,rw*.29,rh*.25,0,0,Math.PI*2);ctx.fill();
- // Shared stash chest and loose piles, updated by returning gatherers.
- ctx.fillStyle='#9a7040';ctx.fillRect(cx-rw*.19,cy-rh*.03,rw*.38,rh*.19);
- ctx.fillStyle='#4b3525';ctx.fillRect(cx-rw*.19,cy-rh*.06,rw*.38,rh*.075);
- ctx.fillStyle='#d6b46a';ctx.fillRect(cx-5,cy-rh*.04,10,16);
- ctx.font=Math.max(13,Math.min(25,w*.035))+'px system-ui';ctx.textAlign='center';ctx.fillStyle='#f1e3b6';
- ctx.fillText('THE ROOT-HOLLOW',cx,cy-rh*.32);
- ctx.font=Math.max(12,Math.min(21,w*.027))+'px system-ui';
- ctx.fillText('🪵 '+trollStash.wood+'    🪨 '+trollStash.stone+'    🍄 '+trollStash.mushrooms+'    🫐 '+trollStash.berries,cx,cy+rh*.28);
- ctx.fillText('Tap anywhere to leave',cx,cy+rh*.39);
+ const rw=Math.min(w*.94,h*1.35),rh=Math.min(h*.88,w*.92);
+ const x=cx-rw/2,y=cy-rh/2;
+ ctx.fillStyle='#0c100e';ctx.fillRect(0,0,w,h);
+ // Vast underground chamber beneath the stump: earthen walls and roots.
+ ctx.fillStyle='#352b20';ctx.beginPath();ctx.ellipse(cx,cy,rw*.52,rh*.53,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#675035';ctx.beginPath();ctx.ellipse(cx,cy+rh*.045,rw*.46,rh*.43,0,0,Math.PI*2);ctx.fill();
+ for(let i=0;i<12;i++){
+  const angle=i*Math.PI/6,radius=rw*.47;
+  ctx.strokeStyle=i%2?'#392b20':'#88603d';ctx.lineWidth=Math.max(7,rw*.028);ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(cx+Math.cos(angle)*radius,cy+Math.sin(angle)*rh*.45);
+  ctx.quadraticCurveTo(cx+Math.cos(angle+.55)*rw*.28,cy+Math.sin(angle+.55)*rh*.29,cx+Math.cos(angle+1)*rw*.13,cy+Math.sin(angle+1)*rh*.1);ctx.stroke();
+ }
+ // Stone path from the entrance; scattered pebbles and fungal lights.
+ ctx.fillStyle='#a18a66';for(let i=0;i<8;i++){const px=cx+Math.sin(i*2.1)*rw*.065,py=cy+rh*.12+i*rh*.043;ctx.beginPath();ctx.ellipse(px,py,rw*.042,rh*.018,i*.3,0,Math.PI*2);ctx.fill()}
+ for(let i=0;i<14;i++){
+  const angle=i*2.399,r=.31+(i%4)*.038,px=cx+Math.cos(angle)*rw*r,py=cy+Math.sin(angle)*rh*r;
+  ctx.fillStyle=i%3?'#94b88b':'#d8a878';ctx.beginPath();ctx.ellipse(px,py-9,8+(i%3)*3,5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#c4b28c';ctx.fillRect(px-2,py-8,4,10);
+ }
+ // Sleeping nooks and handcrafted furniture around the cavern.
+ for(const [px,py] of [[.22,.32],[.76,.29],[.22,.67],[.78,.64]]){
+  const fx=x+rw*px,fy=y+rh*py;
+  ctx.fillStyle='#34291e';ctx.beginPath();ctx.ellipse(fx,fy,rw*.095,rh*.055,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#738355';ctx.beginPath();ctx.ellipse(fx,fy,rw*.07,rh*.035,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#b1a37d';ctx.fillRect(fx-rw*.047,fy-rh*.016,rw*.033,rh*.022);
+ }
+ // Big shared treasure chest, loose wood, stones, berries and mushroom baskets.
+ const chestX=cx,chestY=cy-rh*.12;
+ ctx.fillStyle='#2b2017';ctx.fillRect(chestX-rw*.18,chestY-rh*.06,rw*.36,rh*.19);
+ ctx.fillStyle='#92673a';ctx.fillRect(chestX-rw*.16,chestY-rh*.04,rw*.32,rh*.15);
+ ctx.fillStyle='#4a3021';ctx.fillRect(chestX-rw*.17,chestY-rh*.09,rw*.34,rh*.065);
+ ctx.fillStyle='#d2b46e';ctx.fillRect(chestX-6,chestY-rh*.055,12,19);
+ for(let i=0;i<7;i++){
+  ctx.fillStyle=i%3?'#a78a61':'#6f5132';ctx.fillRect(cx-rw*.3+i*rw*.026,cy+rh*.075+(i%2)*7,rw*.024,rh*.055);
+  ctx.fillStyle='#a5a49a';ctx.beginPath();ctx.arc(cx+rw*.19+(i%3)*rw*.035,cy+rh*.09+(i%4)*rh*.023,5+(i%3)*2,0,Math.PI*2);ctx.fill();
+ }
+ ctx.textAlign='center';ctx.fillStyle='#f5e4b7';
+ ctx.font='bold '+Math.max(14,Math.min(28,w*.035))+'px system-ui';
+ ctx.fillText('THE ROOT-HOLLOW',cx,Math.max(28,y+rh*.08));
+ ctx.font=Math.max(12,Math.min(20,w*.026))+'px system-ui';
+ ctx.fillText('Wood '+trollStash.wood+'   Stone '+trollStash.stone+'   Mushrooms '+trollStash.mushrooms+'   Berries '+trollStash.berries,cx,cy+rh*.31);
+ // Haigen is a controllable visitor inside, not merely an inventory overlay.
+ const hx=x+trollRoomPlayer.x*rw,hy=y+trollRoomPlayer.y*rh;
+ ctx.fillStyle='#e2caa0';ctx.beginPath();ctx.arc(hx,hy-15,8,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#4b7359';ctx.fillRect(hx-8,hy-8,16,20);
+ ctx.fillStyle='#3c322c';ctx.fillRect(hx-7,hy+12,5,9);ctx.fillRect(hx+2,hy+12,5,9);
+ ctx.font=Math.max(11,Math.min(17,w*.021))+'px system-ui';
+ ctx.fillStyle='#f1dcb1';ctx.fillText(trollChestOpen?'Chest: shared troll supplies':'Tap floor to walk  •  Tap chest to inspect  •  Tap bottom doorway to exit',cx,h-25);
  ctx.restore();
 }
 
@@ -8400,14 +8441,25 @@ const editorCanvasPan=(dx,dy)=>{
  cam.y=clamp(cam.y-dy*H/bounds.height/z,WORLD_MIN,WORLD);
  cameraDetached=true;
 };
-// Tap the stump entrance to inspect its shared stores; tap again to return outdoors.
+// Tap the entrance to enter; move around the underground room with touch or mouse.
 gameCanvas.addEventListener('pointerdown',e=>{
  if(worldEditorActive)return;
- if(trollRoomOpen){trollRoomOpen=false;e.preventDefault();e.stopImmediatePropagation();return}
+ if(trollRoomOpen){
+  const rect=gameCanvas.getBoundingClientRect(),w=gameCanvas.width,h=gameCanvas.height;
+  const px=(e.clientX-rect.left)/rect.width*w,py=(e.clientY-rect.top)/rect.height*h;
+  const rw=Math.min(w*.94,h*1.35),rh=Math.min(h*.88,w*.92),x=w/2-rw/2,y=h/2-rh/2;
+  const nx=(px-x)/rw,ny=(py-y)/rh;
+  if(ny>.86&&Math.abs(nx-.5)<.18){trollRoomOpen=false;trollChestOpen=false}
+  else if(Math.abs(nx-.5)<.2&&Math.abs(ny-.38)<.16){trollChestOpen=!trollChestOpen}
+  else {trollRoomPlayer.targetX=clamp(nx,.19,.81);trollRoomPlayer.targetY=clamp(ny,.18,.83);trollChestOpen=false}
+  e.preventDefault();e.stopImmediatePropagation();return;
+ }
  const p=worldEditorScreenPoint(e);
  if(Math.hypot(state.x-trollStump.doorX,state.y-trollStump.doorY)<145&&
     Math.hypot(p.x-trollStump.doorX,p.y-trollStump.doorY)<65){
-  trollRoomOpen=true;e.preventDefault();e.stopImmediatePropagation();
+  trollRoomOpen=true;trollRoomPlayer.x=.5;trollRoomPlayer.y=.77;
+  trollRoomPlayer.targetX=.5;trollRoomPlayer.targetY=.77;
+  e.preventDefault();e.stopImmediatePropagation();
  }
 },true);
 let editorPinchDistance=0;
@@ -8634,6 +8686,7 @@ function frame(now){
   if(!Number.isFinite(cam.x)||!Number.isFinite(cam.y)){cam.x=Number(state.x)||1250;cam.y=Number(state.y)||1310;}
   draw();
   drawHomeInteriorScene();
+  updateTrollRoom(dt);
   drawTrollRoom();
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
