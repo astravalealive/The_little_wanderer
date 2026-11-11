@@ -8312,6 +8312,15 @@ const finishEditorPointer=e=>{
  if(worldEditorTouches.size){worldEditorDrag=null;return}
  editorPinchDistance=0;worldEditorDrag=null;
  if(!d||d.pointerId!==e.pointerId)return;
+ // A cancelled touch (app switch, interrupted gesture) must not save a half-dragged layout.
+ if(e.type==='pointercancel'){
+  if(d.changed&&worldEditorUndo.length){
+   const previous=JSON.parse(worldEditorUndo.pop());
+   worldEditorReplace(previous);
+  }else worldEditorDrawPanel();
+  worldEditorMinimised=false;
+  return;
+ }
  if(e.type!=='pointercancel'&&!d.object&&!d.scrolled&&!d.paintStarted&&d.mode==='place'){
   worldEditorHistory();
   const p=editorPointerPoint(e),o=worldEditorPlace(p.x,p.y,worldEditorKind);
