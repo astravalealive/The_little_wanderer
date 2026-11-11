@@ -7277,7 +7277,8 @@ function worldEditorDrawPanel(){
  '<div style="display:flex;gap:4px;flex-wrap:wrap">'];
  for(const [mode,label] of [['select','◎ Select'],['place','＋ Place'],['pan','✋ Pan']])
   html.push('<button data-editor-mode="'+mode+'" style="background:'+(worldEditorMode===mode?'#8a6a35':'#38433a')+'">'+label+'</button>');
- html.push('<button data-editor-action="undo" '+(worldEditorUndo.length?'':'disabled')+'>↶ Undo</button></div>');
+ html.push('<button data-editor-action="undo" '+(worldEditorUndo.length?'':'disabled')+'>↶ Undo</button>',
+  '<button data-editor-action="delete-selected" '+(worldEditorSelected?'':'disabled')+'>✕ Delete selected</button></div>');
  if(!worldEditorMinimised){
   html.push('<div style="display:flex;gap:5px;flex-wrap:wrap;margin:9px 0">');
   for(const [group] of worldEditorKindGroups)
@@ -7310,6 +7311,7 @@ function worldEditorDrawPanel(){
    if(action==='close'){worldEditorClose();return}
    if(action==='min'){worldEditorMinimised=!worldEditorMinimised;worldEditorDrawPanel();return}
    if(action==='save'){worldEditorSave();notify('World layout saved on this device.');return}
+   if(action==='delete-selected'){if(worldEditorSelected){worldEditorErase(worldEditorSelected);notify('Object deleted. Tap Undo to restore it.')}return}
    if(action==='undo'){const h=worldEditorUndo.pop();if(h){worldEditorReplace(JSON.parse(h));notify('Last edit undone.')}return}
    if(action==='reset'){
     if(confirm('Reset just the world editor layout? Haigen’s progress will not be deleted.')){
