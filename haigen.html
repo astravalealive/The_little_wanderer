@@ -7343,6 +7343,8 @@ function worldEditorOpen(){
  close();worldEditorActive=true;cameraDetached=true;worldEditorMinimised=false;
  // Editor sessions must not trigger Haigen's idle-time autonomous wandering.
  idleTime=0;if(state.autonomy)setAutonomy(false);
+ // Keep normal camera gestures from competing with editor drag and pinch handlers.
+ cameraTouches.clear();pinchDistance=0;
  worldEditorPanel=document.createElement('div');
  worldEditorPanel.id='haigenWorldEditor';
  worldEditorPanel.style.cssText='position:fixed;z-index:9999;left:8px;top:clamp(105px,24dvh,240px);width:min(338px,calc(100vw - 16px));max-height:55dvh;overflow-y:auto;box-sizing:border-box;background:rgba(22,32,28,.96);color:#f4e9d1;border:2px solid #b58b50;border-radius:12px;padding:10px;box-shadow:0 7px 22px #0009;font:13px system-ui;touch-action:pan-y';
@@ -8334,6 +8336,7 @@ const finishEditorPointer=e=>{
 gameCanvas.addEventListener('pointerup',finishEditorPointer,true);
 gameCanvas.addEventListener('pointercancel',finishEditorPointer,true);
 gameCanvas.addEventListener('pointerdown',e=>{
+ if(worldEditorActive)return; // Editor owns canvas gestures while open.
  if(e.pointerType==='mouse'&&e.button!==0)return;
  cameraReleaseAt=-1e9;
  gameCanvas.setPointerCapture(e.pointerId);
@@ -8341,6 +8344,7 @@ gameCanvas.addEventListener('pointerdown',e=>{
  if(cameraTouches.size===2){const p=[...cameraTouches.values()];pinchDistance=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)}
 });
 gameCanvas.addEventListener('pointermove',e=>{
+ if(worldEditorActive)return; // Prevent a second camera pan/zoom during editor gestures.
  const prev=cameraTouches.get(e.pointerId);if(!prev)return;
  cameraTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
  const p=[...cameraTouches.values()];
