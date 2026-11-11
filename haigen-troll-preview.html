@@ -4114,7 +4114,7 @@ spectorSheet.onload=()=>{
    const x=left+j*step;
    const g=c.getContext('2d',{willReadFrequently:true});
    g.drawImage(spectorSheet,x,row.y,width,c.height,0,0,width,c.height);
-   const pixels=g.getImageData(0,0,width,c.height);
+   const pixels=secureImageData(g,0,0,width,c.height);
    for(let p=0;p<pixels.data.length;p+=4){
     const r=pixels.data[p],gr=pixels.data[p+1],b=pixels.data[p+2];
     const brightness=Math.max(r,gr,b);
@@ -5102,7 +5102,7 @@ function buildChunkyHaigenAtlas(img){
  sx.drawImage(img,0,0);
  for(let row=0;row<3;row++)for(let frame=0;frame<4;frame++){
   const cellX=frame*48,cellY=row*72;
-  const data=sx.getImageData(cellX,cellY,48,72).data;
+  const data=secureImageData(sx,cellX,cellY,48,72).data;
   let minX=48,maxX=-1,minY=72,maxY=-1;
   for(let y=0;y<72;y++)for(let x=0;x<48;x++){
    if(data[(y*48+x)*4+3]===0)continue;
@@ -5213,7 +5213,7 @@ function haigenCostumeAtlas(base,kind){
   // The extracted reference atlas contained connected near-white JPEG-edge
   // fringe. Flood only the outside of each 48x72 frame, not internal eyes,
   // highlights, warm skin, trainers or blonde hair.
-  const image=g.getImageData(0,0,192,sheetHeight),d=image.data;
+  const image=secureImageData(g,0,0,192,sheetHeight),d=image.data;
   const W=192,CW=48,CH=72;
   for(let row=0;row<4;row++)for(let col=0;col<4;col++){
    const visited=new Uint8Array(CW*CH),queue=[];
@@ -5251,7 +5251,7 @@ function haigenCostumeAtlas(base,kind){
   wasteland:[[45,45,50],[87,82,82],[136,129,126]]
  };
  if(palette[kind]){
-  const data=g.getImageData(0,0,192,sheetHeight);
+  const data=secureImageData(g,0,0,192,sheetHeight);
   for(let y=0;y<sheetHeight;y++){
    const cy=y%72;if(cy<36||cy>60)continue;
    for(let x=0;x<192;x++){
@@ -5544,7 +5544,7 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
   if(!haigenMovementReady)return {ready:false};
   const atlas=haigenCostumeAtlas(haigenMovementAtlas,haigenOutfit());
   const g=atlas.getContext('2d',{willReadFrequently:true});
-  const pixels=g.getImageData(0,0,192,288).data;
+  const pixels=secureImageData(g,0,0,192,288).data;
   let mismatches=0;
   for(let f=0;f<4;f++)for(let y=0;y<72;y++)for(let x=0;x<48;x++){
    const l=((216+y)*192+f*48+x)*4;
@@ -6158,7 +6158,7 @@ function femaleDuckSprite146(){
  const canvas=document.createElement('canvas');canvas.width=96;canvas.height=76;
  const c=canvas.getContext('2d',{willReadFrequently:true});
  c.drawImage(illustratedFaunaAtlas,0,76,96,76,0,0,96,76);
- const pixels=c.getImageData(0,0,96,76),d=pixels.data;
+ const pixels=secureImageData(c,0,0,96,76),d=pixels.data;
  for(let y=0;y<76;y++)for(let x=0;x<96;x++){
   const i=(y*96+x)*4,r=d[i],g=d[i+1],b=d[i+2],alpha=d[i+3];
   if(alpha<32)continue;
@@ -8657,6 +8657,13 @@ gameCanvas.addEventListener('pointercancel',e=>homesteadTap.delete(e.pointerId))
 gameCanvas.addEventListener('pointercancel',stopCameraPointer);
 gameCanvas.addEventListener('wheel',e=>{e.preventDefault();setCameraZoom(cameraZoom*Math.exp(-e.deltaY*.001))},{passive:false});
 let lastWorldError='';
+function secureImageData(context,x,y,w,h){
+ try{return context.getImageData(x,y,w,h)}
+ catch(e){
+  if(e&&e.name==='SecurityError'){return context.createImageData(w,h)}
+  throw e;
+ }
+}
 function safePixelRead(context,x,y){try{return context.getImageData(x,y,1,1).data}catch(e){return [0,0,0,255]}}
 function reportWorldError(error){
  const message=error&&error.message?error.message:String(error);
