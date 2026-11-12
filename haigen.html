@@ -8679,9 +8679,54 @@ function stepWoodlandResident(t,dt){
  if(blockedBySolid(nx,ny)){t.leg=null;t.goal=null;t.wait=600;return;}
  t.x=nx;t.y=ny;t.dir=trollFacing(lx,ly);t.walking=true;t.clock+=step*16;
 }
+function noticeHaigen(t,dt){
+ const sameRoom=trollStumpInside&&t.room===(inTreasureCave?'vault':'home');
+ if(sameRoom){
+  const x=trollRoomPlayer.x*(t.vault?600:547),y=trollRoomPlayer.y*(t.vault?400:600);
+  const dx=x-t.x,dy=y-t.y,d=Math.hypot(dx,dy);
+  t.noticeIn=(t.noticeIn??(600+Math.random()*2300))-dt;
+  if(t.curiousFor>0)t.curiousFor-=dt;
+  if(t.curiousFor>0||t.noticeIn<=0){
+   if(t.noticeIn<=0){
+    t.noticeIn=1800+Math.random()*2100;
+    if(!t.watchDistance&&!t.to&&d<225&&Math.random()<.58&&
+       caveTrolls.filter(other=>other.room===t.room&&other.curiousFor>0).length<2){
+     t.curiousFor=5000+Math.random()*6000;
+     t.curiosityAngle=(Math.random()-.5)*1.5;
+     t.watchDistance=30+Math.random()*20;
+    }
+   }
+   if(t.curiousFor>0&&d<260){
+    if(d<t.watchDistance+9){
+     t.route=[];t.dir=trollFacing(dx,dy);return true;
+    }
+    if(!t.watchPoint||Math.hypot(x-t.watchPoint[0],y-t.watchPoint[1])>22||!t.route.length){
+     t.watchPoint=[x,y];t.route=[];
+     const angle=Math.atan2(-dy,-dx)+t.curiosityAngle;
+     for(const offset of [0,.8,-.8,1.6,-1.6]){
+      const a=angle+offset,end=[x+Math.cos(a)*t.watchDistance,y+Math.sin(a)*t.watchDistance];
+      if(caveTrolls.some(other=>other!==t&&other.room===t.room&&Math.hypot(other.x-end[0],other.y-end[1])<23))continue;
+      t.route=indoorRoute(t,end);
+      if(t.route.length)break;
+     }
+    }
+    if(t.route.length){
+     t.wait=0;t.pace=t.speed;t.look=trollFacing(dx,dy);stepIndoorResident(t,dt);return true;
+    }
+    t.curiousFor=-1;
+   }
+  }
+ }
+ if(t.watchDistance){
+  t.watchDistance=0;t.curiousFor=0;t.watchPoint=null;t.route=[];t.wait=900+Math.random()*2000;
+  t.noticeIn=6500+Math.random()*8500;
+ }
+ return false;
+}
 function updateCaveResidents(dt){
  for(const t of caveTrolls){
   t.walking=false;
+  if(noticeHaigen(t,dt))continue;
   if(t.wait>0){
    t.wait-=dt;
    if(trollStumpInside&&t.room===(inTreasureCave?'vault':'home')&&Math.random()<dt/3600){
