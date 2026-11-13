@@ -2447,6 +2447,22 @@ addEventListener('pagehide',()=>{state.haigenLastVisit=Date.now();save()});
 // V302: Runestone of Knowledge. Public encyclopedia lookup, explicit source attribution,
 // offline fallback, and persistent research notes. No credentials or unrestricted browsing.
 state.runeResearch=Array.isArray(state.runeResearch)?state.runeResearch.filter(x=>x&&typeof x.topic==='string').slice(-300):[];
+// V350: child-friendly, curated runestone. No unrestricted encyclopedia searching.
+const runeSafeTopics=['Mycology','Mushroom','Fungi','Mycelium','Spore','Forest','Tree','Oak','Pine','Moss','Fern','Lichen','Butterfly','Bee','Fox','Rabbit','Deer','Osprey','Frog','Mallard','Bird migration','Animal migration','Ecology','Habitat','Food chain','Pollination','Photosynthesis','Geography','River','Lake','Mountain','Weather','Cloud','Rain','Snow','Astronomy','Moon','Solar System','Planet','Constellation','Geology','Volcano','Fossil','Dinosaur','Architecture','Medieval architecture','Castle','Runes','Viking Age','Norse mythology','Elder Futhark'];
+const runeUnsafePattern=/\\b(?:sex(?:ual|uality)?|mating|reproduct(?:ion|ive)|intercourse|porn|erotic|genital|breast|nude|nudity|rape|abuse|violence|suicide|self.harm|drug abuse|prostitut|promiscu|polygam|polyand|pregnan|fertiliz|copulat|gamet|sperm|testicle|penis|vagina|orgasm|kill(?:ing)?|murder|warfare)\\b/i;
+function runeTopicAllowed(topic){
+ const t=String(topic||'').trim().toLowerCase();
+ return !!t&&!runeUnsafePattern.test(t)&&runeSafeTopics.some(s=>t===s.toLowerCase()||t===s.toLowerCase()+' habitat');
+}
+function runeSafeSummary(s){return !runeUnsafePattern.test(String(s||''));}
+function runeCleanMemories(){
+ const old=state.runeResearch.length;
+ state.runeResearch=state.runeResearch.filter(x=>runeTopicAllowed(x.topic)&&runeSafeSummary(x.summary));
+ state.runeQuestions=(state.runeQuestions||[]).filter(q=>runeTopicAllowed(q.topic));
+ state.runeRecentTopics=(state.runeRecentTopics||[]).filter(runeTopicAllowed);
+ if(old!==state.runeResearch.length)save();
+}
+runeCleanMemories();
 const runeTopics={lake:'Mallard',wildlife:'Animal migration',botany:'Mycology',building:'Architecture',exploration:'Geography',mysteries:'Runes'};
 function runeChosenTopic(){
  if(Array.isArray(state.runeQuestions)&&state.runeQuestions.length)return state.runeQuestions[0].topic;
@@ -2454,6 +2470,7 @@ function runeChosenTopic(){
  return runeTopics[top]||'Ecology';
 }
 function runeResearchPanel(){
+ runeCleanMemories();
  const history=state.runeResearch.slice(-15).reverse();
  open('<h2>ᚲ Runestone of Knowledge</h2><p><b>Thirst for knowledge:</b> '+Math.round(state.runeCuriosity||0)+'/100 · <b>Questions waiting:</b> '+(state.runeQuestions?.length||0)+'</p><p>Haigen may investigate the world beyond his woodland. Research is attributed to its source, not treated as unquestionable truth.</p><p><b>Haigen is currently curious about:</b> '+safeText(runeChosenTopic())+'</p><input id="runeTopic" style="width:100%;padding:10px;background:#f5ead0;color:#182b23;border-radius:8px" maxlength="100" placeholder="What should Haigen research?" value="'+safeText(runeChosenTopic())+'"><p><button class="btn" id="runeLookup">🔎 Research topic</button> <button class="btn" id="runeCurious">✨ Follow his curiosity</button></p><div id="runeResult" aria-live="polite"></div><h3>Research journal</h3>'+(history.length?history.map(x=>'<p><b>'+safeText(x.topic)+'</b> · '+new Date(x.at).toLocaleDateString()+'<br>'+safeText(x.summary)+'<br><small>Source: '+safeText(x.source)+'</small></p>').join(''):'<p>No research yet.</p>'));
  document.getElementById('runeLookup').onclick=()=>runeLookup(document.getElementById('runeTopic').value);
@@ -2462,6 +2479,7 @@ function runeResearchPanel(){
 async function runeLookup(input){
  const topic=String(input||'').trim().slice(0,100),out=document.getElementById('runeResult');
  if(!topic)return;
+ if(!runeTopicAllowed(topic)){if(out)out.textContent='That subject needs Alfather to choose an approved learning topic first. Try mushrooms, wildlife, forests, rivers or stars.';return;}
  if(out)out.textContent='Haigen is searching for knowledge about '+topic+'…';
  try{
   // Wikipedia's public MediaWiki search endpoint supports browser CORS via origin=*.
@@ -2471,6 +2489,7 @@ async function runeLookup(input){
   const data=await response.json(),page=Object.values(data.query?.pages||{})[0];
   if(!page||!page.extract){if(out)out.textContent='No reliable summary found. Try a different subject.';return}
   const summary=String(page.extract).slice(0,750),title=String(page.title||topic).slice(0,120);
+  if(!runeTopicAllowed(title)||!runeSafeSummary(summary)){if(out)out.textContent='This article wandered beyond the safe woodland library. Haigen will choose another subject.';return;}
   const source='Wikipedia: '+title;
   const record={topic:title,summary,source,at:Date.now()};
   state.runeResearch.push(record);
@@ -10058,7 +10077,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=349;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Woodland cockerel';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=350;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Woodland cockerel';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
