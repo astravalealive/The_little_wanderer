@@ -1,1 +1,1 @@
-{"build":391,"notes":"Installed uploaded robin and songbird 8x8 transparent atlases, using ground, hopping, pecking/worm, takeoff, flight and landing frame sequences; original illustrated birds remain fallback."}
+{"build":392,"notes":"Use repaired uploaded robin and songbird 8x8 atlas files; preserve existing animation sequences and flock behaviour. Visual testing still needed."}
