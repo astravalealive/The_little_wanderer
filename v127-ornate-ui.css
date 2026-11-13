@@ -20,19 +20,19 @@ body.v127-rpg #useBtn::after{content:"RT  USE TOOL";font:700 12px Georgia,serif}
 body.v127-rpg .hotbar{
  z-index:21;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 9px);
  gap:4px;padding:7px 11px;max-width:min(calc(100vw - 280px),840px);
- border-radius:15px;background:linear-gradient(180deg,#3d2b21ee,#0f1515f6 24%,#151816f7 76%,#4d3627f5);
- border:3px ridge #cd9a57;box-shadow:inset 0 0 0 2px #6a472c,0 0 0 2px #261d18,0 8px 22px #070e0fc9;
+ border-radius:15px;background:rgba(24,29,27,.22);
+ border:3px ridge #cd9a57;box-shadow:inset 0 0 0 1px #a9783e66,0 2px 9px #0b110d45;
  scrollbar-color:#a9783e #211c18
 }
 body.v127-rpg .hotbar::before,body.v127-rpg .hotbar::after{content:"✥";color:#e4ba6f;align-self:center;font:700 20px Georgia,serif;filter:drop-shadow(0 1px 1px #140c0b)}
 body.v127-rpg .slot{
  display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;
  color:#efd8a8;min-width:57px;width:57px;min-height:58px;flex:0 0 auto;
- background:linear-gradient(150deg,#34302a,#151b1a);border:2px solid #987448;border-radius:7px;
- box-shadow:inset 0 0 0 2px #2b2924,0 2px 1px #0b0a09;cursor:pointer;
+ background:rgba(32,35,28,.22);border:2px solid #b59259;border-radius:7px;
+ box-shadow:inset 0 0 0 1px #f0d1a02e,0 1px 2px #0b0a0933;cursor:pointer;
 }
-body.v127-rpg .slot.selected{background:linear-gradient(145deg,#504029,#1c1c19);border:2px solid #ffda6a;box-shadow:0 0 0 1px #e3af3a,inset 0 0 10px #ffd15f66,0 0 15px #f2b33180}
-body.v127-rpg .slot:disabled{opacity:.42;filter:grayscale(.75)}
+body.v127-rpg .slot.selected{background:rgba(153,109,54,.34);border:2px solid #ffe095;box-shadow:0 0 0 1px #d7ad66,inset 0 0 9px #ffd18c24,0 0 7px #f2b3313b}
+body.v127-rpg .slot:disabled{opacity:.70;filter:grayscale(.45)}
 body.v127-rpg .slot small{font:600 9px Georgia,serif;letter-spacing:.02em;color:#e1caa0;line-height:1.1}
 body.v127-rpg .slot .rpg-item-art{width:34px;height:34px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(1px 2px 1px #090d0dc9)}
 body.v127-rpg .slot .rpg-item-svg{width:33px;height:33px;filter:drop-shadow(1px 2px 1px #080c0bcb)}
