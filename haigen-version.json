@@ -1,1 +1,1 @@
-{"build":379,"notes":"Greyfang now has a full 32-frame four-direction wolf atlas (idle, walk, run, alert, lunge and rest). When Dylan gets close in wolf territory, Greyfang gives chase, Dylan flees and Skölli can defend. No other wildlife changed."}
+{"build":380,"notes":"Greyfang now renders using the user-approved transparent 1152x448 PNG sprite atlas, with 8x4 cells of 144x112. Rabbit chase and Skolli protection unchanged. Front/back poses remain static as supplied."}
