@@ -5707,7 +5707,7 @@ function haigenSpriteStatus(){
  const knock=haigenKnock&&haigenKnock.remaining>0?haigenKnock:null;
  const useHands=action&&['eat','medicine','cook'].includes(action.kind);
  let equip=useHands?'':state.equipped==='hands'?'':state.equipped;
- if(state.autonomy&&!useHands){
+ if(state.autonomy&&!homeInside&&!useHands){
   const kind=action?.kind;
   const actionTool={axe:'axe',pickaxe:'pickaxe',shovel:'shovel',torch:'torch',
    cast:'rod',reel:'rod',land:'rod',net:'net',catch:'net',release:'net',craft:'hammer'};
@@ -5718,7 +5718,7 @@ function haigenSpriteStatus(){
   else if(state.autoFreeJob?.kind==='net'&&state.tools.net)equip='net';
   else if(state.autoFreeJob?.kind==='build')equip='hammer';
  }
- return {action,knock,equip:state.carriedFrogId>=0&&state.tools.net?'net':equip,outfit:haigenOutfit()};
+ return {action,knock,equip:homeInside?(state.equipped==='hands'?'':state.equipped):equip,outfit:haigenOutfit()};
 }
 // V120 coherent pixel props: cached 40x60 atlases with grips anchored in hands.
 // Pose changes are four distinct 10-12fps phases: windup, contact, follow-through, recovery.
@@ -10058,7 +10058,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=348;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Woodland cockerel';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=349;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Woodland cockerel';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
