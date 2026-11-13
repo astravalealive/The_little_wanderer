@@ -8269,6 +8269,11 @@ trackMotion(c,oldX,oldY,c.x,c.y,dt);
 // Direct pan: no following force while fingers are on the canvas.
 const draggingCamera=cameraTouches.size>0;
 if(playerInput)cameraDetached=false;
+// Do not interrupt active exploration or world editing. Return smoothly after 12 idle seconds.
+if(draggingCamera)cameraLastPanAt=performance.now();
+if(cameraDetached&&!draggingCamera&&!worldEditorActive&&!cameraTouches.size&&performance.now()-cameraLastPanAt>CAMERA_IDLE_RETURN_MS){
+ cameraDetached=false;
+}
 const cameraHolding=!draggingCamera&&performance.now()-cameraReleaseAt<950;
 if(!draggingCamera&&!cameraHolding&&!cameraDetached&&!worldEditorActive){
  const follow=1-Math.exp(-dt/1250);
@@ -9635,7 +9640,9 @@ function updateCoordinateReadout(){
 setInterval(updateCoordinateReadout,150);
 updateCoordinateReadout();
 let cameraReleaseAt=-1e9;
-let cameraDetached=false; // V184: free camera stays where player pans during autonomous play.
+let cameraDetached=false; // V346: temporary free camera returns to Haigen after inactivity.
+let cameraLastPanAt=performance.now();
+const CAMERA_IDLE_RETURN_MS=12000;
 const cameraTouches=new Map();
 let pinchDistance=0;
 const gameCanvas=$('game');
@@ -9650,7 +9657,7 @@ const editorCanvasPan=(dx,dy)=>{
  const bounds=gameCanvas.getBoundingClientRect(),z=worldZoom();
  cam.x=clamp(cam.x-dx*W/bounds.width/z,WORLD_MIN,WORLD);
  cam.y=clamp(cam.y-dy*H/bounds.height/z,WORLD_MIN,WORLD);
- cameraDetached=true;
+ cameraDetached=true;cameraLastPanAt=performance.now();
 };
 let editorPinchDistance=0;
 gameCanvas.addEventListener('pointerdown',e=>{
@@ -9766,7 +9773,7 @@ gameCanvas.addEventListener('pointermove',e=>{
   pinchDistance=distance;
  }else if(p.length===1){
   const scale=worldZoom();
-  if(Math.hypot(e.clientX-prev.x,e.clientY-prev.y)>0.5)cameraDetached=true;
+  if(Math.hypot(e.clientX-prev.x,e.clientY-prev.y)>0.5){cameraDetached=true;cameraLastPanAt=performance.now();}
   // Move the camera exactly with the drag, at the current zoom level.
   cam.x=clamp(cam.x-(e.clientX-prev.x)/scale,WORLD_MIN,WORLD);
   cam.y=clamp(cam.y-(e.clientY-prev.y)/scale,WORLD_MIN,WORLD);
@@ -10050,7 +10057,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=345;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Woodland cockerel';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=346;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Woodland cockerel';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
