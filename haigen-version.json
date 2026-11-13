@@ -1,1 +1,1 @@
-{"build":383,"notes":"Mobile canvas touch gestures now suppress iOS browser rubber-band/pull-to-refresh so swipes pan the world camera; menus retain scrolling."}
+{"build":384,"notes":"Central woodland broadleaf trees are 42% larger, thinned by deterministic selection and 128-unit spacing, with 100-unit road clearance. Other biomes, wildlife and saved tree IDs unchanged."}
