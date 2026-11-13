@@ -5468,7 +5468,7 @@ function drawCampHome(){
   // the dark rectangular presentation backing around the house sprites.
   // Coordinates are fractions of the original art bounds; do not move the door.
   const silhouette=homeSilhouette(tier);
-  silhouette.forEach(([sx,sy],i)=>i?ctx.lineTo(px+sx*w,py+sy*h):ctx.moveTo(px+sx*w,py+sy*h));ctx.closePath();ctx.clip();
+  // Inset the outline slightly to remove the remaining presentation-image fringe.\n  silhouette.forEach(([sx,sy],i)=>{\n   const tx=px+(sx*.966+.017)*w,ty=py+(sy*.972+.014)*h;\n   i?ctx.lineTo(tx,ty):ctx.moveTo(tx,ty);\n  });ctx.closePath();ctx.clip();
   // Remove dark fringe pixels from the presentation artwork without trimming the roof.
  ctx.drawImage(exterior,px,py,w,h);ctx.restore();
   if(!homeInside&&homeDoorOpen>0){ctx.save();ctx.fillStyle='#261b16';ctx.fillRect(x-18,y-72,36,73);ctx.fillStyle='#987247';ctx.fillRect(x-18+homeDoorOpen*30,y-72,Math.max(3,34-homeDoorOpen*30),73);ctx.restore()}
