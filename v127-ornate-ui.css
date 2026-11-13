@@ -372,3 +372,29 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"] h3{
  body.v127-rpg .v127-gear{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}
  body.v127-rpg .v127-settings{bottom:calc(env(safe-area-inset-bottom,0px) + 114px);max-height:65dvh}
 }
+
+/* V377: legacy floating context buttons previously obscured tool controls.
+   Their real actions are now reachable from the Adventure Menu. */
+body.v127-rpg #haigenTalkBtn,
+body.v127-rpg #haigenLookoutBtn,
+body.v127-rpg #ravenPostBtn,
+body.v127-rpg #worldLocator{
+ display:none!important;
+ pointer-events:none!important;
+}
+body.v127-rpg #v127Root .v127-settings.open{
+ display:block;
+ z-index:65;
+}
+body.v127-rpg #v127Root .v127-settings-grid{
+ grid-template-columns:repeat(2,minmax(0,1fr));
+}
+body.v127-rpg #v127Root .v127-settings button{
+ touch-action:manipulation;
+}
+@media (max-width:600px){
+ body.v127-rpg #v127Root .v127-settings{
+  width:min(280px,calc(100vw - 16px));
+  max-height:min(62dvh,450px);
+ }
+}
