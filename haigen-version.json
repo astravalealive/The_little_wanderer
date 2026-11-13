@@ -1,1 +1,1 @@
-{"build":380,"notes":"Greyfang now renders using the user-approved transparent 1152x448 PNG sprite atlas, with 8x4 cells of 144x112. Rabbit chase and Skolli protection unchanged. Front/back poses remain static as supplied."}
+{"build":381,"notes":"Greyfang uses the exact approved original transparent PNG, 840x420 pixels with 8x4 grid of 105x105 frames. Dylan chase and Skolli protection preserved."}
