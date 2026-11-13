@@ -2526,6 +2526,12 @@ setInterval(()=>{runeKnowledgeBtn.style.display=Math.hypot(state.x-ruins.x,state
 
 // V310: direct, persistent two-way conversations with Haigen (local rule-based dialogue).
 state.haigenConversations=Array.isArray(state.haigenConversations)?state.haigenConversations:[];
+ // V351: legacy conversations persist independently of the research journal.
+ // Remove inappropriate historical exchanges once, without resetting the save.
+ const beforeTalk=state.haigenConversations.length;
+ state.haigenConversations=state.haigenConversations.filter(m=>m&&typeof m.text==='string'&&runeSafeSummary(m.text));
+ if(beforeTalk!==state.haigenConversations.length)save();
+
 function haigenAnswer(message){
  const q=message.toLowerCase();
  const recent=state.runeResearch?.[state.runeResearch.length-1];
@@ -2547,6 +2553,7 @@ function haigenAnswer(message){
  return 'That is an interesting question. I do not know enough to answer it properly yet. Could we investigate it at the runestone?';
 }
 function haigenTalkPanel(){
+ state.haigenConversations=state.haigenConversations.filter(m=>m&&typeof m.text==='string'&&runeSafeSummary(m.text));
  const history=state.haigenConversations.slice(-35);
  open('<h2>💬 Talk with Haigen</h2><p>Ask him about his feelings, plans, curiosity, mushrooms or what he has learned. His replies use his actual game state and saved discoveries, not an AI chat service.</p><div id="haigenTalkHistory" style="max-height:42vh;overflow-y:auto;padding:5px">'+history.map(m=>'<p style="margin:7px 0"><b>'+(m.from==='you'?'You':'Haigen')+':</b> '+safeText(m.text)+'</p>').join('')+'</div><textarea id="haigenTalkInput" rows="2" maxlength="500" style="box-sizing:border-box;width:100%;font-size:16px;padding:10px" placeholder="Ask Haigen anything..."></textarea><p><button class="btn" id="haigenTalkSend">Send to Haigen</button></p>');
  const input=document.getElementById('haigenTalkInput'),send=document.getElementById('haigenTalkSend');
@@ -10077,7 +10084,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=350;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Woodland cockerel';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=351;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Woodland cockerel';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
