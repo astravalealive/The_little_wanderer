@@ -1,1 +1,1 @@
-{"build":390,"notes":"Bird flock rendering now uses consistent illustrated atlas sprites for both flying and grounded birds, removing the crude blue curved wings; flight and landing behaviour unchanged."}
+{"build":391,"notes":"Installed uploaded robin and songbird 8x8 transparent atlases, using ground, hopping, pecking/worm, takeoff, flight and landing frame sequences; original illustrated birds remain fallback."}
