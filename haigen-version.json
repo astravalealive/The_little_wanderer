@@ -1,1 +1,1 @@
-{"build":389,"notes":"Phone-sized touch devices display the original starter cottage artwork and matching door/interior geometry without resetting earned home upgrades or saved game. Larger displays retain existing house level."}
+{"build":390,"notes":"Bird flock rendering now uses consistent illustrated atlas sprites for both flying and grounded birds, removing the crude blue curved wings; flight and landing behaviour unchanged."}
