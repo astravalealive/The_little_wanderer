@@ -48,25 +48,27 @@ el.innerHTML=[
  '<nav class="v127-utilities" aria-label="Adventure tools">',
  '<button class="v127-utility" data-action="journalBtn" aria-label="Journal">',icons.book,'</button>',
  '<button class="v127-utility" data-action="packBtn" aria-label="Backpack">',icons.pack,'</button>',
- '<button class="v127-utility" data-action="callBtn" aria-label="Call friends">',icons.paw,'</button>',
  '<button class="v127-utility" data-action="mapBtn" aria-label="Map">',icons.map,'</button></nav>',
  '<button class="v127-gear" id="v127Gear" type="button" aria-label="Settings">',icons.gear,'</button>',
- '<aside class="v127-settings v127-framed" id="v127Settings"><h3>Adventure Menu</h3>',
- '<button data-action="modeBtn">Take control / Explore</button>',
- '<button data-action="storyBtn">The Silent Pond</button>',
- '<button data-action="craftBtn">Craft and Build</button>',
- '<button data-action="devKitBtn">🧰 DEV KIT · Weapons & Items</button>',
- '<button data-action="artBtn">Change World Style</button>',
- '<button data-action="helpBtn">Controls and Help</button>',
- '<button data-action="eatBtn">Eat / Use Food</button>',
- '<button data-action="healBtn">Heal</button>',
- '<button data-action="restBtn">Rest</button>',
- '<button data-action="cookBtn">Cook and Mix</button>',
- '<button data-action="mailBtn">Haigen’s Notes</button>',
- '<button data-action="styleBtn">Hair and Appearance</button>',
- '<button id="v127MeetFriends">Meet Dylan and Skölli</button>',
- '<button id="v127VisitPond">Visit the frog pond</button>',
- '<button id="v127CloseSettings">Close</button></aside>'
+ '<aside class="v127-settings v127-framed" id="v127Settings" aria-label="Adventure menu"><h3>Adventure Menu</h3>',
+ '<div class="v127-settings-grid">',
+ '<button data-action="modeBtn">🎮 Take control</button>',
+ '<button data-action="storyBtn">📜 Quest</button>',
+ '<button data-action="craftBtn">🔨 Craft & Build</button>',
+ '<button data-action="eatBtn">🍎 Eat</button>',
+ '<button data-action="healBtn">🌿 Heal</button>',
+ '<button data-action="restBtn">💤 Rest</button>',
+ '<button data-action="cookBtn">🍲 Cook</button>',
+ '<button data-action="mailBtn">✉️ Notes</button>',
+ '<button data-action="callBtn">🦊 Friends</button>',
+ '<button data-action="styleBtn">🎨 Appearance</button>',
+ '</div>',
+ '<details class="v127-advanced"><summary>⚙️ Extra settings</summary>',
+ '<button data-action="helpBtn">Controls & Help</button>',
+ '<button data-action="artBtn">World appearance</button>',
+ '<button data-action="devKitBtn">🧰 Developer testing</button>',
+ '</details>',
+ '<button id="v127CloseSettings">Close menu</button></aside>'
 ].join('');
 document.body.appendChild(el);
 // V217: portrait acts as a camera locator, not a teleport.
@@ -81,7 +83,7 @@ haigenPortrait.addEventListener('click',focusHaigen);
 haigenPortrait.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();focusHaigen()}});
 // Keep the iPad landscape readable, while allowing the full objective panel
 // to open from its large + target. Desktop keeps the quest visible.
-if(window.innerWidth<=600){
+if(window.innerWidth<=1100){
  $('v127Quest').dataset.collapsed='true';
  $('v127QuestToggle').textContent='+';
 }
@@ -91,35 +93,12 @@ el.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('cl
 }));
 $('v127Gear').onclick=()=>$('v127Settings').classList.toggle('open');
 $('v127CloseSettings').onclick=()=>$('v127Settings').classList.remove('open');
-$('v127MeetFriends').onclick=()=>{$('previewFriends')?.click();$('v127Settings').classList.remove('open')};
-$('v127VisitPond').onclick=()=>{$('previewPond')?.click();$('v127Settings').classList.remove('open')};
 $('v127QuestToggle').onclick=()=>{
  const quest=$('v127Quest'),collapsed=quest.dataset.collapsed!=='true';
  quest.dataset.collapsed=String(collapsed);
  $('v127QuestToggle').textContent=collapsed?'+':'−';
 };
-// Additional inventory slots extend the native toolbar but never alter equipment.
-const extraItems=[
- {id:'berries',label:'Berries',art:icons.berries,num:'8',field:'berries'},
- {id:'mushroom',label:'Mushroom',art:icons.mushroom,num:'9',field:'mushrooms'},
- {id:'bag',label:'Bag',art:icons.pack,num:'0',field:'food'}
-];
-function syncExtraSlots(state){
- const bar=$('hotbar');if(!bar)return;
- for(const item of extraItems){
-  let button=bar.querySelector('[data-item="'+item.id+'"]');
-  if(!button){
-   button=document.createElement('button');button.type='button';
-   button.className='slot v127-item-slot';button.dataset.item=item.id;
-   button.setAttribute('aria-label',item.label+' inventory');
-   button.innerHTML='<span class="rpg-index">'+item.num+'</span><span class="rpg-item-svg">'+item.art+'</span><small>'+item.label+'</small><span class="rpg-count">0</span>';
-   button.onclick=()=>{$('packBtn')?.click()};
-   bar.appendChild(button);
-  }
-  const number=button.querySelector('.rpg-count');
-  if(number)number.textContent=String(Math.max(0,Math.floor(Number(state[item.field])||0)));
- }
-}
+// Extra food counters live in the Backpack, not on the tool hotbar.
 const toast=$('toast');
 if(toast&&typeof MutationObserver!=='undefined'){
  const clean=()=>{
@@ -166,7 +145,6 @@ function tick(){
  if(now-lastDraw>180){lastDraw=now;
   try{
    const state=engine.snapshot(),hp=Math.min(100,Math.max(0,Number(state.health)||0));
-   syncExtraSlots(state);
    if(Math.ceil(hp)!==lastHP){
     lastHP=Math.ceil(hp);
     const hearts=[...el.querySelectorAll('.v127-heart')];
