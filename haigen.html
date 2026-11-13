@@ -7691,37 +7691,43 @@ function updateBirds(dt){
   }
  }
 }
+// V391: uploaded 8x8 atlases, 192x128 cells. Each flock retains its species.
+const songbirdAtlas=new Image(),robinAtlas=new Image();
+let songbirdReady=false,robinReady=false;
+songbirdAtlas.onload=()=>{songbirdReady=songbirdAtlas.naturalWidth===1536&&songbirdAtlas.naturalHeight===1024};
+robinAtlas.onload=()=>{robinReady=robinAtlas.naturalWidth===1536&&robinAtlas.naturalHeight===1024};
+songbirdAtlas.src='./assets/haigen_songbird_clean_transparent_8x8.png?v=391';
+robinAtlas.src='./assets/haigen_robin_clean_8x8.png?v=391';
 function drawBird(b){
  if(b.hiddenUntil&&time<b.hiddenUntil)return;
- const flying=b.air>.04;
- const wing=Math.sin(time*.022+b.phase);
+ const flying=b.air>.04,landing=flying&&b.air<.4;
  const alt=flying?b.air*(72+Math.sin(time*.003+b.phase)*11):0;
- const hop=!flying?Math.max(0,Math.sin(time*.009+b.phase))*3:0;
- const x=b.x,y=b.y-alt-hop;
- // V390: all flock birds use the same detailed illustrated art, in flight AND on the ground.
- // The previous flying branch drew crude blue curved strokes instead of actual wings.
- if(illustratedFaunaReady){
-  ctx.save();
+ const x=b.x,y=b.y-alt;
+ const robin=b.flock%2===1,atlas=robin?robinAtlas:songbirdAtlas;
+ const ready=robin?robinReady:songbirdReady;
+ if(ready){
+  const t=time+b.phase*173;
+  let row=0,col=0;
   if(flying){
-   // A subtle bob/tilt gives a sense of flight without drawing detached stick-wings.
-   ctx.translate(x,y);
-   ctx.rotate(wing*.055);
-   ctx.translate(-x,-y);
-  }
-  drawIllustratedFauna('bird',x,y,b.vx<0?'left':'right',
-   flying,time+b.phase*200,flying?1.04:.94,flying?'fly':b.pecking?'peck':'rest');
-  ctx.restore();
-  return;
+   if(b.air<.36&&!landing){row=3;col=2+Math.floor(t/105)%6}
+   else if(landing){row=5;col=4+Math.floor(t/115)%4}
+   else {row=4+Math.floor(t/900)%2;col=Math.floor(t/110)%8}
+  }else if(time<(b.wormUntil||0)){row=2;col=4+Math.floor(t/150)%4}
+  else if(b.pecking){row=2;col=Math.floor(t/180)%5}
+  else if(Math.sin(t*.002)>-.15){row=1;col=Math.floor(t/170)%8}
+  else {row=0;col=Math.floor(t/280)%8}
+  // Atlas frames include complete birds, worms and wings. No overlay artwork.
+  ctx.save();
+  if(b.vx<-.5){ctx.translate(x,0);ctx.scale(-1,1);ctx.translate(-x,0)}
+  const w=flying?58:49,h=flying?43:37;
+  ctx.drawImage(atlas,col*192,row*128,192,128,Math.round(x-w/2),Math.round(y-h*.72),w,h);
+  ctx.restore();return;
  }
- // Illustrated atlas not loaded yet: small cohesive bird silhouette, no exposed stroke wings.
- ctx.save();ctx.translate(x,y);ctx.scale(b.vx<0?-1:1,1);
- ellipse(0,7+alt+hop,11,4,'#31564044');
- ellipse(0,-7,11,7,b.flock%3===0?'#9c7659':'#738e99');
- ellipse(-5,-10,7,3,b.flock%3===0?'#d4b58e':'#b5c8d0');
- ellipse(7,-12,6,6,b.flock%3===0?'#b88b65':'#9db0ba');
- ellipse(8,-16,4,2,b.flock%3===0?'#e1c9a2':'#dce7e4');
- ellipse(9,-13,1.5,1.5,'#243c3c');poly([[12,-11],[19,-9],[12,-7]],'#d4ad62');
- ctx.restore();
+ // Existing illustrated artwork remains the loading/error fallback.
+ if(illustratedFaunaReady){
+  drawIllustratedFauna('bird',x,y,b.vx<0?'left':'right',flying,time+b.phase*200,
+   flying?1.04:.94,flying?'fly':b.pecking?'peck':'rest');
+ }
 }
 // Gentle fictional weather cycle; saved alongside Haigen's other world state.
 if(!state.weather||typeof state.weather!=='object')state.weather={mode:'clear',elapsed:0,until:95000,rain:0};
@@ -11034,7 +11040,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=390;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=391;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
