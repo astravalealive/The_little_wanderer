@@ -1544,7 +1544,7 @@ function moveBeast(b,tx,ty,dt,speed){const d=Math.hypot(tx-b.x,ty-b.y);if(d>2){b
 function takeDamage(amount,name,venom=false,attacker=null){if(collapseRemaining>0||time-state.lastHitAt<1500)return false;state.lastHitAt=time;damageFlashUntil=time+1050;startHaigenShock(attacker);mindEvent('hurt',name);state.health=Math.max(0,state.health-amount);soundEffect('hurt');notify('💥 '+name+' lunged! -'+amount+' health');if(venom)applyPoison();if(state.health<=0)rescueHaigen();save();return true}
 function eatFood(){if(state.hunger>=100){notify('🍲 Haigen is already full!');return}let gain=0;if(state.food>0){state.food--;gain=42}else if(state.eggs>=2){state.eggs-=2;gain=24}else if(state.vegetables>=2){state.vegetables-=2;gain=22}else if(state.berries>=3){state.berries-=3;gain=16}else{notify('🥕 Gather berries, eggs or vegetables, or prepare a meal.');return}state.hunger=Math.min(100,state.hunger+gain);startHaigenAction('eat',820);notify('🍲 Tummy filled! +'+gain+' hunger.');save()}
 function healSelf(){if(curePoison())return true;if(state.poisonMs>0&&state.potions<=0)return false;if(state.health>=100){notify('❤️ No healing needed.');return false}if(state.potions>0){state.potions--;state.health=Math.min(100,state.health+45);startHaigenAction('medicine',880);notify('🌿 Applied woodland salve! +45 health.');save();return true}notify('🌿 Make a woodland salve at the cooking station to treat injuries.');return false}
-function toggleRest(){if(state.resting){state.resting=false;notify('🌤️ Haigen wakes up. Apparently the ground is still there.');save();return}if(dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<170)){notify('💤 Find a safe spot by camp or a campfire to rest.');return}state.resting=true;mindEvent('rest');state.autonomy=false;autoDestination=null;notify('💤 Haigen curls up for a nap by the fire.');save()}
+function toggleRest(){if(!state.resting&&campDanger(state.x,state.y)){notify('⚠️ Enemies nearby! Find somewhere safe before sleeping.');return}if(state.resting){state.resting=false;notify('🌤️ Haigen wakes up. Apparently the ground is still there.');save();return}if(dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<170)){notify('💤 Find a safe spot by camp or a campfire to rest.');return}state.resting=true;mindEvent('rest');state.autonomy=false;autoDestination=null;notify('💤 Haigen curls up for a nap by the fire.');save()}
 function cookingStation(){if(dist(state,cottage)>270&&!state.structures.some(f=>f.kind==='campfire'&&dist(state,f)<160)){notify('🔥 Get near the campfire or campsite to cook.');return}craft('remedies')}
 // V382: Greyfang roams the wider northern/eastern woodland, rather than a 110px home circle.
 function greyfangPatrolPoint(b){
@@ -3129,7 +3129,10 @@ function campRoadDistance(x,y){
  return nearest;
 }
 function campDanger(x,y){
- return [...beasts,...regionalWildlife].some(a=>animalAlive(a)&&
+ const bossThreat=window.__swampBosses?.snapshot?.().some(b=>b.phase!=='hidden'&&b.phase!=='defeated'&&Math.hypot(x-b.x,y-b.y)<440)||false;
+ const crab=window.__krakkle?.snapshot?.();
+ const crabThreat=!!(crab&&crab.phase&&crab.phase!=='hidden'&&crab.phase!=='defeated'&&Number.isFinite(crab.x)&&Math.hypot(x-crab.x,y-crab.y)<440);
+ return bossThreat||crabThreat||[...beasts,...regionalWildlife].some(a=>animalAlive(a)&&
  ((a.kind==='wolf'||a.kind==='boar'&&state.story?.stage!==4)||hostileTypes.has(a.type))&&
  Math.hypot(x-a.x,y-a.y)<320)
  ||objects.some(o=>spectorsActive()&&o.type==='specter'&&Math.hypot(x-(ghostBehaviour.get(o.id)?.x??o.x),y-(ghostBehaviour.get(o.id)?.y??o.y))<320);
@@ -3729,7 +3732,7 @@ function autonomousTick(dt){
  if(state.poisonMs>0&&state.antidotes>0){autoPlan('cure the poison','antidote');curePoison();return}
  if(state.health<72&&state.potions>0){autoPlan('treat my wounds','salve');healSelf();return}
  if(state.resting){
-  if(travelCamp&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;autoPlan('danger near camp: move away','escape');return}
+  if(!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;autoPlan('danger near camp: move away','escape');return}
   if(state.energy>=90&&state.health>=77&&state.poisonMs<=0){state.resting=false;travelCamp=null;autoPause=350;autoPlan('wake up and explore again','wake');think('I feel better. Time to carry on!',3800,true)}
   else autoPlan('rest until recovered','resting');
   return;
@@ -3782,6 +3785,7 @@ function autonomousTick(dt){
     state.y+=(bedSide.y-state.y)/d*step;
     return;
    }
+   if(!homeInside&&campDanger(state.x,state.y)){autoPlan('too dangerous to sleep: retreat','escape');if(mindRetreat(dt))return;const safe=autoCampSpot();if(safe)autoTravel(safe,dt,35);return;}
    state.resting=true;travelCamp=null;autoDestination=null;autoWaypoint=null;autoResetNav();
    mindEvent('rest');autoPlan('sleep safely at home','rest');
    think('My own bed at last. Goodnight!',3900,true);save();return;
@@ -11027,6 +11031,7 @@ function drawHomeInteriorScene(visiting=false){
 }
 function frame(now){
  const dt=Math.min(Math.max(0,now-last),50);last=now;
+ if(state.resting&&!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;if(state.autonomy){autoPause=0;autoPlan('danger woke me: escape','escape')}notify('⚠️ Danger nearby! Haigen wakes up.');}
  try{
   menuController();
   if(!$('overlay').classList.contains('open'))update(dt);
@@ -11222,7 +11227,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=422;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=423;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
