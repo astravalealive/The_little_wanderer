@@ -11173,29 +11173,34 @@ refreshControllerIndicator();
 
 /* Real-world placement editor: modifies original scenery and building positions, not substitute sprites. */
 const hwRealKey='haigen-real-object-layout-v1',hwRealOriginal=new Map(),hwRealUndo=[];
-let hwRealEnabled=false,hwRealSelected=null,hwRealDrag=null,hwRealMode='move';
-const hwRealNamed=[coopPlot,woodPlot,jettyPlot,gardenPlot,trollStumpHome];
-const hwRealNamedId=['coop','woodstore','jetty','garden','troll-stump'];
-const hwRealItems=()=>[...objects.filter(o=>['tree','bareTree','fir','rock','bush','flower'].includes(o.type)&&Number.isFinite(o.id)),...hwRealNamed];
+let hwRealEnabled=false,hwRealSelected=null,hwRealDrag=null,hwRealMode='move',hwRealPointer=null;const hwRealDeleted=new Set();
+const hwRealNamed=[cottage,coopPlot,woodPlot,jettyPlot,gardenPlot,trollStumpHome];
+const hwRealNamedId=['homestead','coop','woodstore','jetty','garden','troll-stump'];
+const hwRealItems=()=>[...objects.filter(o=>['tree','bareTree','fir','rock','bush','flower'].includes(o.type)&&Number.isFinite(o.id)&&!hwRealDeleted.has('object:'+o.id)),...hwRealNamed];
 function hwRealId(o){const k=hwRealNamed.indexOf(o);return k>=0?'named:'+hwRealNamedId[k]:'object:'+o.id}
-function hwRealStore(){try{const changes={};for(const o of hwRealItems()){const id=hwRealId(o),original=hwRealOriginal.get(id);if(original&&(o.x!==original.x||o.y!==original.y))changes[id]={x:o.x,y:o.y}}localStorage.setItem(hwRealKey,JSON.stringify(changes))}catch(e){notify('Editor save failed')}}
+function hwRealStore(){try{const changes={};for(const o of hwRealItems()){const id=hwRealId(o),original=hwRealOriginal.get(id);if(original&&(o.x!==original.x||o.y!==original.y))changes[id]={x:o.x,y:o.y}}changes.__deleted=[...hwRealDeleted];localStorage.setItem(hwRealKey,JSON.stringify(changes))}catch(e){notify('Editor save failed')}}
 for(const o of hwRealItems())hwRealOriginal.set(hwRealId(o),{x:o.x,y:o.y});
-try{const saved=JSON.parse(localStorage.getItem(hwRealKey)||'{}');for(const o of hwRealItems()){const p=saved[hwRealId(o)];if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.y>=0&&p.x<=5000&&p.y<=5000){o.x=p.x;o.y=p.y}}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem(hwRealKey)||'{}');if(Array.isArray(saved.__deleted))for(const id of saved.__deleted)if(/^object:\\d+$/.test(id))hwRealDeleted.add(id);for(const o of hwRealItems()){const p=saved[hwRealId(o)];if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.y>=0&&p.x<=5000&&p.y<=5000){o.x=p.x;o.y=p.y}}}catch(e){}
 function hwRealPoint(e){const r=cv.getBoundingClientRect(),z=worldZoom();return{x:cam.x+(e.clientX-r.left-r.width/2)/z,y:cam.y+(e.clientY-r.top-r.height/2)/z}}
-function hwRealHit(p){let best=null,d=Infinity;for(const o of hwRealItems()){const r=o===trollStumpHome?145:hwRealNamed.includes(o)?85:o.type==='tree'||o.type==='fir'?60:35;const distance=Math.hypot(o.x-p.x,o.y-p.y);if(distance<r&&distance<d){best=o;d=distance}}return best}
+function hwRealHit(p){let best=null,d=Infinity;for(const o of hwRealItems()){const r=o===trollStumpHome?185:o===cottage?185:hwRealNamed.includes(o)?120:o.type==='tree'||o.type==='fir'?60:35;const oy=o===cottage?o.y-70:o===trollStumpHome?o.y-55:o.y;const distance=Math.hypot(o.x-p.x,oy-p.y);if(distance<r&&distance<d){best=o;d=distance}}return best}
 function hwRealAllowed(o,p){if(p.x<70||p.y<70||p.x>4900||p.y>4900)return false;const radius=hwRealNamed.includes(o)?120:30;if(hwRealItems().some(q=>q!==o&&Math.hypot(q.x-p.x,q.y-p.y)<radius+(hwRealNamed.includes(q)?90:15)))return false;return true}
 const hwRealBar=document.createElement('div');hwRealBar.style.cssText='position:fixed;z-index:999999;bottom:10px;left:10px;right:10px;display:flex;gap:5px;flex-wrap:wrap;pointer-events:none';
 function hwRealButton(label,fn){const b=document.createElement('button');b.textContent=label;b.style.cssText='pointer-events:auto;background:#253b34;color:#fff;border:1px solid #cbb98a;border-radius:8px;padding:9px;font:600 13px system-ui';b.onclick=fn;hwRealBar.append(b);return b}
 const hwRealToggle=hwRealButton('🛠 Edit World',()=>{hwRealEnabled=!hwRealEnabled;hwRealToggle.textContent=hwRealEnabled?'✓ Finish Editing':'🛠 Edit World';hwRealControls.forEach(b=>b.style.display=hwRealEnabled?'':'none');hwRealDrag=null;hwRealStore();notify(hwRealEnabled?'Tap a real tree, rock or building to move':'World layout saved')});
 const hwRealControls=[];
-hwRealControls.push(hwRealButton('✋ Move',()=>{hwRealMode='move';notify('Tap an existing object, then drag')}));
-hwRealControls.push(hwRealButton('↶ Undo',()=>{const p=hwRealUndo.pop();if(p){p.o.x=p.x;p.o.y=p.y;hwRealStore()}}));
+hwRealControls.push(hwRealButton('✋ Grab',()=>{hwRealMode='move';notify('Drag objects directly. Right side pans camera.')}));hwRealControls.push(hwRealButton('🗑 Delete',()=>{hwRealMode=hwRealMode==='delete'?'move':'delete';notify(hwRealMode==='delete'?'Tap a tree or rock to delete. Tap Delete again to exit.':'Grab mode restored')}));
+hwRealControls.push(hwRealButton('↶ Undo',()=>{const p=hwRealUndo.pop();if(p){if(p.deleted)hwRealDeleted.delete(hwRealId(p.o));p.o.x=p.x;p.o.y=p.y;hwRealStore()}}));
 hwRealControls.push(hwRealButton('↺ Reset selected',()=>{if(!hwRealSelected)return;const p=hwRealOriginal.get(hwRealId(hwRealSelected));if(p){hwRealUndo.push({o:hwRealSelected,x:hwRealSelected.x,y:hwRealSelected.y});hwRealSelected.x=p.x;hwRealSelected.y=p.y;hwRealStore()}}));
 hwRealControls.forEach(b=>b.style.display='none');document.body.append(hwRealBar);
-cv.addEventListener('pointerdown',e=>{if(!hwRealEnabled)return;e.preventDefault();e.stopImmediatePropagation();const p=hwRealPoint(e),o=hwRealHit(p);if(!o){notify('No movable object here');return}hwRealSelected=o;hwRealDrag={o,dx:o.x-p.x,dy:o.y-p.y,startX:o.x,startY:o.y};try{cv.setPointerCapture(e.pointerId)}catch(err){}},true);
-cv.addEventListener('pointermove',e=>{if(!hwRealEnabled||!hwRealDrag)return;e.preventDefault();e.stopImmediatePropagation();const p=hwRealPoint(e),o=hwRealDrag.o,next={x:Math.round((p.x+hwRealDrag.dx)/16)*16,y:Math.round((p.y+hwRealDrag.dy)/16)*16};if(hwRealAllowed(o,next)){o.x=next.x;o.y=next.y}},true);
-function hwRealFinish(e){if(!hwRealDrag)return;e.preventDefault();e.stopImmediatePropagation();const d=hwRealDrag;if(d.o.x!==d.startX||d.o.y!==d.startY){hwRealUndo.push({o:d.o,x:d.startX,y:d.startY});if(hwRealUndo.length>30)hwRealUndo.shift()}hwRealDrag=null;hwRealStore()}
+function hwRealRightSide(e){const r=cv.getBoundingClientRect();return e.clientX-r.left>=r.width*.58}
+cv.addEventListener('pointerdown',e=>{if(!hwRealEnabled||hwRealRightSide(e))return;const p=hwRealPoint(e),o=hwRealHit(p);if(!o)return;
+e.preventDefault();e.stopImmediatePropagation();hwRealSelected=o;
+if(hwRealMode==='delete'){if(hwRealNamed.includes(o)){notify('Building deletion protected. Move it instead.');return}hwRealUndo.push({o,x:o.x,y:o.y,deleted:true});hwRealDeleted.add(hwRealId(o));hwRealStore();notify('Object deleted · Undo available');return}
+hwRealPointer=e.pointerId;hwRealDrag={o,dx:o.x-p.x,dy:o.y-p.y,startX:o.x,startY:o.y};try{cv.setPointerCapture(e.pointerId)}catch(err){}},true);
+cv.addEventListener('pointermove',e=>{if(!hwRealEnabled||!hwRealDrag||e.pointerId!==hwRealPointer)return;e.preventDefault();e.stopImmediatePropagation();const p=hwRealPoint(e),o=hwRealDrag.o,next={x:Math.round((p.x+hwRealDrag.dx)/16)*16,y:Math.round((p.y+hwRealDrag.dy)/16)*16};if(hwRealAllowed(o,next)){o.x=next.x;o.y=next.y}},true);
+function hwRealFinish(e){if(!hwRealDrag||e.pointerId!==hwRealPointer)return;e.preventDefault();e.stopImmediatePropagation();const d=hwRealDrag;if(d.o.x!==d.startX||d.o.y!==d.startY){hwRealUndo.push({o:d.o,x:d.startX,y:d.startY});if(hwRealUndo.length>30)hwRealUndo.shift()}hwRealDrag=null;hwRealPointer=null;hwRealStore()}
 cv.addEventListener('pointerup',hwRealFinish,true);cv.addEventListener('pointercancel',hwRealFinish,true);
+
 
 function frame(now){
  const dt=Math.min(Math.max(0,now-last),50);last=now;
