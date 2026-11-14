@@ -7214,8 +7214,42 @@ function drawWaterfowl145(kind,x,y,scale,dir,pose,phase){
  if(flying)drawWaterfowlWing145(scale,phase,true,female);
  ctx.restore();
 }
+// V396: approved fixed-grid mallard and duckling PNGs. Never sample across cells.
+const mallardLandAtlas=new Image(),mallardFlightAtlas=new Image(),ducklingAtlas=new Image();
+let mallardLandReady=false,mallardFlightReady=false,ducklingReady=false;
+mallardLandAtlas.onload=()=>{mallardLandReady=mallardLandAtlas.naturalWidth===1792&&mallardLandAtlas.naturalHeight===880};
+mallardFlightAtlas.onload=()=>{mallardFlightReady=mallardFlightAtlas.naturalWidth===1792&&mallardFlightAtlas.naturalHeight===896};
+ducklingAtlas.onload=()=>{ducklingReady=ducklingAtlas.naturalWidth===1792&&ducklingAtlas.naturalHeight===896};
+mallardLandAtlas.src='./assets/haigen_mallard_ground_water_atlas.png?v=396';
+mallardFlightAtlas.src='./assets/haigen_mallard_flight_atlas.png?v=396';
+ducklingAtlas.src='./assets/haigen_ducklings_fixed_8x4.png?v=396';
+function drawPondAtlas(image,row,col,cellW,cellH,x,y,width,height,flip){
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ const dx=Math.round(x-width/2),dy=Math.round(y-height*.82);
+ if(flip){ctx.translate(dx+width,0);ctx.scale(-1,1);ctx.drawImage(image,col*cellW,row*cellH,cellW,cellH,0,dy,width,height)}
+ else ctx.drawImage(image,col*cellW,row*cellH,cellW,cellH,dx,dy,width,height);
+ ctx.restore();
+}
 function drawDuck(d){
  const afloat=d.air<.08&&lakeLevel(d.x,d.y)<1;
+ const flying=d.air>=.08;
+ // Female ducks keep their existing female artwork; the new male atlas is a drake.
+ if(d.kind!=='female'){
+  const flip=Math.cos(d.heading)<0;
+  if(flying&&mallardFlightReady){
+   const frame=Math.floor(time/125+d.phase*3)%16;
+   const row=frame<8?1:2,col=frame%8;
+   drawPondAtlas(mallardFlightAtlas,row,col,224,224,d.x,d.y-d.air*54,70*d.size,60*d.size,flip);
+   return;
+  }
+  if(!flying&&mallardLandReady){
+   const frame=Math.floor(time/185+d.phase*2)%8;
+   const row=afloat?2:1;
+   drawPondAtlas(mallardLandAtlas,row,frame,224,176,d.x,d.y,64*d.size,51*d.size,flip);
+   return;
+  }
+ }
+
  const flying=d.air>=.08;
  const dir=Math.cos(d.heading)<0?'left':'right';
  const size=.80*d.size;
@@ -7244,6 +7278,16 @@ function drawDuckNest(f){
 }
 function drawDuckling(ch){
  const growth=Math.min(1,Math.max(0,ch.age||0));
+ const atlasFlying=!!(ch.flying||ch.departAlt);
+ const atlasAfloat=!atlasFlying&&lakeLevel(ch.x,ch.y)<1;
+ if(ducklingReady&&!atlasFlying){
+  const frame=Math.floor(time/175+ch.phase*3)%8;
+  const row=atlasAfloat?2:((ch.vx||0)**2+(ch.vy||0)**2>.03?1:0);
+  const size=35+growth*13;
+  drawPondAtlas(ducklingAtlas,row,frame,224,224,ch.x,ch.y,size,size,(ch.vx||0)<0);
+  return;
+ }
+
  const scale=.30+growth*.22;
  const flying=!!(ch.flying||ch.departAlt);
  const afloat=!flying&&lakeLevel(ch.x,ch.y)<1;
@@ -11088,7 +11132,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=395;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=396;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
