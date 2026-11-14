@@ -2047,28 +2047,43 @@ approvedDylanAtlas.onload=()=>{
 };
 approvedDylanAtlas.onerror=()=>{approvedDylanReady=false;window.__v125DylanReady=false};
 approvedDylanAtlas.src='./assets/dylan-rabbit-approved-v125.png?v=1';
+// V395 adult Dylan atlas. Exact 8x8 grid: 192x128 per frame.
+const adultDylanAtlas=new Image();let adultDylanReady=false;
+adultDylanAtlas.onload=()=>{adultDylanReady=adultDylanAtlas.naturalWidth===1536&&adultDylanAtlas.naturalHeight===1024};
+adultDylanAtlas.src='./assets/dylan_adult_rabbit_8x8_transparent.png?v=395';
 function drawApprovedDylan(x,y,actor){
- if(!approvedDylanReady)return false;
+ if(!adultDylanReady){
+  if(!approvedDylanReady)return false;
+  // Keep the original approved rabbit visible if the new asset fails to load.
+  const m=actor||playerMotion,anim=m.anim||0;
+  const row=1,col=Math.floor(anim/125)%4;
+  ctx.save();ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(approvedDylanAtlas,col*96,row*96,96,96,Math.round(x-38),Math.round(y-73),77,82);
+  ctx.restore();return true;
+ }
  const m=actor||playerMotion,dir=m.dir||'down',moving=!!m.moving;
- const anim=m.anim||0;
- const frame=moving?Math.floor(anim/125)%4:0;
- const resting=['resting','sleeping'].includes(actor?.mode),alert=['alert','watching','notifying'].includes(actor?.mode),foraging=['foraging','searching','delivering','collecting'].includes(actor?.mode);
- const row=resting||alert||foraging?4:moving?(dir==='up'?2:dir==='down'?3:1):0;
- const col=resting?0:alert?1:foraging?(actor?.mode==='delivering'?3:2):moving?frame:(dir==='up'?2:dir==='right'?1:dir==='left'?3:0);
- const reflect=moving&&dir==='left';
- const bounce=moving?Math.abs(Math.sin(anim*.0125))*6:0;
- const leap=actor?.mode==='pouncing'?Math.sin(Math.max(0,Math.min(1,1-actor.t/650))*Math.PI)*16:0;
- // A little smaller than Haigen but with matching 16-bit contour weight.
- const width=77,height=82;
- const drawX=Math.round(x-width/2),drawY=Math.round(y-height+9-bounce-leap);
+ const anim=m.anim||0,mode=actor?.mode||'wandering';
+ const resting=['resting','sleeping'].includes(mode);
+ const foraging=['foraging','searching','delivering','collecting'].includes(mode);
+ const alert=['alert','watching','notifying'].includes(mode);
+ const jumping=mode==='pouncing'||(moving&&Math.abs(m.vx||0)+Math.abs(m.vy||0)>1.5);
+ let row=0,col=0;
+ if(resting){row=7;col=Math.floor(anim/360)%5}
+ else if(foraging){row=2;col=Math.floor(anim/210)%8}
+ else if(alert){row=0;col=Math.floor(anim/440)%8}
+ else if(jumping){row=5;col=Math.floor(anim/95)%8}
+ else if(moving){row=3;col=Math.floor(anim/120)%8}
+ else if(dir==='up'){row=6;col=2+Math.floor(anim/360)%4}
+ else {row=0;col=Math.floor(anim/440)%8}
+ const reflect=dir==='left';
+ const bounce=moving?Math.abs(Math.sin(anim*.0125))*3:0;
+ const width=78,height=66,drawX=Math.round(x-width/2),drawY=Math.round(y-height+5-bounce);
  ctx.save();ctx.imageSmoothingEnabled=false;
  ellipse(x,y+6,20,4,'#203b3261');
- if(reflect){
-  ctx.translate(drawX+width,0);ctx.scale(-1,1);
-  ctx.drawImage(approvedDylanAtlas,col*96,row*96,96,96,0,drawY,width,height);
- }else ctx.drawImage(approvedDylanAtlas,col*96,row*96,96,96,drawX,drawY,width,height);
+ if(reflect){ctx.translate(drawX+width,0);ctx.scale(-1,1);ctx.drawImage(adultDylanAtlas,col*192,row*128,192,128,0,drawY,width,height)}
+ else ctx.drawImage(adultDylanAtlas,col*192,row*128,192,128,drawX,drawY,width,height);
  ctx.restore();
- window.__v125DylanLastFrame={dir,moving,row,col,reflect,mode:actor?.mode||'wandering',width,height};
+ window.__v125DylanLastFrame={dir,moving,row,col,reflect,mode,width,height,adult:true};
  return true;
 }
 window.__v125DylanStatus=()=>({loaded:approvedDylanReady,
@@ -11073,7 +11088,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=394;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=395;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
