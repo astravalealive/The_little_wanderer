@@ -4094,38 +4094,41 @@ const rbTileCache={grass:null,tree:new Map(),rock:new Map()};
 function rbWoodland(x,y){return x>=0&&x<3500&&y>=0&&y<3100&&!expandedRegion(x,y)}
 // Repeating 8x8 atlas of 16x16 ground tiles, with sub-tile 8x8 details.
 function rbGrass(){
- // V139: deterministic illustrated woodland floor; no square tile borders.
+ // V399: large seamless painterly ground pattern, no 16px square atlas.
  if(rbTileCache.grass)return rbTileCache.grass;
- const tile=document.createElement('canvas');tile.width=256;tile.height=256;
- const g=tile.getContext('2d');g.imageSmoothingEnabled=false;
- let seed=83517;const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
- const p=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.floor(x),Math.floor(y),Math.ceil(w),Math.ceil(h))};
- p(0,0,256,256,'#789d68');
- // Broad irregular soil/moss islands with softened stepped pixel edges.
- for(let i=0;i<95;i++){
-  const x=Math.floor(rng()*256),y=Math.floor(rng()*256),w=8+Math.floor(rng()*28),h=3+Math.floor(rng()*12);
-  const col=['#70945f','#83a66e','#719b66','#8aab72','#6d9160','#799f69'][Math.floor(rng()*6)];
-  g.globalAlpha=.32+rng()*.22;
-  p(x,y,w,h,col);p(x+3,y-2,Math.max(3,w-8),h+4,col);
+ const size=512,tile=document.createElement('canvas');tile.width=tile.height=size;
+ const g=tile.getContext('2d');g.imageSmoothingEnabled=true;
+ let seed=399271;const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+ g.fillStyle='#668b61';g.fillRect(0,0,size,size);
+ // Wrap each mark around the canvas so the pattern is seamless at its boundaries.
+ function mark(x,y,rx,ry,color,alpha,angle=0){
+  g.fillStyle=color;g.globalAlpha=alpha;
+  for(let ox=-size;ox<=size;ox+=size)for(let oy=-size;oy<=size;oy+=size){
+   g.beginPath();g.ellipse(x+ox,y+oy,rx,ry,angle,0,Math.PI*2);g.fill();
+  }
   g.globalAlpha=1;
  }
- for(let i=0;i<1250;i++){
-  const x=Math.floor(rng()*256),y=Math.floor(rng()*256);
-  p(x,y,1+rng()*2,1,['#4c7950','#a2b77b','#638d58','#b5bb83'][Math.floor(rng()*4)]);
+ for(let i=0;i<390;i++){
+  const x=rng()*size,y=rng()*size,angle=rng()*6.28;
+  mark(x,y,12+rng()*45,5+rng()*23,['#3d674d','#7ca071','#8fa17a','#526e53','#9a9b6c'][i%5],.13+rng()*.16,angle);
  }
- // Grass clumps are hand-pixelled silhouettes with shaded stems and sunlit tips.
- for(let i=0;i<190;i++){
-  const x=Math.floor(rng()*256),y=Math.floor(rng()*256),h=2+Math.floor(rng()*5);
-  p(x,y-h,1,h,'#4d7c4b');p(x+2,y-h+1,1,h-1,'#568953');
-  p(x-2,y-h+2,1,h-2,'#648d51');p(x-1,y-1,5,1,'#85aa69');
-  if(i%3===0){p(x,y-h,1,1,'#b2c784');p(x+2,y-h+1,1,1,'#9fc17b')}
+ for(let i=0;i<3500;i++){
+  const x=rng()*size,y=rng()*size;
+  mark(x,y,.7+rng()*2.1,.4+rng()*1.5,['#b1b88a','#355f48','#a9a77b','#496f51'][i%4],.27+rng()*.3,rng()*6.28);
  }
- // Moss, leaf litter and small natural debris, kept sparse for item readability.
- for(let i=0;i<65;i++){
-  const x=Math.floor(rng()*256),y=Math.floor(rng()*256);
-  if(i%4===0){p(x,y,6,2,'#597f4c');p(x+2,y-2,3,2,'#8eae6b')}
-  else if(i%3===0){p(x,y,4,2,'#b39b68');p(x+2,y+2,2,1,'#816e4e')}
-  else{p(x,y,2,1,'#b7aa79');p(x+1,y+1,2,1,'#947d55')}
+ g.lineCap='round';
+ for(let i=0;i<1550;i++){
+  const x=rng()*size,y=rng()*size,h=2+rng()*6;
+  g.strokeStyle=['#385f42','#91a776','#adc18c','#4e794d'][i%4];
+  g.globalAlpha=.38+rng()*.35;g.lineWidth=.7+rng()*1.2;
+  for(let ox=-size;ox<=size;ox+=size)for(let oy=-size;oy<=size;oy+=size){
+   g.beginPath();g.moveTo(x+ox,y+oy);g.quadraticCurveTo(x+ox-2,y+oy-h*.55,x+ox+(rng()-.5)*5,y+oy-h);g.stroke();
+  }
+ }
+ g.globalAlpha=1;
+ for(let i=0;i<155;i++){
+  const x=rng()*size,y=rng()*size,a=rng()*6.28;
+  mark(x,y,2+rng()*4,.8+rng()*1.3,['#aa9164','#c4aa7c','#685e42','#c2bd91'][i%4],.55,a);
  }
  rbTileCache.grass=ctx.createPattern(tile,'repeat');
  return rbTileCache.grass;
@@ -4897,7 +4900,7 @@ function mushroomPatch(o){
  }
 }
 
-function bush(o){const n=nightStrength(),v=Math.abs(Math.floor(o.x*.07+o.y*.03))%3;const tint=(day,dark)=>{if(n<=0)return day;if(n>=1)return dark;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const a=rgb(day),b=rgb(dark);return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*n).toString(16).padStart(2,'0')).join('')};ellipse(o.x,o.y+5,28,12,tint('#1e5b38','#234e37'));ellipse(o.x-14,o.y-12,20,20,tint('#5a994d',['#426b4d','#3a6856','#557350'][v]));ellipse(o.x+13,o.y-13,22,21,tint('#79b25c',['#679474','#579b70','#79976a'][v]));if(berryReady(o)){for(let i=0;i<5;i++)ellipse(o.x-19+i*9,o.y-16+(i%2)*8,4,4,tint('#db5570','#d98bad'))}else{for(let i=0;i<3;i++)ellipse(o.x-13+i*12,o.y-18+(i%2)*6,2.2,2.2,tint('#96b65c','#6f8770'))}}function flower(o){const f=flowerKind(o);ellipse(o.x,o.y,17,8,'#40794c');ctx.strokeStyle='#4c8750';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x,o.y-22);ctx.stroke();for(let j=0;j<6;j++){let a=j*Math.PI/3;ellipse(o.x+Math.cos(a)*9,o.y-22+Math.sin(a)*9,6,6,f.color)}ellipse(o.x,o.y-22,5,5,'#f7e6a4')}function clearingGround(x,y){ellipse(x,y+14,113,49,'#b3a477');ellipse(x,y+12,95,37,'#8f9567');for(let i=0;i<6;i++)ellipse(x-80+i*29,y+23+(i%2)*12,9,5,'#698d50')}function startingClearing(x,y){ctx.strokeStyle='#8b633e';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x-37,y-9);ctx.lineTo(x-37,y-92);ctx.moveTo(x-37,y-92);ctx.lineTo(x+12,y-101);ctx.stroke();ctx.fillStyle='#ead39a';ctx.fillRect(x-36,y-89,57,27);ctx.font='bold 11px system-ui';ctx.fillStyle='#4c4531';ctx.textAlign='center';ctx.fillText('FIRST CAMP',x-7,y-72);for(let i=0;i<3;i++){ctx.fillStyle='#805a38';ctx.fillRect(x+27+i*11,y+7-i*3,31,8)}ctx.font='13px system-ui';ctx.fillStyle='#f7e8b1';ctx.fillText('Build your shelter',x,y-112)}function house(x,y){ellipse(x,y+24,105,43,'#173f32aa');ctx.fillStyle='#a27b4c';ctx.fillRect(x-69,y-85,138,109);poly([[x-91,y-78],[x,y-167],[x+91,y-78]],'#745346','#473e35');poly([[x-76,y-83],[x,y-149],[x+76,y-83]],'#b77b4e');ctx.fillStyle='#543c32';ctx.fillRect(x-17,y-34,34,58);ctx.fillStyle='#f6d18a';ctx.fillRect(x+32,y-50,25,27);ctx.fillStyle='#775139';ctx.fillRect(x+42,y-50,4,27);ctx.fillStyle='#a8b97b';ctx.fillRect(x-65,y-10,30,23);ctx.fillStyle='#dbbd7c';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText('HOME',x,y-177)}// V300: approved runestone asset, white matte removed once at load.
+function bush(o){const n=nightStrength(),v=Math.abs(Math.floor(o.x*.07+o.y*.03))%3;const tint=(day,dark)=>{if(n<=0)return day;if(n>=1)return dark;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const a=rgb(day),b=rgb(dark);return '#'+a.map((v,i)=>Math.round(v+(b[i]-v)*n).toString(16).padStart(2,'0')).join('')};ellipse(o.x,o.y+5,28,12,tint('#1e5b38','#234e37'));ellipse(o.x-14,o.y-12,20,20,tint('#5a994d',['#426b4d','#3a6856','#557350'][v]));ellipse(o.x+13,o.y-13,22,21,tint('#79b25c',['#679474','#579b70','#79976a'][v]));if(berryReady(o)){for(let i=0;i<5;i++)ellipse(o.x-19+i*9,o.y-16+(i%2)*8,4,4,tint('#db5570','#d98bad'))}else{for(let i=0;i<3;i++)ellipse(o.x-13+i*12,o.y-18+(i%2)*6,2.2,2.2,tint('#96b65c','#6f8770'))}}function flower(o){const f=flowerKind(o);ellipse(o.x,o.y,17,8,'#40794c');ctx.strokeStyle='#4c8750';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x,o.y-22);ctx.stroke();for(let j=0;j<6;j++){let a=j*Math.PI/3;ellipse(o.x+Math.cos(a)*9,o.y-22+Math.sin(a)*9,6,6,f.color)}ellipse(o.x,o.y-22,5,5,'#f7e6a4')}function clearingGround(x,y){ctx.save();for(let i=0;i<13;i++){const a=i*2.399,r=Math.sqrt((i+.5)/13),px=x+Math.cos(a)*r*93,py=y+14+Math.sin(a)*r*39;ellipse(px,py,18+(i%4)*7,7+(i%3)*4,i%3===0?'#788b62':i%3===1?'#879a6c':'#9a9b73')}ctx.restore()}function startingClearing(x,y){ctx.strokeStyle='#8b633e';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x-37,y-9);ctx.lineTo(x-37,y-92);ctx.moveTo(x-37,y-92);ctx.lineTo(x+12,y-101);ctx.stroke();ctx.fillStyle='#ead39a';ctx.fillRect(x-36,y-89,57,27);ctx.font='bold 11px system-ui';ctx.fillStyle='#4c4531';ctx.textAlign='center';ctx.fillText('FIRST CAMP',x-7,y-72);for(let i=0;i<3;i++){ctx.fillStyle='#805a38';ctx.fillRect(x+27+i*11,y+7-i*3,31,8)}ctx.font='13px system-ui';ctx.fillStyle='#f7e8b1';ctx.fillText('Build your shelter',x,y-112)}function house(x,y){ellipse(x,y+24,105,43,'#173f32aa');ctx.fillStyle='#a27b4c';ctx.fillRect(x-69,y-85,138,109);poly([[x-91,y-78],[x,y-167],[x+91,y-78]],'#745346','#473e35');poly([[x-76,y-83],[x,y-149],[x+76,y-83]],'#b77b4e');ctx.fillStyle='#543c32';ctx.fillRect(x-17,y-34,34,58);ctx.fillStyle='#f6d18a';ctx.fillRect(x+32,y-50,25,27);ctx.fillStyle='#775139';ctx.fillRect(x+42,y-50,4,27);ctx.fillStyle='#a8b97b';ctx.fillRect(x-65,y-10,30,23);ctx.fillStyle='#dbbd7c';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText('HOME',x,y-177)}// V300: approved runestone asset, white matte removed once at load.
 const approvedRunestone=new Image();let approvedRunestoneCanvas=null;
 approvedRunestone.onload=()=>{
  try{
