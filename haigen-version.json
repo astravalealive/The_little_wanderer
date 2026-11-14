@@ -1,1 +1,1 @@
-{"build":392,"notes":"Use repaired uploaded robin and songbird 8x8 atlas files; preserve existing animation sequences and flock behaviour. Visual testing still needed."}
+{"build":393,"notes":"Adjust bird sprite source crop 18px upward and reduce source window height to avoid adjacent-row fragments; no changes to bird movement or behaviour. Needs visual confirmation."}
