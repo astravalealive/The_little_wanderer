@@ -1,7 +1,7 @@
 // V420: Two distinct Forgotten Swamps guardians. Procedural first-pass art.
 (()=>{'use strict';const p=window.__gloamPort;if(!p)return;const {ctx,state}=p;
 const bosses=[
- {id:'mossmaw',name:'Mossmaw',x:-3150,y:450,hx:-3150,hy:450,hp:280,max:280,phase:'hidden',clock:0,attack:0,seed:0},
+ {id:'mossmaw',name:'Mossmaw',x:-3150,y:450,hx:-3150,hy:450,hp:280,max:280,phase:'hidden',clock:0,attack:0,seed:0,shellHits:0},
  {id:'grumgullet',name:'Grumgullet',x:-2200,y:2150,hx:-2200,hy:2150,hp:230,max:230,phase:'hidden',clock:0,attack:0,seed:2}
 ];
 const projectiles=[];let hitAt=0;
@@ -15,7 +15,7 @@ function strike(){
  if(!dmg)return false;
  if(p.snapshot().time-hitAt<450)return true;hitAt=p.snapshot().time;
  const vulnerable=b.phase==='stunned';
- if(!vulnerable){notify(b,'Its armour is too strong! Wait for an opening.');return true}
+ if(!vulnerable){p.startHaigenAction('swing',300);p.soundEffect('hit');if(b.id==='mossmaw'&&(tool==='pickaxe'||tool==='axe')){b.shellHits=(b.shellHits||0)+1;if(b.shellHits>=3){b.shellHits=0;b.phase='stunned';b.clock=0;notify(b,'Shell cracked open! Strike now!')}else notify(b,'Shell hit '+b.shellHits+'/3. Keep striking with the axe or pickaxe!');}else notify(b,b.id==='mossmaw'?'Use an axe or pickaxe to stagger its shell!':'Its armour is too strong! Wait for an opening.');return true}
  b.hp=Math.max(0,b.hp-dmg);p.startHaigenAction('swing',300);p.soundEffect('hit');
  if(!b.hp){b.phase='defeated';b.clock=0;p.memory('Haigen overcame '+b.name+' in the Forgotten Swamps.');notify(b,'The swamp guardian is defeated!');p.save()}
  return true;
@@ -48,35 +48,27 @@ function update(dt){
 function moss(b){
  ctx.save();ctx.translate(b.x,b.y);
  const face=(b.facingX||1)<0?-1:1;ctx.scale(face,1);
- const step=b.phase==='fight'?Math.sin(b.clock*.008)*4:0;
- ellipse(0,13,145,36,'#18392f88');
- // Four grounded clawed legs: heavy turtle proportions, not frog pads.
- for(const side of [-1,1])for(const rear of [0,1]){
-  const x=side*(rear?91:65),y=rear?0:-57;
-  ellipse(x,y+step*side,32,23,'#344c3d');
-  ellipse(x+side*8,y+10+step*side,30,17,'#506b50');
-  for(let j=0;j<3;j++)ellipse(x+side*(12+j*9),y+19+step*side,7,4,'#d0c59b');
+ const wobble=b.phase==='fight'?Math.sin(b.clock*.008)*3:0;
+ ellipse(0,15,150,39,'#152d2780');
+ // Four weighty, asymmetrical reptile legs, planted beneath the carapace.
+ for(const [x,y,phase] of [[-91,-27,0],[-76,-92,1],[76,-20,2],[72,-94,3]]){
+  const dy=Math.sin(b.clock*.007+phase*Math.PI)*wobble;
+  ellipse(x,y+dy,39,30,'#263e31');
+  ellipse(x+10,y+10+dy,34,23,'#547254');
+  for(let k=0;k<3;k++)ellipse(x+25+k*8,y+21+dy,8,5,'#c4b88a');
  }
- // Shell is an unmistakable high-domed carapace with angular scutes.
- ellipse(-12,-69,121,92,'#253b30');
- ellipse(-12,-76,114,84,'#526a46');
- ctx.save();ctx.translate(-12,-76);
- for(let ring=0;ring<2;ring++)for(let j=0;j<7;j++){
-  const ang=j*Math.PI*2/7+(ring?.25:0),rad=ring?66:35;
-  const x=Math.cos(ang)*rad,y=Math.sin(ang)*rad*.68;
-  ctx.strokeStyle='#253e32';ctx.lineWidth=4;
-  ctx.beginPath();for(let k=0;k<6;k++){const a=k*Math.PI/3;const px=x+Math.cos(a)*(ring?25:22),py=y+Math.sin(a)*(ring?19:17);if(!k)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.closePath();ctx.stroke();
-  ellipse(x-4,y-4,7,4,ring?'#73875a':'#879466');
- }
- ctx.restore();
- for(let i=0;i<17;i++){const a=i*2.399;ellipse(-12+Math.cos(a)*94,-76+Math.sin(a)*59,6+i%5,4+i%3,i%2?'#668a50':'#899758')}
- // Broad snapping beak and low reptilian head, projecting ahead of shell.
- ellipse(89,-62,49,37,'#3c5945');
- ellipse(110,-55,42,24,'#667d57');
- ctx.fillStyle='#b4a87c';ctx.beginPath();ctx.moveTo(120,-43);ctx.lineTo(146,-39);ctx.lineTo(123,-25);ctx.lineTo(113,-38);ctx.fill();
- ellipse(113,-77,12,11,'#d5a95b');ellipse(116,-77,4,7,'#192b25');
- ellipse(133,-54,4,3,'#25382e');
- if(b.phase==='stunned'){ellipse(80,-13,50,11,'#a99274');ellipse(100,-7,24,6,'#c6a88c')}
+ // Irregular domed shell, layered rim and natural moss-covered scutes.
+ ctx.fillStyle='#1e352b';ctx.beginPath();ctx.moveTo(-123,-65);ctx.bezierCurveTo(-141,-124,-83,-171,-22,-171);ctx.bezierCurveTo(41,-180,104,-137,111,-76);ctx.bezierCurveTo(89,-17,-69,-11,-123,-65);ctx.fill();
+ ctx.fillStyle='#4d6444';ctx.beginPath();ctx.moveTo(-111,-72);ctx.bezierCurveTo(-121,-120,-73,-158,-18,-158);ctx.bezierCurveTo(43,-165,89,-126,98,-78);ctx.bezierCurveTo(72,-28,-67,-28,-111,-72);ctx.fill();
+ ctx.strokeStyle='#1c3a30';ctx.lineWidth=6;ctx.lineJoin='round';
+ for(let i=0;i<11;i++){const x=-83+(i%4)*46+(i%2)*8,y=-128+Math.floor(i/4)*35;ctx.beginPath();ctx.moveTo(x-19,y);ctx.lineTo(x-8,y-16);ctx.lineTo(x+15,y-12);ctx.lineTo(x+23,y+5);ctx.lineTo(x+4,y+16);ctx.lineTo(x-17,y+10);ctx.closePath();ctx.stroke();}
+ for(let i=0;i<25;i++){const t=i*2.399,x=-16+Math.cos(t)*Math.sqrt(i)*21,y=-96+Math.sin(t)*Math.sqrt(i)*12;ellipse(x,y,5+i%7,3+i%4,i%3?'#6b8651':'#87985b')}
+ // Low, long-necked snapping turtle head, jaw, hooked beak and wary eyes.
+ ellipse(88,-73,56,31,'#2b4938');ellipse(117,-70,47,29,'#506f50');
+ ellipse(130,-56,35,16,'#75906a');ellipse(148,-48,16,9,'#b7a47c');
+ ctx.strokeStyle='#26392f';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(119,-49);ctx.quadraticCurveTo(139,-39,157,-49);ctx.stroke();
+ ellipse(121,-85,13,12,'#c9a45d');ellipse(125,-85,5,8,'#192c26');ellipse(151,-66,4,3,'#263d30');
+ if(b.phase==='stunned'){ctx.save();ctx.globalAlpha=.85;ellipse(2,-166,67,11,'#d7b66d');ctx.restore();}
  ctx.restore();
 }
 const atlasImage=new Image();atlasImage.src='./assets/Grumgullet_Sprite_Sheet.png?v=421';
