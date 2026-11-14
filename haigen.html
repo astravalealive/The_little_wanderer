@@ -11170,14 +11170,14 @@ window.addEventListener('gamepadconnected',refreshControllerIndicator);
 window.addEventListener('gamepaddisconnected',refreshControllerIndicator);
 setInterval(refreshControllerIndicator,750);
 refreshControllerIndicator();
-window.__hwEditorBridge={canvas:cv,ctx,camera:()=>({x:cam.x,y:cam.y}),zoom:()=>worldZoom(),size:()=>({width:W,height:H}),renderEditor:null};function frame(now){
+function frame(now){
  const dt=Math.min(Math.max(0,now-last),50);last=now;
  if(state.resting&&!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;if(state.autonomy){autoPause=0;autoPlan('danger woke me: escape','escape')}notify('⚠️ Danger nearby! Haigen wakes up.');}
  try{
   menuController();
   if(!$('overlay').classList.contains('open'))update(dt);
   if(!Number.isFinite(cam.x)||!Number.isFinite(cam.y)){cam.x=Number(state.x)||1250;cam.y=Number(state.y)||1310;}
-  draw();if(window.__hwEditorBridge.renderEditor)window.__hwEditorBridge.renderEditor();
+  draw();
   if(visitorRoom==='saltwick')drawSaltwickInterior();
  if(visitorRoom==='home')drawHomeInteriorScene(true);
   else if(visitorRoom==='stump'||visitorRoom==='vault')drawTrollStumpInterior(true);
@@ -11603,4 +11603,4 @@ function refreshFrogHud(){
 }
 setInterval(refreshFrogHud,300);refreshFrogHud();
  placeArtCart();restoreTrollPosition();stumpPositionReady=true;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./swamp-bosses-v420.js?v=425"></script><script src="./v127-ornate-ui.js?v=418"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><!-- Tactical Gloamjaw adapter retired: original real-time boss remains active. --><script src="./thrummaw-v148.js?v=410"></script><script src="./krakkle-v407.js?v=417"></script><script src="./devkit/in-game-editor.js?v=1"></script></body></html>
+</script><script src="./swamp-bosses-v420.js?v=425"></script><script src="./v127-ornate-ui.js?v=418"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><!-- Tactical Gloamjaw adapter retired: original real-time boss remains active. --><script src="./thrummaw-v148.js?v=410"></script><script src="./krakkle-v407.js?v=417"></script></body></html>
