@@ -4134,27 +4134,27 @@ function rbGrass(){
  return rbTileCache.grass;
 }
 function rbDrawGround(){
- // V174: irregular, feathered woodland-floor coverage, not a rectangular overlay.
- const z=worldZoom(),l=Math.max(-200,cam.x-W/(2*z)-80),t=Math.max(-200,cam.y-H/(2*z)-80);
- const r=Math.min(3700,cam.x+W/(2*z)+80),b=Math.min(3300,cam.y+H/(2*z)+80);
+ // V403: one continuous woodland surface, with smooth world-space feathering.
+ // Do not use 16px binary mask cells: they created the checkerboard seams.
+ const z=worldZoom(),l=Math.max(-180,cam.x-W/(2*z)-100),t=Math.max(-180,cam.y-H/(2*z)-100);
+ const r=Math.min(3750,cam.x+W/(2*z)+100),b=Math.min(3350,cam.y+H/(2*z)+100);
  if(r<=l||b<=t)return;
- const cell=16,night=nightStrength();
- ctx.save();ctx.fillStyle=rbGrass();
+ const cell=6,night=nightStrength(),pattern=rbGrass();
+ ctx.save();ctx.fillStyle=pattern;
  for(let y=Math.floor(t/cell)*cell;y<b;y+=cell){
   for(let x=Math.floor(l/cell)*cell;x<r;x+=cell){
-   const cx=x+8,cy=y+8;
-   const wobble=95*Math.sin(cy/245)+48*Math.sin(cy/91+cx/310)+30*Math.sin(cx/133+cy/170);
-   const wobbleY=90*Math.sin(cx/280)+37*Math.sin(cx/107+cy/270);
-   const edge=Math.min(cx+wobble,3500+ wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-95);
-   // Dither the fringe using stable world coordinates; never shift as the camera moves.
-   const noise=(Math.sin((Math.floor(cx/16)*127.1+Math.floor(cy/16)*311.7))*43758.5453)%1;
-   if(edge < -110 || edge < 110 && Math.abs(noise)*220>edge+110)continue;
-   const px=Math.max(l,x),py=Math.max(t,y),pw=Math.min(r,x+cell)-px,ph=Math.min(b,y+cell)-py;
-   if(pw<=0||ph<=0)continue;
-   ctx.fillRect(px,py,pw,ph);
-   if(night){ctx.fillStyle='rgba(19,32,48,'+(night*.62)+')';ctx.fillRect(px,py,pw,ph);ctx.fillStyle=rbGrass()}
+   const cx=x+cell*.5,cy=y+cell*.5;
+   const wobble=90*Math.sin(cy/245)+40*Math.sin(cy/91+cx/310)+24*Math.sin(cx/133+cy/170);
+   const wobbleY=80*Math.sin(cx/280)+32*Math.sin(cx/107+cy/270);
+   const edge=Math.min(cx+wobble,3500+wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-20);
+   // Smooth continuous fade across the woodland boundary, no binary dither.
+   const fade=Math.max(0,Math.min(1,(edge+170)/350));
+   if(fade<=0)continue;
+   ctx.globalAlpha=fade;
+   ctx.fillRect(x,y,cell+.35,cell+.35);
   }
  }
+ if(night>.01){ctx.globalAlpha=night*.44;ctx.fillStyle='#192030';ctx.fillRect(l,t,r-l,b-t)}
  ctx.restore();
 }
 function rbTreeImage(id){
@@ -11169,7 +11169,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=402;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=403;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
