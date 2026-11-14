@@ -1,1 +1,1 @@
-{"build":393,"notes":"Adjust bird sprite source crop 18px upward and reduce source window height to avoid adjacent-row fragments; no changes to bird movement or behaviour. Needs visual confirmation."}
+{"build":394,"notes":"Fixed atlas slicing for robin and songbird: complete source sprite rows repacked into 192x160 isolated cells at runtime (1536x1280), no cross-row clipping. Bird AI, movement and animation selection preserved."}
