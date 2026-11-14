@@ -11148,6 +11148,28 @@ function drawHomeInteriorScene(visiting=false){
  ctx.fillText(homeFloor?'Use the left staircase to go downstairs':tier>=3?'Use the left stairs to reach upstairs · Door to leave':'Walk to the bottom doorway to leave',cw/2,top+size+28);
  ctx.restore();
 }
+// Controller connection diagnostics run independently of gameplay and remain visible on mobile.
+const controllerIndicator=document.createElement('button');
+controllerIndicator.type='button';
+controllerIndicator.id='controllerIndicator';
+controllerIndicator.setAttribute('aria-label','Controller connection status');
+controllerIndicator.style.cssText='position:fixed;left:calc(env(safe-area-inset-left,0px) + 8px);bottom:calc(env(safe-area-inset-bottom,0px) + 8px);z-index:9999;padding:5px 9px;border:1px solid #b6a67d;border-radius:9px;background:#102e28e8;color:#fff4d2;font:12px system-ui;pointer-events:auto;max-width:75vw';
+controllerIndicator.textContent='🎮 Checking controller…';
+document.body.appendChild(controllerIndicator);
+function refreshControllerIndicator(){
+ let pads=[];
+ try{pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[]}catch(e){}
+ const pad=pads.find(p=>p&&p.connected);
+ controllerIndicator.textContent=pad?'🎮 Controller connected':'🎮 Controller not detected';
+ controllerIndicator.title=pad?(pad.id||'Controller detected'):'Check Bluetooth pairing, then press a controller button';
+ const existing=document.getElementById('padDebug');
+ if(existing)existing.textContent=pad?'🎮 Connected: '+(pad.id||'Gamepad'):'🎮 No controller detected';
+}
+controllerIndicator.addEventListener('click',()=>{refreshControllerIndicator();});
+window.addEventListener('gamepadconnected',refreshControllerIndicator);
+window.addEventListener('gamepaddisconnected',refreshControllerIndicator);
+setInterval(refreshControllerIndicator,750);
+refreshControllerIndicator();
 function frame(now){
  const dt=Math.min(Math.max(0,now-last),50);last=now;
  if(state.resting&&!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;if(state.autonomy){autoPause=0;autoPlan('danger woke me: escape','escape')}notify('⚠️ Danger nearby! Haigen wakes up.');}
