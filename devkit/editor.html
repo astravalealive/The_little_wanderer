@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Haigen's World | Development Kit Prototype</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui;background:#111d1c;color:#f3ecd8}*{box-sizing:border-box}body{margin:0;padding:16px;max-width:1100px;margin:auto}h1{font-size:1.4rem;margin:.2rem 0}p{color:#c1cbbd}button,select{background:#293f38;border:1px solid #718577;color:#fff4d6;border-radius:8px;padding:9px;font:inherit}button[aria-pressed=true]{background:#746a4a;border-color:#ead59a}button:focus-visible{outline:3px solid #e6d18c}header{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}main{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:14px}.tools{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.panel{background:#1a2c28;border:1px solid #465c50;border-radius:12px;padding:12px}canvas{display:block;width:100%;aspect-ratio:4/3;background:#5e975b;border-radius:8px;touch-action:none;image-rendering:pixelated}#status{min-height:2em}textarea{width:100%;height:130px;background:#0d1715;color:#d7e5ce;border:1px solid #607466;border-radius:8px;font-size:11px}small{color:#c7d0c1}#legend{font-size:.85rem}#preview{font-size:.85rem;color:#d8cfab}@media(max-width:720px){main{grid-template-columns:1fr}canvas{aspect-ratio:1/1}.panel{min-width:0}}
+</style></head><body>
+<header><div><h1>🌲 Haigen's World: Development Kit</h1><small>Prototype only · no live world or saved games are modified</small></div><select id="mood" aria-label="Lighting palette"><option value="day">🌿 Daylight</option><option value="night">🌙 Moonlit night</option><option value="dusk">🌅 Golden dusk</option><option value="storm">⛈️ Thunderstorm</option><option value="sand">🏜️ Sandstorm</option><option value="magic">🔮 Magic / memory</option></select></header>
+<div class="tools" id="tools"></div>
+<main><section class="panel"><canvas id="world" width="768" height="576" aria-label="Editable terrain grid"></canvas><p id="status" role="status">Choose a tool, then tap or drag to paint terrain. Buildings and trees snap to the grid.</p><small>32 world-unit grid · automatic path/water edges · red means blocked placement · tap an object with Erase to remove it</small></section>
+<aside class="panel"><h2 style="font-size:1.05rem">Placement rules</h2><p id="preview">Select a prefab to see its footprint.</p><div id="legend">🌳 Tree: trunk collision only<br>🏠 Cottage: 3×3 tiles, entrance reserved<br>🌿 Grass / 🟫 Path / 💧 Water: terrain layers</div><hr><button id="undo">↶ Undo</button> <button id="reset">Reset test area</button><h2 style="font-size:1.05rem">Export world layout</h2><button id="export">Generate JSON</button> <button id="copy">Copy JSON</button><textarea id="output" aria-label="Exported layout JSON" readonly placeholder="Exported map appears here."></textarea><small>Exports a portable layout for review. Does not import into Haigen's World yet.</small></aside></main>
+<script>
+'use strict';
+const COLS=24,ROWS=18,TILE=32,canvas=document.getElementById('world'),ctx=canvas.getContext('2d');
+const palettes={
+day:['#91bd79','#5e975b','#d6c88c','#a7d6e5'],
+night:['#171e67','#39318d','#6966c4','#b8caff'],
+dusk:['#6f493e','#b87744','#e8ad65','#e6c18c'],
+storm:['#202e43','#40536b','#66717c','#a2b6c9'],
+sand:['#76503a','#ac774a','#d7a36b','#e8c59a'],
+magic:['#312451','#6b478f','#a17bc3','#e1c5f4']};
+const definitions={tree:{width:1,height:1,collision:'trunk'},cottage:{width:3,height:3,collision:'rect',door:[1,3],clearance:2}};
+const toolList=[['grass','🌿 Grass'],['path','🟫 Path'],['water','💧 Water'],['tree','🌳 Tree'],['cottage','🏠 Cottage'],['erase','⌫ Erase']];
+let tool='path',mood='day',terrain,objects,history=[],lastPaint='',pointerDown=false;
+function initial(){terrain=Array.from({length:ROWS},(_,y)=>Array.from({length:COLS},(_,x)=>(y===8||y===9)&&x>1&&x<22?'path':'grass'));objects=[{id:'tree-1',kind:'tree',x:4,y:4},{id:'cottage-1',kind:'cottage',x:11,y:3}];}
+initial();
+function snapshot(){history.push(JSON.stringify({terrain,objects}));if(history.length>30)history.shift();}
+function inBounds(x,y){return x>=0&&y>=0&&x<COLS&&y<ROWS}
+function occupies(o,x,y){const d=definitions[o.kind];return x>=o.x&&y>=o.y&&x<o.x+d.width&&y<o.y+d.height}
+function reserved(x,y,ignore){return objects.some(o=>o!==ignore&&o.kind==='cottage'&&x===o.x+1&&y>=o.y+3&&y<=o.y+5)}
+function valid(kind,x,y){const d=definitions[kind];if(x<0||y<0||x+d.width>COLS||y+d.height>ROWS)return false;
+for(let j=y;j<y+d.height;j++)for(let i=x;i<x+d.width;i++){if(terrain[j][i]==='water'||reserved(i,j)||objects.some(o=>occupies(o,i,j)))return false}
+if(kind==='cottage'){for(let j=y+3;j<=y+5;j++){if(!inBounds(x+1,j)||terrain[j][x+1]==='water'||objects.some(o=>occupies(o,x+1,j))||reserved(x+1,j))return false}}
+return true}
+function hexRgb(h){return [1,3,5].map(i=>parseInt(h.slice(i,i+2),16))}
+function mix(a,b,t){const x=hexRgb(a),y=hexRgb(b);return 'rgb('+x.map((v,i)=>Math.round(v*(1-t)+y[i]*t)).join(',')+')'}
+function colors(){const p=palettes[mood];return {grass:p[1],grass2:mix(p[0],p[1],.6),path:p[2],water:mix(p[0],p[3],.48),outline:mix(p[1],p[3],.38),tree:mix(p[1],p[0],.35),roof:mix(p[2],p[1],.55)}}
+function render(hover){const c=colors();ctx.clearRect(0,0,768,576);
+for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const t=terrain[y][x],px=x*TILE,py=y*TILE;ctx.fillStyle=t==='grass'?((x+y)%3===0?c.grass2:c.grass):t==='path'?c.path:c.water;ctx.fillRect(px,py,TILE,TILE);
+if(t!=='grass'){ctx.fillStyle=c.outline;for(const [dx,dy] of [[0,-1],[1,0],[0,1],[-1,0]]){const nx=x+dx,ny=y+dy;if(!inBounds(nx,ny)||terrain[ny][nx]!==t){if(dx===0)ctx.fillRect(px,dy<0?py:py+TILE-3,TILE,3);else ctx.fillRect(dx<0?px:px+TILE-3,py,3,TILE)}}}
+ctx.strokeStyle='rgba(255,255,255,.065)';ctx.strokeRect(px+.5,py+.5,TILE,TILE)}
+for(const o of objects){const x=o.x*TILE,y=o.y*TILE;if(o.kind==='tree'){ctx.fillStyle='#47372b';ctx.fillRect(x+12,y+14,8,16);ctx.fillStyle=c.tree;ctx.beginPath();ctx.arc(x+16,y+10,17,0,Math.PI*2);ctx.fill();ctx.strokeStyle=c.outline;ctx.stroke()}else{ctx.fillStyle='#493c36';ctx.fillRect(x+3,y+23,90,69);ctx.fillStyle=c.roof;ctx.beginPath();ctx.moveTo(x-3,y+26);ctx.lineTo(x+48,y-6);ctx.lineTo(x+99,y+26);ctx.closePath();ctx.fill();ctx.strokeStyle=c.outline;ctx.stroke();ctx.fillStyle='#352a25';ctx.fillRect(x+40,y+66,16,26);ctx.fillStyle=c.path;ctx.fillRect(x+40,y+96,16,8)}}
+if(hover&&inBounds(hover.x,hover.y)&&(tool==='tree'||tool==='cottage')){const d=definitions[tool],ok=valid(tool,hover.x,hover.y);ctx.fillStyle=ok?'rgba(110,240,145,.3)':'rgba(255,75,75,.42)';ctx.fillRect(hover.x*TILE,hover.y*TILE,d.width*TILE,d.height*TILE);ctx.strokeStyle=ok?'#9df0aa':'#ff7474';ctx.lineWidth=2;ctx.strokeRect(hover.x*TILE+1,hover.y*TILE+1,d.width*TILE-2,d.height*TILE-2);if(tool==='cottage'){ctx.fillRect((hover.x+1)*TILE,(hover.y+3)*TILE,TILE,TILE*2)}}}
+let hover=null;function point(e){const r=canvas.getBoundingClientRect();return {x:Math.floor((e.clientX-r.left)/r.width*COLS),y:Math.floor((e.clientY-r.top)/r.height*ROWS)}}
+function place(x,y){if(!inBounds(x,y))return;const key=x+','+y+','+tool;if(key===lastPaint)return;lastPaint=key;
+if(tool==='tree'||tool==='cottage'){if(!valid(tool,x,y)){status.textContent='⛔ Blocked: footprint, water, entrance or reserved clearance.';return}snapshot();objects.push({id:tool+'-'+Date.now()+'-'+objects.length,kind:tool,x,y});status.textContent='✓ '+tool+' placed at '+x+', '+y;}
+else if(tool==='erase'){const i=objects.findIndex(o=>occupies(o,x,y));if(i>=0){snapshot();objects.splice(i,1);status.textContent='Object removed.'}else if(terrain[y][x]!=='grass'){snapshot();terrain[y][x]='grass';status.textContent='Terrain erased.'}}
+else if(terrain[y][x]!==tool){snapshot();terrain[y][x]=tool;status.textContent='Painted '+tool+' at '+x+', '+y;}render(hover)}
+const status=document.getElementById('status');
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();pointerDown=true;canvas.setPointerCapture(e.pointerId);hover=point(e);lastPaint='';place(hover.x,hover.y);render(hover)});
+canvas.addEventListener('pointermove',e=>{hover=point(e);if(pointerDown&&['grass','path','water','erase'].includes(tool))place(hover.x,hover.y);render(hover)});
+function end(){pointerDown=false;lastPaint='';hover=null;render()}canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('pointerleave',()=>{if(!pointerDown){hover=null;render()}});
+const tools=document.getElementById('tools');for(const [id,name] of toolList){const b=document.createElement('button');b.textContent=name;b.setAttribute('aria-pressed',id===tool?'true':'false');b.onclick=()=>{tool=id;for(const c of tools.children)c.setAttribute('aria-pressed',c===b?'true':'false');document.getElementById('preview').textContent=definitions[tool]?'Footprint: '+definitions[tool].width+'×'+definitions[tool].height+' tile(s). Placement checks enabled.':'Paint or erase tiles directly on the grid.';render(hover)};tools.appendChild(b)}
+document.getElementById('mood').onchange=e=>{mood=e.target.value;render(hover)};
+document.getElementById('undo').onclick=()=>{if(!history.length)return;({terrain,objects}=JSON.parse(history.pop()));status.textContent='Last edit undone.';render()};
+document.getElementById('reset').onclick=()=>{snapshot();initial();status.textContent='Test area reset.';render()};
+function exportMap(){const value=JSON.stringify({format:'haigen-devkit-layout',version:1,tileWorldUnits:32,width:COLS,height:ROWS,terrain,objects},null,2);document.getElementById('output').value=value;return value}
+document.getElementById('export').onclick=()=>{exportMap();status.textContent='Layout JSON generated. Live game unchanged.'};
+document.getElementById('copy').onclick=async()=>{const value=exportMap();try{await navigator.clipboard.writeText(value);status.textContent='Layout JSON copied.'}catch(e){document.getElementById('output').select();status.textContent='Select and copy JSON manually.'}};
+render();
+</script></body></html>
