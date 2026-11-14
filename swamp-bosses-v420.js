@@ -115,15 +115,15 @@ function spriteToad(b){
  const index=Math.min(frames.length-1,Math.floor((kind==='rising'?b.clock:kind==='stunned'?b.clock:b.attack)/Math.max(120,kind==='rising'?270:250))%frames.length);
  const frame=frames[index];if(!frame)return false;
  ctx.save();ctx.translate(b.x,b.y);
- // The atlas faces left by default: flip horizontally when travelling right.
- ctx.scale((b.facingX||-1)>0?-1:1,1);
+ // Atlas forward direction is right; mirror it when travelling left.
+ ctx.scale((b.facingX||-1)>0?1:-1,1);
  // World position is at the creature's feet, matching the old procedural boss.
  const w=236,h=210;ctx.drawImage(frame,-w/2,-h+15,w,h);ctx.restore();
  return true;
 }
 
 function toad(b){
- if(spriteToad(b))return;ctx.save();ctx.translate(b.x,b.y);ctx.scale((b.facingX||-1)>0?-1:1,1);
+ if(spriteToad(b))return;ctx.save();ctx.translate(b.x,b.y);ctx.scale((b.facingX||-1)>0?1:-1,1);
  ellipse(0,8,113,32,'#274f4388');ellipse(0,-37,109,77,'#546a39');
  ellipse(-72,-6,41,30,'#465d33');ellipse(72,-6,41,30,'#465d33');
  ellipse(0,-79,89,58,'#73824a');
