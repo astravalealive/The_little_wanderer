@@ -4,7 +4,7 @@
   const port = window.__gloamPort;
   if (!port) return;
   const {state, ctx} = port;
-  const home = {x:2300, y:7750};
+  const home = {x:1800, y:7750};
   const names = ['down','up','left','right','idle','claw','foam','throw','burrow','tunnel','emerge','pull','stun','recover','hurt','defeat','water'];
   const counts = [4,4,4,4,4,4,4,6,6,4,6,4,6,6,2,6,4];
   const durations = {emerge:1100, claw:650, foam:800, throw:1080, burrow:600, tunnel:1600, pull:580, stun:2700, recover:720, defeat:1080};
@@ -112,7 +112,7 @@
     const row=names.indexOf(name), frame=Math.min(counts[row]-1, Math.floor(fraction*counts[row]));
     ctx.save();
     ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(atlas,frame*176,row*128,176,128,s.x-99,s.y-134,198,144);
+    ctx.drawImage(atlas,frame*176,row*128,176,128,s.x-297,s.y-422,594,432);
     if (!['hidden','defeat','burrow','tunnel'].includes(s.mode)) {
       ctx.fillStyle='#271f25';ctx.fillRect(s.x-65,s.y-145,130,9);
       ctx.fillStyle='#d56d4c';ctx.fillRect(s.x-63,s.y-143,126*s.hp/s.maxHp,5);
