@@ -15,21 +15,20 @@ for(const action of actions){const b=document.createElement('button');b.textCont
 document.getElementById('thrumMode').onclick=()=>{s.wait=!s.wait;document.getElementById('thrumMode').textContent=s.wait?'WAIT':'ACTIVE'};
 function message(t){document.getElementById('thrumMsg').textContent=t}
 function emerge(){s.phase='rising';s.charge=0;s.shake=now();p.notify('🏜️ The dunes erupt! THRUMMAW rises from beneath the sand!')}
-function begin(){s.phase='battle';s.player=0;s.enemy=0;hud.style.display='block';message('The ground is alive. Wait for your turn!');p.memory('Thrummaw erupted from the Sunscorched Dunes after tracking Haigen by vibration.')}
+function begin(){s.phase='battle';s.player=0;s.enemy=0;hud.style.display='none';p.notify('🏜️ Thrummaw attacks! Move, dodge and use your weapons!');p.memory('Thrummaw erupted from the Sunscorched Dunes after tracking Haigen by vibration.')}
 function end(){hud.style.display='none';s.player=0;s.enemy=0}
-function act(a){
- if(s.phase!=='battle')return;
- if(a==='retreat'){s.phase='retreat';s.lock=true;end();p.notify('Haigen escapes the shifting sands.');return}
- if(s.player<2200)return;
- if(a==='heal'){if(!state.potions){message('No healing salves left.');return}state.potions--;state.health=Math.min(100,state.health+38);message('Haigen uses a healing salve.');p.save()}
- else if(a==='defend'){s.defend=true;message('Haigen braces for impact.')}
- else if(a==='distract'){s.enemy=Math.max(0,s.enemy-1700);message('Haigen throws a stone. Thrummaw follows the vibration!');if(state.stone>0)state.stone--}
- else {const eq=state.equipped,tool=a==='tool';if(tool&&!['axe','pickaxe','bow','crossbow'].includes(eq)){message('Equip a weapon before using Tool.');return}
- let dmg=tool?22:13;if(eq==='axe')dmg+=4;if(eq==='pickaxe')dmg+=3;
- if(['bow','crossbow'].includes(eq)){if(!state.arrows){message('No arrows!');return}state.arrows--;dmg+=eq==='crossbow'?13:7}
- if(s.phase==='battle'){s.hp=Math.max(0,s.hp-dmg);p.startHaigenAction('swing',320);p.soundEffect('swing');message('Haigen strikes the exposed jaw for '+dmg+' damage.');p.save();}
- if(s.hp<=0){s.phase='defeated';end();p.memory('Haigen defeated Thrummaw, the enormous predator beneath the desert sands.');p.notify('🏆 THRUMMAW DEFEATED! The dunes fall silent.');p.save();return}}
- s.player=0;
+function useTool(){
+ if(s.phase!=='battle'||distance()>260)return false;
+ const eq=state.equipped;
+ if(!['axe','pickaxe','bow','crossbow'].includes(eq))return false;
+ const t=now();if(t-s.cool<620)return true;
+ if(['bow','crossbow'].includes(eq)){if(!state.arrows)return true;state.arrows--}
+ else if(distance()>155)return false;
+ s.cool=t;
+ const damage=(eq==='crossbow'?29:eq==='bow'?23:eq==='axe'?20:18)+(Number(state.tools?.[eq])||0)*2;
+ s.hp=Math.max(0,s.hp-damage);p.startHaigenAction('swing',320);p.soundEffect('swing');
+ if(s.hp<=0){s.phase='defeated';end();p.memory('Haigen defeated Thrummaw, the enormous predator beneath the desert sands.');p.notify('🏆 THRUMMAW DEFEATED! The dunes fall silent.')}
+ p.save();return true;
 }
 function update(dt){
  const t=now(),d=distance(),step=Math.min(50,Math.max(0,dt));
@@ -43,14 +42,14 @@ function update(dt){
  }else if(s.phase==='rising'){if(t-s.shake>1550)begin()}
  else if(s.phase==='battle'){
   if(d>660||p.snapshot().collapsed){s.phase='retreat';s.lock=true;end();return}
-  s.player=Math.min(2200,s.player+step);
-  if(!(s.wait&&s.player>=2200&&!state.autonomy))s.enemy+=step;
-  if(s.enemy>=3900){s.enemy=0;const hits=[['a crushing jaw strike',22],['a spray of sand',11],['a whipping sensory tendril',16],['a subterranean shockwave',18]],h=hits[s.turn++%hits.length],damage=s.defend?Math.ceil(h[1]*.35):h[1];s.defend=false;if(safeRock()){message('Thrummaw slams into the stone refuge! Haigen is safe.');}else p.takeDamage(damage,'Thrummaw '+h[0],false,{x:X,y:Y});if(!safeRock())message('Thrummaw attacks with '+h[0]+'! '+damage+' damage.')}
-  if(state.autonomy&&s.player>=2200)act(state.health<45&&state.potions?'heal':'attack');
-  document.getElementById('thrumHealth').textContent=Math.ceil(s.hp)+' / 240';
-  document.getElementById('thrumHp').style.width=s.hp/240*100+'%';
-  document.getElementById('thrumReady').textContent=s.player>=2200?'HAIGEN READY':'ATB '+Math.round(s.player/22)+'%';
-  for(const b of bar.children)b.disabled=s.player<2200&&b.dataset.action!=='retreat';
+  s.enemy+=step;
+  if(s.enemy>=2100){s.enemy=0;
+   if(!safeRock()&&d<245)p.takeDamage(12,'Thrummaw lunges from the sand',false,{x:X,y:Y});
+  }
+  if(state.autonomy&&d<165&&t-s.cool>1250){
+   const eq=state.equipped;
+   if(['axe','pickaxe','bow','crossbow'].includes(eq))useTool();
+  }
  }
 }
 function ellipse(x,y,rx,ry,fill){ctx.fillStyle=fill;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,TAU);ctx.fill()}
@@ -76,5 +75,5 @@ function creature(){
  ellipse(-51,-43,8,7,'#d7a24c');ellipse(51,-43,8,7,'#d7a24c');ellipse(-51,-43,3,3,'#21151a');ellipse(51,-43,3,3,'#21151a');
  ctx.restore();
 }
-window.__thrummaw={update,ground,creature,y:Y,snapshot:()=>({...s,rocks})};
+window.__thrummaw={update,ground,creature,useTool,y:Y,snapshot:()=>({...s,rocks})};
 })();
