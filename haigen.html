@@ -115,7 +115,7 @@ const expandedRegions=[
  {id:'snow',name:'The Frostbound Highlands',x:-8200,y:-8200,w:19500,h:6650,color:'#dce9e9',animals:['🦌','🐇','🐐']},
  {id:'fen',name:'The Forgotten Swamps',x:-3950,y:-1550,w:2450,h:4750,color:'#698976',animals:['🐸','🦆','🪿']},
  {id:'rainforest',name:'Western Rainforest',x:-6500,y:-1550,w:2550,h:6000,color:'#487c5c',animals:['🐸','🦦','🪿']},
- {id:'eastDunes',name:'Eastern Dunes',x:7550,y:-950,w:2600,h:5150,color:'#dcba7d',animals:['🦂','🦎','🐍']}
+ {id:'eastDunes',name:'Eastern Dunes',x:7450,y:4850,w:3000,h:4750,color:'#dcba7d',animals:['🦂','🦎','🐍']}
 ];
 // The ground and wardrobe sample the same gently curved biome borders.
 function biomePosition(x,y){
@@ -505,8 +505,8 @@ function islandDepth(x,y){
  const mainland=(1+irregular(a)+north+southern-eastBight-Math.hypot(dx,dy))*6300;
  const ja=Math.atan2((y-1050)/2400,(x+6000)/1350);
  const jungle=(1+.08*Math.sin(5*ja+.3)+.035*Math.cos(9*ja)-Math.hypot((x+6000)/1350,(y-1050)/2400))*1350;
- const ea=Math.atan2((y-1600)/2500,(x-8800)/1300);
- const eastern=(1+.075*Math.sin(5*ea-.6)+.045*Math.cos(8*ea)-Math.hypot((x-8800)/1300,(y-1600)/2500))*1300;
+ const ea=Math.atan2((y-7200)/2250,(x-9000)/1400);
+ const eastern=(1+.105*Math.sin(5*ea-.6)+.06*Math.cos(8*ea)-Math.hypot((x-9000)/1400,(y-7200)/2250))*1400;
  // Lighthouse stands on its own small rocky island off Riverwatch's southeast coast.
  const lx=6100,ly=6600,la=Math.atan2((y-ly)/165,(x-lx)/205);
  const lighthouseIsland=(1+.09*Math.sin(5*la)+.035*Math.cos(9*la)-Math.hypot((x-lx)/205,(y-ly)/165))*205;
@@ -3973,8 +3973,8 @@ function roadDistance(x,y){let best=Infinity;for(const route of roadRoutes)for(l
 }
 // V408: Eastern island sparse landmark layout. Preserve shoreline, quests and existing object IDs.
 {
- const center={x:8800,y:1600};
- const protectedAreas=[{x:8800,y:1600,r:530},{x:8800,y:350,r:330},{x:8120,y:2250,r:290},{x:9410,y:2300,r:310}];
+ const center={x:9000,y:7200};
+ const protectedAreas=[{x:9000,y:7200,r:530},{x:9000,y:5950,r:330},{x:8320,y:7850,r:290},{x:9610,y:7900,r:310}];
  for(let i=objects.length-1;i>=0;i--){
   const o=objects[i];
   if(expandedRegion(o.x,o.y)?.id!=='eastDunes'||!['cactus','rock','bareTree','bush','flower'].includes(o.type))continue;
@@ -3982,10 +3982,10 @@ function roadDistance(x,y){let best=Infinity;for(const route of roadRoutes)for(l
  }
  // Intentional small scenic clusters, with wide walkable gaps.
  const clusters=[
-  [8070,2190,'palm'],[8125,2280,'palm'],[8190,2200,'palm'],
-  [8750,370,'rock'],[8890,390,'rock'],[8720,510,'bareTree'],
-  [9350,2290,'rock'],[9490,2390,'rock'],[9440,2150,'cactus'],
-  [8320,3100,'cactus'],[8390,3170,'rock'],[9580,1100,'cactus']
+  [8270,7790,'palm'],[8325,7880,'palm'],[8390,7800,'palm'],
+  [8950,5970,'rock'],[9090,5990,'rock'],[8920,6110,'bareTree'],
+  [9550,7890,'rock'],[9690,7990,'rock'],[9640,7750,'cactus'],
+  [8520,8700,'cactus'],[8590,8770,'rock'],[9780,6700,'cactus']
  ];
  clusters.forEach(([x,y,type],i)=>objects.push({id:408000+i,x,y,type,size:1}));
 }
@@ -4846,6 +4846,7 @@ function drawWoodlandArtwork(o){
 }
 // V408: understated landmarks, painted directly on the eastern island.
 function drawEasternIslandLandmarks(){
+ ctx.save();ctx.translate(200,5600);
  const oval=(x,y,rx,ry,fill)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();};
  // Thrummaw's open fighting basin, deliberately free of obstructing scenery.
  oval(8800,1600,450,300,'#cba96c55');
@@ -4868,6 +4869,7 @@ function drawEasternIslandLandmarks(){
  for(const [x,y,w] of [[9310,2140,230],[9500,2450,220],[9300,2540,160]]){
   oval(x,y,w,39,'#aa856a88');oval(x-14,y-11,w*.75,20,'#e4c395aa');
  }
+ ctx.restore();
 }
 function drawSceneryNearHaigen(o){
  if(drawWoodlandArtwork(o))return;
@@ -11209,7 +11211,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=408;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=409;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
