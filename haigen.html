@@ -2119,10 +2119,11 @@ function drawApprovedSkolli(x,y,actor){
  const leap=pounce?Math.sin(Math.max(0,Math.min(1,1-(m.t||0)/650))*Math.PI)*15:0;
  ctx.save();
  ctx.imageSmoothingEnabled=false;
- ellipse(x+1,y+6,side||row>=4?23:12,5,'#203b3259');
+ ellipse(x+1,y+6,side||row>=4?30:16,7,'#203b3259');
  ctx.translate(Math.round(x),Math.round(y+6-leap));
  ctx.scale(flip?-1:1,1);
- ctx.drawImage(skolliAtlas,col*336,row*176,336,176,-56,-58,112,59);
+ // Wolf-sized adult Skölli, same source atlas, frame mapping and paw baseline.
+ ctx.drawImage(skolliAtlas,col*336,row*176,336,176,-74,-76,148,78);
  ctx.restore();
  window.__v126SkolliLastFrame={dir,mode,row,col,moving,rest,alert,pounce};
  return true;
@@ -11223,7 +11224,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=418;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=419;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
