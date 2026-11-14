@@ -11178,11 +11178,9 @@ function frame(now){
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
  }catch(error){reportWorldError(error);}
- if(perfEnabled){const ms=performance.now()-perfStart;perfFrames++;perfTotal+=ms;perfMax=Math.max(perfMax,ms);if(ms>33.3)perfSlow++;if(!perfWindowStart)perfWindowStart=now;if(now-perfWindowStart>=1000){const elapsed=(now-perfWindowStart)/1000;perfPanel.textContent='FPS '+Math.round(perfFrames/elapsed)+' | frame '+(perfTotal/perfFrames).toFixed(1)+'ms | max '+perfMax.toFixed(1)+'ms
-Update '+perfUpdate.toFixed(1)+'ms | draw '+perfDraw.toFixed(1)+'ms | slow '+perfSlow+'
-Terrain '+islandCache.size+'/'+TERRAIN_CACHE_LIMIT+' | hit '+terrainPerf.hits+' miss '+terrainPerf.misses+'
-Last chunk '+terrainPerf.lastBuildMs.toFixed(1)+'ms';perfFrames=0;perfTotal=0;perfSlow=0;perfMax=0;perfWindowStart=now;}}
- requestAnimationFrame(frame);\n}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
+ if(perfEnabled){const ms=performance.now()-perfStart;perfFrames++;perfTotal+=ms;perfMax=Math.max(perfMax,ms);if(ms>33.3)perfSlow++;if(!perfWindowStart)perfWindowStart=now;if(now-perfWindowStart>=1000){const elapsed=(now-perfWindowStart)/1000;perfPanel.textContent='FPS '+Math.round(perfFrames/elapsed)+' | frame '+(perfTotal/perfFrames).toFixed(1)+'ms | max '+perfMax.toFixed(1)+'ms\\nUpdate '+perfUpdate.toFixed(1)+'ms | draw '+perfDraw.toFixed(1)+'ms | slow '+perfSlow+'\\nTerrain '+islandCache.size+'/'+TERRAIN_CACHE_LIMIT+' | hit '+terrainPerf.hits+' miss '+terrainPerf.misses+'\\nLast chunk '+terrainPerf.lastBuildMs.toFixed(1)+'ms;perfFrames=0;perfTotal=0;perfSlow=0;perfMax=0;perfWindowStart=now;}}
+ requestAnimationFrame(frame);
+}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
 // Temporary in-game preview recovery and status controls.
  const previewTools=document.createElement('div');
  previewTools.id='v121PreviewTools';
