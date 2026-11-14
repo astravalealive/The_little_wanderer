@@ -1,1 +1,1 @@
-{"build":394,"notes":"Fixed atlas slicing for robin and songbird: complete source sprite rows repacked into 192x160 isolated cells at runtime (1536x1280), no cross-row clipping. Bird AI, movement and animation selection preserved."}
+{"build":395,"notes":"Installed adult Dylan 8x8 rabbit atlas for idle, hopping, foraging, jumping and rear views; original rabbit fallback retained. Gathering AI and other wildlife unchanged."}
