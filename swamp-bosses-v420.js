@@ -23,7 +23,7 @@ function strike(){
 function update(dt){
  dt=Math.max(0,Math.min(dt,50));
  for(const b of bosses){
- b.clock+=dt;const d=dist(b);
+ b.clock+=dt;const d=dist(b);if(d>1){b.facingX=(state.x-b.x)/d;b.facingY=(state.y-b.y)/d;}
  if(b.phase==='hidden'){if(d<260){b.phase='rising';b.clock=0;notify(b,b.id==='mossmaw'?'The island is moving!':'The mire begins to croak!')}continue}
  if(b.phase==='defeated')continue;
  if(b.phase==='rising'&&b.clock>1700){b.phase='fight';b.clock=0}
@@ -45,16 +45,40 @@ function update(dt){
  if(Math.hypot(q.x-state.x,q.y-state.y)<38){p.takeDamage(q.type==='tongue'?13:9,q.type==='tongue'?'Grumgullet tongue':'Swamp projectile',false,q);projectiles.splice(i,1)}
  else if(q.age>1700)projectiles.splice(i,1)}
 }
-function moss(b){ctx.save();ctx.translate(b.x,b.y);
- ellipse(0,7,145,51,'#294f4a88');ellipse(0,0,134,65,'#426a5b');
- for(let i=0;i<8;i++){const a=i*Math.PI/4;ellipse(Math.cos(a)*110,Math.sin(a)*41,30,21,'#536b45')}
- ellipse(0,-44,123,93,'#293f35');ellipse(0,-57,113,82,'#607750');
- for(let i=0;i<16;i++){const a=i*2.399;ellipse(Math.cos(a)*85,Math.sin(a)*57-56,19,12,i%3?'#3d6a45':'#8a9561')}
- ellipse(0,-105,35,25,'#80916a');ellipse(-22,-111,10,8,'#e8b957');ellipse(22,-111,10,8,'#e8b957');
- ellipse(-22,-111,4,5,'#1c2924');ellipse(22,-111,4,5,'#1c2924');
- if(b.phase==='stunned')ellipse(0,-13,67,15,'#b7a47e');
- ctx.restore()}
-
+function moss(b){
+ ctx.save();ctx.translate(b.x,b.y);
+ const face=(b.facingX||1)<0?-1:1;ctx.scale(face,1);
+ const step=b.phase==='fight'?Math.sin(b.clock*.008)*4:0;
+ ellipse(0,13,145,36,'#18392f88');
+ // Four grounded clawed legs: heavy turtle proportions, not frog pads.
+ for(const side of [-1,1])for(const rear of [0,1]){
+  const x=side*(rear?91:65),y=rear?0:-57;
+  ellipse(x,y+step*side,32,23,'#344c3d');
+  ellipse(x+side*8,y+10+step*side,30,17,'#506b50');
+  for(let j=0;j<3;j++)ellipse(x+side*(12+j*9),y+19+step*side,7,4,'#d0c59b');
+ }
+ // Shell is an unmistakable high-domed carapace with angular scutes.
+ ellipse(-12,-69,121,92,'#253b30');
+ ellipse(-12,-76,114,84,'#526a46');
+ ctx.save();ctx.translate(-12,-76);
+ for(let ring=0;ring<2;ring++)for(let j=0;j<7;j++){
+  const ang=j*Math.PI*2/7+(ring?.25:0),rad=ring?66:35;
+  const x=Math.cos(ang)*rad,y=Math.sin(ang)*rad*.68;
+  ctx.strokeStyle='#253e32';ctx.lineWidth=4;
+  ctx.beginPath();for(let k=0;k<6;k++){const a=k*Math.PI/3;const px=x+Math.cos(a)*(ring?25:22),py=y+Math.sin(a)*(ring?19:17);if(!k)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.closePath();ctx.stroke();
+  ellipse(x-4,y-4,7,4,ring?'#73875a':'#879466');
+ }
+ ctx.restore();
+ for(let i=0;i<17;i++){const a=i*2.399;ellipse(-12+Math.cos(a)*94,-76+Math.sin(a)*59,6+i%5,4+i%3,i%2?'#668a50':'#899758')}
+ // Broad snapping beak and low reptilian head, projecting ahead of shell.
+ ellipse(89,-62,49,37,'#3c5945');
+ ellipse(110,-55,42,24,'#667d57');
+ ctx.fillStyle='#b4a87c';ctx.beginPath();ctx.moveTo(120,-43);ctx.lineTo(146,-39);ctx.lineTo(123,-25);ctx.lineTo(113,-38);ctx.fill();
+ ellipse(113,-77,12,11,'#d5a95b');ellipse(116,-77,4,7,'#192b25');
+ ellipse(133,-54,4,3,'#25382e');
+ if(b.phase==='stunned'){ellipse(80,-13,50,11,'#a99274');ellipse(100,-7,24,6,'#c6a88c')}
+ ctx.restore();
+}
 const atlasImage=new Image();atlasImage.src='./assets/Grumgullet_Sprite_Sheet.png?v=421';
 const spriteFrames={idle:[[608,58,116,125],[718,58,116,125],[827,58,116,125],[937,58,116,125]],walk:[[1082,59,115,125],[1194,59,115,125],[1308,59,115,125],[1418,59,115,125]],tongue:[[8,257,145,123],[157,257,145,123],[307,257,145,123],[454,257,145,123],[598,257,145,123],[729,257,125,123]],bubble:[[869,258,154,123],[1025,258,154,123],[1180,258,154,123],[1334,258,154,123]],stunned:[[1091,441,148,131],[1239,441,148,131],[1383,441,148,131]],rising:[[5,828,155,144],[165,828,155,144],[320,828,155,144],[480,828,155,144],[635,828,155,144],[785,828,165,144]],defeated:[[560,643,155,135],[720,643,155,135],[865,643,155,135],[1015,643,155,135],[1165,643,155,135],[1320,643,155,135]]};
 const processed={};let atlasReady=false;
@@ -91,13 +115,15 @@ function spriteToad(b){
  const index=Math.min(frames.length-1,Math.floor((kind==='rising'?b.clock:kind==='stunned'?b.clock:b.attack)/Math.max(120,kind==='rising'?270:250))%frames.length);
  const frame=frames[index];if(!frame)return false;
  ctx.save();ctx.translate(b.x,b.y);
+ // The atlas faces left by default: flip horizontally when travelling right.
+ ctx.scale((b.facingX||-1)>0?-1:1,1);
  // World position is at the creature's feet, matching the old procedural boss.
  const w=236,h=210;ctx.drawImage(frame,-w/2,-h+15,w,h);ctx.restore();
  return true;
 }
 
 function toad(b){
- if(spriteToad(b))return;ctx.save();ctx.translate(b.x,b.y);
+ if(spriteToad(b))return;ctx.save();ctx.translate(b.x,b.y);ctx.scale((b.facingX||-1)>0?-1:1,1);
  ellipse(0,8,113,32,'#274f4388');ellipse(0,-37,109,77,'#546a39');
  ellipse(-72,-6,41,30,'#465d33');ellipse(72,-6,41,30,'#465d33');
  ellipse(0,-79,89,58,'#73824a');
