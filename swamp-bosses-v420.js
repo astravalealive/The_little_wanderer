@@ -54,7 +54,50 @@ function moss(b){ctx.save();ctx.translate(b.x,b.y);
  ellipse(-22,-111,4,5,'#1c2924');ellipse(22,-111,4,5,'#1c2924');
  if(b.phase==='stunned')ellipse(0,-13,67,15,'#b7a47e');
  ctx.restore()}
-function toad(b){ctx.save();ctx.translate(b.x,b.y);
+
+const atlasImage=new Image();atlasImage.src='./assets/Grumgullet_Sprite_Sheet.png?v=421';
+const spriteFrames={idle:[[608,58,116,125],[718,58,116,125],[827,58,116,125],[937,58,116,125]],walk:[[1082,59,115,125],[1194,59,115,125],[1308,59,115,125],[1418,59,115,125]],tongue:[[8,257,145,123],[157,257,145,123],[307,257,145,123],[454,257,145,123],[598,257,145,123],[729,257,125,123]],bubble:[[869,258,154,123],[1025,258,154,123],[1180,258,154,123],[1334,258,154,123]],stunned:[[1091,441,148,131],[1239,441,148,131],[1383,441,148,131]],rising:[[5,828,155,144],[165,828,155,144],[320,828,155,144],[480,828,155,144],[635,828,155,144],[785,828,165,144]],defeated:[[560,643,155,135],[720,643,155,135],[865,643,155,135],[1015,643,155,135],[1165,643,155,135],[1320,643,155,135]]};
+const processed={};let atlasReady=false;
+atlasImage.onload=()=>{
+ try{
+  for(const [kind,rects] of Object.entries(spriteFrames)){
+   processed[kind]=rects.map(([sx,sy,sw,sh])=>{
+    const c=document.createElement('canvas');c.width=sw;c.height=sh;
+    const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(atlasImage,sx,sy,sw,sh,0,0,sw,sh);
+    const data=g.getImageData(0,0,sw,sh),a=data.data;
+    // Estimate each frame's painted brown background from its upper corners.
+    const sample=(x,y)=>{const k=(y*sw+x)*4;return[a[k],a[k+1],a[k+2]]};
+    const bg=sample(sw-3,3);
+    for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){
+     const k=(y*sw+x)*4,r=a[k],gr=a[k+1],bl=a[k+2];
+     const distance=Math.hypot(r-bg[0],gr-bg[1],bl-bg[2]);
+     const brown=(r>gr*1.08&&gr>bl*.99&&r<190&&bl<125);
+     if(brown&&distance<54)a[k+3]=0;
+     else if(brown&&distance<72)a[k+3]=Math.round(255*(distance-54)/18);
+    }
+    g.putImageData(data,0,0);return c;
+   });
+  }atlasReady=true;
+ }catch(e){console.warn('Grumgullet atlas unavailable; procedural fallback',e)}
+};
+function spriteToad(b){
+ if(!atlasReady)return false;
+ let kind='idle';
+ if(b.phase==='rising')kind='rising';
+ else if(b.phase==='stunned')kind='stunned';
+ else if(b.phase==='defeated')kind='defeated';
+ else if(b.phase==='fight')kind=b.attack>1450?(b.seed%2?'tongue':'bubble'):(dist(b)>120?'walk':'idle');
+ const frames=processed[kind]||processed.idle;
+ const index=Math.min(frames.length-1,Math.floor((kind==='rising'?b.clock:kind==='stunned'?b.clock:b.attack)/Math.max(120,kind==='rising'?270:250))%frames.length);
+ const frame=frames[index];if(!frame)return false;
+ ctx.save();ctx.translate(b.x,b.y);
+ // World position is at the creature's feet, matching the old procedural boss.
+ const w=236,h=210;ctx.drawImage(frame,-w/2,-h+15,w,h);ctx.restore();
+ return true;
+}
+
+function toad(b){
+ if(spriteToad(b))return;ctx.save();ctx.translate(b.x,b.y);
  ellipse(0,8,113,32,'#274f4388');ellipse(0,-37,109,77,'#546a39');
  ellipse(-72,-6,41,30,'#465d33');ellipse(72,-6,41,30,'#465d33');
  ellipse(0,-79,89,58,'#73824a');
