@@ -1,1 +1,1 @@
-{"build":396,"notes":"Installed adult mallard land/swim/flight and corrected 8x4 duckling atlas. Female mallards and duckling flight retain existing art fallback; family behaviour unchanged. Visual test required."}
+{"build":397,"notes":"Hotfix: remove duplicate const flying declaration in drawDuck which caused startup SyntaxError in V396. Keep duck atlases and behaviour."}
