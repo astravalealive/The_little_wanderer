@@ -101,7 +101,21 @@
   function draw() {
     if (!atlas.naturalWidth || (s.defeated && s.timer>durations.defeat+300)) return;
     let name=s.mode, fraction=0;
-    if (s.mode==='hidden') {name='burrow';fraction=.65;}
+    if (s.mode==='hidden') {
+      // Only the mysterious buried shell is visible before the encounter.
+      const pulse=s.noticed?Math.sin(now()*.018)*2:0;
+      ctx.save();
+      ctx.fillStyle='#bd9b69';
+      ctx.beginPath();ctx.ellipse(s.x,s.y-7,84,27,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#d7b985';
+      ctx.beginPath();ctx.ellipse(s.x,s.y-23+pulse,63,29,0,Math.PI,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#977b5c';ctx.lineWidth=4;
+      for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(s.x+i*16,s.y-18+pulse);ctx.quadraticCurveTo(s.x+i*11,s.y-42+pulse,s.x+i*7,s.y-45+pulse);ctx.stroke();}
+      ctx.fillStyle='#ead3a0';
+      ctx.beginPath();ctx.ellipse(s.x-14,s.y-37+pulse,23,5,-.2,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+      return;
+    }
     else if (s.mode==='fight') {
       name=s.y>home.y+140?'water':distance()<=66?'idle':s.direction;
       fraction=(now()%680)/680;
