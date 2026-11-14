@@ -7720,7 +7720,10 @@ function drawBird(b){
   ctx.save();
   if(b.vx<-.5){ctx.translate(x,0);ctx.scale(-1,1);ctx.translate(-x,0)}
   const w=flying?58:49,h=flying?43:37;
-  ctx.drawImage(atlas,col*192,row*128,192,128,Math.round(x-w/2),Math.round(y-h*.72),w,h);
+  // V393: source artwork sits higher than the nominal 128px cell and spills below it.
+// Shift the extraction window upward, excluding the next row's stray feathers.
+  const sy=Math.max(0,row*128-18),sh=row===0?110:112;
+  ctx.drawImage(atlas,col*192,sy,192,sh,Math.round(x-w/2),Math.round(y-h*.72),w,h);
   ctx.restore();return;
  }
  // Existing illustrated artwork remains the loading/error fallback.
@@ -11040,7 +11043,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=392;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=393;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
