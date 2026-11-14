@@ -8086,10 +8086,42 @@ function drawFenDetail(night){
   }
  }
  // A raised, uninterrupted route through the heart of the swamp.
- ctx.strokeStyle='#4d503b';ctx.lineWidth=118;ctx.beginPath();
+ ctx.strokeStyle='#4d503b';ctx.lineWidth=230;ctx.beginPath();
  for(let y=Math.floor(top/30)*30;y<=bottom+30;y+=30){const x=fenTrailX(y);if(y===Math.floor(top/30)*30)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();
- ctx.strokeStyle='#85795b';ctx.lineWidth=102;ctx.stroke();
- ctx.strokeStyle='#a39671';ctx.lineWidth=69;ctx.stroke();
+ ctx.strokeStyle='#85795b';ctx.lineWidth=200;ctx.stroke();
+ ctx.strokeStyle='#a39671';ctx.lineWidth=158;ctx.stroke();
+
+ // Wide, unobstructed fighting grounds for both swamp guardians.
+ for(const [bx,by] of [[-3150,450],[-2200,2150]]){
+  if(Math.abs(bx-cam.x)>1250||Math.abs(by-cam.y)>1000)continue;
+  ctx.fillStyle='#4c5b42';ctx.beginPath();ctx.ellipse(bx,by,345,250,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#788568';ctx.lineWidth=17;ctx.stroke();
+  for(let k=0;k<22;k++){const a=k*2.399,r=Math.sqrt((k+1)/23);
+   ctx.fillStyle=k%3?'#6b7855':'#405a45';ctx.beginPath();
+   ctx.ellipse(bx+Math.cos(a)*r*290,by+Math.sin(a)*r*195,19,8,a,0,Math.PI*2);ctx.fill();
+  }
+ }
+ // Rotten fallen logs, lily patches, ripples and distant mist. All decorative.
+ const t=performance.now()*.001;
+ for(let i=0;i<115;i++){
+  const x=-3890+seeded(54000+i*3)*2300,y=-1480+seeded(54001+i*3)*4600;
+  if(expandedRegion(x,y)?.id!=='fen'||Math.abs(x-cam.x)>1050||Math.abs(y-cam.y)>850||fenTrailDistance(x,y)<150||fenArenaDistance(x,y)<330)continue;
+  const wet=fenWater(x,y),v=seeded(54002+i*3);
+  if(wet>.38){
+   ctx.fillStyle='#7f9d60';ctx.beginPath();ctx.ellipse(x,y,8+v*6,5+v*3,-.3,0,Math.PI*1.85);ctx.lineTo(x,y);ctx.fill();
+   ctx.strokeStyle='#9cb4a066';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(x+13,y+4,17+Math.sin(t+i)*2,7,0,0,Math.PI*2);ctx.stroke();
+  }else if(i%4===0){
+   ctx.save();ctx.translate(x,y);ctx.rotate(v*2);
+   ctx.fillStyle='#293d3288';ctx.beginPath();ctx.ellipse(0,9,70,15,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#594b38';ctx.fillRect(-61,-10,122,20);
+   ctx.fillStyle='#827454';ctx.fillRect(-58,-9,116,5);
+   for(let j=0;j<5;j++){ctx.strokeStyle='#a09165';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-48+j*24,-7);ctx.lineTo(-42+j*24,7);ctx.stroke()}
+   ctx.restore();
+  }
+  if(i%6===0){ctx.fillStyle='rgba(182,209,188,'+(.035+.018*Math.sin(t*.35+i))+')';ctx.beginPath();ctx.ellipse(x+Math.sin(t*.12+i)*20,y,105,20,0,0,Math.PI*2);ctx.fill();
+   if(night>.3){ctx.fillStyle='rgba(203,238,158,'+(night*(.25+.2*Math.sin(t*1.4+i)))+')';ctx.beginPath();ctx.arc(x,y-20+Math.sin(t+i)*8,2.6,0,Math.PI*2);ctx.fill()}
+  }
+ }
  // Root bridges crossing the shallows at irregular intervals.
  for(let y=-1300;y<3300;y+=740){
   const x=fenTrailX(y);
@@ -9021,6 +9053,17 @@ function worldEditorClose(){
  worldEditorSave();if(worldEditorPanel)worldEditorPanel.remove();worldEditorPanel=null;
  if(worldEditorDeleteButton)worldEditorDeleteButton.remove();worldEditorDeleteButton=null;
  notify('World Editor closed. Layout saved on this device.');
+}
+
+// V424: clear only fen collision clutter; keep save IDs and all other regions intact.
+for(let i=objects.length-1;i>=0;i--){
+ const o=objects[i];if(expandedRegion(o.x,o.y)?.id!=='fen')continue;
+ const solid=['tree','rock','fir','palm','bareTree','cactus'].includes(o.type);
+ const nearPath=fenTrailDistance(o.x,o.y)<185;
+ const nearArena=fenArenaDistance(o.x,o.y)<365;
+ const v=seeded(o.id*13+771);
+ if((nearPath||nearArena)&&['tree','rock','fir','palm','bareTree','cactus','bush'].includes(o.type)||
+    (solid&&v>.19)||(o.type==='bush'&&v>.38))objects.splice(i,1);
 }
 let idleTime=0;// Solid objects use a small spatial hash for efficient iPad collision checks.
 const solidCellSize=128,solidCells=new Map();
