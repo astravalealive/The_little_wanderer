@@ -13,9 +13,14 @@
   const s = { ...home, hp:320, maxHp:320, mode:'hidden', timer:0, attack:0, direction:'down', noticed:false, defeated:false };
   let lastHit = -Infinity, attackIndex = 0, released = false, aimX = 0, aimY = 0;
   let shots = [];
+  let wreckDebris = [];
+  function scatterWreck(){
+    wreckDebris=Array.from({length:19},(_,i)=>{const angle=i*2.39996,spread=75+(i%5)*24;return {x:home.x+Math.cos(angle)*spread,y:home.y+Math.sin(angle)*spread*.55,rot:angle,len:19+(i%4)*13,kind:i%4};});
+  }
   const distance = () => Math.hypot(state.x-s.x, state.y-s.y);
   const now = () => port.snapshot().time;
   function enter(mode) {
+    if(mode==='emerge' && s.mode==='hidden')scatterWreck();
     s.mode = mode;
     s.timer = 0;
     released = false;
@@ -99,22 +104,27 @@
     enter(({burrow:'tunnel',tunnel:'emerge',pull:'stun',stun:'recover'})[s.mode] || 'fight');
   }
   function draw() {
+    if(wreckDebris.length){ctx.save();for(const p of wreckDebris){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.kind===0?'#b08b5c':'#70513c';ctx.fillRect(-p.len/2,-4,p.len,8);ctx.fillStyle='#c7a477';ctx.fillRect(-p.len/2,-4,p.len,2);ctx.restore();}ctx.restore();}
     if (!atlas.naturalWidth || (s.defeated && s.timer>durations.defeat+300)) return;
     let name=s.mode, fraction=0;
     if (s.mode==='hidden') {
-      // Only the mysterious buried shell is visible before the encounter.
-      const pulse=s.noticed?Math.sin(now()*.018)*2:0;
-      ctx.save();
-      ctx.fillStyle='#bd9b69';
-      ctx.beginPath();ctx.ellipse(s.x,s.y-7,84,27,0,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='#d7b985';
-      ctx.beginPath();ctx.ellipse(s.x,s.y-23+pulse,63,29,0,Math.PI,Math.PI*2);ctx.fill();
-      ctx.strokeStyle='#977b5c';ctx.lineWidth=4;
-      for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(s.x+i*16,s.y-18+pulse);ctx.quadraticCurveTo(s.x+i*11,s.y-42+pulse,s.x+i*7,s.y-45+pulse);ctx.stroke();}
-      ctx.fillStyle='#ead3a0';
-      ctx.beginPath();ctx.ellipse(s.x-14,s.y-37+pulse,23,5,-.2,0,Math.PI*2);ctx.fill();
-      ctx.restore();
-      return;
+      // Half-buried fishing wreck, not the boss sprite.
+      ctx.save();ctx.translate(s.x,s.y);const shake=s.noticed?Math.sin(now()*.045)*2.8:0;ctx.translate(shake,0);
+      ctx.fillStyle='#bfa37688';ctx.beginPath();ctx.ellipse(0,0,112,29,0,0,Math.PI*2);ctx.fill();
+      // Weathered curved hull and dark interior.
+      ctx.fillStyle='#302d2a';ctx.beginPath();ctx.moveTo(-105,-20);ctx.quadraticCurveTo(-63,-87,20,-76);ctx.quadraticCurveTo(90,-64,112,-22);ctx.quadraticCurveTo(24,13,-105,-20);ctx.fill();
+      ctx.fillStyle='#77513b';ctx.beginPath();ctx.moveTo(-108,-25);ctx.quadraticCurveTo(-50,-103,26,-84);ctx.quadraticCurveTo(92,-71,115,-26);ctx.lineTo(95,-11);ctx.quadraticCurveTo(7,-37,-87,-11);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='#c19b6a';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-107,-24);ctx.quadraticCurveTo(-47,-100,28,-83);ctx.quadraticCurveTo(92,-70,114,-26);ctx.stroke();
+      ctx.strokeStyle='#382c2b';ctx.lineWidth=4;
+      for(let i=0;i<7;i++){const x=-78+i*26;ctx.beginPath();ctx.moveTo(x,-16);ctx.lineTo(x+12,-63+Math.abs(i-3)*7);ctx.stroke();}
+      // Broken mast, net and brass fittings.
+      ctx.strokeStyle='#5d4432';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(-7,-52);ctx.lineTo(23,-137);ctx.stroke();
+      ctx.strokeStyle='#d2b47c';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(20,-131);ctx.lineTo(79,-47);ctx.lineTo(-49,-30);ctx.stroke();
+      ctx.strokeStyle='#8a9a81';ctx.lineWidth=1.7;
+      for(let j=0;j<6;j++){ctx.beginPath();ctx.moveTo(-43+j*19,-34);ctx.lineTo(-24+j*17,-53);ctx.stroke();}
+      for(let j=0;j<5;j++){ctx.beginPath();ctx.moveTo(-42,-34-j*4);ctx.lineTo(60,-36-j*3);ctx.stroke();}
+      for(const x of [-84,74]){ctx.fillStyle='#d4aa65';ctx.beginPath();ctx.arc(x,-24,5,0,Math.PI*2);ctx.fill();}
+      ctx.restore();return;
     }
     else if (s.mode==='fight') {
       name=s.y>home.y+140?'water':distance()<=66?'idle':s.direction;
