@@ -4031,6 +4031,13 @@ for(let i=objects.length-1;i>=0;i--){
  const o=objects[i];
  if(expandedRegion(o.x,o.y)?.id==='coast'&&o.type==='bush')objects.splice(i,1);
 }
+// V415: Keep Krakkle's western beach arena clear of foreground props.
+// The boss can roam ~520 units from his home; preserve an unobstructed battle zone.
+for(let i=objects.length-1;i>=0;i--){
+ const o=objects[i];
+ if(Math.hypot(o.x+2500,(o.y-7750)*1.15)<760 &&
+    ['palm','tree','fir','bareTree','rock','bush','cactus','flower'].includes(o.type))objects.splice(i,1);
+}
 // Draw road surfaces by material layer, not complete roads one by one.
 // This prevents the border of one road drawing a line across another at a junction.
 roadRoutes.push(
@@ -11216,7 +11223,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=414;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=415;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
