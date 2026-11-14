@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Haigen's World prefab manifest v1",
+  "type": "object",
+  "required": ["id", "version", "category", "worldSize", "pivot", "renderLayer", "collision"],
+  "properties": {
+    "id": {"type":"string","pattern":"^[a-z0-9-]+$"},
+    "version": {"type":"integer","minimum":1},
+    "category": {"enum":["building","tree","prop","creature","terrain"]},
+    "worldSize": {"type":"object","required":["width","height"],"properties":{"width":{"type":"number","exclusiveMinimum":0},"height":{"type":"number","exclusiveMinimum":0}},"additionalProperties":false},
+    "pivot": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number","minimum":0,"maximum":1},"y":{"type":"number","minimum":0,"maximum":1}},"additionalProperties":false},
+    "renderLayer": {"enum":["ground","ground-detail","behind-actors","actors","above-actors","effects"]},
+    "collision": {"type":"object","required":["shape"],"properties":{"shape":{"enum":["none","rect","circle"]},"width":{"type":"number","minimum":0},"height":{"type":"number","minimum":0},"radius":{"type":"number","minimum":0}}},
+    "sprite": {"type":"string"},
+    "frame": {"type":"object","properties":{"width":{"type":"integer","minimum":1},"height":{"type":"integer","minimum":1}}},
+    "animations": {"type":"object"},
+    "doorway": {"type":"object","properties":{"x":{"type":"number"},"y":{"type":"number"},"clearance":{"type":"number","minimum":0},"destination":{"type":"string"}}},
+    "tags": {"type":"array","items":{"type":"string"}}
+  }
+}
