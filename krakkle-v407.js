@@ -143,9 +143,27 @@
     }
     for (const q of shots) {
       const lift=q.rock?30*Math.sin(Math.PI*q.age/1500):0;
-      ctx.beginPath();ctx.ellipse(q.x,q.y-14-lift,q.rock?11:14,q.rock?10:7,0,0,Math.PI*2);
-      ctx.fillStyle=q.rock?'#958077':'#99dce9';ctx.fill();
-      ctx.strokeStyle=q.rock?'#61534c':'#e2fcff';ctx.lineWidth=2;ctx.stroke();
+      ctx.save();
+      ctx.translate(q.x,q.y-30-lift);
+      const spin=q.age*.0035;
+      ctx.rotate(q.rock?spin:Math.sin(q.age*.012)*.12);
+      if(q.rock){
+        // Large faceted boulder with chipped edges, shadow and highlighted planes.
+        ctx.fillStyle='#302e35';ctx.beginPath();ctx.moveTo(-31,-12);ctx.lineTo(-18,-32);ctx.lineTo(13,-35);ctx.lineTo(34,-13);ctx.lineTo(29,19);ctx.lineTo(3,33);ctx.lineTo(-29,17);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#857d7a';ctx.beginPath();ctx.moveTo(-25,-14);ctx.lineTo(-14,-28);ctx.lineTo(12,-28);ctx.lineTo(26,-9);ctx.lineTo(18,16);ctx.lineTo(-7,25);ctx.lineTo(-25,11);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#b2a59a';ctx.beginPath();ctx.moveTo(-14,-28);ctx.lineTo(12,-28);ctx.lineTo(4,-5);ctx.lineTo(-22,-7);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#625f64';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(26,-9);ctx.lineTo(18,16);ctx.lineTo(-7,25);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#d2c4b1';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-16,6);ctx.lineTo(-5,2);ctx.lineTo(0,12);ctx.lineTo(12,15);ctx.stroke();
+      }else{
+        // Oversized foamy seawater orb: deep translucent core, scalloped foam and specular glints.
+        ctx.fillStyle='#2a728dbb';ctx.beginPath();ctx.arc(0,0,36,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#64bcd4e0';ctx.beginPath();ctx.arc(-3,-3,31,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#9de6e9';ctx.beginPath();ctx.arc(-10,-12,15,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#e5ffff';ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,0,33,-2.7,.6);ctx.stroke();
+        for(let i=0;i<7;i++){const a=i*Math.PI*2/7+q.age*.003;ctx.fillStyle=i%2?'#f2ffff':'#c2f5f4';ctx.beginPath();ctx.arc(Math.cos(a)*33,Math.sin(a)*33,5+(i%3)*2,0,Math.PI*2);ctx.fill();}
+        ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(-16,-17,5,0,Math.PI*2);ctx.fill();
+      }
+      ctx.restore();
     }
     ctx.restore();
   }
