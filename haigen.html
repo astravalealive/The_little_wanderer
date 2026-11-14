@@ -7953,9 +7953,6 @@ function drawWoodlandFloorV391(nightMix){
   const density=nearHome?.36:.86;
   if(hash(gx,gy,3)>density)continue;
   const dark=nightMix*.48;
-  ctx.globalAlpha=(nearHome?.19:.31)*(1-dark);
-  ctx.fillStyle=hash(gx,gy,4)>.48?'#304d2b':'#c0aa70';
-  ctx.beginPath();ctx.ellipse(x,y,14+hash(gx,gy,5)*21,5+hash(gx,gy,6)*10,hash(gx,gy,7)*3.14,0,Math.PI*2);ctx.fill();
   ctx.globalAlpha=(nearHome?.32:.62)*(1-dark);
   for(let j=0;j<(nearHome?2:5);j++){
    const px=x+(hash(gx,gy,j+10)-.5)*65,py=y+(hash(gx,gy,j+20)-.5)*37;
@@ -11169,7 +11166,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=403;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=404;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
