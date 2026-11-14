@@ -602,7 +602,7 @@ function islandChunk(ix,iy){
   pixels.data[i++]=Math.max(0,Math.min(255,rgb[2]));pixels.data[i++]=255;
  }
  g.putImageData(pixels,0,0);islandCache.set(key,c);
- if(islandCache.size>36islandCache.delete(islandCache.keys().next().value);
+ if(islandCache.size>36)islandCache.delete(islandCache.keys().next().value);
  return c;
 }
 const islandOutline=Array.from({length:160},(_,i)=>{
