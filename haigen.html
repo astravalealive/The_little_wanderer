@@ -4026,6 +4026,11 @@ function roadDistance(x,y){let best=Infinity;for(const route of roadRoutes)for(l
   objects.push({id:280100+i,x,y,type,size:type==='palm'?1.7:1.05});
  }
 }
+// V411: Saltwick beach is sand, not shrubland. Keep palms and buildings.
+for(let i=objects.length-1;i>=0;i--){
+ const o=objects[i];
+ if(expandedRegion(o.x,o.y)?.id==='coast'&&o.type==='bush')objects.splice(i,1);
+}
 // Draw road surfaces by material layer, not complete roads one by one.
 // This prevents the border of one road drawing a line across another at a junction.
 roadRoutes.push(
@@ -7981,7 +7986,7 @@ function updateHaigenSpeech(){
  el.style.visibility='visible';
 }
 
-function ensureWorldLocator(){let el=document.getElementById('worldLocator');if(!el){el=document.createElement('div');el.id='worldLocator';el.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 220px);right:12px;z-index:28;background:#15231ee8;color:#ffe9ae;border:1px solid #b99762;border-radius:9px;padding:7px 10px;font:600 12px system-ui;text-align:right;pointer-events:auto';el.innerHTML='<div id="worldXY"></div><button id="jumpToTroll" style="margin-top:5px;background:#58442e;color:#fff1ce;border:1px solid #b99762;border-radius:5px;padding:5px">🌳 Go to troll stump</button>';document.body.appendChild(el);const krBtn=document.createElement('button');krBtn.id='findKrakkle';krBtn.textContent='🦀 Find Krakkle';krBtn.style.cssText='display:block;margin-top:5px;background:#58442e;color:#fff1ce;border:1px solid #b99762;border-radius:5px;padding:5px';krBtn.onclick=()=>{cam.x=1800;cam.y=7750;cameraDetached=true;notify('🦀 Camera moved to Krakkle on Saltwick Beach. Haigen continues exploring.');};el.appendChild(krBtn);document.getElementById('jumpToTroll').onclick=()=>{state.x=trollStumpHome.x;state.y=trollStumpHome.y+95;cam.x=state.x;cam.y=state.y;state.autonomy=false;notify('At the troll stump');};}document.getElementById('worldXY').textContent='X '+Math.round(state.x)+' · Y '+Math.round(state.y);}
+function ensureWorldLocator(){let el=document.getElementById('worldLocator');if(!el){el=document.createElement('div');el.id='worldLocator';el.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 220px);right:12px;z-index:28;background:#15231ee8;color:#ffe9ae;border:1px solid #b99762;border-radius:9px;padding:7px 10px;font:600 12px system-ui;text-align:right;pointer-events:auto';el.innerHTML='<div id="worldXY"></div><button id="jumpToTroll" style="margin-top:5px;background:#58442e;color:#fff1ce;border:1px solid #b99762;border-radius:5px;padding:5px">🌳 Go to troll stump</button>';document.body.appendChild(el);const krBtn=document.createElement('button');krBtn.id='findKrakkle';krBtn.textContent='🦀 Find Krakkle';krBtn.style.cssText='display:block;margin-top:5px;background:#58442e;color:#fff1ce;border:1px solid #b99762;border-radius:5px;padding:5px';krBtn.onclick=()=>{cam.x=-2500;cam.y=7750;cameraDetached=true;notify('🦀 Camera moved to Krakkle on Saltwick Beach. Haigen continues exploring.');};el.appendChild(krBtn);document.getElementById('jumpToTroll').onclick=()=>{state.x=trollStumpHome.x;state.y=trollStumpHome.y+95;cam.x=state.x;cam.y=state.y;state.autonomy=false;notify('At the troll stump');};}document.getElementById('worldXY').textContent='X '+Math.round(state.x)+' · Y '+Math.round(state.y);}
 
 // V391 woodland floor pass: restrained painterly texture, denser only in wild woodland.
 // Stable world-coordinate marks; no tile outlines, image filters or gameplay changes.
@@ -11211,7 +11216,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=410;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=411;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · Krakkle sprite atlas';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
@@ -11426,4 +11431,4 @@ function refreshFrogHud(){
 }
 setInterval(refreshFrogHud,300);refreshFrogHud();
  placeArtCart();restoreTrollPosition();stumpPositionReady=true;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./v127-ornate-ui.js?v=381"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><!-- Tactical Gloamjaw adapter retired: original real-time boss remains active. --><script src="./thrummaw-v148.js?v=410"></script><script src="./krakkle-v407.js?v=407"></script></body></html>
+</script><script src="./v127-ornate-ui.js?v=381"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><!-- Tactical Gloamjaw adapter retired: original real-time boss remains active. --><script src="./thrummaw-v148.js?v=410"></script><script src="./krakkle-v407.js?v=411"></script></body></html>
