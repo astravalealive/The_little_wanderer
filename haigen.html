@@ -591,9 +591,12 @@ function fenGroundColour(x,y,base){
  return dry.map((c,i)=>c*(1-w)+water[i]*w);
 }
 const islandChunkSize=512,islandResolution=128,islandCache=new Map();
+const terrainPerf={hits:0,misses:0,buildMs:0,lastBuildMs:0};
+const TERRAIN_CACHE_LIMIT=64; // Retain more previously visited terrain on iPad; bounded LRU.
 function islandChunk(ix,iy){
  const key=ix+','+iy;
- if(islandCache.has(key)){const c=islandCache.get(key);islandCache.delete(key);islandCache.set(key,c);return c}
+ if(islandCache.has(key)){terrainPerf.hits++;const c=islandCache.get(key);islandCache.delete(key);islandCache.set(key,c);return c}
+ terrainPerf.misses++;const buildStarted=performance.now();
  const c=document.createElement('canvas');c.width=c.height=islandResolution;
  const g=c.getContext('2d'),pixels=g.createImageData(islandResolution,islandResolution);let i=0;
  for(let y=0;y<islandResolution;y++)for(let x=0;x<islandResolution;x++){
@@ -601,8 +604,8 @@ function islandChunk(ix,iy){
   pixels.data[i++]=Math.max(0,Math.min(255,rgb[0]));pixels.data[i++]=Math.max(0,Math.min(255,rgb[1]));
   pixels.data[i++]=Math.max(0,Math.min(255,rgb[2]));pixels.data[i++]=255;
  }
- g.putImageData(pixels,0,0);islandCache.set(key,c);
- if(islandCache.size>36)islandCache.delete(islandCache.keys().next().value);
+ g.putImageData(pixels,0,0);terrainPerf.lastBuildMs=performance.now()-buildStarted;terrainPerf.buildMs+=terrainPerf.lastBuildMs;islandCache.set(key,c);
+ if(islandCache.size>TERRAIN_CACHE_LIMIT)islandCache.delete(islandCache.keys().next().value);
  return c;
 }
 const islandOutline=Array.from({length:160},(_,i)=>{
@@ -11148,23 +11151,38 @@ function drawHomeInteriorScene(visiting=false){
  ctx.fillText(homeFloor?'Use the left staircase to go downstairs':tier>=3?'Use the left stairs to reach upstairs · Door to leave':'Walk to the bottom doorway to leave',cw/2,top+size+28);
  ctx.restore();
 }
+// Opt-in diagnostics: no gameplay or visual art changes while hidden.
+const perfPanel=document.createElement('div');
+perfPanel.id='haigenPerfPanel';perfPanel.style.cssText='display:none;position:fixed;right:8px;top:calc(env(safe-area-inset-top,0px) + 75px);z-index:9000;background:#142b27e8;color:#f7eac8;border:1px solid #b69a64;border-radius:8px;padding:7px 10px;font:12px/1.5 monospace;pointer-events:none;white-space:pre';
+document.body.appendChild(perfPanel);
+const perfToggle=document.createElement('button');perfToggle.type='button';perfToggle.textContent='FPS';perfToggle.title='Toggle performance diagnostics';perfToggle.style.cssText='position:fixed;right:8px;top:calc(env(safe-area-inset-top,0px) + 42px);z-index:9001;background:#142b27cc;color:#f7eac8;border:1px solid #b69a64;border-radius:6px;padding:3px 7px;font:11px system-ui;opacity:.75';
+document.body.appendChild(perfToggle);
+let perfEnabled=false,perfWindowStart=0,perfFrames=0,perfSlow=0,perfTotal=0,perfMax=0,perfUpdate=0,perfDraw=0;
+perfToggle.onclick=()=>{perfEnabled=!perfEnabled;perfPanel.style.display=perfEnabled?'block':'none';perfWindowStart=0;perfFrames=0;perfSlow=0;perfTotal=0;perfMax=0;};
+window.__haigenPerf=()=>({enabled:perfEnabled,terrain:{...terrainPerf,cacheSize:islandCache.size,cacheLimit:TERRAIN_CACHE_LIMIT}});
 function frame(now){
+ const perfStart=perfEnabled?performance.now():0;
  const dt=Math.min(Math.max(0,now-last),50);last=now;
  if(state.resting&&!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;if(state.autonomy){autoPause=0;autoPlan('danger woke me: escape','escape')}notify('⚠️ Danger nearby! Haigen wakes up.');}
  try{
   menuController();
   if(!$('overlay').classList.contains('open'))update(dt);
+  if(perfEnabled)perfUpdate=performance.now()-perfStart;
   if(!Number.isFinite(cam.x)||!Number.isFinite(cam.y)){cam.x=Number(state.x)||1250;cam.y=Number(state.y)||1310;}
   draw();
   if(visitorRoom==='saltwick')drawSaltwickInterior();
  if(visitorRoom==='home')drawHomeInteriorScene(true);
   else if(visitorRoom==='stump'||visitorRoom==='vault')drawTrollStumpInterior(true);
   else if(!state.autonomy&&!cameraDetached&&!autonomousHomeVisit){drawHomeInteriorScene();drawTrollStumpInterior()}
+  if(perfEnabled)perfDraw=performance.now()-perfStart-perfUpdate;
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
  }catch(error){reportWorldError(error);}
- requestAnimationFrame(frame);
-}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
+ if(perfEnabled){const ms=performance.now()-perfStart;perfFrames++;perfTotal+=ms;perfMax=Math.max(perfMax,ms);if(ms>33.3)perfSlow++;if(!perfWindowStart)perfWindowStart=now;if(now-perfWindowStart>=1000){const elapsed=(now-perfWindowStart)/1000;perfPanel.textContent='FPS '+Math.round(perfFrames/elapsed)+' | frame '+(perfTotal/perfFrames).toFixed(1)+'ms | max '+perfMax.toFixed(1)+'ms
+Update '+perfUpdate.toFixed(1)+'ms | draw '+perfDraw.toFixed(1)+'ms | slow '+perfSlow+'
+Terrain '+islandCache.size+'/'+TERRAIN_CACHE_LIMIT+' | hit '+terrainPerf.hits+' miss '+terrainPerf.misses+'
+Last chunk '+terrainPerf.lastBuildMs.toFixed(1)+'ms';perfFrames=0;perfTotal=0;perfSlow=0;perfMax=0;perfWindowStart=now;}}
+ requestAnimationFrame(frame);\n}// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
 // Temporary in-game preview recovery and status controls.
  const previewTools=document.createElement('div');
  previewTools.id='v121PreviewTools';
