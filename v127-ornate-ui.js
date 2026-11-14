@@ -156,9 +156,13 @@ function tick(){
    }
    const day='Day '+state.day+' · '+state.phase;
    if(day!==lastDay){$('v127Day').textContent=day;lastDay=day}
+   // Retired Silent Pond objectives should never occupy the active HUD.
+   // The full history remains in the story journal.
+   const questComplete=state.stage>=6;
+   $('v127Quest').style.display=questComplete?'none':'';
    if(state.stage!==lastStage){
     lastStage=state.stage;
-    $('v127QuestList').innerHTML=questSteps.map(([title,step])=>'<li><span class="v127-checkbox">'+(state.stage>=step?'✓':'')+'</span><span>'+title+'</span></li>').join('');
+    $('v127QuestList').innerHTML=questSteps.filter(([,step])=>state.stage<step).map(([title])=>'<li><span class="v127-checkbox"></span><span>'+title+'</span></li>').join('');
    }
    minimap(state,now);
    if(!window.__v127PortraitReady)window.__v127PortraitReady=portrait();
