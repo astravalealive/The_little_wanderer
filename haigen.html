@@ -7691,19 +7691,50 @@ function updateBirds(dt){
   }
  }
 }
-// V391: uploaded 8x8 atlases, 192x128 cells. Each flock retains its species.
+// V394: the original art is arranged in 8 columns but its rows are NOT 128px high.
+// Repack each COMPLETE source row into an independent 160px-high destination row.
+// This eliminates the previous clipping/adjacent-row fragments without changing bird AI.
 const songbirdAtlas=new Image(),robinAtlas=new Image();
-let songbirdReady=false,robinReady=false;
-songbirdAtlas.onload=()=>{songbirdReady=songbirdAtlas.naturalWidth===1536&&songbirdAtlas.naturalHeight===1024};
-robinAtlas.onload=()=>{robinReady=robinAtlas.naturalWidth===1536&&robinAtlas.naturalHeight===1024};
-songbirdAtlas.src='./assets/haigen_songbird_repaired_8x8.png?v=392';
-robinAtlas.src='./assets/haigen_robin_repaired_8x8.png?v=392';
+let songbirdReady=false,robinReady=false,songbirdGameSheet=null,robinGameSheet=null;
+const songbirdBands=[[14,127],[158,267],[296,392],[414,540],[551,674],[683,802],[819,917],[928,1022]];
+const robinBands=[[18,130],[159,267],[297,393],[410,532],[551,672],[679,789],[804,904],[921,1016]];
+function repackBirdAtlas(image,bands){
+ if(image.naturalWidth!==1536||image.naturalHeight!==1024)return null;
+ const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=1280;
+ const context=canvas.getContext('2d');if(!context)return null;
+ context.imageSmoothingEnabled=false;
+ for(let row=0;row<8;row++){
+  const [first,last]=bands[row],sourceY=Math.max(0,first-2);
+  const sourceHeight=Math.min(1024,last+3)-sourceY;
+  // All source frames have blank horizontal gaps, and each source band is isolated.
+  context.drawImage(image,0,sourceY,1536,sourceHeight,0,row*160+152-sourceHeight,1536,sourceHeight);
+ }
+ return canvas;
+}
+songbirdAtlas.onload=()=>{
+ songbirdGameSheet=repackBirdAtlas(songbirdAtlas,songbirdBands);
+ songbirdReady=!!songbirdGameSheet;
+};
+robinAtlas.onload=()=>{
+ robinGameSheet=repackBirdAtlas(robinAtlas,robinBands);
+ robinReady=!!robinGameSheet;
+};
+songbirdAtlas.onerror=()=>{songbirdReady=false};
+robinAtlas.onerror=()=>{robinReady=false};
+songbirdAtlas.src='./assets/haigen_songbird_repaired_8x8.png?v=394';
+robinAtlas.src='./assets/haigen_robin_repaired_8x8.png?v=394';
+window.__birdAtlasDiagnostics=()=>({
+ version:394,cellWidth:192,cellHeight:160,columns:8,rows:8,
+ songbirdReady,robinReady,
+ songbirdSize:songbirdGameSheet?[songbirdGameSheet.width,songbirdGameSheet.height]:null,
+ robinSize:robinGameSheet?[robinGameSheet.width,robinGameSheet.height]:null
+});
 function drawBird(b){
  if(b.hiddenUntil&&time<b.hiddenUntil)return;
  const flying=b.air>.04,landing=flying&&b.air<.4;
  const alt=flying?b.air*(72+Math.sin(time*.003+b.phase)*11):0;
  const x=b.x,y=b.y-alt;
- const robin=b.flock%2===1,atlas=robin?robinAtlas:songbirdAtlas;
+ const robin=b.flock%2===1,atlas=robin?robinGameSheet:songbirdGameSheet;
  const ready=robin?robinReady:songbirdReady;
  if(ready){
   const t=time+b.phase*173;
@@ -7720,10 +7751,9 @@ function drawBird(b){
   ctx.save();
   if(b.vx<-.5){ctx.translate(x,0);ctx.scale(-1,1);ctx.translate(-x,0)}
   const w=flying?58:49,h=flying?43:37;
-  // V393: source artwork sits higher than the nominal 128px cell and spills below it.
-// Shift the extraction window upward, excluding the next row's stray feathers.
-  const sy=Math.max(0,row*128-18),sh=row===0?110:112;
-  ctx.drawImage(atlas,col*192,sy,192,sh,Math.round(x-w/2),Math.round(y-h*.72),w,h);
+  // Exact 192x160 isolated frames. Wings, feet and worms are fully contained.
+  ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(atlas,col*192,row*160,192,160,Math.round(x-w/2),Math.round(y-h*.92),w,h);
   ctx.restore();return;
  }
  // Existing illustrated artwork remains the loading/error fallback.
@@ -11043,7 +11073,7 @@ window.__haigenArtAudit=()=>({
  missing:[],
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
- const GAME_BUILD=393;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
+ const GAME_BUILD=394;const buildBadge=document.getElementById('devVersion');buildBadge.textContent='V'+GAME_BUILD;buildBadge.title='V'+GAME_BUILD+' · No overlapping context controls';window.__haigenBuild=GAME_BUILD;let availableBuild=GAME_BUILD;async function checkForUpdates(){try{const response=await fetch('./haigen-version.json?t='+Date.now(),{cache:'no-store'});if(!response.ok)return;const info=await response.json();const latest=Number(info.build)||0;if(latest>GAME_BUILD){availableBuild=latest;$('updateBanner').classList.add('show')}}catch(e){/* Offline play remains available. */}}
 $('applyUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));u.searchParams.set('reload',String(Date.now()));location.replace(u.href)});
 $('applyUpdateBtn').addEventListener('click',()=>{save();const u=new URL(location.href);u.searchParams.set('v',String(availableBuild));location.replace(u.href)});
 $('laterUpdateBtn').addEventListener('pointerup',e=>{e.preventDefault();$('updateBanner').classList.remove('show')});
