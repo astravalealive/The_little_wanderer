@@ -4,7 +4,7 @@
   const port = window.__gloamPort;
   if (!port) return;
   const {state, ctx} = port;
-  const home = {x:2300, y:7750};
+  const home = {x:1800, y:7750};
   const names = ['down','up','left','right','idle','claw','foam','throw','burrow','tunnel','emerge','pull','stun','recover','hurt','defeat','water'];
   const counts = [4,4,4,4,4,4,4,6,6,4,6,4,6,6,2,6,4];
   const durations = {emerge:1100, claw:650, foam:800, throw:1080, burrow:600, tunnel:1600, pull:580, stun:2700, recover:720, defeat:1080};
