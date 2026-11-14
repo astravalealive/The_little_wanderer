@@ -8981,7 +8981,9 @@ function recoverAutonomousHaigen(dt,oldX,oldY){
  }
  autoDestination=null;autoPause=1800;
 }
-function update(dt){updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00024,ny=trollRoomPlayer.y+dy*dt*.00024;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
+function update(dt){updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;
+ if(autonomousTrollVisitMs>0){autonomousTrollVisitMs-=dt;trollRoomPlayer.moving=true;trollRoomPlayer.dir='down';trollRoomPlayer.steps+=dt;trollRoomPlayer.y=Math.min(455/600,trollRoomPlayer.y+dt*.000035);if(autonomousTrollVisitMs<=0){autonomousTrollVisitMs=0;leaveTrollRoom();state.autonomy=true;autoResetNav();}time+=dt;return;}
+ const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00024,ny=trollRoomPlayer.y+dy*dt*.00024;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
  if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=174/600){
  changeTrollChamber(true);
@@ -9412,6 +9414,7 @@ const trollStumpImage=new Image();trollStumpImage.src='./assets/Stump.png';
 var stumpPositionReady=false;
 let trollStumpInside=false;
 let trollDoorCooldown=0;
+let autonomousTrollVisitMs=0;
 // Paintings keep their seed so the cart, gallery and buyer display the same work.
 const artCart={x:1660,y:1690},artSeat={x:1555,y:1725};
 const artProps=new Image();artProps.src='./assets/painters-cart.webp';
@@ -9854,7 +9857,9 @@ function trollRoomWalkable(x,y,vault=inTreasureCave){
 }
 function enterTrollRoom(){
  Object.assign(trollRoomPlayer,{x:262/547,y:411/600,dir:'up',moving:false,steps:0});
- trollStumpInside=true;trollDoorCooldown=1300;state.autonomy=false;
+ trollStumpInside=true;trollDoorCooldown=1300;
+ autonomousTrollVisitMs=state.autonomy?4600:0;
+ if(!autonomousTrollVisitMs)state.autonomy=false;
  notify('Seven places at the table. Approach the stool at the left end for supper.');
 }
 // Reference-art pixels. A few common aisle points let residents pass around the hearth and table.
@@ -11380,5 +11385,5 @@ function refreshFrogHud(){
  lastFrogReleaseReady=ready;
 }
 setInterval(refreshFrogHud,300);refreshFrogHud();
- placeArtCart();restoreTrollPosition();stumpPositionReady=true;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
+ placeArtCart();delete state.stumpPosition;trollStumpInside=false;inTreasureCave=false;state.x=cottage.x;state.y=cottage.y+105;cam.x=cottage.x;cam.y=cottage.y+45;cameraDetached=false;stumpPositionReady=true;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
 </script><script src="./v127-ornate-ui.js?v=381"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><script src="./gloamjaw-v147.js?v=147"></script><script src="./thrummaw-v148.js?v=167"></script></body></html>
