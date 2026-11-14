@@ -4094,40 +4094,39 @@ const rbTileCache={grass:null,tree:new Map(),rock:new Map()};
 function rbWoodland(x,y){return x>=0&&x<3500&&y>=0&&y<3100&&!expandedRegion(x,y)}
 // Repeating 8x8 atlas of 16x16 ground tiles, with sub-tile 8x8 details.
 function rbGrass(){
- // V139: deterministic illustrated woodland floor; no square tile borders.
+ // Woodland V399: seamless organic 512px floor with no rectangular pixel islands.
  if(rbTileCache.grass)return rbTileCache.grass;
- const tile=document.createElement('canvas');tile.width=256;tile.height=256;
- const g=tile.getContext('2d');g.imageSmoothingEnabled=false;
+ const tile=document.createElement('canvas');tile.width=512;tile.height=512;
+ const g=tile.getContext('2d');g.imageSmoothingEnabled=true;
  let seed=83517;const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
- const p=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.floor(x),Math.floor(y),Math.ceil(w),Math.ceil(h))};
- p(0,0,256,256,'#789d68');
- // Broad irregular soil/moss islands with softened stepped pixel edges.
- for(let i=0;i<95;i++){
-  const x=Math.floor(rng()*256),y=Math.floor(rng()*256),w=8+Math.floor(rng()*28),h=3+Math.floor(rng()*12);
-  const col=['#70945f','#83a66e','#719b66','#8aab72','#6d9160','#799f69'][Math.floor(rng()*6)];
-  g.globalAlpha=.32+rng()*.22;
-  p(x,y,w,h,col);p(x+3,y-2,Math.max(3,w-8),h+4,col);
-  g.globalAlpha=1;
+ g.fillStyle='#76965e';g.fillRect(0,0,512,512);
+ // Repeat edge-crossing shapes on the opposite side to eliminate seams.
+ const wrap=(x,y,painter)=>{for(const dx of [-512,0,512])for(const dy of [-512,0,512])painter(x+dx,y+dy)};
+ const patch=(x,y,rx,ry,col,alpha,rotation)=>{
+  wrap(x,y,(px,py)=>{g.save();g.translate(px,py);g.rotate(rotation);
+   const grad=g.createRadialGradient(0,0,0,0,0,rx);
+   grad.addColorStop(0,col);grad.addColorStop(.65,col);grad.addColorStop(1,'rgba(0,0,0,0)');
+   g.globalAlpha=alpha;g.scale(1,ry/rx);g.fillStyle=grad;g.beginPath();g.arc(0,0,rx,0,Math.PI*2);g.fill();g.restore()});
+ };
+ // Overlapping moss and grassy pigment, no block edges or obvious tile boundaries.
+ for(let i=0;i<320;i++){
+  const x=rng()*512,y=rng()*512,rx=17+rng()*58,ry=8+rng()*30;
+  patch(x,y,rx,ry,['#486f45','#9bb477','#b2ad77','#5c8350','#8cab6a','#526f44'][Math.floor(rng()*6)],.12+rng()*.20,rng()*6.28);
  }
- for(let i=0;i<1250;i++){
-  const x=Math.floor(rng()*256),y=Math.floor(rng()*256);
-  p(x,y,1+rng()*2,1,['#4c7950','#a2b77b','#638d58','#b5bb83'][Math.floor(rng()*4)]);
+ // Small botanical details, illustrated rather than square pixel speckles.
+ g.lineCap='round';
+ for(let i=0;i<2100;i++){
+  const x=rng()*512,y=rng()*512,len=1.8+rng()*5.4,a=rng()*6.28;
+  const col=['#385e37','#bed090','#a2b87a','#527949','#c1aa78'][Math.floor(rng()*5)];
+  wrap(x,y,(px,py)=>{g.strokeStyle=col;g.globalAlpha=.25+rng()*.28;g.lineWidth=.6+rng()*.8;
+   g.beginPath();g.moveTo(px,py);g.quadraticCurveTo(px+Math.cos(a+1)*len*.5,py+Math.sin(a+1)*len*.5,px+Math.cos(a)*len,py+Math.sin(a)*len);g.stroke()});
  }
- // Grass clumps are hand-pixelled silhouettes with shaded stems and sunlit tips.
- for(let i=0;i<190;i++){
-  const x=Math.floor(rng()*256),y=Math.floor(rng()*256),h=2+Math.floor(rng()*5);
-  p(x,y-h,1,h,'#4d7c4b');p(x+2,y-h+1,1,h-1,'#568953');
-  p(x-2,y-h+2,1,h-2,'#648d51');p(x-1,y-1,5,1,'#85aa69');
-  if(i%3===0){p(x,y-h,1,1,'#b2c784');p(x+2,y-h+1,1,1,'#9fc17b')}
+ for(let i=0;i<145;i++){
+  const x=rng()*512,y=rng()*512,a=rng()*6.28;
+  wrap(x,y,(px,py)=>{g.save();g.translate(px,py);g.rotate(a);g.globalAlpha=.35;
+   g.fillStyle=i%3?'#a9915b':'#d0bc80';g.beginPath();g.ellipse(0,0,2.6,1.1,0,0,Math.PI*2);g.fill();g.restore()});
  }
- // Moss, leaf litter and small natural debris, kept sparse for item readability.
- for(let i=0;i<65;i++){
-  const x=Math.floor(rng()*256),y=Math.floor(rng()*256);
-  if(i%4===0){p(x,y,6,2,'#597f4c');p(x+2,y-2,3,2,'#8eae6b')}
-  else if(i%3===0){p(x,y,4,2,'#b39b68');p(x+2,y+2,2,1,'#816e4e')}
-  else{p(x,y,2,1,'#b7aa79');p(x+1,y+1,2,1,'#947d55')}
- }
- rbTileCache.grass=ctx.createPattern(tile,'repeat');
+ g.globalAlpha=1;rbTileCache.grass=ctx.createPattern(tile,'repeat');
  return rbTileCache.grass;
 }
 function rbDrawGround(){
