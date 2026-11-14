@@ -7934,9 +7934,44 @@ function updateHaigenSpeech(){
 }
 
 function ensureWorldLocator(){let el=document.getElementById('worldLocator');if(!el){el=document.createElement('div');el.id='worldLocator';el.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 220px);right:12px;z-index:28;background:#15231ee8;color:#ffe9ae;border:1px solid #b99762;border-radius:9px;padding:7px 10px;font:600 12px system-ui;text-align:right;pointer-events:auto';el.innerHTML='<div id="worldXY"></div><button id="jumpToTroll" style="margin-top:5px;background:#58442e;color:#fff1ce;border:1px solid #b99762;border-radius:5px;padding:5px">🌳 Go to troll stump</button>';document.body.appendChild(el);document.getElementById('jumpToTroll').onclick=()=>{state.x=trollStumpHome.x;state.y=trollStumpHome.y+95;cam.x=state.x;cam.y=state.y;state.autonomy=false;notify('At the troll stump');};}document.getElementById('worldXY').textContent='X '+Math.round(state.x)+' · Y '+Math.round(state.y);}
+
+// V391 woodland floor pass: restrained painterly texture, denser only in wild woodland.
+// Stable world-coordinate marks; no tile outlines, image filters or gameplay changes.
+function drawWoodlandFloorV391(nightMix){
+ const zoom=worldZoom(),halfW=W/(2*zoom)+110,halfH=H/(2*zoom)+110,step=94;
+ const x0=Math.floor((cam.x-halfW)/step),x1=Math.ceil((cam.x+halfW)/step);
+ const y0=Math.floor((cam.y-halfH)/step),y1=Math.ceil((cam.y+halfH)/step);
+ const hash=(x,y,k)=>{let v=Math.sin(x*127.1+y*311.7+k*74.7)*43758.5453;return v-Math.floor(v)};
+ ctx.save();ctx.lineCap='round';
+ for(let gx=x0;gx<=x1;gx++)for(let gy=y0;gy<=y1;gy++){
+  const x=gx*step+hash(gx,gy,1)*step,y=gy*step+hash(gx,gy,2)*step;
+  if(!rbWoodland(x,y))continue;
+  const nearHome=Math.hypot(x-cottage.x,y-cottage.y)<310;
+  const density=nearHome?.36:.86;
+  if(hash(gx,gy,3)>density)continue;
+  const dark=nightMix*.48;
+  ctx.globalAlpha=(nearHome?.19:.31)*(1-dark);
+  ctx.fillStyle=hash(gx,gy,4)>.48?'#304d2b':'#c0aa70';
+  ctx.beginPath();ctx.ellipse(x,y,14+hash(gx,gy,5)*21,5+hash(gx,gy,6)*10,hash(gx,gy,7)*3.14,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=(nearHome?.32:.62)*(1-dark);
+  for(let j=0;j<(nearHome?2:5);j++){
+   const px=x+(hash(gx,gy,j+10)-.5)*65,py=y+(hash(gx,gy,j+20)-.5)*37;
+   const len=3+hash(gx,gy,j+30)*7;
+   ctx.strokeStyle=j%3===0?'#b5ad72':j%3===1?'#294d2b':'#71864c';
+   ctx.lineWidth=1.2+hash(gx,gy,j+40)*1.6;
+   ctx.beginPath();ctx.moveTo(px-len*.55,py+2);ctx.quadraticCurveTo(px,py-len,px+len*.45,py+1);ctx.stroke();
+  }
+  if(!nearHome&&hash(gx,gy,55)>.79){
+   ctx.fillStyle='#a98a55';ctx.globalAlpha=.5*(1-dark);
+   for(let j=0;j<3;j++){const a=j*2.3+hash(gx,gy,56)*6.28;ctx.beginPath();ctx.ellipse(x+Math.cos(a)*12,y+Math.sin(a)*8,3.4,1.7,a,0,Math.PI*2);ctx.fill()}
+  }
+ }
+ ctx.restore();
+}
+
 function draw(){ensureWorldLocator();const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const questHud=$('campQuestHud');if(questHud)questHud.textContent=state.campClearingDone?'🏕️ Campsite secure ✓':'🏕️ Clear campsite '+state.campClearingPicked.length+'/'+campDebris.length+' · X Collect brush';const homeHud=$('homesteadHud');if(homeHud)homeHud.textContent='🪵 '+state.wood+'/'+woodCarryLimit+' · 📦 '+state.woodStored+'/'+woodStoreLimit()+' · 🪨 '+state.stone+' · 🥚 '+state.eggs+' · 🐟 '+state.fish+' · 🥩 '+state.rawMeat+' · 🥕 '+state.vegetables+' · 🩵 '+state.medicinalMushrooms+' · 🧪 '+state.antidotes;const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100'+(state.poisonMs>0?' · 🟢 POISONED':'')+(collapseRemaining>0?' · 💤 RESCUE':'');hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=worldZoom();ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);
  if(cameraZoom<.18){drawWideCamera(zoom);ctx.restore();$('haigenSpeech').style.visibility='hidden';return}
- const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(cam.x-W/(2*zoom)-120,cam.y-H/(2*zoom)-120,W/zoom+240,H/zoom+240);drawExpandedTerrain(nightMix);ctx.save();/* V154: do not clip actors and shoreline to obsolete original-island outline; expanded coast lies beyond it. */if(rbEnabled)rbDrawGround();for(let i=0;i<410;i++){let x=WORLD_MIN+seeded(i+950)*WORLD_SPAN,y=WORLD_MIN+seeded(i+1200)*WORLD_SPAN;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850||expandedRegion(x,y)||(rbEnabled&&rbWoodland(x,y)))continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
+ const nightMix=nightStrength();ctx.fillStyle=mixColour('#91b96d','#283c65',nightMix);ctx.fillRect(cam.x-W/(2*zoom)-120,cam.y-H/(2*zoom)-120,W/zoom+240,H/zoom+240);drawExpandedTerrain(nightMix);ctx.save();/* V154: do not clip actors and shoreline to obsolete original-island outline; expanded coast lies beyond it. */if(rbEnabled)rbDrawGround();if(rbEnabled)drawWoodlandFloorV391(nightMix);for(let i=0;i<410;i++){let x=WORLD_MIN+seeded(i+950)*WORLD_SPAN,y=WORLD_MIN+seeded(i+1200)*WORLD_SPAN;if(Math.abs(x-cam.x)>1100||Math.abs(y-cam.y)>850||expandedRegion(x,y)||(rbEnabled&&rbWoodland(x,y)))continue;ellipse(x,y,30+seeded(i+800)*90,18+seeded(i+700)*65,mixColour(i%2?'#9fc47a':'#72a960',i%2?'#514d87':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
 const tint=ctx.createRadialGradient(0,0,.04,0,0,1),shade=l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564';
 tint.addColorStop(0,shade+'cc');tint.addColorStop(.67,shade+'77');tint.addColorStop(1,shade+'00');
 ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(let j=0;j<24;j++){const a=j*2.399,r=Math.sqrt((j+1)/25),px=l.x+Math.cos(a)*r*390,py=l.y+Math.sin(a)*r*245;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],j%3?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,j%2?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,j%2?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();drawWetGround();if(window.__gloamAddon)window.__gloamAddon.drawGround();if(window.__thrummaw)window.__thrummaw.ground();clearingGround(cottage.x,cottage.y);drawCampDecor();drawDigPatches();drawMountainRiver(nightMix);if(!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80)){ellipse(firstFire.x,firstFire.y,47,25,'#76674a');for(let j=0;j<8;j++)ellipse(firstFire.x+Math.cos(j*Math.PI/4)*33,firstFire.y+Math.sin(j*Math.PI/4)*17,8,6,'#a7a18c')}lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();// V266: the cabin's eastern approach is a broad shallow shelf; depths migrate west.
