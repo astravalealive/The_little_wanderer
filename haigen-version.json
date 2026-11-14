@@ -1,1 +1,1 @@
-{"build":397,"notes":"Hotfix: remove duplicate const flying declaration in drawDuck which caused startup SyntaxError in V396. Keep duck atlases and behaviour."}
+{"build":407,"notes":"Krakkle beach boss sprite atlas and animated attacks."}
