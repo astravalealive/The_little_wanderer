@@ -79,7 +79,7 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
   window.__haigenWorldReady=false;
   function showStartupError(message){
     const el=document.getElementById('worldError');
-    if(el){el.style.display='block';el.textContent='⚠️ Haigen\'s World V127 could not start: '+message+'. Please send this message to the developer.';}
+    if(el){el.style.display='block';el.textContent='⚠️ Haigen\'s World could not start: '+message+'. Please send this message to the developer.';}
   }
   window.addEventListener('error',function(e){showStartupError(e.message||'JavaScript error');});
   window.addEventListener('unhandledrejection',function(e){showStartupError(String(e.reason&&e.reason.message||e.reason||'Startup error'));});
@@ -11170,7 +11170,7 @@ function frame(now){
  previewTools.id='v121PreviewTools';
  previewTools.setAttribute('aria-label','Haigen preview troubleshooting');
  previewTools.style.cssText='position:fixed;z-index:8;left:9px;top:calc(env(safe-area-inset-top,0px) + 93px);display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:min(90vw,300px);pointer-events:auto';
- previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>V127 · Preview help</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewFriends" class="btn" style="font-size:11px;padding:5px">🐇 Meet Dylan &amp; Skölli</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
+ previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>Game troubleshooting</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewFriends" class="btn" style="font-size:11px;padding:5px">🐇 Meet Dylan &amp; Skölli</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
  document.body.appendChild(previewTools);
  // Optional field guide for visual inspection. Never inserts artificial wildlife
  // into the actual map, changes the creature AI or writes to saved progress.
