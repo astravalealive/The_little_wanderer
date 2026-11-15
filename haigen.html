@@ -357,6 +357,7 @@ function updateWoodlandDeer(dt){
   // Job 25: rare quiet rests use the existing stationary forage pose.
   const quiet=d>250&&time>a.scaredUntil&&time>a.alertUntil;
   if(!quiet)a.restUntil=0;
+  else if(a.restUntil&&time>=a.restUntil)a.restUntil=0;
   else if(!a.restUntil&&a.pause>0&&seeded(a.phase+Math.floor(time/17000))>.89)a.restUntil=time+4500+seeded(a.phase+17)*4200;
   if(quiet&&time<(a.restUntil||0)){a.walking=false;a.pause=Math.max(a.pause,250);continue}
   if(a.pause>0){a.pause=Math.max(0,a.pause-dt);a.walking=false;continue}
