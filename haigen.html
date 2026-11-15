@@ -11715,6 +11715,20 @@ function soundTone(frequency,duration,volume,voice,finishFrequency){
  osc.onended=()=>{osc.disconnect();gain.disconnect()};
 }
 const soundLast=Object.create(null);
+let woodlandCallUntil=0;
+function woodlandWildlifeSound(kind,source){
+ // Job 23: one brief, distance-faded call at a time, through the existing mute/master bus.
+ if(!soundMode||!soundCtx||soundCtx.state!=='running'||document.hidden||!source)return;
+ const distance=Math.hypot(source.x-state.x,source.y-state.y);
+ if(distance>210)return;
+ const now=performance.now();
+ if(now<woodlandCallUntil||now-(soundLast[kind]||-999999)<9000)return;
+ const volume=(1-distance/260)*.016;
+ if(kind==='squirrel')soundTone(1250,.10,volume,'sine',1600);
+ else if(kind==='deer')soundTone(225,.32,volume,'triangle',155);
+ else return;
+ soundLast[kind]=now;woodlandCallUntil=now+950;
+}
 function soundEffect(kind,source){
  if(!soundMode||!soundCtx||soundCtx.state!=='running'||document.hidden)return;
  if(source&&Math.hypot(source.x-state.x,source.y-state.y)>270)return;
@@ -11775,7 +11789,22 @@ function soundPulse(){
   if(soundBeat%8===0){const hz=440*Math.pow(2,(profile.root-81)/12);soundTone(hz,4.3,.028,'sine')}
   soundBeat++;
  }
- if(biome==='woodland'||biome==='downs'){if(Math.random()<.10&&birds.some(b=>dist(b,state)<180))soundEffect('bird')}
+ if(biome==='woodland'){
+  // Reuse the existing bird call; alternate rare squirrel/deer calls without overlap.
+  if(performance.now()>woodlandCallUntil){
+   const roll=Math.random();
+   if(roll<.07){
+    const bird=birds.find(b=>rbWoodland(b.x,b.y)&&dist(b,state)<180);
+    if(bird){soundEffect('bird',bird);woodlandCallUntil=performance.now()+950}
+   }else if(roll<.105){
+    const squirrel=woodlandCritters.find(c=>c.kind==='squirrel'&&rbWoodland(c.x,c.y)&&dist(c,state)<185);
+    woodlandWildlifeSound('squirrel',squirrel);
+   }else if(roll<.13){
+    const deer=woodlandDeer.find(d=>dist(d,state)<200);
+    woodlandWildlifeSound('deer',deer);
+   }
+  }
+ }else if(biome==='downs'){if(Math.random()<.10&&birds.some(b=>dist(b,state)<180))soundEffect('bird')}
  else if(biome==='fen'){if(Math.random()<.11&&regionalWildlife.some(a=>a.type==='frog'&&animalAlive(a)&&dist(a,state)<200))soundEffect('frog')}
  else if(biome==='wasteland'){if(Math.random()<.08)soundEffect('ash')}
  else if(biome==='coast'){if(Math.random()<.11)soundEffect('surf')}
