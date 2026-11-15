@@ -4916,7 +4916,8 @@ function drawWoodlandArtwork(o){
   ellipse(o.x+drift*.4,o.y+2,size*.18,size*.047,'#1b292022');
  }
  // Job 8: low moss at existing woodland trunks, behind original sprites.
- if(type!=='rock'&&rbWoodland(o.x,o.y)&&Math.hypot(o.x-cottage.x,o.y-cottage.y)>310){
+ if(type!=='rock'&&rbWoodland(o.x,o.y)&&Math.hypot(o.x-cottage.x,o.y-cottage.y)>310&&
+    homesteadPlots.every(p=>Math.hypot(o.x-p.x,o.y-p.y)>220)&&roadDistance(o.x,o.y)>115){
   ellipse(o.x-size*.12,o.y+3,size*.11,size*.025,'#486b4350');
   ellipse(o.x+size*.11,o.y+4,size*.08,size*.02,'#647a4650');
  }
