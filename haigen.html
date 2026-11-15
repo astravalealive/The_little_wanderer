@@ -560,6 +560,13 @@ function islandTerrainRGB(x,y){
           (171-60*t)*(1-foam*.7)+238*foam*.7+noise,
           (182-29*t)*(1-foam*.7)+228*foam*.7+noise];
  }
+ // Job 4: gently blend woodland ground tones without changing terrain geometry.
+ // Smoothly fade the effect at the woodland boundary; keep coast, river and fen intact.
+ const woodlandFade=coastSmooth(100,380,x)* (1-coastSmooth(2700,3100,x))*
+  coastSmooth(100,380,y)*(1-coastSmooth(2700,3100,y));
+ const woodlandDetail=(Math.sin(x*.009+y*.006)*Math.cos(y*.008-x*.004)*3.2+
+  Math.sin(x*.019-y*.013)*1.3)*woodlandFade;
+ red+=woodlandDetail*.55;green+=woodlandDetail;blue+=woodlandDetail*.45;
  const woodlandBank=(1-coastSmooth(700,1400,x))*(1-coastSmooth(350,900,Math.abs(y-1700)));
  const beach=coastSmooth(125-60*woodlandBank,540-320*woodlandBank,d);
  const shore=[232-20*snow-35*waste+5*desert,205+18*snow-30*waste,157+49*snow-15*waste-8*desert];
