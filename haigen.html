@@ -4099,6 +4099,30 @@ const paintedTrails=new Image();let paintedTrailsReady=false;
 paintedTrails.onload=()=>{paintedTrailsReady=paintedTrails.naturalWidth===2600&&paintedTrails.naturalHeight===2600;window.__haigenTrailsReady=paintedTrailsReady};
 paintedTrails.onerror=()=>{paintedTrailsReady=false;window.__haigenTrailsReady=false};
 paintedTrails.src='./assets/haigen-trails.webp?v=129';
+// Job 5: deterministic, purely decorative woodland path-edge flecks.
+// Draw above either the painted trail image or procedural fallback, without changing routes.
+const woodlandEdgeFlecks=[];
+for(let r=0;r<roadRoutes.length;r++)for(let j=1;j<roadRoutes[r].length;j++){
+ const a=roadRoutes[r][j-1],b=roadRoutes[r][j],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
+ if(!len)continue;
+ for(let k=0;k<Math.floor(len/24);k++){
+  const t=(k+.35+seeded(r*9000+j*900+k)*.3)/(Math.floor(len/24)||1);
+  const side=seeded(r*9000+j*900+k+1)>.5?1:-1;
+  const edge=roadWidths[r]*.5+7+seeded(r*9000+j*900+k+2)*15;
+  const x=a.x+dx*t-side*dy/len*edge,y=a.y+dy*t+side*dx/len*edge;
+  if(x<120||x>2880||y<120||y>2880)continue;
+  woodlandEdgeFlecks.push({x,y,size:1.5+seeded(k*17+r*101+j)*2.8,moss:seeded(k*13+r*67+j)>.46});
+ }
+}
+function drawWoodlandPathEdges(){
+ ctx.save();
+ for(const f of woodlandEdgeFlecks){
+  if(Math.abs(f.x-cam.x)>950||Math.abs(f.y-cam.y)>750)continue;
+  ctx.fillStyle=f.moss?'#526b4370':'#92764e65';
+  ctx.beginPath();ctx.ellipse(f.x,f.y,f.size*1.8,f.size,0,0,Math.PI*2);ctx.fill();
+ }
+ ctx.restore();
+}
 function path(){
  if(paintedTrailsReady){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();return}
  // Draw full road network one material layer at a time so the junctions merge.
@@ -4115,6 +4139,7 @@ function path(){
   ctx.beginPath();ctx.ellipse(x,y,1+n*3.5,.5+n,0,0,Math.PI*2);ctx.fill();
  }
  ctx.restore();
+ drawWoodlandPathEdges();
 }
 function ellipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}function poly(points,fill,stroke){ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=3;ctx.stroke()}}// Visibility assist: tall foliage fades softly only while its canopy obscures Haigen.
 // Does not alter harvesting, solidity, save files or tree placement.
