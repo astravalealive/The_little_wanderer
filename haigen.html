@@ -7569,10 +7569,25 @@ function drawWoodlandCritter(c){
 
  if(c.hiddenUntil&&time<c.hiddenUntil)return;
  if(c.kind==='butterfly'){
-  const phase=time*.001+c.phase;
-  const flowerPause=Math.sin(phase*.23)> .94;
-  const x=c.x+Math.sin(phase*.83)*33+Math.sin(phase*1.67)*9;
-  const y=c.y-(flowerPause?14:65+Math.sin(phase*2.1)*17);
+  // Job 13: individual flight/rest cycles, visiting existing nearby woodland flowers.
+  // Render-only: no changes to critter coordinates, population or save data.
+  if(!c.butterflyFlowerChecked){
+   c.butterflyFlowerChecked=true;
+   let best=115*115;
+   for(const o of objects){
+    if(o.type!=='flower'||!rbWoodland(o.x,o.y))continue;
+    const d2=(o.x-c.x)**2+(o.y-c.y)**2;
+    if(d2<best){best=d2;c.butterflyFlower=o}
+   }
+  }
+  const flower=c.butterflyFlower;
+  const validFlower=flower&&!state.removed.includes(flower.id)&&flowerHasHabitat(flower);
+  const phase=time*(.00075+seeded(c.phase+73)*.00055)+c.phase;
+  const rest=Math.sin(phase*.28+seeded(c.phase+79)*6.28)>.90;
+  const visit=validFlower&&Math.sin(phase*.19+seeded(c.phase+83)*6.28)>.45;
+  const anchorX=visit?flower.x:c.x,anchorY=visit?flower.y:c.y;
+  const x=anchorX+(rest?Math.sin(phase)*2:Math.sin(phase*.83)*33+Math.sin(phase*1.67)*9);
+  const y=anchorY-(rest?9:visit?19+Math.sin(phase*2.1)*7:65+Math.sin(phase*2.1)*17);
   const flap=Math.sin(time*.034+c.phase*3),wing=Math.max(.18,Math.abs(flap));
   ctx.save();ctx.translate(x,y);ctx.scale(Math.sin(phase*.7)<0?-1:1,1);
   ctx.fillStyle='#bd844b';ctx.beginPath();ctx.ellipse(-8,-4,10*wing,13,-.35,0,Math.PI*2);ctx.fill();
