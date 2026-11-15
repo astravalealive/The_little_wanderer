@@ -4915,6 +4915,12 @@ function drawWoodlandArtwork(o){
   ellipse(o.x+size*.07+drift,o.y+size*.025,size*.28,size*.077,'#2534271b');
   ellipse(o.x+drift*.4,o.y+2,size*.18,size*.047,'#1b292022');
  }
+ // Job 8: low moss at existing woodland trunks, behind original sprites.
+ if(type!=='rock'&&rbWoodland(o.x,o.y)&&Math.hypot(o.x-cottage.x,o.y-cottage.y)>310&&
+    homesteadPlots.every(p=>Math.hypot(o.x-p.x,o.y-p.y)>220)&&roadDistance(o.x,o.y)>115){
+  ellipse(o.x-size*.12,o.y+3,size*.11,size*.025,'#486b4350');
+  ellipse(o.x+size*.11,o.y+4,size*.08,size*.02,'#647a4650');
+ }
  ellipse(o.x,o.y+2,size*(type==='rock'?.32:.22),size*.055,'#292a2748');
  ctx.drawImage(woodlandSceneryArt,cell%3*192,Math.floor(cell/3)*192,192,192,o.x-size/2,o.y-size+4,size,size);
  if(type==='rock'&&state.boulderHits[o.id]){
@@ -8100,6 +8106,16 @@ function drawWoodlandFloorV391(nightMix){
     const tipX=x+Math.cos(a)*spread,tipY=y-5-Math.sin(a)*spread*.75;
     ctx.beginPath();ctx.moveTo(x,y+2);ctx.quadraticCurveTo((x+tipX)/2,tipY-3,tipX,tipY);ctx.stroke();
     ctx.beginPath();ctx.moveTo(tipX-2,tipY+2);ctx.lineTo(tipX+2,tipY-1);ctx.stroke();
+   }
+  }
+  // Job 8: quiet leaf litter and exposed-earth flecks, decorative only.
+  if(!nearHome&&hash(gx,gy,80)>.84&&roadDistance(x,y)>115&&
+   homesteadPlots.every(p=>Math.hypot(x-p.x,y-p.y)>220)){
+   ctx.globalAlpha=.27*(1-dark);
+   ctx.fillStyle='#6b5940';ctx.beginPath();ctx.ellipse(x,y+3,13,4,0,0,Math.PI*2);ctx.fill();
+   for(let k=0;k<4;k++){
+    const a=hash(gx,gy,81+k)*6.283,px=x+Math.cos(a)*11,py=y+Math.sin(a)*7;
+    ctx.fillStyle=k%2?'#87734b':'#9b8659';ctx.beginPath();ctx.ellipse(px,py,3.3,1.4,a,0,Math.PI*2);ctx.fill();
    }
   }
   if(!nearHome&&hash(gx,gy,55)>.79){
