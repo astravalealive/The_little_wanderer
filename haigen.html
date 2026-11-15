@@ -8148,14 +8148,24 @@ function drawWoodlandFloorV391(nightMix){
     ctx.beginPath();ctx.moveTo(tipX-2,tipY+2);ctx.lineTo(tipX+2,tipY-1);ctx.stroke();
    }
   }
-  // Job 8: quiet leaf litter and exposed-earth flecks, decorative only.
-  if(!nearHome&&hash(gx,gy,80)>.84&&roadDistance(x,y)>115&&
+  // Jobs 8/17: retain existing litter art; cluster it near real woodland trees.
+  if(!nearHome&&hash(gx,gy,80)>.77&&roadDistance(x,y)>115&&
    homesteadPlots.every(p=>Math.hypot(x-p.x,y-p.y)>220)){
+   let nearTree=false;
+   const cx=Math.floor(x/solidCellSize),cy=Math.floor(y/solidCellSize);
+   for(let dx=-1;dx<=1&&!nearTree;dx++)for(let dy=-1;dy<=1&&!nearTree;dy++){
+    for(const o of solidCells.get((cx+dx)+','+(cy+dy))||[]){
+     if((o.type==='tree'||o.type==='fir'||o.type==='bareTree')&&
+        !state.removed.includes(o.id)&&Math.hypot(x-o.x,y-o.y)<105){nearTree=true;break}
+    }
+   }
+   if(nearTree){
    ctx.globalAlpha=.27*(1-dark);
    ctx.fillStyle='#6b5940';ctx.beginPath();ctx.ellipse(x,y+3,13,4,0,0,Math.PI*2);ctx.fill();
    for(let k=0;k<4;k++){
     const a=hash(gx,gy,81+k)*6.283,px=x+Math.cos(a)*11,py=y+Math.sin(a)*7;
     ctx.fillStyle=k%2?'#87734b':'#9b8659';ctx.beginPath();ctx.ellipse(px,py,3.3,1.4,a,0,Math.PI*2);ctx.fill();
+   }
    }
   }
   if(!nearHome&&hash(gx,gy,55)>.79){
