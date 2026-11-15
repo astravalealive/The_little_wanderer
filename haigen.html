@@ -8525,6 +8525,23 @@ const permittedGhostIds=new Set(naturallySpawnedGhosts.slice(0,5).map(o=>o.id));
 for(let i=objects.length-1;i>=0;i--){
  if(objects[i].type==='specter'&&!permittedGhostIds.has(objects[i].id))objects.splice(i,1);
 }
+// Woodland Job 3: selectively remove unedited procedural trail obstacles only.
+// Preserve stable IDs, hand-moved scenery, buildings, trees and other regions.
+{
+ const editedIds=new Set();
+ try{
+  const saved=JSON.parse(localStorage.getItem('haigenWorldEditorLayoutV1')||'{}');
+  if(saved.moves&&typeof saved.moves==='object')for(const id of Object.keys(saved.moves))editedIds.add(Number(id));
+ }catch(e){}
+ for(let i=objects.length-1;i>=0;i--){
+  const o=objects[i];
+  if(o.id>=4400||editedIds.has(o.id)||!(o.type==='rock'||o.type==='bush'))continue;
+  if(o.x<100||o.x>2900||o.y<100||o.y>2900)continue;
+  if(Math.hypot(o.x-cottage.x,o.y-cottage.y)<520)continue;
+  if(roadDistance(o.x,o.y)>52)continue;
+  if(seeded(o.id*59+426)<.55)objects.splice(i,1);
+ }
+}
 // V408 woodland pass 1: gently open walking routes without changing other regions.
 // Keep stable IDs and exempt all saved editor moves.
 {
