@@ -4911,9 +4911,13 @@ function drawWoodlandArtwork(o){
  // Three translucent ellipses avoid gradients, new assets and per-frame allocations.
  if(rbWoodland(o.x,o.y)&&type!=='rock'){
   const drift=(seeded(o.id*43+7)-.5)*size*.12;
+  // Job 16: modulate existing canopy shade gently in daylight; no new layers.
+  const shadeAlpha=ctx.globalAlpha;
+  ctx.globalAlpha*=1-(1-nightStrength())*(.13+.09*Math.sin(time*.00012+o.x*.0009+o.y*.0006));
   ellipse(o.x+size*.13+drift,o.y+size*.035,size*.36,size*.105,'#263b2a12');
   ellipse(o.x+size*.07+drift,o.y+size*.025,size*.28,size*.077,'#2534271b');
   ellipse(o.x+drift*.4,o.y+2,size*.18,size*.047,'#1b292022');
+  ctx.globalAlpha=shadeAlpha;
  }
  // Job 8: low moss at existing woodland trunks, behind original sprites.
  if(type!=='rock'&&rbWoodland(o.x,o.y)&&Math.hypot(o.x-cottage.x,o.y-cottage.y)>310&&
