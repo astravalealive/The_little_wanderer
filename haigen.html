@@ -4926,7 +4926,16 @@ function drawWoodlandArtwork(o){
   ellipse(o.x+size*.11,o.y+4,size*.08,size*.02,'#647a4650');
  }
  ellipse(o.x,o.y+2,size*(type==='rock'?.32:.22),size*.055,'#292a2748');
- ctx.drawImage(woodlandSceneryArt,cell%3*192,Math.floor(cell/3)*192,192,192,o.x-size/2,o.y-size+4,size,size);
+ // Job 18: shift only the upper canopy crop by at most 1px; trunks and roots stay fixed.
+ if(type!=='rock'&&rbWoodland(o.x,o.y)){
+  const gust=Math.max(0,Math.sin(time*.00018+o.x*.085+o.y*.065));
+  const sway=Math.sin(time*.00065+o.x*.017+o.y*.023)*(0.2+gust*.8);
+  const sx=cell%3*192,sy=Math.floor(cell/3)*192,topH=110;
+  ctx.drawImage(woodlandSceneryArt,sx,sy+topH,192,192-topH,o.x-size/2,o.y-size+4+size*topH/192,size,size*(192-topH)/192);
+  ctx.drawImage(woodlandSceneryArt,sx,sy,192,topH,o.x-size/2+sway,o.y-size+4,size,size*topH/192);
+ }else{
+  ctx.drawImage(woodlandSceneryArt,cell%3*192,Math.floor(cell/3)*192,192,192,o.x-size/2,o.y-size+4,size,size);
+ }
  if(type==='rock'&&state.boulderHits[o.id]){
   ctx.strokeStyle='#332f2a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(o.x-size*.08,o.y-size*.26);
   ctx.lineTo(o.x+2,o.y-size*.18);ctx.lineTo(o.x-3,o.y-size*.08);ctx.stroke();
