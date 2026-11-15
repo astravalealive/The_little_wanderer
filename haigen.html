@@ -8087,7 +8087,8 @@ function drawWoodlandFloorV391(nightMix){
   }
   // Job 7: sparse, non-colliding woodland fern and moss details.
   // Painted paths are rendered after this floor pass; keep a generous route buffer.
-  if(!nearHome&&roadDistance(x,y)>115&&hash(gx,gy,70)>.76){
+  if(!nearHome&&hash(gx,gy,70)>.76&&roadDistance(x,y)>115&&
+   homesteadPlots.every(p=>Math.hypot(x-p.x,y-p.y)>220)){
    const spread=9+hash(gx,gy,71)*7;
    ctx.globalAlpha=.32*(1-dark);
    ctx.fillStyle='#405d3e';
