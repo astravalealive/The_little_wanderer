@@ -8111,7 +8111,9 @@ function drawWoodlandFloorV391(nightMix){
    ctx.lineWidth=1.5;
    for(let leaf=0;leaf<5;leaf++){
     const a=-Math.PI+.4+leaf*(Math.PI-.8)/4;
-    const tipX=x+Math.cos(a)*spread,tipY=y-5-Math.sin(a)*spread*.75;
+    // Job 10: gentle, phase-offset breeze on decorative fern fronds only.
+    const breeze=Math.sin(time*.00065+gx*1.7+gy*2.3+leaf*.45)*1.5;
+    const tipX=x+Math.cos(a)*spread+breeze,tipY=y-5-Math.sin(a)*spread*.75;
     ctx.beginPath();ctx.moveTo(x,y+2);ctx.quadraticCurveTo((x+tipX)/2,tipY-3,tipX,tipY);ctx.stroke();
     ctx.beginPath();ctx.moveTo(tipX-2,tipY+2);ctx.lineTo(tipX+2,tipY-1);ctx.stroke();
    }
