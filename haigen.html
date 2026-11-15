@@ -7583,11 +7583,12 @@ function drawWoodlandCritter(c){
   const flower=c.butterflyFlower;
   const validFlower=flower&&!state.removed.includes(flower.id)&&flowerHasHabitat(flower);
   const phase=time*(.00075+seeded(c.phase+73)*.00055)+c.phase;
-  const rest=Math.sin(phase*.28+seeded(c.phase+79)*6.28)>.90;
-  const visit=validFlower&&Math.sin(phase*.19+seeded(c.phase+83)*6.28)>.45;
-  const anchorX=visit?flower.x:c.x,anchorY=visit?flower.y:c.y;
-  const x=anchorX+(rest?Math.sin(phase)*2:Math.sin(phase*.83)*33+Math.sin(phase*1.67)*9);
-  const y=anchorY-(rest?9:visit?19+Math.sin(phase*2.1)*7:65+Math.sin(phase*2.1)*17);
+  const visitWave=Math.sin(phase*.19+seeded(c.phase+83)*6.28);
+  const visit=validFlower?Math.max(0,Math.min(1,(visitWave+.35)/1.15)):0;
+  const restWave=Math.sin(phase*.28+seeded(c.phase+79)*6.28);
+  const rest=Math.max(0,Math.min(1,(restWave-.55)/.35))*visit;
+  const x=c.x+(validFlower?(flower.x-c.x)*visit:0)+(1-rest)*(Math.sin(phase*.83)*33+Math.sin(phase*1.67)*9);
+  const y=c.y+(validFlower?(flower.y-c.y)*visit:0)-(65*(1-visit)+19*visit)*(1-rest)-9*rest-Math.sin(phase*2.1)*7*(1-rest);
   const flap=Math.sin(time*.034+c.phase*3),wing=Math.max(.18,Math.abs(flap));
   ctx.save();ctx.translate(x,y);ctx.scale(Math.sin(phase*.7)<0?-1:1,1);
   ctx.fillStyle='#bd844b';ctx.beginPath();ctx.ellipse(-8,-4,10*wing,13,-.35,0,Math.PI*2);ctx.fill();
