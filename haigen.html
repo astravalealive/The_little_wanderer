@@ -337,6 +337,23 @@ function updateWoodlandDeer(dt){
    a.alertUntil=time+650+seeded(a.phase+7)*450;
    a.pause=Math.max(a.pause,a.alertUntil-time);
   }
+  // Original spawn/home positions remain fixed. During long, infrequent windows
+  // each pair can walk toward a shared woodland clearing, then head home.
+  const index=woodlandDeer.indexOf(a),mate=woodlandDeer[index%2===0?index+1:index-1];
+  const cycle=(time+index/2*135000)%540000;
+  const gathering=cycle>=12000&&cycle<315000&&time>a.scaredUntil&&time>a.alertUntil;
+  const meetingX=(a.homeX+mate.homeX)*.5,meetingY=(a.homeY+mate.homeY)*.5;
+  if(gathering&&(!a.groupGathering||Math.hypot(a.targetX-a.x,a.targetY-a.y)<8)){
+   const phase=a.phase+Math.floor(time/11000)*2.4;
+   const radius=28+seeded(92280+phase)*42;
+   const tx=meetingX+Math.cos(phase)*radius,ty=meetingY+Math.sin(phase)*radius;
+   if(rbWoodland(tx,ty)&&!blockedBySolid(tx,ty)){
+    a.targetX=tx;a.targetY=ty;a.pause=Math.min(a.pause,500);
+   }
+  }else if(!gathering&&a.groupGathering){
+   a.targetX=a.homeX;a.targetY=a.homeY;a.pause=0;
+  }
+  a.groupGathering=gathering;
   if(a.pause>0){a.pause=Math.max(0,a.pause-dt);a.walking=false;continue}
   const dx=a.targetX-a.x,dy=a.targetY-a.y,distToTarget=Math.hypot(dx,dy);
   if(distToTarget<5){
@@ -344,13 +361,13 @@ function updateWoodlandDeer(dt){
    // If two deer naturally meet, sometimes graze nearby without locking movement.
    const partner=woodlandDeer.find(b=>b!==a&&Math.hypot(a.x-b.x,a.y-b.y)<185&&time>b.scaredUntil);
    const pair=partner&&seeded(a.phase+Math.floor(time/11000))>.48;
-   const centreX=pair?(a.homeX+partner.x)*.5:a.homeX;
-   const centreY=pair?(a.homeY+partner.y)*.5:a.homeY;
+   const centreX=pair?(a.x+partner.x)*.5:a.groupGathering?meetingX:a.homeX;
+   const centreY=pair?(a.y+partner.y)*.5:a.groupGathering?meetingY:a.homeY;
    a.targetX=clamp(centreX+Math.cos(phase)*range,100,3400);
    a.targetY=clamp(centreY+Math.sin(phase)*range,100,3000);
    a.pause=1400+seeded(92240+phase)*3100;a.walking=false;continue;
   }
-  const move=Math.min(distToTarget,(time<a.scaredUntil?52:15)*step);
+  const move=Math.min(distToTarget,(time<a.scaredUntil?52:a.groupGathering?20:15)*step);
   const nx=a.x+dx/distToTarget*move,ny=a.y+dy/distToTarget*move;
   if(!rbWoodland(nx,ny)||blockedBySolid(nx,ny)){
    // Use the game's collision slide, but never slide outside the woodland.
