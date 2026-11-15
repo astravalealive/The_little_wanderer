@@ -7871,8 +7871,10 @@ function updateBirds(dt){
    b.air=0;b.vx=0;b.vy=0;
    // Slow ground foraging, not a walking migration.
    if(birdLandingSuitable(b.x,b.y)){
-    const peck=Math.sin(time*.007+b.phase);
-    b.pecking=peck>.42;
+    // Job 11: individual woodland ground-bird pauses and peck rhythms.
+    const woodlandIdle=rbWoodland(b.x,b.y);
+    const peck=Math.sin(time*(woodlandIdle?.0045+seeded(b.phase+11)*.003:.007)+b.phase);
+    b.pecking=peck>(woodlandIdle?.25+seeded(b.phase+19)*.35:.42);
     if(b.pecking&&time>(b.nextWormAt||0)){
      b.wormUntil=time+600;b.nextWormAt=time+4500+seeded(b.phase+Math.floor(time/4000))*6500;
     }
