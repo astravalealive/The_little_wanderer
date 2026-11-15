@@ -4907,6 +4907,14 @@ function drawWoodlandArtwork(o){
  const cell=type==='rock'?(variant<.5?3:4):type==='bareTree'?(variant<.55?0:1):type==='fir'?5:2;
  const size=(type==='rock'?solidRadius(o)*2.45:(type==='bareTree'?114:type==='fir'?145:136)*(o.size||1))*(.94+variant*.12);
  ctx.save();ctx.globalAlpha*=foliageVisibility(o);ctx.imageSmoothingEnabled=false;
+ // Job 6: woodland-only layered canopy shade, behind the existing artwork.
+ // Three translucent ellipses avoid gradients, new assets and per-frame allocations.
+ if(rbWoodland(o.x,o.y)&&type!=='rock'){
+  const drift=(seeded(o.id*43+7)-.5)*size*.12;
+  ellipse(o.x+size*.13+drift,o.y+size*.035,size*.36,size*.105,'#263b2a12');
+  ellipse(o.x+size*.07+drift,o.y+size*.025,size*.28,size*.077,'#2534271b');
+  ellipse(o.x+drift*.4,o.y+2,size*.18,size*.047,'#1b292022');
+ }
  ellipse(o.x,o.y+2,size*(type==='rock'?.32:.22),size*.055,'#292a2748');
  ctx.drawImage(woodlandSceneryArt,cell%3*192,Math.floor(cell/3)*192,192,192,o.x-size/2,o.y-size+4,size,size);
  if(type==='rock'&&state.boulderHits[o.id]){
