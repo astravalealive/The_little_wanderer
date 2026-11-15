@@ -295,7 +295,10 @@ const woodlandDeer=Array.from({length:4},(_,i)=>{
  return {x,y,homeX:x,homeY:y,targetX:x,targetY:y,phase:i*1.7,face:1,gait:0,
   walking:false,pause:1600+i*900,scaredUntil:0,alertUntil:0};
 });
+// Existing 180-unit clock: four 45-unit phases, no new timer or saved state.
+function woodlandDailyPhase(){return Math.floor((((state.daytime%180)+180)%180)/45)}
 function updateWoodlandDeer(dt){
+ const daily=woodlandDailyPhase();
  const step=Math.min(dt,50)/1000,skolli=companions[1];
  for(const a of woodlandDeer){
   // Resolve a deterministic clear starting point against the game's existing collision map.
@@ -358,7 +361,7 @@ function updateWoodlandDeer(dt){
   const quiet=d>250&&time>a.scaredUntil&&time>a.alertUntil;
   if(!quiet)a.restUntil=0;
   else if(a.restUntil&&time>=a.restUntil)a.restUntil=0;
-  else if(!a.restUntil&&a.pause>0&&seeded(a.phase+Math.floor(time/17000))>.89)a.restUntil=time+4500+seeded(a.phase+17)*4200;
+  else if(!a.restUntil&&a.pause>0&&seeded(a.phase+Math.floor(time/17000))>(daily===1?.78:daily===3?.84:.91))a.restUntil=time+4500+seeded(a.phase+17)*4200;
   if(quiet&&time<(a.restUntil||0)){a.walking=false;a.pause=Math.max(a.pause,250);continue}
   if(a.pause>0){a.pause=Math.max(0,a.pause-dt);a.walking=false;continue}
   const dx=a.targetX-a.x,dy=a.targetY-a.y,distToTarget=Math.hypot(dx,dy);
@@ -366,7 +369,7 @@ function updateWoodlandDeer(dt){
    const phase=a.phase+Math.floor(time/3500)*2.4,range=55+seeded(92230+phase)*85;
    // If two deer naturally meet, sometimes graze nearby without locking movement.
    const partner=woodlandDeer.find(b=>b!==a&&Math.hypot(a.x-b.x,a.y-b.y)<185&&time>b.scaredUntil);
-   const pair=partner&&seeded(a.phase+Math.floor(time/11000))>.48;
+   const pair=partner&&seeded(a.phase+Math.floor(time/11000))>(daily===2?.32:.48);
    const centreX=pair?(a.x+partner.x)*.5:a.groupGathering?meetingX:a.homeX;
    const centreY=pair?(a.y+partner.y)*.5:a.groupGathering?meetingY:a.homeY;
    a.targetX=clamp(centreX+Math.cos(phase)*range,100,3400);
@@ -7674,12 +7677,13 @@ function updateSquirrel(c,dt){
   return;
  }
  // Quiet squirrels pause using the existing watch pose; threats still take priority above.
- if(mode==='forage'&&threatDistance>190&&time>=c.squirrelNextAt&&seeded(c.phase+Math.floor(time/13000))>.91){
+ if(mode==='forage'&&threatDistance>190&&time>=c.squirrelNextAt&&seeded(c.phase+Math.floor(time/13000))>(woodlandDailyPhase()===1?.78:woodlandDailyPhase()===3?.72:.91)){
   c.squirrelMode='watch';c.squirrelNextAt=time+2500+seeded(c.phase+9)*2500;return;
  }
  if(time<c.squirrelNextAt)return;
  if(mode==='watch'){c.squirrelMode='forage';c.squirrelNextAt=time+900+seeded(c.phase+Math.floor(time/900)+43)*1450;return}
  // Independent, stable rhythms per squirrel; preserve existing modes and destinations.
+ const daily=woodlandDailyPhase();
  const roll=seeded(c.phase+Math.floor(time/1800)*.73+47),tree=squirrelTreeNear(c);
  if(tree&&roll<.20){
   c.squirrelMode='scamper';c.squirrelDestination={x:tree.x+12,y:tree.y+5};
@@ -8052,7 +8056,8 @@ function updateBirds(dt){
      b.wormUntil=time+600;b.nextWormAt=time+4500+seeded(b.phase+Math.floor(time/4000))*6500;
     }
     // Woodland birds occasionally rest in place using existing idle atlas frames.
-    const resting=woodlandIdle&&!nearby&&Math.sin(time*.00032+b.phase)> .84;
+    const daily=woodlandDailyPhase();
+    const resting=woodlandIdle&&!nearby&&Math.sin(time*.00032+b.phase)>(daily===1?.65:daily===3?.45:daily===0?.94:.84);
     if(resting){b.pecking=false;b.wormUntil=0}
     else{
      b.x+=Math.sin(time*.001+b.phase)*step*2;
