@@ -324,12 +324,30 @@ function updateWoodlandDeer(dt){
    a.pause=Math.max(a.pause,a.alertUntil-time);
    a.face=threat.x<a.x?-1:1;
   }
+  // Job 24: nearby deer share warnings, but retain their own retreat vectors and timing.
+  const neighbour=woodlandDeer.find(b=>b!==a&&Math.hypot(a.x-b.x,a.y-b.y)<270);
+  if(neighbour&&time<neighbour.scaredUntil&&time>a.scaredUntil){
+   const awayX=a.x-neighbour.x,awayY=a.y-neighbour.y;
+   const threatX=hd<sd?state.x:skolli.x,threatY=hd<sd?state.y:skolli.y;
+   const angle=Math.atan2(a.y-threatY+awayY*.3,a.x-threatX+awayX*.3)+Math.sin(a.phase)*.22;
+   a.targetX=clamp(a.x+Math.cos(angle)*125,a.homeX-220,a.homeX+220);
+   a.targetY=clamp(a.y+Math.sin(angle)*125,a.homeY-220,a.homeY+220);
+   a.scaredUntil=time+1900+seeded(a.phase)*500;a.pause=0;
+  }else if(neighbour&&time<neighbour.alertUntil&&time>a.alertUntil&&time>a.scaredUntil){
+   a.alertUntil=time+650+seeded(a.phase+7)*450;
+   a.pause=Math.max(a.pause,a.alertUntil-time);
+  }
   if(a.pause>0){a.pause=Math.max(0,a.pause-dt);a.walking=false;continue}
   const dx=a.targetX-a.x,dy=a.targetY-a.y,distToTarget=Math.hypot(dx,dy);
   if(distToTarget<5){
    const phase=a.phase+Math.floor(time/3500)*2.4,range=55+seeded(92230+phase)*85;
-   a.targetX=clamp(a.homeX+Math.cos(phase)*range,100,3400);
-   a.targetY=clamp(a.homeY+Math.sin(phase)*range,100,3000);
+   // If two deer naturally meet, sometimes graze nearby without locking movement.
+   const partner=woodlandDeer.find(b=>b!==a&&Math.hypot(a.x-b.x,a.y-b.y)<185&&time>b.scaredUntil);
+   const pair=partner&&seeded(a.phase+Math.floor(time/11000))>.48;
+   const centreX=pair?(a.homeX+partner.x)*.5:a.homeX;
+   const centreY=pair?(a.homeY+partner.y)*.5:a.homeY;
+   a.targetX=clamp(centreX+Math.cos(phase)*range,100,3400);
+   a.targetY=clamp(centreY+Math.sin(phase)*range,100,3000);
    a.pause=1400+seeded(92240+phase)*3100;a.walking=false;continue;
   }
   const move=Math.min(distToTarget,(time<a.scaredUntil?52:15)*step);
