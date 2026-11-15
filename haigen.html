@@ -4926,7 +4926,18 @@ function drawWoodlandArtwork(o){
   ellipse(o.x+size*.11,o.y+4,size*.08,size*.02,'#647a4650');
  }
  ellipse(o.x,o.y+2,size*(type==='rock'?.32:.22),size*.055,'#292a2748');
- ctx.drawImage(woodlandSceneryArt,cell%3*192,Math.floor(cell/3)*192,192,192,o.x-size/2,o.y-size+4,size,size);
+ // Job 18: move only the upper foliage pixels; keep the lower trunk and roots fixed.
+ const sx=cell%3*192,sy=Math.floor(cell/3)*192,top=o.y-size+4;
+ if(rbWoodland(o.x,o.y)&&(type==='tree'||type==='fir')){
+  const gust=Math.max(0,Math.sin(time*.00018+o.x*.085+o.y*.065));
+  const sway=Math.sin(time*.00065+o.x*.017+o.y*.023+seeded(o.id*29)*6.28)*(.25+gust*.75);
+  const canopyH=124;
+  ctx.drawImage(woodlandSceneryArt,sx,sy,192,192,o.x-size/2,top,size,size);
+  ctx.save();
+  ctx.beginPath();ctx.rect(o.x-size/2-3,top-3,size+6,size*canopyH/192+3);ctx.clip();
+  ctx.drawImage(woodlandSceneryArt,sx,sy,192,canopyH,o.x-size/2+sway,top,size,size*canopyH/192);
+  ctx.restore();
+ }else ctx.drawImage(woodlandSceneryArt,sx,sy,192,192,o.x-size/2,top,size,size);
  if(type==='rock'&&state.boulderHits[o.id]){
   ctx.strokeStyle='#332f2a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(o.x-size*.08,o.y-size*.26);
   ctx.lineTo(o.x+2,o.y-size*.18);ctx.lineTo(o.x-3,o.y-size*.08);ctx.stroke();
