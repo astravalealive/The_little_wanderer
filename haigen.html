@@ -8091,6 +8091,14 @@ function drawWoodlandFloorV391(nightMix){
    ctx.lineWidth=1.2+hash(gx,gy,j+40)*1.6;
    ctx.beginPath();ctx.moveTo(px-len*.55,py+2);ctx.quadraticCurveTo(px,py-len,px+len*.45,py+1);ctx.stroke();
   }
+  // Job 9: restrained, deterministic woodland sun flecks; no lighting system changes.
+  if(nightMix<.38&&!nearHome&&hash(gx,gy,90)>.88&&roadDistance(x,y)>115&&
+   homesteadPlots.every(p=>Math.hypot(x-p.x,y-p.y)>220)){
+   ctx.globalAlpha=.13*(1-nightMix/.38);
+   ctx.fillStyle='#e4d8a0';ctx.beginPath();
+   ctx.ellipse(x+8,y-7,17,5,-.3,0,Math.PI*2);ctx.fill();
+   ctx.beginPath();ctx.ellipse(x-12,y+9,8,2.5,-.3,0,Math.PI*2);ctx.fill();
+  }
   // Job 7: sparse, non-colliding woodland fern and moss details.
   // Painted paths are rendered after this floor pass; keep a generous route buffer.
   if(!nearHome&&hash(gx,gy,70)>.76&&roadDistance(x,y)>115&&
