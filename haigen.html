@@ -289,7 +289,76 @@ function wildlifeFacing(dx,dy,previous='right'){
  if(Math.abs(dx)<.03&&Math.abs(dy)<.03)return previous;
  return Math.abs(dy)>Math.abs(dx)*1.12?(dy<0?'up':'down'):(dx<0?'left':'right');
 }
+// Job 22: four fixed, non-persistent woodland deer; existing tundra stags are untouched.
+const woodlandDeer=Array.from({length:4},(_,i)=>{
+ const x=650+(i%2)*1750+seeded(92200+i)*260,y=680+Math.floor(i/2)*1500+seeded(92210+i)*250;
+ return {x,y,homeX:x,homeY:y,targetX:x,targetY:y,phase:i*1.7,face:1,gait:0,
+  walking:false,pause:1600+i*900,scaredUntil:0,alertUntil:0};
+});
+function updateWoodlandDeer(dt){
+ const step=Math.min(dt,50)/1000,skolli=companions[1];
+ for(const a of woodlandDeer){
+  // Resolve a deterministic clear starting point against the game's existing collision map.
+  if(!a.placed){
+   a.placed=true;
+   if(blockedBySolid(a.x,a.y)){
+    for(const radius of [45,90,150,210]){
+     let found=false;
+     for(let j=0;j<12;j++){
+      const angle=j*Math.PI/6+a.phase,x=a.homeX+Math.cos(angle)*radius,y=a.homeY+Math.sin(angle)*radius;
+      if(rbWoodland(x,y)&&!blockedBySolid(x,y)){a.x=a.homeX=a.targetX=x;a.y=a.homeY=a.targetY=y;found=true;break}
+     }
+     if(found)break;
+    }
+   }
+  }
+  const hd=Math.hypot(a.x-state.x,a.y-state.y),sd=skolli?Math.hypot(a.x-skolli.x,a.y-skolli.y):Infinity;
+  const threat=sd<hd?skolli:state,d=Math.min(hd,sd);
+  if(d<125&&time>a.scaredUntil){
+   const angle=Math.atan2(a.y-threat.y,a.x-threat.x);
+   a.targetX=clamp(a.x+Math.cos(angle)*140,a.homeX-220,a.homeX+220);
+   a.targetY=clamp(a.y+Math.sin(angle)*140,a.homeY-220,a.homeY+220);
+   a.scaredUntil=time+2600;a.pause=0;
+  }else if(d<230&&time>a.scaredUntil&&time>a.alertUntil){
+   a.alertUntil=time+1000+seeded(a.phase+Math.floor(time/2000))*900;
+   a.pause=Math.max(a.pause,a.alertUntil-time);
+   a.face=threat.x<a.x?-1:1;
+  }
+  if(a.pause>0){a.pause=Math.max(0,a.pause-dt);a.walking=false;continue}
+  const dx=a.targetX-a.x,dy=a.targetY-a.y,distToTarget=Math.hypot(dx,dy);
+  if(distToTarget<5){
+   const phase=a.phase+Math.floor(time/3500)*2.4,range=55+seeded(92230+phase)*85;
+   a.targetX=clamp(a.homeX+Math.cos(phase)*range,100,3400);
+   a.targetY=clamp(a.homeY+Math.sin(phase)*range,100,3000);
+   a.pause=1400+seeded(92240+phase)*3100;a.walking=false;continue;
+  }
+  const move=Math.min(distToTarget,(time<a.scaredUntil?52:15)*step);
+  const nx=a.x+dx/distToTarget*move,ny=a.y+dy/distToTarget*move;
+  if(!rbWoodland(nx,ny)||blockedBySolid(nx,ny)){
+   // Use the game's collision slide, but never slide outside the woodland.
+   const slide=resolveSolidMovement(a.x,a.y,nx,ny);
+   if(!rbWoodland(slide.x,slide.y)||(slide.x===a.x&&slide.y===a.y)){
+    const turn=a.phase+Math.floor(time/1700)*2.399;
+    a.targetX=clamp(a.x+Math.cos(turn)*75,100,3400);
+    a.targetY=clamp(a.y+Math.sin(turn)*75,100,3000);
+    a.pause=450;a.walking=false;continue;
+   }
+   a.x=slide.x;a.y=slide.y;
+  }else{a.x=nx;a.y=ny}
+  const moved=Math.hypot(a.x-(nx-dx/distToTarget*move),a.y-(ny-dy/distToTarget*move));
+  a.face=dx>=0?1:-1;a.gait+=moved*.18;a.walking=moved>.06;
+ }
+}
+function drawWoodlandDeer(){
+ for(const a of woodlandDeer){
+  if(Math.abs(a.x-cam.x)>1050||Math.abs(a.y-cam.y)>800)continue;
+  // Existing worldFaunaDraw tries illustrated stag atlases and falls back to generated sprites.
+  worldFaunaDraw('stag',a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,.85,
+   time<a.scaredUntil?'flee':time<a.alertUntil?'alert':a.walking?'walk':'forage');
+ }
+}
 function updateRegionalWildlife(dt){
+ updateWoodlandDeer(dt);
  const step=Math.min(50,dt)/1000;
  for(const a of regionalWildlife){
   if(!animalAlive(a)){a.walking=false;continue}
@@ -344,6 +413,7 @@ function updateRegionalWildlife(dt){
  }
 }
 function drawRegionalWildlife(){
+ drawWoodlandDeer();
  for(const a of regionalWildlife){
   if(!animalAlive(a)||Math.abs(a.x-cam.x)>1050||Math.abs(a.y-cam.y)>800)continue;
   drawWildAnimal(a);
