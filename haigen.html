@@ -7681,9 +7681,8 @@ function updateSquirrel(c,dt){
   c.squirrelMode='watch';c.squirrelNextAt=time+2500+seeded(c.phase+9)*2500;return;
  }
  if(time<c.squirrelNextAt)return;
- if(mode==='watch'){c.squirrelMode='forage';c.squirrelNextAt=time+900+seeded(c.phase+Math.floor(time/900)+43)*1450;return}
+ if(mode==='watch'){c.squirrelMode='forage';c.squirrelNextAt=time+(woodlandDailyPhase()===0?550:900)+seeded(c.phase+Math.floor(time/900)+43)*1450;return}
  // Independent, stable rhythms per squirrel; preserve existing modes and destinations.
- const daily=woodlandDailyPhase();
  const roll=seeded(c.phase+Math.floor(time/1800)*.73+47),tree=squirrelTreeNear(c);
  if(tree&&roll<.20){
   c.squirrelMode='scamper';c.squirrelDestination={x:tree.x+12,y:tree.y+5};
@@ -8051,7 +8050,7 @@ function updateBirds(dt){
     // Job 11: individual woodland ground-bird pauses and peck rhythms.
     const woodlandIdle=rbWoodland(b.x,b.y);
     const peck=Math.sin(time*(woodlandIdle?.0045+seeded(b.phase+11)*.003:.007)+b.phase);
-    b.pecking=peck>(woodlandIdle?.25+seeded(b.phase+19)*.35:.42);
+    b.pecking=peck>(woodlandIdle?(woodlandDailyPhase()===0?.12:.25)+seeded(b.phase+19)*.35:.42);
     if(b.pecking&&time>(b.nextWormAt||0)){
      b.wormUntil=time+600;b.nextWormAt=time+4500+seeded(b.phase+Math.floor(time/4000))*6500;
     }
