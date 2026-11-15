@@ -295,8 +295,12 @@ const woodlandDeer=Array.from({length:4},(_,i)=>{
  return {x,y,homeX:x,homeY:y,targetX:x,targetY:y,phase:i*1.7,face:1,gait:0,
   walking:false,pause:1600+i*900,scaredUntil:0,alertUntil:0};
 });
-// Existing 180-unit clock: four 45-unit phases, no new timer or saved state.
-function woodlandDailyPhase(){return Math.floor((((state.daytime%180)+180)%180)/45)}
+function woodlandDailyPhase(){
+ const phase=((state.daytime%180)+180)%180;
+ if(nightStrength()>.5)return 3;
+ if(phase>=173||phase<45)return 0;
+ return phase<83?1:2;
+}
 function updateWoodlandDeer(dt){
  const daily=woodlandDailyPhase();
  const step=Math.min(dt,50)/1000,skolli=companions[1];
