@@ -7874,7 +7874,11 @@ function updateBirds(dt){
    b.birdReady=true;b.groundedUntil=time+400+seeded(b.phase)*1800;
    b.flightUntil=0;b.air=0;b.targetX=b.x;b.targetY=b.y;
   }
-  const nearby=Math.hypot(b.x-state.x,b.y-state.y)<155;
+  // Job 20: woodland birds notice Haigen or Skolli, with individual alert radii.
+  const woodlandBird=rbWoodland(b.x,b.y);
+  const skolli=woodlandBird?companions[1]:null;
+  const skolliNear=skolli&&Math.hypot(b.x-skolli.x,b.y-skolli.y)<105+seeded(b.phase+31)*35;
+  const nearby=Math.hypot(b.x-state.x,b.y-state.y)<(woodlandBird?105+seeded(b.phase+17)*45:155)||!!skolliNear;
   let plan=birdFlockPlans.get(b.flock);
   if(!plan||time>plan.until){
    const leader=birds.find(other=>other.flock===b.flock)||b;
@@ -7896,7 +7900,10 @@ function updateBirds(dt){
     const ox=b.x-m.x,oy=b.y-m.y,d=Math.hypot(ox,oy);
     if(d>0&&d<27){dx+=ox/d*(27-d)*3;dy+=oy/d*(27-d)*3}
    }
-   if(nearby){dx+=(b.x-state.x)*1.2;dy+=(b.y-state.y)*1.2}
+   if(nearby){
+    const threat=skolliNear&&Math.hypot(b.x-skolli.x,b.y-skolli.y)<Math.hypot(b.x-state.x,b.y-state.y)?skolli:state;
+    dx+=(b.x-threat.x)*1.2;dy+=(b.y-threat.y)*1.2;
+   }
    const distance=Math.hypot(dx,dy),speed=Math.min(145,Math.max(20,distance*1.1));
    const desiredX=distance>1?dx/distance*speed:0,desiredY=distance>1?dy/distance*speed:0;
    b.vx+=(desiredX-b.vx)*Math.min(1,step*2.4);
