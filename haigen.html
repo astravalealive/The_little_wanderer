@@ -7499,7 +7499,7 @@ function startSquirrelFlee(c,duration=2900){
 function updateSquirrel(c,dt){
  if(!c.squirrelMode){
   c.squirrelMode='forage';c.squirrelHeight=0;c.squirrelFacing=c.phase%2<1?'left':'right';
-  c.squirrelNextAt=time+700+(c.phase%3)*950;c.squirrelSteps=0;
+  c.squirrelNextAt=time+700+seeded(c.phase+31)*2850;c.squirrelSteps=0;
  }
  if(dist(c,state)<115&&time>c.scaredUntil)startSquirrelFlee(c,2200+rand(0,1100));
  const mode=c.squirrelMode;
@@ -7522,29 +7522,30 @@ function updateSquirrel(c,dt){
  }
  if(mode==='descend'){
   c.squirrelHeight=Math.max(0,(c.squirrelHeight||0)-Math.min(dt,48)*.13);
-  if(c.squirrelHeight<=0){c.squirrelMode='watch';c.squirrelNextAt=time+900+rand(0,1050)}
+  if(c.squirrelHeight<=0){c.squirrelMode='watch';c.squirrelNextAt=time+900+seeded(c.phase+Math.floor(time/1100)+37)*1050}
   return;
  }
  if(mode==='scamper'){
   if(squirrelGoTo(c,c.squirrelDestination,dt,.092)||time>=c.squirrelNextAt){
    const tree=squirrelTreeNear(c);
    if(c.squirrelClimbAfter&&tree&&Math.hypot(c.x-tree.x-12,c.y-tree.y-5)<18)c.squirrelMode='climb';
-   else{c.squirrelMode='forage';c.squirrelNextAt=time+1300+rand(0,2100)}
+   else{c.squirrelMode='forage';c.squirrelNextAt=time+1300+seeded(c.phase+Math.floor(time/1300)+41)*2100}
    c.squirrelClimbAfter=false;
   }
   return;
  }
  if(time<c.squirrelNextAt)return;
- if(mode==='watch'){c.squirrelMode='forage';c.squirrelNextAt=time+900+rand(0,1450);return}
- const roll=Math.random(),tree=squirrelTreeNear(c);
+ if(mode==='watch'){c.squirrelMode='forage';c.squirrelNextAt=time+900+seeded(c.phase+Math.floor(time/900)+43)*1450;return}
+ // Independent, stable rhythms per squirrel; preserve existing modes and destinations.
+ const roll=seeded(c.phase+Math.floor(time/1800)*.73+47),tree=squirrelTreeNear(c);
  if(tree&&roll<.20){
   c.squirrelMode='scamper';c.squirrelDestination={x:tree.x+12,y:tree.y+5};
   c.squirrelNextAt=time+5000;c.squirrelClimbAfter=true;
  }else if(roll<.76){
   c.squirrelMode='scamper';c.squirrelClimbAfter=false;
-  c.squirrelDestination={x:c.homeX+rand(-80,80),y:c.homeY+rand(-70,70)};
+  c.squirrelDestination={x:c.homeX+(seeded(c.phase+Math.floor(time/2100)+53)*160-80),y:c.homeY+(seeded(c.phase+Math.floor(time/2300)+59)*140-70)};
   c.squirrelNextAt=time+2600;
- }else{c.squirrelMode='watch';c.squirrelNextAt=time+650+rand(0,950)}
+ }else{c.squirrelMode='watch';c.squirrelNextAt=time+650+seeded(c.phase+Math.floor(time/700)+61)*950}
 }
 
 function drawWoodlandCritter(c){
