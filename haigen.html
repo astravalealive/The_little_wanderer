@@ -4932,7 +4932,7 @@ function drawWoodlandArtwork(o){
   const gust=Math.max(0,Math.sin(time*.00018+o.x*.085+o.y*.065));
   const sway=Math.sin(time*.00065+o.x*.017+o.y*.023+seeded(o.id*29)*6.28)*(.25+gust*.75);
   const canopyH=124;
-  ctx.drawImage(woodlandSceneryArt,sx,sy,192,192,o.x-size/2,top,size,size);
+  ctx.drawImage(woodlandSceneryArt,sx,sy+canopyH,192,192-canopyH,o.x-size/2,top+size*canopyH/192,size,size*(192-canopyH)/192);
   ctx.save();
   ctx.beginPath();ctx.rect(o.x-size/2-3,top-3,size+6,size*canopyH/192+3);ctx.clip();
   ctx.drawImage(woodlandSceneryArt,sx,sy,192,canopyH,o.x-size/2+sway,top,size,size*canopyH/192);
