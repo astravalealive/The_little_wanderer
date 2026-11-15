@@ -11773,8 +11773,14 @@ function soundEffect(kind,source){
  }
 }
 function nearbyWildlifeCall(){
+ // Keep existing animal calls from overlapping the new woodland wildlife calls.
+ if(soundArea()==='woodland'&&performance.now()<woodlandCallUntil)return;
  const nearAnimals=[...beasts,...regionalWildlife].filter(a=>animalAlive(a)&&dist(state,a)<195);
- if(nearAnimals.length&&Math.random()<.075)soundEffect('animal',nearAnimals[Math.floor(Math.random()*nearAnimals.length)]);
+ if(nearAnimals.length&&Math.random()<.075){
+  const before=soundLast.animal||0;
+  soundEffect('animal',nearAnimals[Math.floor(Math.random()*nearAnimals.length)]);
+  if(soundArea()==='woodland'&&(soundLast.animal||0)!==before)woodlandCallUntil=performance.now()+950;
+ }
 }
 function soundPulse(){
  if(!soundMode||!soundCtx||soundCtx.state!=='running'||document.hidden)return;
