@@ -354,6 +354,11 @@ function updateWoodlandDeer(dt){
    a.targetX=a.homeX;a.targetY=a.homeY;a.pause=0;
   }
   a.groupGathering=gathering;
+  // Job 25: rare quiet rests use the existing stationary forage pose.
+  const quiet=d>250&&time>a.scaredUntil&&time>a.alertUntil;
+  if(!quiet)a.restUntil=0;
+  else if(!a.restUntil&&a.pause>0&&seeded(a.phase+Math.floor(time/17000))>.89)a.restUntil=time+4500+seeded(a.phase+17)*4200;
+  if(quiet&&time<(a.restUntil||0)){a.walking=false;returnDeerRest(a);continue}
   if(a.pause>0){a.pause=Math.max(0,a.pause-dt);a.walking=false;continue}
   const dx=a.targetX-a.x,dy=a.targetY-a.y,distToTarget=Math.hypot(dx,dy);
   if(distToTarget<5){
@@ -384,6 +389,7 @@ function updateWoodlandDeer(dt){
   a.face=dx>=0?1:-1;a.gait+=moved*.18;a.walking=moved>.06;
  }
 }
+function returnDeerRest(a){a.pause=Math.max(a.pause,250)}
 function drawWoodlandDeer(){
  for(const a of woodlandDeer){
   if(Math.abs(a.x-cam.x)>1050||Math.abs(a.y-cam.y)>800)continue;
@@ -7667,6 +7673,10 @@ function updateSquirrel(c,dt){
   }
   return;
  }
+ // Quiet squirrels pause using the existing watch pose; threats still take priority above.
+ if(mode==='forage'&&threatDistance>190&&time>=c.squirrelNextAt&&seeded(c.phase+Math.floor(time/13000))>.91){
+  c.squirrelMode='watch';c.squirrelNextAt=time+2500+seeded(c.phase+9)*2500;return;
+ }
  if(time<c.squirrelNextAt)return;
  if(mode==='watch'){c.squirrelMode='forage';c.squirrelNextAt=time+900+seeded(c.phase+Math.floor(time/900)+43)*1450;return}
  // Independent, stable rhythms per squirrel; preserve existing modes and destinations.
@@ -8041,8 +8051,13 @@ function updateBirds(dt){
     if(b.pecking&&time>(b.nextWormAt||0)){
      b.wormUntil=time+600;b.nextWormAt=time+4500+seeded(b.phase+Math.floor(time/4000))*6500;
     }
-    b.x+=Math.sin(time*.001+b.phase)*step*2;
-    b.y+=Math.cos(time*.0011+b.phase)*step*2;
+    // Woodland birds occasionally rest in place using existing idle atlas frames.
+    const resting=woodlandIdle&&!nearby&&Math.sin(time*.00032+b.phase)> .84;
+    if(resting){b.pecking=false;b.wormUntil=0}
+    else{
+     b.x+=Math.sin(time*.001+b.phase)*step*2;
+     b.y+=Math.cos(time*.0011+b.phase)*step*2;
+    }
    }else b.groundedUntil=time;
   }
  }
