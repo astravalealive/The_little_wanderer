@@ -7621,11 +7621,17 @@ function drawWoodlandCritter(c){
   const x=c.x+Math.sin(time*.001+c.phase)*18,y=c.y-24+wiggle*8;const flutter=.55+.45*Math.abs(Math.sin(time*.019+c.phase));
   ellipse(x-7,y-4,8*flutter,11,'#e8a54f');ellipse(x+7,y-4,8*flutter,11,'#d58cb7');ellipse(x-6,y+5,5*flutter,7,'#f5d78c');ellipse(x+6,y+5,5*flutter,7,'#f5b6d4');ellipse(x-8,y-5,2,2,'#fff0c2');ellipse(x+8,y-5,2,2,'#fff0c2');ellipse(x,y,2,11,'#463b32');ctx.strokeStyle='#463b32';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y-8);ctx.lineTo(x-4,y-14);ctx.moveTo(x,y-8);ctx.lineTo(x+4,y-14);ctx.stroke();
  }else{
-  const night=nightStrength(),drift=night>.35?25:0;
-  const x=c.x+Math.sin(time*.0012+c.phase)*23+Math.sin(time*.00037+c.phase*2)*10+Math.sin(time*.00027+c.phase)*drift;
-  const y=c.y-22+Math.cos(time*.0017+c.phase)*14;
+  const night=nightStrength(),woodland=rbWoodland(c.homeX,c.homeY);
+  // Job 14: woodland fireflies only. Analytic motion avoids per-frame searches or allocations.
+  const phase=c.phase,pace=woodland?.00075+seeded(phase+101)*.00065:.0012;
+  const gather=woodland?Math.max(0,Math.sin(time*.00019+Math.floor(phase/4)*2.1))*.32:0;
+  const drift=night>.35?25:0;
+  const x=c.x+Math.sin(time*pace+phase)*23+Math.sin(time*.00037+phase*2)*10+Math.sin(time*.00027+phase)*drift
+   +(woodland?Math.sin(phase*2.3)*gather*26:0);
+  const y=c.y-22+Math.cos(time*(woodland?.0011+seeded(phase+107)*.0008:.0017)+phase)*14;
+  if(woodland&&night<.12)return;
   if(night<.35&&roadDistance(x,y)<47)return;
-  const pulse=(.55+.45*Math.sin(time*.003+c.phase))*(.48+night*.52);
+  const pulse=(.55+.45*Math.sin(time*(woodland?.002+seeded(phase+109)*.002:.003)+phase))*(woodland?night:(.48+night*.52));
   ctx.save();ctx.globalAlpha=pulse;ctx.shadowBlur=13+night*16;
   ctx.shadowColor=c.phase%3<1?'#b9f5a0':'#f9df7c';
   ellipse(x,y,5.8,5.8,'#ffe79c55');ellipse(x,y,2.7,2.7,c.phase%3<1?'#d7ffb1':'#fff0a3');ctx.restore();
