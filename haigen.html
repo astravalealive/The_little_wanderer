@@ -340,7 +340,7 @@ function updateWoodlandDeer(dt){
   // Original spawn/home positions remain fixed. During long, infrequent windows
   // each pair can walk toward a shared woodland clearing, then head home.
   const index=woodlandDeer.indexOf(a),mate=woodlandDeer[index%2===0?index+1:index-1];
-  const cycle=(time+index/2*135000)%540000;
+  const cycle=(time+Math.floor(index/2)*135000)%540000;
   const gathering=cycle>=12000&&cycle<315000&&time>a.scaredUntil&&time>a.alertUntil;
   const meetingX=(a.homeX+mate.homeX)*.5,meetingY=(a.homeY+mate.homeY)*.5;
   if(gathering&&(!a.groupGathering||Math.hypot(a.targetX-a.x,a.targetY-a.y)<8)){
@@ -350,7 +350,7 @@ function updateWoodlandDeer(dt){
    if(rbWoodland(tx,ty)&&!blockedBySolid(tx,ty)){
     a.targetX=tx;a.targetY=ty;a.pause=Math.min(a.pause,500);
    }
-  }else if(!gathering&&a.groupGathering){
+  }else if(!gathering&&a.groupGathering&&time>a.scaredUntil&&time>a.alertUntil){
    a.targetX=a.homeX;a.targetY=a.homeY;a.pause=0;
   }
   a.groupGathering=gathering;
