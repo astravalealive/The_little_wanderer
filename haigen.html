@@ -298,6 +298,20 @@ const woodlandDeer=Array.from({length:4},(_,i)=>{
 function updateWoodlandDeer(dt){
  const step=Math.min(dt,50)/1000,skolli=companions[1];
  for(const a of woodlandDeer){
+  // Resolve a deterministic clear starting point against the game's existing collision map.
+  if(!a.placed){
+   a.placed=true;
+   if(blockedBySolid(a.x,a.y)){
+    for(const radius of [45,90,150,210]){
+     let found=false;
+     for(let j=0;j<12;j++){
+      const angle=j*Math.PI/6+a.phase,x=a.homeX+Math.cos(angle)*radius,y=a.homeY+Math.sin(angle)*radius;
+      if(rbWoodland(x,y)&&!blockedBySolid(x,y)){a.x=a.homeX=a.targetX=x;a.y=a.homeY=a.targetY=y;found=true;break}
+     }
+     if(found)break;
+    }
+   }
+  }
   const hd=Math.hypot(a.x-state.x,a.y-state.y),sd=skolli?Math.hypot(a.x-skolli.x,a.y-skolli.y):Infinity;
   const threat=sd<hd?skolli:state,d=Math.min(hd,sd);
   if(d<125&&time>a.scaredUntil){
@@ -320,13 +334,23 @@ function updateWoodlandDeer(dt){
   }
   const move=Math.min(distToTarget,(time<a.scaredUntil?52:15)*step);
   const nx=a.x+dx/distToTarget*move,ny=a.y+dy/distToTarget*move;
-  if(!rbWoodland(nx,ny)||islandDepth(nx,ny)<100){a.targetX=a.homeX;a.targetY=a.homeY;a.pause=900;a.walking=false;continue}
-  a.x=nx;a.y=ny;a.face=dx>=0?1:-1;a.gait+=move*.18;a.walking=move>.06;
+  if(!rbWoodland(nx,ny)||blockedBySolid(nx,ny)){
+   // Try sliding around scenery, then pick another roaming direction if blocked.
+   const slide=resolveSolidMovement(a.x,a.y,nx,ny);
+   if(slide.x===a.x&&slide.y===a.y){
+    const turn=a.phase+Math.floor(time/1700)*2.399;
+    a.targetX=clamp(a.x+Math.cos(turn)*75,100,3400);
+    a.targetY=clamp(a.y+Math.sin(turn)*75,100,3000);
+    a.pause=450;a.walking=false;continue;
+   }
+   a.x=slide.x;a.y=slide.y;
+  }else{a.x=nx;a.y=ny}a.face=dx>=0?1:-1;a.gait+=move*.18;a.walking=move>.06;
  }
 }
 function drawWoodlandDeer(){
  for(const a of woodlandDeer){
   if(Math.abs(a.x-cam.x)>1050||Math.abs(a.y-cam.y)>800)continue;
+  // Existing worldFaunaDraw tries illustrated stag atlases and falls back to generated sprites.
   worldFaunaDraw('stag',a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,.85,
    time<a.scaredUntil?'flee':time<a.alertUntil?'alert':a.walking?'walk':'forage');
  }
