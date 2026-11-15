@@ -7501,7 +7501,7 @@ function squirrelGoTo(c,target,dt,speed){
  c.squirrelFacing=dx<0?'left':'right';
  c.x=nx;c.y=ny;c.squirrelSteps=(c.squirrelSteps||0)+step;return false;
 }
-function startSquirrelFlee(c,duration=2900){
+function startSquirrelFlee(c,duration=2900,threat=state){
  c.scaredUntil=time+duration;
  if((c.squirrelHeight||0)>8){
   c.squirrelMode='perch';c.squirrelNextAt=c.scaredUntil+850;return;
@@ -7510,7 +7510,7 @@ function startSquirrelFlee(c,duration=2900){
  const tree=squirrelTreeNear(c);
  if(tree)c.squirrelDestination={x:tree.x+12,y:tree.y+5};
  else{
-  const angle=Math.atan2(c.y-state.y,c.x-state.x);
+  const angle=Math.atan2(c.y-threat.y,c.x-threat.x);
   c.squirrelDestination={x:c.homeX+Math.cos(angle)*105,y:c.homeY+Math.sin(angle)*105};
  }
 }
@@ -7519,7 +7519,17 @@ function updateSquirrel(c,dt){
   c.squirrelMode='forage';c.squirrelHeight=0;c.squirrelFacing=c.phase%2<1?'left':'right';
   c.squirrelNextAt=time+700+seeded(c.phase+31)*2850;c.squirrelSteps=0;
  }
- if(dist(c,state)<115&&time>c.scaredUntil)startSquirrelFlee(c,2200+rand(0,1100));
+ // Job 21: alert at a distance, flee only when Haigen or Skolli comes close.
+ const skolli=companions[1],haigenDistance=dist(c,state);
+ const skolliDistance=skolli?dist(c,skolli):Infinity;
+ const threat=skolliDistance<haigenDistance?skolli:state;
+ const threatDistance=Math.min(haigenDistance,skolliDistance);
+ const alertRadius=145+seeded(c.phase+71)*35;
+ if(threatDistance<105&&time>c.scaredUntil)startSquirrelFlee(c,2200+seeded(c.phase+Math.floor(time/1800))*1100,threat);
+ else if(threatDistance<alertRadius&&['forage','watch'].includes(c.squirrelMode)&&time>c.squirrelNextAt){
+  c.squirrelMode='watch';c.squirrelFacing=threat.x<c.x?'left':'right';
+  c.squirrelNextAt=time+750+seeded(c.phase+73)*900;
+ }
  const mode=c.squirrelMode;
  if(mode==='flee'){
   if(squirrelGoTo(c,c.squirrelDestination,dt,.21)){
