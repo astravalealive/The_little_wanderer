@@ -9754,7 +9754,7 @@ for(const c of companions){const oldX=c.x,oldY=c.y;c.t-=dt;c.anim=(c.anim||0)+dt
 if(!rabbit){
  const threat=beasts.find(b=>animalAlive(b)&&(dist(b,state)<255||(b.kind==='wolf'&&dist(b,companions[0])<215))&&b.mode!=='retreating')||
   (c.mode==='resting'?beasts.find(b=>animalAlive(b)&&b.mode!=='retreating'&&dist(b,c)<220):null);
- if(threat){c.gift=null;c.mode='defending';c.target={x:threat.x,y:threat.y};c.t=900}
+ if(threat){c.threatWatchUntil=0;c.gift=null;c.mode='defending';c.target={x:threat.x,y:threat.y};c.t=900}
  else if(c.mode==='defending'){c.mode='watching';c.target=null;c.t=rand(1000,2000);c.threatWatchUntil=time+c.t}
  else if(!c.gift&&c.mode!=='called'&&c.mode!=='delivering'&&c.mode!=='returning'&&time>=(c.threatWatchUntil||0)&&dist(c,ruins)>160){c.mode='returning';c.target={x:ruins.x+38,y:ruins.y+42};c.t=6000}
  else if(!c.gift&&c.mode==='returning'&&dist(c,ruins)<80){
