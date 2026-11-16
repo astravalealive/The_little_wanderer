@@ -9803,7 +9803,7 @@ if(!rabbit){
  }else{c.patrolTarget=null;c.patrolStallMs=0}
 }
 trackMotion(c,oldX,oldY,c.x,c.y,dt);
-}const activePadnavigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const rightX=activePad&&Math.abs(activePad.axes[2]||0)>.2?activePad.axes[2]:0,rightY=activePad&&Math.abs(activePad.axes[3]||0)>.2?activePad.axes[3]:0;const smoothing=Math.min(1,dt*((rightX||rightY)? .008 : .005));look.x+=(rightX*270-look.x)*smoothing;look.y+=(rightY*210-look.y)*smoothing;// Follow the player, but honour active finger pans. Once released, return smoothly.
+}const activePad=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const rightX=activePad&&Math.abs(activePad.axes[2]||0)>.2?activePad.axes[2]:0,rightY=activePad&&Math.abs(activePad.axes[3]||0)>.2?activePad.axes[3]:0;const smoothing=Math.min(1,dt*((rightX||rightY)? .008 : .005));look.x+=(rightX*270-look.x)*smoothing;look.y+=(rightY*210-look.y)*smoothing;// Follow the player, but honour active finger pans. Once released, return smoothly.
 // Pan feels direct under the finger. Release holds the view briefly before a gentle recenter.
 // Direct pan: no following force while fingers are on the canvas.
 const draggingCamera=cameraTouches.size>0;
