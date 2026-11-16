@@ -9786,10 +9786,11 @@ if(rabbit){
  if(c.mode==='foraging'&&c.target&&!(c.fleeUntil>time)&&time>=(c.nextPredatorAlertAt||0)&&beasts.some(b=>animalAlive(b)&&b.kind==='wolf'&&b.mode!=='retreating'&&dist(b,c)<300)&&Math.random()<.012){c.mode='watching';c.alertForageUntil=time+rand(500,950);c.nextPredatorAlertAt=time+rand(7000,12000)}
 }
 const arrived=c.target&&!(rabbit&&c.alertForageUntil>time)&&dist(c,c.target)<(c.mode==='stalking'?46:24);
-if(arrived){if(c.mode==='foraging'){c.mode='nibbling';c.t=rand(2400,5200);c.target=null;c.nibbles=(c.nibbles||0)+1}
+if(arrived){if(c.mode==='foraging'){c.mode='nibbling';c.postMealWatchMs=rabbit&&Math.random()<.3?rand(500,900):0;c.t=rand(2400,5200)-c.postMealWatchMs;c.target=null;c.nibbles=(c.nibbles||0)+1}
 else if(c.mode==='stalking'){c.mode='pouncing';c.t=650;c.pounceX=c.target.x;c.pounceY=c.target.y;c.target=null}
 else if(c.mode==='investigating'){c.mode='sniffing';c.t=rand(1600,3400);c.target=null}
 else if(c.mode!=='called'&&c.mode!=='returning'){c.mode='watching';c.t=rand(2600,5400);c.target=null}}
+if(rabbit&&c.mode==='nibbling'&&c.t<=0&&c.postMealWatchMs&&!c.target&&!c.gift){c.mode='watching';c.t=c.postMealWatchMs;c.postMealWatchMs=0}
 if(c.t<=0&&!c.target&&!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=='defending'&&c.mode!=='fleeing'){const nearby=objects.filter(o=>!state.removed.includes(o.id)&&dist(o,c)<(rabbit?220:310)&&!inPond(o.x,o.y,28)&&o.type!=='tree');
 const choose=types=>{const list=nearby.filter(o=>types.includes(o.type));return list.length?list[Math.floor(Math.random()*list.length)]:null};
 const roll=Math.random();c.target=null;
