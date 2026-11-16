@@ -382,6 +382,12 @@ function updateWoodlandDeer(dt){
    a.groupPauseNextAt=time+19000+seeded(a.phase+32)*15000;
    if(seeded(a.phase+Math.floor(time/19000)+32)>.72)a.pause=Math.max(a.pause,1100+seeded(a.phase+32)*1000);
   }
+  // Job 33: a passing, walking deer sometimes draws a brief head-up alert.
+  if(d>260&&time>a.scaredUntil&&time>a.alertUntil&&time>=(a.movementNoticeNextAt||0)){
+   a.movementNoticeNextAt=time+16000+seeded(a.phase+33)*14000;
+   const passer=woodlandDeer.find(b=>b!==a&&b.walking&&time>b.scaredUntil&&Math.hypot(a.x-b.x,a.y-b.y)<115);
+   if(passer&&seeded(a.phase+Math.floor(time/16000)+33)>.7){a.face=passer.x<a.x?-1:1;a.alertUntil=time+650;a.pause=Math.max(a.pause,650)}
+  }
   // Job 25: rare quiet rests use the existing stationary forage pose.
   const quiet=d>250&&time>a.scaredUntil&&time>a.alertUntil;
   if(!quiet)a.restUntil=0;
@@ -7725,6 +7731,12 @@ function updateSquirrel(c,dt){
   const peer=woodlandCritters.find(other=>other!==c&&other.kind==='squirrel'&&other.squirrelMode==='forage'&&Math.hypot(c.x-other.x,c.y-other.y)<85);
   if(peer&&seeded(c.phase+Math.floor(time/17000)+32)>.72){c.squirrelFacing=peer.x<c.x?'left':'right';c.squirrelNextAt=time+900+seeded(c.phase+32)*700;return}
  }
+ // Job 33: briefly notice a nearby scurrying squirrel, without joining its route.
+ if(mode==='forage'&&threatDistance>190&&time>=c.squirrelNextAt&&time>=(c.movementNoticeNextAt||0)&&rbWoodland(c.x,c.y)){
+  c.movementNoticeNextAt=time+16000+seeded(c.phase+33)*14000;
+  const passer=woodlandCritters.find(other=>other!==c&&other.kind==='squirrel'&&other.squirrelMode==='scamper'&&Math.hypot(c.x-other.x,c.y-other.y)<95);
+  if(passer&&seeded(c.phase+Math.floor(time/16000)+33)>.7){c.squirrelFacing=passer.x<c.x?'left':'right';c.squirrelMode='watch';c.squirrelNextAt=time+650+seeded(c.phase+33)*450;return}
+ }
  // Quiet squirrels pause using the existing watch pose; threats still take priority above.
  if(mode==='forage'&&threatDistance>190&&time>=c.squirrelNextAt&&seeded(c.phase+Math.floor(time/13000))>(woodlandDailyPhase()===1?.78:woodlandDailyPhase()===3?.72:.91)){
   c.squirrelMode='watch';c.squirrelNextAt=time+2500+seeded(c.phase+9)*2500;return;
@@ -8069,7 +8081,8 @@ function updateBirds(dt){
   }
   const isFlying=b.air>.03||time>b.groundedUntil||nearby;
   if(isFlying){
-   if(b.air<.03){b.targetX=plan.x;b.targetY=plan.y;b.flightUntil=time+24000;}
+   if(b.air<.03){b.targetX=plan.x;b.targetY=plan.y;b.flightUntil=time+24000;
+    if(woodlandBird)b.takeoffAt=time;}
    // Climb only while travelling; allow a complete descent at the destination.
    if(Math.hypot(plan.x-b.x,plan.y-b.y)>55||nearby)b.air=Math.min(1,b.air+step*1.7);
    const mates=birds.filter(other=>other!==b&&other.flock===b.flock);
@@ -8119,6 +8132,9 @@ function updateBirds(dt){
     // Job 32: flockmates occasionally share a short grounded pause without changing flight plans.
     if(woodlandIdle&&!nearby&&birds.some(other=>other!==b&&other.flock===b.flock&&other.air<.03&&Math.hypot(b.x-other.x,b.y-other.y)<75)&&
        seeded(b.flock+Math.floor(time/19000)+32)>.95){b.pecking=false;b.wormUntil=0;continue}
+    // Job 33: a nearby flockmate's recent takeoff sometimes interrupts pecking, not flight.
+    if(woodlandIdle&&!nearby&&birds.some(other=>other!==b&&other.flock===b.flock&&other.air>.03&&time-(other.takeoffAt||-10000)<900&&Math.hypot(b.x-other.x,b.y-other.y)<95)&&
+       seeded(b.phase+Math.floor(time/14000)+33)>.7){b.pecking=false;b.wormUntil=0}
     // Woodland birds occasionally rest in place using existing idle atlas frames.
     const daily=woodlandDailyPhase();
     const resting=woodlandIdle&&!nearby&&Math.sin(time*.00032+b.phase)>(daily===1?.65:daily===3?.45:daily===0?.94:.84);
