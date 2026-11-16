@@ -9804,6 +9804,17 @@ if(c.mode==='pouncing'&&c.t<=0){c.mode='watching';c.t=rand(2500,5000)}
 if(rabbit&&c.mode==='foraging'&&c.target&&time>=(c.nextForagePauseAt||Infinity)){c.foragePauseUntil=time+rand(450,900);c.nextForagePauseAt=time+rand(4500,8500)}
 if(c.target){const d=dist(c,c.target);if(rabbit&&((c.mode==='foraging'&&time<(c.foragePauseUntil||0))||(c.mode==='watching'&&c.alertForageUntil>time))){c.moving=false}else if(d>3){const speed=c.mode==='fleeing'?.19:c.mode==='called'?.105:c.mode==='defending'?.35:c.mode==='delivering'?.065:c.mode==='returning'?.09:c.mode==='stalking'?.027:rabbit?.044:.039;const step=Math.min(d,dt*speed);const nx=c.x+(c.target.x-c.x)/d*step,ny=c.y+(c.target.y-c.y)/d*step;const limit=rabbit?1.025:.76;if(lakeLevel(nx,ny)>=limit){c.facing=c.target.x>=c.x?1:-1;c.x=nx;c.y=ny;c.moving=true}else{c.target=null;c.mode='watching';c.t=rand(1800,3500);c.moving=false}}else c.moving=false}else c.moving=false;
 if(c.mode==='pouncing'){const nx=c.x+(c.pounceX-c.x)*Math.min(1,dt*.004),ny=c.y+(c.pounceY-c.y)*Math.min(1,dt*.004);if(lakeLevel(nx,ny)> (rabbit?1.025:.76)){c.x=nx;c.y=ny}else{c.mode='watching';c.t=2500}}
+if(rabbit){
+ const foragingOrAlert=c.mode==='foraging'||(c.mode==='watching'&&c.alertForageUntil>time);
+ if(foragingOrAlert&&c.target){
+  if(c.forageTrackedTarget!==c.target){c.forageTrackedTarget=c.target;c.forageStallMs=0}
+  else if(c.mode==='foraging'&&time>=(c.foragePauseUntil||0)&&dist(c,c.target)>24){
+   const progress=dist({x:oldX,y:oldY},c.target)-dist(c,c.target);
+   c.forageStallMs=progress<.3?(c.forageStallMs||0)+dt:0;
+   if(c.forageStallMs>1800){c.target=null;c.mode='watching';c.t=rand(1800,3500);c.forageTrackedTarget=null;c.forageStallMs=0}
+  }
+ }else{c.forageTrackedTarget=null;c.forageStallMs=0}
+}
 if(!rabbit){
  if(c.mode==='investigating'&&c.target&&c.target===c.patrolTarget){
   c.patrolStallMs=Math.hypot(c.x-oldX,c.y-oldY)<.3? (c.patrolStallMs||0)+dt:0;
