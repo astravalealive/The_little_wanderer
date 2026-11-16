@@ -700,7 +700,10 @@ function islandTerrainRGB(x,y){
  const river=easternRiverDepth(x,y);if(river<0&&islandDepth(x,y)>80){const bank=coastSmooth(-25,0,river);return [37+35*bank,112+49*bank,136+40*bank]}
  // Keep the coastline visually calmer while retaining existing inland terrain texture.
  const d=islandDepth(x,y),noise=(Math.sin(x*.032+y*.012)+Math.sin(y*.069-x*.023))*2.5;
- const landNoise=noise*coastSmooth(0,120,d);
+ // Northern Tundra: soften fine ground speckling where snow meets exposed stone.
+ // Keep the coastline, biome boundaries and all non-snow regions unchanged.
+ const tundraCalm=expandedRegion(x,y)?.id==='snow'?1-.45*snow:1;
+ const landNoise=noise*coastSmooth(0,120,d)*tundraCalm;
  if(d<0){
   const t=coastSmooth(0,240,-d),foam=1-coastSmooth(0,13,Math.abs(d+3));
   return [(71-34*t)*(1-foam*.7)+231*foam*.7+noise,
