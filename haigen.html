@@ -9793,7 +9793,7 @@ else if(c.mode!=='called'&&c.mode!=='returning'){c.mode='watching';c.t=rand(2600
 if(c.t<=0&&!c.target&&!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=='defending'&&c.mode!=='fleeing'){const nearby=objects.filter(o=>!state.removed.includes(o.id)&&dist(o,c)<(rabbit?220:310)&&!inPond(o.x,o.y,28)&&o.type!=='tree');
 const choose=types=>{const list=nearby.filter(o=>types.includes(o.type));return list.length?list[Math.floor(Math.random()*list.length)]:null};
 const roll=Math.random();c.target=null;
-if(rabbit&&roll<.42){const food=choose(['flower','bush']);if(food){c.mode='foraging';c.target={x:food.x,y:food.y+22};c.t=12000;c.nextForagePauseAt=time+rand(2500,5000)}}
+if(rabbit&&roll<.42){const foods=nearby.filter(o=>o.type==='flower'||o.type==='bush');const alternatives=foods.filter(o=>!(time<(c.avoidForageUntil||0)&&c.avoidForageTarget&&o.x===c.avoidForageTarget.x&&o.y+22===c.avoidForageTarget.y));const candidates=alternatives.length?alternatives:foods;const food=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:null;if(food){c.mode='foraging';c.target={x:food.x,y:food.y+22};c.t=12000;c.nextForagePauseAt=time+rand(2500,5000)}}
 else if(!rabbit&&roll<.16&&dist(c,ruins)<110){const tx=ruins.x+rand(-75,75),ty=ruins.y+rand(-75,75);if(lakeLevel(tx,ty)>=.76&&![.25,.5,.75,1].some(t=>blockedBySolid(c.x+(tx-c.x)*t,c.y+(ty-c.y)*t)||lakeLevel(c.x+(tx-c.x)*t,c.y+(ty-c.y)*t)<.76)){c.mode='investigating';c.target={x:tx,y:ty};c.patrolTarget=c.target;c.patrolStallMs=0;c.t=5000}}
 else if(!rabbit&&roll<.35){const prey=choose(['bush','mushroom']);if(prey){c.mode='stalking';c.target={x:prey.x+rand(-25,25),y:prey.y+rand(-15,15)};c.t=12000}}
 if(!c.target){if(roll<.28&&(rabbit||!beasts.some(b=>animalAlive(b)&&b.mode!=='retreating'&&dist(b,c)<220))){c.mode='resting';c.t=rand(2800,6500)}
@@ -9811,7 +9811,7 @@ if(rabbit){
   else if(c.mode==='foraging'&&time>=(c.foragePauseUntil||0)&&dist(c,c.target)>24){
    const progress=dist({x:oldX,y:oldY},c.target)-dist(c,c.target);
    c.forageStallMs=progress<.3?(c.forageStallMs||0)+dt:0;
-   if(c.forageStallMs>1800){c.target=null;c.mode='watching';c.t=rand(1800,3500);c.forageTrackedTarget=null;c.forageStallMs=0}
+   if(c.forageStallMs>1800){c.avoidForageTarget={x:c.target.x,y:c.target.y};c.avoidForageUntil=time+12000;c.target=null;c.mode='watching';c.t=rand(1800,3500);c.forageTrackedTarget=null;c.forageStallMs=0}
   }
  }else{c.forageTrackedTarget=null;c.forageStallMs=0}
 }
