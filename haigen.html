@@ -751,11 +751,12 @@ function islandTerrainRGB(x,y){
  red+=desertSand;green+=desertSand*.72;blue+=desertSand*.48;
  // Open Downs: gently varied grassy earth, feathered inland from the coastline.
  // Colour-only detail, leaving the coast, paths, objects and terrain geometry intact.
- const downsGrain=terrainRegion?.id==='downs'?Math.sin(x*.0049+y*.0026)*Math.cos(y*.0041-x*.002)*3.1*coastSmooth(100,380,d):0;
+ const downsShoreFade=terrainRegion?.id==='downs'?coastSmooth(100,380,d):0;
+ const downsGrain=terrainRegion?.id==='downs'?Math.sin(x*.0049+y*.0026)*Math.cos(y*.0041-x*.002)*3.1*downsShoreFade:0;
  red+=downsGrain*.78;green+=downsGrain;blue+=downsGrain*.49;
  // Open Downs: subdued grass, dry-earth and exposed-stone tones in existing ground.
  // Decorative RGB only; fade toward the shoreline without changing any terrain.
- const downsEarth=terrainRegion?.id==='downs'?Math.sin(x*.0043-y*.0021)*Math.cos(y*.0037+x*.0019)*2.8*coastSmooth(100,380,d):0;
+ const downsEarth=terrainRegion?.id==='downs'?Math.sin(x*.0043-y*.0021)*Math.cos(y*.0037+x*.0019)*2.8*downsShoreFade:0;
  red+=downsEarth*.85;green+=downsEarth;blue+=downsEarth*.58;
  // Eastern island dunes: restrained sand-and-stone variation, feathered off the shore.
  // Decorative colour only; existing island shapes, bridges and objects are unchanged.
