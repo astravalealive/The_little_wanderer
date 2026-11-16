@@ -9790,6 +9790,7 @@ if(arrived){if(c.mode==='foraging'){c.mode='nibbling';c.postMealWatchMs=rabbit&&
 else if(c.mode==='stalking'){c.mode='pouncing';c.t=650;c.pounceX=c.target.x;c.pounceY=c.target.y;c.target=null}
 else if(c.mode==='investigating'){c.mode='sniffing';c.t=rand(1600,3400);c.target=null}
 else if(c.mode!=='called'&&c.mode!=='returning'){c.mode='watching';c.t=rand(2600,5400);c.target=null}}
+if(rabbit&&c.mode!=='nibbling'&&c.postMealWatchMs)c.postMealWatchMs=0;
 if(rabbit&&c.mode==='nibbling'&&c.t<=0&&c.postMealWatchMs&&!c.target&&!c.gift){c.mode='watching';c.t=c.postMealWatchMs;c.postMealWatchMs=0}
 if(c.t<=0&&!c.target&&!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=='defending'&&c.mode!=='fleeing'){const nearby=objects.filter(o=>!state.removed.includes(o.id)&&dist(o,c)<(rabbit?220:310)&&!inPond(o.x,o.y,28)&&o.type!=='tree');
 const choose=types=>{const list=nearby.filter(o=>types.includes(o.type));return list.length?list[Math.floor(Math.random()*list.length)]:null};
