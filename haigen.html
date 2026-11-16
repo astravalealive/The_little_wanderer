@@ -9792,7 +9792,7 @@ else if(c.mode==='investigating'){c.mode='sniffing';c.t=rand(1600,3400);c.target
 else if(c.mode!=='called'&&c.mode!=='returning'){c.mode='watching';c.t=rand(2600,5400);c.target=null}}
 if(rabbit&&c.mode!=='nibbling'&&c.postMealWatchMs)c.postMealWatchMs=0;
 if(rabbit&&c.mode==='nibbling'&&c.t<=0&&c.postMealWatchMs&&!c.target&&!c.gift){c.mode='watching';c.t=c.postMealWatchMs;c.postMealWatchMs=0}
-if(c.t<=0&&!c.target&&!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=='defending'&&c.mode!=='fleeing'){const nearby=objects.filter(o=>!state.removed.includes(o.id)&&dist(o,c)<(rabbit?220:310)&&!inPond(o.x,o.y,28)&&o.type!=='tree');
+if(c.t<=0&&!c.target&&!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=='defending'&&c.mode!=='fleeing'&&(rabbit||c.mode!=='watching'||time>=(c.threatWatchUntil||0))){const nearby=objects.filter(o=>!state.removed.includes(o.id)&&dist(o,c)<(rabbit?220:310)&&!inPond(o.x,o.y,28)&&o.type!=='tree');
 const choose=types=>{const list=nearby.filter(o=>types.includes(o.type));return list.length?list[Math.floor(Math.random()*list.length)]:null};
 const roll=Math.random();c.target=null;
 if(rabbit&&roll<.42){if(c.avoidForageUntil&&time>=c.avoidForageUntil){c.avoidForageTarget=null;c.avoidForageUntil=0}const foods=nearby.filter(o=>o.type==='flower'||o.type==='bush');const alternatives=foods.filter(o=>!(c.avoidForageTarget&&o.x===c.avoidForageTarget.x&&o.y+22===c.avoidForageTarget.y));const candidates=alternatives.length?alternatives:foods;const food=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:null;if(food){c.mode='foraging';c.target={x:food.x,y:food.y+22};c.t=12000;c.nextForagePauseAt=time+rand(2500,5000)}}
