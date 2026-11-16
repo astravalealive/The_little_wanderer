@@ -712,7 +712,9 @@ function islandTerrainRGB(x,y){
  }
  // Job 4: gently blend woodland ground tones without changing terrain geometry.
  // Smoothly fade the effect at the woodland boundary; keep coast, river and fen intact.
- const woodlandFade=coastSmooth(100,380,x)* (1-coastSmooth(2700,3100,x))*
+ // Feather woodland colour detail across neighbouring biome edges, never a hard cutoff.
+ const neighbouringBiomeBlend=Math.max(0,...expandedRegions.map(r=>coastSmooth(-120,120,biomeMargin(r,p))));
+ const woodlandFade=(1-neighbouringBiomeBlend)*coastSmooth(100,380,x)* (1-coastSmooth(2700,3100,x))*
   coastSmooth(100,380,y)*(1-coastSmooth(2700,3100,y));
  const woodlandDetail=(Math.sin(x*.009+y*.006)*Math.cos(y*.008-x*.004)*3.2+
   Math.sin(x*.019-y*.013)*1.3)*woodlandFade;
