@@ -766,6 +766,10 @@ function islandTerrainRGB(x,y){
  // Colour only; preserve the existing shore, water and collision geometry.
  const coastalGrain=expandedRegion(x,y)?.id==='coast'?Math.sin(x*.0052+y*.0028)*Math.cos(y*.0044-x*.0023)*3.2*(1-coastSmooth(180,520,d)):0;
  shore[0]+=coastalGrain;shore[1]+=coastalGrain*.83;shore[2]+=coastalGrain*.62;
+ // Southern Coast: pale sand, warm earth and coastal-stone colour variation.
+ // Shore RGB only; fade inland without changing water or shoreline geometry.
+ const coastStone=expandedRegion(x,y)?.id==='coast'?Math.sin(x*.0046-y*.0022)*Math.cos(y*.0038+x*.002)*2.8*(1-coastSmooth(160,500,d)):0;
+ shore[0]+=coastStone;shore[1]+=coastStone*.79;shore[2]+=coastStone*.61;
  return [shore[0]*(1-beach)+red*beach+landNoise,
          shore[1]*(1-beach)+green*beach+landNoise,
          shore[2]*(1-beach)+blue*beach+landNoise];
