@@ -4242,7 +4242,7 @@ function drawWoodlandPathEdges(){
  ctx.restore();
 }
 function path(){
- if(paintedTrailsReady){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();return}
+ if(paintedTrailsReady){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();drawWoodlandPathEdges();return}
  // Draw full road network one material layer at a time so the junctions merge.
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
  const bands=[{pad:22,c:'#55674748'},{pad:14,c:'#91836e90'},{pad:5,c:'#b19a76'},{pad:-7,c:'#d2bb91'}];
