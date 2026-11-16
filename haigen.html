@@ -361,6 +361,12 @@ function updateWoodlandDeer(dt){
    a.targetX=a.homeX;a.targetY=a.homeY;a.pause=0;
   }
   a.groupGathering=gathering;
+  // Job 29: after a retreat, pause briefly before resuming grazing or wandering.
+  if(d>230&&time>=a.scaredUntil&&a.scaredUntil>0&&!a.settledScareAt){
+   a.settledScareAt=a.scaredUntil;
+   a.pause=Math.max(a.pause,850+seeded(a.phase+29)*850);
+  }
+  if(time<a.scaredUntil)a.settledScareAt=0;
   // Job 25: rare quiet rests use the existing stationary forage pose.
   const quiet=d>250&&time>a.scaredUntil&&time>a.alertUntil;
   if(!quiet)a.restUntil=0;
@@ -7691,6 +7697,10 @@ function updateSquirrel(c,dt){
  if(mode==='forage'&&threatDistance>190&&time>=c.squirrelNextAt&&seeded(c.phase+Math.floor(time/13000))>(woodlandDailyPhase()===1?.78:woodlandDailyPhase()===3?.72:.91)){
   c.squirrelMode='watch';c.squirrelNextAt=time+2500+seeded(c.phase+9)*2500;return;
  }
+ // Job 29: after a squirrel's escape, use its existing watch pose before foraging.
+ if(mode==='watch'&&time<c.scaredUntil+750&&c.scaredUntil>0){
+  c.squirrelNextAt=Math.max(c.squirrelNextAt,c.scaredUntil+750);
+ }
  if(time<c.squirrelNextAt)return;
  if(mode==='watch'){c.squirrelMode='forage';c.squirrelNextAt=time+(woodlandDailyPhase()===0?550:900)+seeded(c.phase+Math.floor(time/900)+43)*1450;return}
  // Independent, stable rhythms per squirrel; preserve existing modes and destinations.
@@ -8054,7 +8064,7 @@ function updateBirds(dt){
    b.heading=Math.atan2(b.vy,b.vx);
    if(distance<65&&!nearby&&birdLandingSuitable(b.x,b.y)){
     b.air=Math.max(0,b.air-step*2.5);
-    if(b.air<.04){b.air=0;b.groundedUntil=time+3500+seeded(b.phase+Math.floor(time/1000))*5500;b.vx=0;b.vy=0}
+    if(b.air<.04){b.air=0;b.groundedUntil=time+(woodlandBird?4700:3500)+seeded(b.phase+Math.floor(time/1000))*5500;b.vx=0;b.vy=0}
    }
   }else{
    b.air=0;b.vx=0;b.vy=0;
