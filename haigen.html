@@ -4265,6 +4265,8 @@ function drawWoodlandPathEdges(){
  ctx.save();
  for(const f of woodlandEdgeFlecks){
   if(Math.abs(f.x-cam.x)>950||Math.abs(f.y-cam.y)>750)continue;
+  // Keep the camp clearing readable while preserving trail-edge flecks elsewhere.
+  if(Math.hypot(f.x-cottage.x,f.y-cottage.y)<245)continue;
   ctx.fillStyle=f.moss?'#526b4370':'#92764e65';
   ctx.beginPath();ctx.ellipse(f.x,f.y,f.size*1.8,f.size,0,0,Math.PI*2);ctx.fill();
  }
@@ -8347,10 +8349,13 @@ function drawWoodlandFloorV391(nightMix){
   const x=gx*step+hash(gx,gy,1)*step,y=gy*step+hash(gx,gy,2)*step;
   if(!rbWoodland(x,y))continue;
   const nearHome=Math.hypot(x-cottage.x,y-cottage.y)<310;
+  const routeDistance=roadDistance(x,y);
   const density=nearHome?.36:.86;
   if(hash(gx,gy,3)>density)continue;
   const dark=nightMix*.48;
-  ctx.globalAlpha=(nearHome?.32:.62)*(1-dark);
+  // Fade floor strokes at road edges rather than drawing grass over the paths.
+  const routeFade=coastSmooth(45,125,routeDistance);
+  ctx.globalAlpha=(nearHome?.32:.62)*(1-dark)*routeFade;
   for(let j=0;j<(nearHome?2:5);j++){
    const px=x+(hash(gx,gy,j+10)-.5)*65,py=y+(hash(gx,gy,j+20)-.5)*37;
    const len=3+hash(gx,gy,j+30)*7;
