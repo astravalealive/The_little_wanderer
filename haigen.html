@@ -9787,7 +9787,7 @@ if(c.t<=0&&!c.target&&!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=
 const choose=types=>{const list=nearby.filter(o=>types.includes(o.type));return list.length?list[Math.floor(Math.random()*list.length)]:null};
 const roll=Math.random();c.target=null;
 if(rabbit&&roll<.42){const food=choose(['flower','bush']);if(food){c.mode='foraging';c.target={x:food.x,y:food.y+22};c.t=12000}}
-else if(!rabbit&&roll<.16&&dist(c,ruins)<110){const tx=ruins.x+rand(-75,75),ty=ruins.y+rand(-75,75);if(lakeLevel(tx,ty)>=.76&&![.25,.5,.75,1].some(t=>blockedBySolid(c.x+(tx-c.x)*t,c.y+(ty-c.y)*t)||lakeLevel(c.x+(tx-c.x)*t,c.y+(ty-c.y)*t)<.76)){c.mode='investigating';c.target={x:tx,y:ty};c.t=5000}}
+else if(!rabbit&&roll<.16&&dist(c,ruins)<110){const tx=ruins.x+rand(-75,75),ty=ruins.y+rand(-75,75);if(lakeLevel(tx,ty)>=.76&&![.25,.5,.75,1].some(t=>blockedBySolid(c.x+(tx-c.x)*t,c.y+(ty-c.y)*t)||lakeLevel(c.x+(tx-c.x)*t,c.y+(ty-c.y)*t)<.76)){c.mode='investigating';c.target={x:tx,y:ty};c.patrolTarget=c.target;c.patrolStallMs=0;c.t=5000}}
 else if(!rabbit&&roll<.35){const prey=choose(['bush','mushroom']);if(prey){c.mode='stalking';c.target={x:prey.x+rand(-25,25),y:prey.y+rand(-15,15)};c.t=12000}}
 if(!c.target){if(roll<.28&&(rabbit||!beasts.some(b=>animalAlive(b)&&b.mode!=='retreating'&&dist(b,c)<220))){c.mode='resting';c.t=rand(2800,6500)}
 else if(roll<.53){c.mode='watching';c.t=rand(2800,5200)}
@@ -9796,6 +9796,12 @@ else{c.mode='investigating';c.target={x:clamp(c.x+rand(-110,110),WORLD_MIN+60,WO
 if(c.mode==='pouncing'&&c.t<=0){c.mode='watching';c.t=rand(2500,5000)}
 if(c.target){const d=dist(c,c.target);if(d>3){const speed=c.mode==='fleeing'?.19:c.mode==='called'?.105:c.mode==='defending'?.35:c.mode==='delivering'?.065:c.mode==='returning'?.09:c.mode==='stalking'?.027:rabbit?.044:.039;const step=Math.min(d,dt*speed);const nx=c.x+(c.target.x-c.x)/d*step,ny=c.y+(c.target.y-c.y)/d*step;const limit=rabbit?1.025:.76;if(lakeLevel(nx,ny)>=limit){c.facing=c.target.x>=c.x?1:-1;c.x=nx;c.y=ny;c.moving=true}else{c.target=null;c.mode='watching';c.t=rand(1800,3500);c.moving=false}}else c.moving=false}else c.moving=false;
 if(c.mode==='pouncing'){const nx=c.x+(c.pounceX-c.x)*Math.min(1,dt*.004),ny=c.y+(c.pounceY-c.y)*Math.min(1,dt*.004);if(lakeLevel(nx,ny)> (rabbit?1.025:.76)){c.x=nx;c.y=ny}else{c.mode='watching';c.t=2500}}
+if(!rabbit){
+ if(c.mode==='investigating'&&c.target&&c.target===c.patrolTarget){
+  c.patrolStallMs=Math.hypot(c.x-oldX,c.y-oldY)<.3? (c.patrolStallMs||0)+dt:0;
+  if(c.patrolStallMs>1200){c.target=null;c.mode='watching';c.t=rand(1800,3500);c.patrolTarget=null;c.patrolStallMs=0}
+ }else{c.patrolTarget=null;c.patrolStallMs=0}
+}
 trackMotion(c,oldX,oldY,c.x,c.y,dt);
 }const activePad=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const rightX=activePad&&Math.abs(activePad.axes[2]||0)>.2?activePad.axes[2]:0,rightY=activePad&&Math.abs(activePad.axes[3]||0)>.2?activePad.axes[3]:0;const smoothing=Math.min(1,dt*((rightX||rightY)? .008 : .005));look.x+=(rightX*270-look.x)*smoothing;look.y+=(rightY*210-look.y)*smoothing;// Follow the player, but honour active finger pans. Once released, return smoothly.
 // Pan feels direct under the finger. Release holds the view briefly before a gentle recenter.
