@@ -721,6 +721,11 @@ function islandTerrainRGB(x,y){
  // Fade naturally through the existing snow weight; leave other biomes untouched.
  const tundraStone=expandedRegion(x,y)?.id==='snow'?Math.sin(x*.0047+y*.0021)*Math.cos(y*.0039-x*.0018)*3.2*snow*(1-snow*.45):0;
  red+=tundraStone*.75;green+=tundraStone*.88;blue+=tundraStone;
+ // Northern Tundra: faint icy-blue and exposed-rock colour variation in existing snow.
+ // Decorative RGB only; feather at the snow biome edge, without changing terrain.
+ const tundraEdge=expandedRegion(x,y)?.id==='snow'?snow:0;
+ const tundraIce=Math.sin(x*.0043-y*.0024)*Math.cos(y*.0041+x*.0019)*2.8*tundraEdge;
+ red+=tundraIce*.55;green+=tundraIce*.83;blue+=tundraIce;
  // Ashen Expanse: restrained ash-and-stone mottling fades with the existing biome blend.
  // Decorative colour only; no terrain, object or collision changes.
  const ashenGrain=expandedRegion(x,y)?.id==='wasteland'?Math.sin(x*.0051+y*.0027)*Math.cos(y*.0043-x*.0022)*3.5*waste:0;
