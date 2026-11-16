@@ -740,8 +740,11 @@ function fenGroundColour(x,y,base){
  const n=Math.sin(x*.018+y*.01)*5+Math.cos(y*.023-x*.014)*4;
  const mud=[88+n,91+n*.65,65+n*.45],water=[48+n*.5,94+n*.55,84+n*.45];
  const grass=[77+n,105+n*.7,76+n*.55];
- const w=Math.max(0,wet*(1-trail*.9));
- const dry=grass.map((c,i)=>c*(1-trail*.72)+mud[i]*trail*.72);
+ // Ease colour-only pool margins and trail shoulders; hydrology and walkability stay fixed.
+ const poolBlend=coastSmooth(0,1,wet);
+ const trailBlend=coastSmooth(0,1,trail);
+ const w=poolBlend*(1-trailBlend*.9);
+ const dry=grass.map((c,i)=>c*(1-trailBlend*.72)+mud[i]*trailBlend*.72);
  return dry.map((c,i)=>c*(1-w)+water[i]*w);
 }
 const islandChunkSize=512,islandResolution=128,islandCache=new Map();
