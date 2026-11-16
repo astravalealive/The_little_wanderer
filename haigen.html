@@ -1248,6 +1248,9 @@ function drawMountainRiver(nightMix){
  const course=()=>{ctx.beginPath();mountainRiverPoints.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y))};
  // Banks stop before the estuary so they cannot form a stone bar across the lake mouth.
  const bankCourse=()=>{ctx.beginPath();mountainRiverPoints.slice(0,-5).forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y))};
+ // Soft outer bank tint integrates the existing river stones with woodland ground.
+ // Decorative only: the water course and all collision geometry stay unchanged.
+ bankCourse();ctx.strokeStyle=mixColour('rgba(128,145,111,.22)','rgba(91,108,121,.18)',nightMix);ctx.lineWidth=184;ctx.stroke();
  bankCourse();ctx.strokeStyle='#a39e83';ctx.lineWidth=164;ctx.stroke();
  bankCourse();ctx.strokeStyle=mixColour('#79b8c4','#526b91',nightMix);ctx.lineWidth=133;ctx.stroke();
  course();ctx.strokeStyle=mixColour('#3b90af','#34577e',nightMix);ctx.lineWidth=94;ctx.stroke();
