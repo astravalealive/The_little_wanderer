@@ -733,6 +733,10 @@ function islandTerrainRGB(x,y){
  // Colour-only detail, leaving the coast, paths, objects and terrain geometry intact.
  const downsGrain=expandedRegion(x,y)?.id==='downs'?Math.sin(x*.0049+y*.0026)*Math.cos(y*.0041-x*.002)*3.1*coastSmooth(100,380,d):0;
  red+=downsGrain*.78;green+=downsGrain;blue+=downsGrain*.49;
+ // Eastern island dunes: restrained sand-and-stone variation, feathered off the shore.
+ // Decorative colour only; existing island shapes, bridges and objects are unchanged.
+ const easternIslandGrain=expandedRegion(x,y)?.id==='eastDunes'?Math.sin(x*.0048+y*.0024)*Math.cos(y*.0042-x*.0021)*3.1*coastSmooth(85,330,d):0;
+ red+=easternIslandGrain;green+=easternIslandGrain*.82;blue+=easternIslandGrain*.57;
  const woodlandBank=(1-coastSmooth(700,1400,x))*(1-coastSmooth(350,900,Math.abs(y-1700)));
  const beach=coastSmooth(125-60*woodlandBank,540-320*woodlandBank,d);
  const shore=[232-20*snow-35*waste+5*desert,205+18*snow-30*waste,157+49*snow-15*waste-8*desert];
