@@ -730,6 +730,10 @@ function islandTerrainRGB(x,y){
  // Decorative colour only; no terrain, object or collision changes.
  const ashenGrain=expandedRegion(x,y)?.id==='wasteland'?Math.sin(x*.0051+y*.0027)*Math.cos(y*.0043-x*.0022)*3.5*waste:0;
  red+=ashenGrain;green+=ashenGrain*.91;blue+=ashenGrain*.84;
+ // Ashen Expanse: muted charcoal and exposed-stone colour variation in existing ground.
+ // RGB only; existing wasteland blend fades the effect at its boundaries.
+ const ashenStone=expandedRegion(x,y)?.id==='wasteland'?Math.sin(x*.0044-y*.0022)*Math.cos(y*.0037+x*.0021)*2.9*waste:0;
+ red+=ashenStone*.78;green+=ashenStone*.83;blue+=ashenStone*.91;
  // Eastern Desert: low-frequency sand-and-stone variation fades at the existing biome edge.
  // Decorative colour only; Thrummaw, scenery, paths and terrain geometry remain unchanged.
  const desertStone=expandedRegion(x,y)?.id==='desert'?Math.sin(x*.0046+y*.0023)*Math.cos(y*.0038-x*.0021)*3.4*desert:0;
