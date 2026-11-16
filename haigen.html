@@ -9757,7 +9757,10 @@ if(!rabbit){
  if(threat){c.gift=null;c.mode='defending';c.target={x:threat.x,y:threat.y};c.t=900}
  else if(c.mode==='defending'){c.mode='returning';c.target={x:ruins.x+38,y:ruins.y+42};c.t=6000}
  else if(!c.gift&&c.mode!=='called'&&c.mode!=='delivering'&&c.mode!=='returning'&&dist(c,ruins)>160){c.mode='returning';c.target={x:ruins.x+38,y:ruins.y+42};c.t=6000}
- else if(!c.gift&&c.mode==='returning'&&dist(c,ruins)<80){c.mode='resting';c.target=null;c.t=rand(3200,8000)}
+ else if(!c.gift&&c.mode==='returning'&&dist(c,ruins)<80){
+  const safeToWatch=!beasts.some(b=>animalAlive(b)&&b.mode!=='retreating'&&dist(b,c)<220);
+  c.mode=safeToWatch&&Math.random()<.35?'watching':'resting';c.target=null;c.t=c.mode==='watching'?rand(1800,3600):rand(3200,8000)
+ }
 }
 if(c.gift){if(dist(c,state)<85){const gift=c.gift;c.gift=null;c.mode='watching';c.target=null;c.t=rand(2800,5000);if(gift==='leaves')state.leaves+=1;else if(gift==='twigs')state.twigs+=1;else if(gift==='wood')gainWood(1);else if(gift==='berries')state.berries+=1;mindEvent('gift',rabbit?'Dylan':'Skölli');notify((rabbit?'🐇 Dylan':'🦊 Skölli')+' brought Haigen '+(gift==='berries'?'some berries':gift==='leaves'?'a handful of leaves':gift==='twigs'?'a twig':'a stick')+'! 🎁');save()}
 else{c.mode='delivering';c.target={x:clamp(state.x+(rabbit?30:-35),WORLD_MIN+60,WORLD-60),y:clamp(state.y+30,WORLD_MIN+60,WORLD-60)};c.t=7000}}
