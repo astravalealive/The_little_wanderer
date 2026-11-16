@@ -9778,7 +9778,12 @@ if(rabbit&&c.mode==='fleeing'&&c.fleeUntil<=time){
 if(c.mode==='called'&&c.target&&dist(c,c.target)<38){c.mode='watching';c.t=rand(1600,3200);c.target=null}
 if(!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=='fleeing'&&rabbit&&distance>330){c.mode='returning';c.target={x:clamp(state.x+(rabbit?42:-70),WORLD_MIN+60,WORLD-60),y:clamp(state.y+55,WORLD_MIN+60,WORLD-60)};c.t=6000}
 if(c.mode==='returning'&&distance<105&&rabbit){c.mode='watching';c.target=null;c.t=rand(1300,3000)}
-const arrived=c.target&&dist(c,c.target)<(c.mode==='stalking'?46:24);
+if(rabbit){
+ if(c.alertForageUntil&&c.mode==='watching'&&c.target&&time>=c.alertForageUntil){c.mode='foraging';c.alertForageUntil=0}
+ else if(c.alertForageUntil&&c.mode!=='watching')c.alertForageUntil=0;
+ if(c.mode==='foraging'&&c.target&&!(c.fleeUntil>time)&&time>=(c.nextPredatorAlertAt||0)&&beasts.some(b=>animalAlive(b)&&b.kind==='wolf'&&b.mode!=='retreating'&&dist(b,c)<300)&&Math.random()<.012){c.mode='watching';c.alertForageUntil=time+rand(500,950);c.nextPredatorAlertAt=time+rand(7000,12000)}
+}
+const arrived=c.target&&!(rabbit&&c.alertForageUntil>time)&&dist(c,c.target)<(c.mode==='stalking'?46:24);
 if(arrived){if(c.mode==='foraging'){c.mode='nibbling';c.t=rand(2400,5200);c.target=null;c.nibbles=(c.nibbles||0)+1}
 else if(c.mode==='stalking'){c.mode='pouncing';c.t=650;c.pounceX=c.target.x;c.pounceY=c.target.y;c.target=null}
 else if(c.mode==='investigating'){c.mode='sniffing';c.t=rand(1600,3400);c.target=null}
@@ -9795,7 +9800,7 @@ else if(roll<.77){c.mode='sniffing';c.t=rand(2400,4600)}
 else{c.mode='investigating';c.target={x:clamp(c.x+rand(-110,110),WORLD_MIN+60,WORLD-60),y:clamp(c.y+rand(-95,95),WORLD_MIN+60,WORLD-60)};c.t=5000}}}
 if(c.mode==='pouncing'&&c.t<=0){c.mode='watching';c.t=rand(2500,5000)}
 if(rabbit&&c.mode==='foraging'&&c.target&&time>=(c.nextForagePauseAt||Infinity)){c.foragePauseUntil=time+rand(450,900);c.nextForagePauseAt=time+rand(4500,8500)}
-if(c.target){const d=dist(c,c.target);if(rabbit&&c.mode==='foraging'&&time<(c.foragePauseUntil||0)){c.moving=false}else if(d>3){const speed=c.mode==='fleeing'?.19:c.mode==='called'?.105:c.mode==='defending'?.35:c.mode==='delivering'?.065:c.mode==='returning'?.09:c.mode==='stalking'?.027:rabbit?.044:.039;const step=Math.min(d,dt*speed);const nx=c.x+(c.target.x-c.x)/d*step,ny=c.y+(c.target.y-c.y)/d*step;const limit=rabbit?1.025:.76;if(lakeLevel(nx,ny)>=limit){c.facing=c.target.x>=c.x?1:-1;c.x=nx;c.y=ny;c.moving=true}else{c.target=null;c.mode='watching';c.t=rand(1800,3500);c.moving=false}}else c.moving=false}else c.moving=false;
+if(c.target){const d=dist(c,c.target);if(rabbit&&((c.mode==='foraging'&&time<(c.foragePauseUntil||0))||(c.mode==='watching'&&c.alertForageUntil>time))){c.moving=false}else if(d>3){const speed=c.mode==='fleeing'?.19:c.mode==='called'?.105:c.mode==='defending'?.35:c.mode==='delivering'?.065:c.mode==='returning'?.09:c.mode==='stalking'?.027:rabbit?.044:.039;const step=Math.min(d,dt*speed);const nx=c.x+(c.target.x-c.x)/d*step,ny=c.y+(c.target.y-c.y)/d*step;const limit=rabbit?1.025:.76;if(lakeLevel(nx,ny)>=limit){c.facing=c.target.x>=c.x?1:-1;c.x=nx;c.y=ny;c.moving=true}else{c.target=null;c.mode='watching';c.t=rand(1800,3500);c.moving=false}}else c.moving=false}else c.moving=false;
 if(c.mode==='pouncing'){const nx=c.x+(c.pounceX-c.x)*Math.min(1,dt*.004),ny=c.y+(c.pounceY-c.y)*Math.min(1,dt*.004);if(lakeLevel(nx,ny)> (rabbit?1.025:.76)){c.x=nx;c.y=ny}else{c.mode='watching';c.t=2500}}
 if(!rabbit){
  if(c.mode==='investigating'&&c.target&&c.target===c.patrolTarget){
