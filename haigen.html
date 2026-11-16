@@ -11710,20 +11710,23 @@ cv.addEventListener('pointerup',hwRealFinish,true);cv.addEventListener('pointerc
 
 
 function frame(now){
+ const diag=window.__haigenPerfDiag,measure=!!(diag&&diag.enabled),frameStart=measure?performance.now():0,frameGap=measure&&diag.lastFrame?now-diag.lastFrame:0;if(measure)diag.lastFrame=now;
  const dt=Math.min(Math.max(0,now-last),50);last=now;
  if(state.resting&&!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;if(state.autonomy){autoPause=0;autoPlan('danger woke me: escape','escape')}notify('⚠️ Danger nearby! Haigen wakes up.');}
  try{
   menuController();
-  if(!$('overlay').classList.contains('open'))update(dt);
+  if(!$('overlay').classList.contains('open')){const t=measure?performance.now():0;update(dt);if(measure)diag.updateMs+=performance.now()-t}
   if(!Number.isFinite(cam.x)||!Number.isFinite(cam.y)){cam.x=Number(state.x)||1250;cam.y=Number(state.y)||1310;}
-  draw();
+  let t=measure?performance.now():0;draw();
   if(visitorRoom==='saltwick')drawSaltwickInterior();
  if(visitorRoom==='home')drawHomeInteriorScene(true);
   else if(visitorRoom==='stump'||visitorRoom==='vault')drawTrollStumpInterior(true);
   else if(!state.autonomy&&!cameraDetached&&!autonomousHomeVisit){drawHomeInteriorScene();drawTrollStumpInterior()}
+  if(measure)diag.renderMs+=performance.now()-t;
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
  }catch(error){reportWorldError(error);}
+ if(measure){diag.frameMs.push(performance.now()-frameStart);if(diag.frameMs.length>60)diag.frameMs.shift();diag.frameGapMs.push(frameGap);if(diag.frameGapMs.length>60)diag.frameGapMs.shift();diag.frames++;if(now-diag.lastPanel>=500){diag.lastPanel=now;diag.renderPanel()}}
  requestAnimationFrame(frame);
 }// Same-origin GitHub Pages version check. Updates are opt-in, never interrupt play.
 // Temporary in-game preview recovery and status controls.
@@ -11731,8 +11734,11 @@ function frame(now){
  previewTools.id='v121PreviewTools';
  previewTools.setAttribute('aria-label','Haigen preview troubleshooting');
  previewTools.style.cssText='position:fixed;z-index:8;left:9px;top:calc(env(safe-area-inset-top,0px) + 93px);display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:min(90vw,300px);pointer-events:auto';
- previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>Game troubleshooting</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewFriends" class="btn" style="font-size:11px;padding:5px">🐇 Meet Dylan &amp; Skölli</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
+ previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>Game troubleshooting</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewFriends" class="btn" style="font-size:11px;padding:5px">🐇 Meet Dylan &amp; Skölli</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button><button type="button" id="previewPerfToggle" class="btn" style="font-size:11px;padding:5px">📊 Performance: Off</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
  document.body.appendChild(previewTools);
+ const perfPanel=document.createElement('div');perfPanel.id='haigenPerfPanel';perfPanel.style.cssText='position:fixed;z-index:30;right:9px;top:calc(env(safe-area-inset-top,0px) + 9px);max-width:min(88vw,270px);padding:8px 10px;border:1px solid #c7b47b;border-radius:8px;background:#102b25ed;color:#fff0cf;font:11px/1.45 ui-monospace,monospace;white-space:pre-line;pointer-events:none;display:none';document.body.appendChild(perfPanel);
+ window.__haigenPerfDiag={enabled:false,frames:0,updateMs:0,renderMs:0,frameMs:[],frameGapMs:[],lastFrame:0,lastPanel:0,renderPanel(){const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;const mem=performance.memory&&Number.isFinite(performance.memory.usedJSHeapSize)?'Heap: '+(performance.memory.usedJSHeapSize/1048576).toFixed(1)+' MB':'Heap: unavailable in this browser';perfPanel.textContent='PERFORMANCE DIAGNOSTICS\nFPS: '+(1000/Math.max(1,avg(this.frameGapMs))).toFixed(1)+'\nFrame work: '+avg(this.frameMs).toFixed(2)+' ms avg\nUpdate: '+(this.updateMs/Math.max(1,this.frames)).toFixed(2)+' ms avg\nRender: '+(this.renderMs/Math.max(1,this.frames)).toFixed(2)+' ms avg\n'+mem+'\nSamples: '+this.frameMs.length;perfPanel.style.display=this.enabled?'block':'none'}};
+ $('previewPerfToggle').onclick=()=>{const d=window.__haigenPerfDiag;d.enabled=!d.enabled;d.frames=0;d.updateMs=0;d.renderMs=0;d.frameMs=[];d.frameGapMs=[];d.lastFrame=0;d.lastPanel=0;$('previewPerfToggle').textContent='📊 Performance: '+(d.enabled?'On':'Off');perfPanel.style.display=d.enabled?'block':'none';if(d.enabled)d.renderPanel()};
  // Optional field guide for visual inspection. Never inserts artificial wildlife
  // into the actual map, changes the creature AI or writes to saved progress.
  const guideNames=['Skölli','Dylan','frog',...Object.keys(illustratedFaunaCells).filter(k=>k!=='frog'),...Object.keys(extraFaunaCells)];
