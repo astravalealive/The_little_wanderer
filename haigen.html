@@ -11717,11 +11717,12 @@ function frame(now){
   menuController();
   if(!$('overlay').classList.contains('open')){const t=measure?performance.now():0;update(dt);if(measure)diag.updateMs+=performance.now()-t}
   if(!Number.isFinite(cam.x)||!Number.isFinite(cam.y)){cam.x=Number(state.x)||1250;cam.y=Number(state.y)||1310;}
-  let t=measure?performance.now():0;draw();if(measure)diag.renderMs+=performance.now()-t;
+  let t=measure?performance.now():0;draw();
   if(visitorRoom==='saltwick')drawSaltwickInterior();
  if(visitorRoom==='home')drawHomeInteriorScene(true);
   else if(visitorRoom==='stump'||visitorRoom==='vault')drawTrollStumpInterior(true);
   else if(!state.autonomy&&!cameraDetached&&!autonomousHomeVisit){drawHomeInteriorScene();drawTrollStumpInterior()}
+  if(measure)diag.renderMs+=performance.now()-t;
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
  }catch(error){reportWorldError(error);}
