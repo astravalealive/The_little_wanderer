@@ -9784,7 +9784,7 @@ const choose=types=>{const list=nearby.filter(o=>types.includes(o.type));return 
 const roll=Math.random();c.target=null;
 if(rabbit&&roll<.42){const food=choose(['flower','bush']);if(food){c.mode='foraging';c.target={x:food.x,y:food.y+22};c.t=12000}}
 else if(!rabbit&&roll<.35){const prey=choose(['bush','mushroom']);if(prey){c.mode='stalking';c.target={x:prey.x+rand(-25,25),y:prey.y+rand(-15,15)};c.t=12000}}
-if(!c.target){if(roll<.28){c.mode='resting';c.t=rand(2800,6500)}
+if(!c.target){if(roll<.28&&(rabbit||!beasts.some(b=>animalAlive(b)&&b.mode!=='retreating'&&dist(b,c)<220))){c.mode='resting';c.t=rand(2800,6500)}
 else if(roll<.53){c.mode='watching';c.t=rand(2800,5200)}
 else if(roll<.77){c.mode='sniffing';c.t=rand(2400,4600)}
 else{c.mode='investigating';c.target={x:clamp(c.x+rand(-110,110),WORLD_MIN+60,WORLD-60),y:clamp(c.y+rand(-95,95),WORLD_MIN+60,WORLD-60)};c.t=5000}}}
