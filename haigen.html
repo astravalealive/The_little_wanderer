@@ -364,6 +364,12 @@ function updateWoodlandDeer(dt){
   // Job 29: briefly stand still after alarm before normal grazing resumes.
   if(time<a.scaredUntil||time<a.alertUntil)a.settleUntil=Math.max(a.settleUntil||0,Math.max(a.scaredUntil,a.alertUntil)+650+seeded(a.phase+29)*650);
   if(time>=a.scaredUntil&&time>=a.alertUntil&&time<(a.settleUntil||0)&&d>230){a.walking=false;a.pause=Math.max(a.pause,200);continue}
+  // Job 30: rare distant curiosity uses the existing alert pose without changing deer paths.
+  if(d>270&&time>a.scaredUntil&&time>a.alertUntil&&time>=(a.curiosityNextAt||0)){
+   a.curiosityNextAt=time+18000+seeded(a.phase+30)*17000;
+   const bird=birds.find(b=>b.air>.2&&Math.hypot(a.x-b.x,a.y-b.y)<170);
+   if(bird&&seeded(a.phase+Math.floor(time/17000))>.65){a.alertUntil=time+850;a.face=bird.x<a.x?-1:1;a.pause=Math.max(a.pause,850)}
+  }
   // Job 25: rare quiet rests use the existing stationary forage pose.
   const quiet=d>250&&time>a.scaredUntil&&time>a.alertUntil;
   if(!quiet)a.restUntil=0;
@@ -7690,6 +7696,11 @@ function updateSquirrel(c,dt){
   }
   return;
  }
+ // Job 30: occasional curiosity about nearby grounded birds uses the watch pose only.
+ if(mode==='forage'&&threatDistance>190&&time>=c.squirrelNextAt&&rbWoodland(c.x,c.y)&&
+    seeded(c.phase+Math.floor(time/16000)+30)>.91&&birds.some(b=>b.air<.03&&Math.hypot(c.x-b.x,c.y-b.y)<110)){
+  c.squirrelMode='watch';c.squirrelNextAt=time+1000+seeded(c.phase+30)*850;return;
+ }
  // Quiet squirrels pause using the existing watch pose; threats still take priority above.
  if(mode==='forage'&&threatDistance>190&&time>=c.squirrelNextAt&&seeded(c.phase+Math.floor(time/13000))>(woodlandDailyPhase()===1?.78:woodlandDailyPhase()===3?.72:.91)){
   c.squirrelMode='watch';c.squirrelNextAt=time+2500+seeded(c.phase+9)*2500;return;
@@ -8075,6 +8086,9 @@ function updateBirds(dt){
     if(b.pecking&&time>(b.nextWormAt||0)){
      b.wormUntil=time+600;b.nextWormAt=time+4500+seeded(b.phase+Math.floor(time/4000))*6500;
     }
+    // Job 30: occasional woodland curiosity pauses pecking when calm deer pass nearby.
+    if(woodlandIdle&&!nearby&&woodlandDeer.some(d=>time>d.scaredUntil&&Math.hypot(b.x-d.x,b.y-d.y)<125)&&
+       seeded(b.phase+Math.floor(time/15000)+30)>.91){b.pecking=false;b.wormUntil=0}
     // Woodland birds occasionally rest in place using existing idle atlas frames.
     const daily=woodlandDailyPhase();
     const resting=woodlandIdle&&!nearby&&Math.sin(time*.00032+b.phase)>(daily===1?.65:daily===3?.45:daily===0?.94:.84);
