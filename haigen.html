@@ -9779,8 +9779,10 @@ if(c.mode==='called'&&c.target&&dist(c,c.target)<38){c.mode='watching';c.t=rand(
 if(!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=='fleeing'&&rabbit&&distance>330){c.mode='returning';c.target={x:clamp(state.x+(rabbit?42:-70),WORLD_MIN+60,WORLD-60),y:clamp(state.y+55,WORLD_MIN+60,WORLD-60)};c.t=6000}
 if(c.mode==='returning'&&distance<105&&rabbit){c.mode='watching';c.target=null;c.t=rand(1300,3000)}
 if(rabbit){
- if(c.alertForageUntil&&c.mode==='watching'&&c.target&&time>=c.alertForageUntil){c.mode='foraging';c.alertForageUntil=0}
- else if(c.alertForageUntil&&c.mode!=='watching')c.alertForageUntil=0;
+ if(c.alertForageUntil&&time>=c.alertForageUntil){
+  if(c.mode==='watching'&&c.target)c.mode='foraging';
+  c.alertForageUntil=0;
+ }else if(c.alertForageUntil&&(c.mode!=='watching'||!c.target))c.alertForageUntil=0;
  if(c.mode==='foraging'&&c.target&&!(c.fleeUntil>time)&&time>=(c.nextPredatorAlertAt||0)&&beasts.some(b=>animalAlive(b)&&b.kind==='wolf'&&b.mode!=='retreating'&&dist(b,c)<300)&&Math.random()<.012){c.mode='watching';c.alertForageUntil=time+rand(500,950);c.nextPredatorAlertAt=time+rand(7000,12000)}
 }
 const arrived=c.target&&!(rabbit&&c.alertForageUntil>time)&&dist(c,c.target)<(c.mode==='stalking'?46:24);
