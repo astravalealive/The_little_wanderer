@@ -686,6 +686,7 @@ function drawEasternBridges(left,right,top,bottom){
 function islandTerrainRGB(x,y){
  let red=145,green=183,blue=110,snow=0,waste=0,desert=0;
  const p=biomePosition(x,y);
+ const terrainRegion=expandedRegion(x,y);
  for(let i=0;i<biomePalette.length;i++){
   const r=biomePalette[i];
   // V291: continuous biome blending instead of 24-unit pixel-cell boundary jitter.
@@ -696,13 +697,13 @@ function islandTerrainRGB(x,y){
   red+=(r.rgb[0]-red)*w;green+=(r.rgb[1]-green)*w;blue+=(r.rgb[2]-blue)*w;
   if(r.id==='snow')snow=w;if(r.id==='wasteland')waste=w;if(r.id==='desert')desert=w;
  }
- if(expandedRegion(x,y)?.id==='fen')return fenGroundColour(x,y,[red,green,blue]);
+ if(terrainRegion?.id==='fen')return fenGroundColour(x,y,[red,green,blue]);
  const river=easternRiverDepth(x,y);if(river<0&&islandDepth(x,y)>80){const bank=coastSmooth(-25,0,river);return [37+35*bank,112+49*bank,136+40*bank]}
  // Keep the coastline visually calmer while retaining existing inland terrain texture.
  const d=islandDepth(x,y),noise=(Math.sin(x*.032+y*.012)+Math.sin(y*.069-x*.023))*2.5;
  // Northern Tundra: soften fine ground speckling where snow meets exposed stone.
  // Keep the coastline, biome boundaries and all non-snow regions unchanged.
- const tundraCalm=expandedRegion(x,y)?.id==='snow'?1-.45*snow:1;
+ const tundraCalm=terrainRegion?.id==='snow'?1-.45*snow:1;
  const landNoise=noise*coastSmooth(0,120,d)*tundraCalm;
  if(d<0){
   const t=coastSmooth(0,240,-d),foam=1-coastSmooth(0,13,Math.abs(d+3));
@@ -725,44 +726,44 @@ function islandTerrainRGB(x,y){
  red+=woodlandMoss*.57;green+=woodlandMoss;blue+=woodlandMoss*.52;
  // Subtle cold-stone undertones in the snow transition, without new terrain patches.
  // Fade naturally through the existing snow weight; leave other biomes untouched.
- const tundraStone=expandedRegion(x,y)?.id==='snow'?Math.sin(x*.0047+y*.0021)*Math.cos(y*.0039-x*.0018)*3.2*snow*(1-snow*.45):0;
+ const tundraStone=terrainRegion?.id==='snow'?Math.sin(x*.0047+y*.0021)*Math.cos(y*.0039-x*.0018)*3.2*snow*(1-snow*.45):0;
  red+=tundraStone*.75;green+=tundraStone*.88;blue+=tundraStone;
  // Northern Tundra: faint icy-blue and exposed-rock colour variation in existing snow.
  // Decorative RGB only; feather at the snow biome edge, without changing terrain.
- const tundraEdge=expandedRegion(x,y)?.id==='snow'?snow:0;
+ const tundraEdge=terrainRegion?.id==='snow'?snow:0;
  const tundraIce=Math.sin(x*.0043-y*.0024)*Math.cos(y*.0041+x*.0019)*2.8*tundraEdge;
  red+=tundraIce*.55;green+=tundraIce*.83;blue+=tundraIce;
  // Ashen Expanse: restrained ash-and-stone mottling fades with the existing biome blend.
  // Decorative colour only; no terrain, object or collision changes.
- const ashenGrain=expandedRegion(x,y)?.id==='wasteland'?Math.sin(x*.0051+y*.0027)*Math.cos(y*.0043-x*.0022)*3.5*waste:0;
+ const ashenGrain=terrainRegion?.id==='wasteland'?Math.sin(x*.0051+y*.0027)*Math.cos(y*.0043-x*.0022)*3.5*waste:0;
  red+=ashenGrain;green+=ashenGrain*.91;blue+=ashenGrain*.84;
  // Ashen Expanse: muted charcoal and exposed-stone colour variation in existing ground.
  // RGB only; existing wasteland blend fades the effect at its boundaries.
- const ashenStone=expandedRegion(x,y)?.id==='wasteland'?Math.sin(x*.0044-y*.0022)*Math.cos(y*.0037+x*.0021)*2.9*waste:0;
+ const ashenStone=terrainRegion?.id==='wasteland'?Math.sin(x*.0044-y*.0022)*Math.cos(y*.0037+x*.0021)*2.9*waste:0;
  red+=ashenStone*.78;green+=ashenStone*.83;blue+=ashenStone*.91;
  // Eastern Desert: low-frequency sand-and-stone variation fades at the existing biome edge.
  // Decorative colour only; Thrummaw, scenery, paths and terrain geometry remain unchanged.
- const desertStone=expandedRegion(x,y)?.id==='desert'?Math.sin(x*.0046+y*.0023)*Math.cos(y*.0038-x*.0021)*3.4*desert:0;
+ const desertStone=terrainRegion?.id==='desert'?Math.sin(x*.0046+y*.0023)*Math.cos(y*.0038-x*.0021)*3.4*desert:0;
  red+=desertStone;green+=desertStone*.78;blue+=desertStone*.55;
  // Eastern Desert: warm sand and cooler sandstone variation within existing ground.
  // Decorative colour only; reuse the desert blend to feather out at its boundary.
- const desertSand=expandedRegion(x,y)?.id==='desert'?Math.sin(x*.0042-y*.0021)*Math.cos(y*.0036+x*.0018)*2.8*desert:0;
+ const desertSand=terrainRegion?.id==='desert'?Math.sin(x*.0042-y*.0021)*Math.cos(y*.0036+x*.0018)*2.8*desert:0;
  red+=desertSand;green+=desertSand*.72;blue+=desertSand*.48;
  // Open Downs: gently varied grassy earth, feathered inland from the coastline.
  // Colour-only detail, leaving the coast, paths, objects and terrain geometry intact.
- const downsGrain=expandedRegion(x,y)?.id==='downs'?Math.sin(x*.0049+y*.0026)*Math.cos(y*.0041-x*.002)*3.1*coastSmooth(100,380,d):0;
+ const downsGrain=terrainRegion?.id==='downs'?Math.sin(x*.0049+y*.0026)*Math.cos(y*.0041-x*.002)*3.1*coastSmooth(100,380,d):0;
  red+=downsGrain*.78;green+=downsGrain;blue+=downsGrain*.49;
  // Open Downs: subdued grass, dry-earth and exposed-stone tones in existing ground.
  // Decorative RGB only; fade toward the shoreline without changing any terrain.
- const downsEarth=expandedRegion(x,y)?.id==='downs'?Math.sin(x*.0043-y*.0021)*Math.cos(y*.0037+x*.0019)*2.8*coastSmooth(100,380,d):0;
+ const downsEarth=terrainRegion?.id==='downs'?Math.sin(x*.0043-y*.0021)*Math.cos(y*.0037+x*.0019)*2.8*coastSmooth(100,380,d):0;
  red+=downsEarth*.85;green+=downsEarth;blue+=downsEarth*.58;
  // Eastern island dunes: restrained sand-and-stone variation, feathered off the shore.
  // Decorative colour only; existing island shapes, bridges and objects are unchanged.
- const easternIslandGrain=expandedRegion(x,y)?.id==='eastDunes'?Math.sin(x*.0048+y*.0024)*Math.cos(y*.0042-x*.0021)*3.1*coastSmooth(85,330,d):0;
+ const easternIslandGrain=terrainRegion?.id==='eastDunes'?Math.sin(x*.0048+y*.0024)*Math.cos(y*.0042-x*.0021)*3.1*coastSmooth(85,330,d):0;
  red+=easternIslandGrain;green+=easternIslandGrain*.82;blue+=easternIslandGrain*.57;
  // Western Rainforest: restrained moss-and-damp-earth tones feather into existing ground.
  // Colour only; forest objects, waterways, paths and terrain geometry stay unchanged.
- const rainforestEdge=expandedRegion(x,y)?.id==='rainforest'?coastSmooth(0,130,biomeMargin(expandedRegions.find(r=>r.id==='rainforest'),p)):0;
+ const rainforestEdge=terrainRegion?.id==='rainforest'?coastSmooth(0,130,biomeMargin(expandedRegions.find(r=>r.id==='rainforest'),p)):0;
  const rainforestGrain=Math.sin(x*.0048+y*.0025)*Math.cos(y*.004-x*.0022)*3.2*rainforestEdge;
  red+=rainforestGrain*.63;green+=rainforestGrain;blue+=rainforestGrain*.7;
  const woodlandBank=(1-coastSmooth(700,1400,x))*(1-coastSmooth(350,900,Math.abs(y-1700)));
@@ -770,11 +771,11 @@ function islandTerrainRGB(x,y){
  const shore=[232-20*snow-35*waste+5*desert,205+18*snow-30*waste,157+49*snow-15*waste-8*desert];
  // Southern coast: subtle sand-and-stone tint, fading before the inland ground.
  // Colour only; preserve the existing shore, water and collision geometry.
- const coastalGrain=expandedRegion(x,y)?.id==='coast'?Math.sin(x*.0052+y*.0028)*Math.cos(y*.0044-x*.0023)*3.2*(1-coastSmooth(180,520,d)):0;
+ const coastalGrain=terrainRegion?.id==='coast'?Math.sin(x*.0052+y*.0028)*Math.cos(y*.0044-x*.0023)*3.2*(1-coastSmooth(180,520,d)):0;
  shore[0]+=coastalGrain;shore[1]+=coastalGrain*.83;shore[2]+=coastalGrain*.62;
  // Southern Coast: pale sand, warm earth and coastal-stone colour variation.
  // Shore RGB only; fade inland without changing water or shoreline geometry.
- const coastStone=expandedRegion(x,y)?.id==='coast'?Math.sin(x*.0046-y*.0022)*Math.cos(y*.0038+x*.002)*2.8*(1-coastSmooth(160,500,d)):0;
+ const coastStone=terrainRegion?.id==='coast'?Math.sin(x*.0046-y*.0022)*Math.cos(y*.0038+x*.002)*2.8*(1-coastSmooth(160,500,d)):0;
  shore[0]+=coastStone;shore[1]+=coastStone*.79;shore[2]+=coastStone*.61;
  return [shore[0]*(1-beach)+red*beach+landNoise,
          shore[1]*(1-beach)+green*beach+landNoise,
