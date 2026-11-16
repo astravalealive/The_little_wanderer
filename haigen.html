@@ -737,7 +737,9 @@ function fenArenaDistance(x,y){return Math.min(Math.hypot(x+3150,y-450),Math.hyp
 function fenGroundColour(x,y,base){
  const r=expandedRegion(x,y);if(r?.id!=='fen')return base;
  const wet=fenWater(x,y),trail=1-Math.min(1,Math.max(0,(fenTrailDistance(x,y)-65)/85));
- const n=Math.sin(x*.018+y*.01)*5+Math.cos(y*.023-x*.014)*4;
+ // Keep the existing marsh palette but calm high-frequency colour flecks at wet edges and paths.
+ const edgeCalm=1-.35*Math.max(wet,trail);
+ const n=(Math.sin(x*.018+y*.01)*5+Math.cos(y*.023-x*.014)*4)*edgeCalm;
  const mud=[88+n,91+n*.65,65+n*.45],water=[48+n*.5,94+n*.55,84+n*.45];
  const grass=[77+n,105+n*.7,76+n*.55];
  const w=Math.max(0,wet*(1-trail*.9));
