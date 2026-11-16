@@ -8457,8 +8457,12 @@ function drawFenDetail(night){
   }
  }
  // A raised, uninterrupted route through the heart of the swamp.
- ctx.strokeStyle='#4d503b';ctx.lineWidth=230;ctx.beginPath();
- for(let y=Math.floor(top/30)*30;y<=bottom+30;y+=30){const x=fenTrailX(y);if(y===Math.floor(top/30)*30)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();
+ ctx.beginPath();
+ for(let y=Math.floor(top/30)*30;y<=bottom+30;y+=30){const x=fenTrailX(y);if(y===Math.floor(top/30)*30)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+ // A narrow, translucent silt fringe softens the raised path against wet ground.
+ // The original three path bands and all traversable geometry are unchanged.
+ ctx.strokeStyle='#6d7456';ctx.globalAlpha=.24;ctx.lineWidth=250;ctx.stroke();ctx.globalAlpha=1;
+ ctx.strokeStyle='#4d503b';ctx.lineWidth=230;ctx.stroke();
  ctx.strokeStyle='#85795b';ctx.lineWidth=200;ctx.stroke();
  ctx.strokeStyle='#a39671';ctx.lineWidth=158;ctx.stroke();
 
