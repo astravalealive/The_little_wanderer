@@ -7643,6 +7643,13 @@ function updateSquirrel(c,dt){
  const threat=skolliDistance<haigenDistance?skolli:state;
  const threatDistance=Math.min(haigenDistance,skolliDistance);
  const alertRadius=145+seeded(c.phase+71)*35;
+ // Job 28: nearby startled deer or a passing low bird briefly draw a squirrel's attention.
+ const wildlifeAlert=rbWoodland(c.x,c.y)&&(
+  woodlandDeer.some(d=>time<d.scaredUntil&&Math.hypot(c.x-d.x,c.y-d.y)<145)||
+  birds.some(b=>b.air>.15&&b.air<.85&&Math.hypot(c.x-b.x,c.y-b.y)<65));
+ if(wildlifeAlert&&c.squirrelMode==='forage'&&time>=c.squirrelNextAt){
+  c.squirrelMode='watch';c.squirrelNextAt=time+650+seeded(c.phase+91)*500;
+ }
  if(threatDistance<105&&time>c.scaredUntil)startSquirrelFlee(c,2200+seeded(c.phase+Math.floor(time/1800))*1100,threat);
  else if(threatDistance<alertRadius&&['forage','watch'].includes(c.squirrelMode)&&time>c.squirrelNextAt){
   c.squirrelMode='watch';c.squirrelFacing=threat.x<c.x?'left':'right';
@@ -8010,7 +8017,9 @@ function updateBirds(dt){
   const woodlandBird=rbWoodland(b.x,b.y);
   const skolli=woodlandBird?companions[1]:null;
   const skolliNear=skolli&&Math.hypot(b.x-skolli.x,b.y-skolli.y)<105+seeded(b.phase+31)*35;
-  const nearby=Math.hypot(b.x-state.x,b.y-state.y)<(woodlandBird?105+seeded(b.phase+17)*45:155)||!!skolliNear;
+  // Job 28: birds take a short flight when an already-startled deer comes close.
+  const deerNear=woodlandBird&&woodlandDeer.some(d=>time<d.scaredUntil&&Math.hypot(b.x-d.x,b.y-d.y)<110);
+  const nearby=Math.hypot(b.x-state.x,b.y-state.y)<(woodlandBird?105+seeded(b.phase+17)*45:155)||!!skolliNear||!!deerNear;
   let plan=birdFlockPlans.get(b.flock);
   if(!plan||time>plan.until){
    const leader=birds.find(other=>other.flock===b.flock)||b;
