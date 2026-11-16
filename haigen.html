@@ -9787,6 +9787,7 @@ if(c.t<=0&&!c.target&&!c.gift&&c.mode!=='called'&&c.mode!=='returning'&&c.mode!=
 const choose=types=>{const list=nearby.filter(o=>types.includes(o.type));return list.length?list[Math.floor(Math.random()*list.length)]:null};
 const roll=Math.random();c.target=null;
 if(rabbit&&roll<.42){const food=choose(['flower','bush']);if(food){c.mode='foraging';c.target={x:food.x,y:food.y+22};c.t=12000}}
+else if(!rabbit&&roll<.16&&dist(c,ruins)<110){const tx=ruins.x+rand(-75,75),ty=ruins.y+rand(-75,75);if(lakeLevel(tx,ty)>=.76){c.mode='investigating';c.target={x:tx,y:ty};c.t=5000}}
 else if(!rabbit&&roll<.35){const prey=choose(['bush','mushroom']);if(prey){c.mode='stalking';c.target={x:prey.x+rand(-25,25),y:prey.y+rand(-15,15)};c.t=12000}}
 if(!c.target){if(roll<.28&&(rabbit||!beasts.some(b=>animalAlive(b)&&b.mode!=='retreating'&&dist(b,c)<220))){c.mode='resting';c.t=rand(2800,6500)}
 else if(roll<.53){c.mode='watching';c.t=rand(2800,5200)}
