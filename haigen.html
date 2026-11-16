@@ -361,6 +361,9 @@ function updateWoodlandDeer(dt){
    a.targetX=a.homeX;a.targetY=a.homeY;a.pause=0;
   }
   a.groupGathering=gathering;
+  // Job 29: briefly stand still after alarm before normal grazing resumes.
+  if(time<a.scaredUntil||time<a.alertUntil)a.settleUntil=Math.max(a.settleUntil||0,Math.max(a.scaredUntil,a.alertUntil)+650+seeded(a.phase+29)*650);
+  if(time>=a.scaredUntil&&time>=a.alertUntil&&time<(a.settleUntil||0)&&d>230){a.walking=false;a.pause=Math.max(a.pause,200);continue}
   // Job 25: rare quiet rests use the existing stationary forage pose.
   const quiet=d>250&&time>a.scaredUntil&&time>a.alertUntil;
   if(!quiet)a.restUntil=0;
@@ -7692,6 +7695,8 @@ function updateSquirrel(c,dt){
   c.squirrelMode='watch';c.squirrelNextAt=time+2500+seeded(c.phase+9)*2500;return;
  }
  if(time<c.squirrelNextAt)return;
+ // Job 29: a frightened squirrel watches briefly before resuming forage.
+ if(mode==='watch'&&time<c.scaredUntil+900){c.squirrelNextAt=c.scaredUntil+900+seeded(c.phase+29)*450;return}
  if(mode==='watch'){c.squirrelMode='forage';c.squirrelNextAt=time+(woodlandDailyPhase()===0?550:900)+seeded(c.phase+Math.floor(time/900)+43)*1450;return}
  // Independent, stable rhythms per squirrel; preserve existing modes and destinations.
  const roll=seeded(c.phase+Math.floor(time/1800)*.73+47),tree=squirrelTreeNear(c);
@@ -8054,7 +8059,8 @@ function updateBirds(dt){
    b.heading=Math.atan2(b.vy,b.vx);
    if(distance<65&&!nearby&&birdLandingSuitable(b.x,b.y)){
     b.air=Math.max(0,b.air-step*2.5);
-    if(b.air<.04){b.air=0;b.groundedUntil=time+3500+seeded(b.phase+Math.floor(time/1000))*5500;b.vx=0;b.vy=0}
+    if(b.air<.04){b.air=0;b.groundedUntil=time+3500+seeded(b.phase+Math.floor(time/1000))*5500;b.vx=0;b.vy=0;
+     if(woodlandBird)b.settleUntil=time+800+seeded(b.phase+29)*1100;}
    }
   }else{
    b.air=0;b.vx=0;b.vy=0;
@@ -8064,6 +8070,8 @@ function updateBirds(dt){
     const woodlandIdle=rbWoodland(b.x,b.y);
     const peck=Math.sin(time*(woodlandIdle?.0045+seeded(b.phase+11)*.003:.007)+b.phase);
     b.pecking=peck>(woodlandIdle?(woodlandDailyPhase()===0?.12:.25)+seeded(b.phase+19)*.35:.42);
+    // Job 29: newly landed woodland birds settle before resuming pecking.
+    if(woodlandIdle&&time<(b.settleUntil||0)){b.pecking=false;b.wormUntil=0;continue}
     if(b.pecking&&time>(b.nextWormAt||0)){
      b.wormUntil=time+600;b.nextWormAt=time+4500+seeded(b.phase+Math.floor(time/4000))*6500;
     }
