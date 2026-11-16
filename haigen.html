@@ -717,6 +717,10 @@ function islandTerrainRGB(x,y){
  const woodlandDetail=(Math.sin(x*.009+y*.006)*Math.cos(y*.008-x*.004)*3.2+
   Math.sin(x*.019-y*.013)*1.3)*woodlandFade;
  red+=woodlandDetail*.55;green+=woodlandDetail;blue+=woodlandDetail*.45;
+ // Haigen's Woodlands: faint grass, forest-earth and moss colour variation.
+ // Reuse the existing woodland fade; RGB only, with no new terrain or objects.
+ const woodlandMoss=Math.sin(x*.0045-y*.0022)*Math.cos(y*.0041+x*.0018)*2.7*woodlandFade;
+ red+=woodlandMoss*.57;green+=woodlandMoss;blue+=woodlandMoss*.52;
  // Subtle cold-stone undertones in the snow transition, without new terrain patches.
  // Fade naturally through the existing snow weight; leave other biomes untouched.
  const tundraStone=expandedRegion(x,y)?.id==='snow'?Math.sin(x*.0047+y*.0021)*Math.cos(y*.0039-x*.0018)*3.2*snow*(1-snow*.45):0;
