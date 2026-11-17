@@ -10,6 +10,7 @@ on:
       - 'tests/live/woodland-grid-range.test.cjs'
       - 'tests/live/woodland-road-density.test.cjs'
       - 'tests/live/painted-path-cull.test.cjs'
+      - 'tests/live/woodland-route-reuse.test.cjs'
       - '.github/workflows/forest-visual-evidence.yml'
   workflow_dispatch:
 permissions:
@@ -37,6 +38,8 @@ jobs:
         run: node tests/live/woodland-road-density.test.cjs
       - name: Check painted path glaze viewport culling
         run: node tests/live/painted-path-cull.test.cjs
+      - name: Check reuse of woodland route distances
+        run: node tests/live/woodland-route-reuse.test.cjs
       - name: Capture fixed-camera woodland screenshots
         run: node tests/live/forest-evidence.cjs
       - name: Upload forest screenshots

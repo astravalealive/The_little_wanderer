@@ -8513,7 +8513,7 @@ function drawWoodlandFloorV391(nightMix){
    ctx.beginPath();ctx.moveTo(px-len*.55,py+2);ctx.quadraticCurveTo(px,py-len,px+len*.45,py+1);ctx.stroke();
   }
   // Job 9: restrained, deterministic woodland sun flecks; no lighting system changes.
-  if(nightMix<.38&&!nearHome&&hash(gx,gy,90)>.88&&roadDistance(x,y)>115&&
+  if(nightMix<.38&&!nearHome&&hash(gx,gy,90)>.88&&routeDistance>115&&
    homesteadPlots.every(p=>Math.hypot(x-p.x,y-p.y)>220)){
    ctx.globalAlpha=.13*(1-nightMix/.38);
    ctx.fillStyle='#e4d8a0';ctx.beginPath();
@@ -8522,7 +8522,7 @@ function drawWoodlandFloorV391(nightMix){
   }
   // Job 7: sparse, non-colliding woodland fern and moss details.
   // Painted paths are rendered after this floor pass; keep a generous route buffer.
-  if(!nearHome&&hash(gx,gy,70)>.76&&roadDistance(x,y)>115&&
+  if(!nearHome&&hash(gx,gy,70)>.76&&routeDistance>115&&
    homesteadPlots.every(p=>Math.hypot(x-p.x,y-p.y)>220)){
    const spread=9+hash(gx,gy,71)*7;
    ctx.globalAlpha=.32*(1-dark);
@@ -8541,7 +8541,7 @@ function drawWoodlandFloorV391(nightMix){
    }
   }
   // Jobs 8/17: retain existing litter art; cluster it near real woodland trees.
-  if(!nearHome&&hash(gx,gy,80)>.77&&roadDistance(x,y)>115&&
+  if(!nearHome&&hash(gx,gy,80)>.77&&routeDistance>115&&
    homesteadPlots.every(p=>Math.hypot(x-p.x,y-p.y)>220)){
    let nearTree=false;
    const cx=Math.floor(x/solidCellSize),cy=Math.floor(y/solidCellSize);
