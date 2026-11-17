@@ -1,0 +1,14 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const s=fs.readFileSync('haigen.html','utf8');
+const a=s.indexOf('function rbDrawRock(o){'),b=s.indexOf('\nfunction rbDrawBush(o){',a);
+assert(a>=0&&b>a,'rock renderer');
+const body=s.slice(a,b);
+assert(body.includes("ellipse(o.x,o.y+7,29*scale,9,'#6178582c')"),'lichen apron');
+assert(body.includes("ellipse(o.x,o.y+6,25*scale,7,'#283e3955')"),'original shadow');
+assert(body.indexOf('#6178582c')<body.indexOf('#283e3955'),'layer order');
+assert(body.includes('rbRockImage(o.id)')&&body.includes('ctx.drawImage(c,'),'original sprite');
+assert(!body.includes('Math.random'),'deterministic rendering');
+assert(s.includes('setInterval(save,5000)'),'autosave intact');
+console.log('PASS Job 217 rock base regression');
