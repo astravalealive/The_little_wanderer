@@ -1,0 +1,15 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const s=fs.readFileSync('haigen.html','utf8');
+const a=s.indexOf('function rbDrawFlower(o){'),b=s.indexOf('\nfunction rbDrawMushroom(o){',a);
+assert(a>=0&&b>a,'flower renderer');
+const body=s.slice(a,b);
+assert(body.includes("ellipse(x,y+4,15,5,'#65855229')"),'ground tint');
+assert(body.includes("ellipse(x,y+3,12,4,'#2e604e7a')"),'original shadow');
+assert(body.indexOf('#65855229')<body.indexOf('#2e604e7a'),'layer order');
+assert(body.includes('flowerKind(o)')&&body.includes('f.color'),'existing flower varieties');
+assert(body.includes("p(x-1,y-17,2,17,'#396d53')"),'stem artwork');
+assert(!body.includes('Math.random'),'deterministic visuals');
+assert(s.includes('setInterval(save,5000)'),'save intact');
+console.log('PASS Job 219 flower base regression');
