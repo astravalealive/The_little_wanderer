@@ -11081,7 +11081,7 @@ function raftWalkBoard(dx,dy){
  if(Math.hypot(dx,dy)<.12||Math.hypot(state.x-p.x,state.y-p.y)>62)return false;
  // Require the player to step toward the moored raft, not press Collect.
  const tx=p.x-state.x,ty=p.y-state.y,range=Math.hypot(tx,ty);
- if(range>12&&(dx*tx+dy*ty)/Math.max(.001,Math.hypot(dx,dy)*range)<.35)return false;
+ if(range>12?(dx*tx+dy*ty)/Math.max(.001,Math.hypot(dx,dy)*range)<.35:dx*towardWater<.12)return false;
  state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.moving=false;raft.facing=towardWater;raft.heading=towardWater<0?Math.PI:0;raft.stroke=0;
  notify('🛶 Aboard. Steer freely; paddle into a bank to step ashore.');return true;
 }
@@ -11090,7 +11090,7 @@ function raftMove(dt,dx,dy){
  const mag=Math.hypot(dx,dy);raft.moving=false;
  if(mag<=.10)return;
  const vx=dx/Math.max(1,mag),vy=dy/Math.max(1,mag),speed=dt*.24;
- const nx=state.x+vx*speed,ny=state.y+vy*speed;
+ const nx=state.x+vx*Math.min(speed,12),ny=state.y+vy*Math.min(speed,12);
  const atIsland=onLakeIsland(nx,ny),atMainland=lakeLevel(nx,ny)>1.02;
  // Shore exit is based on actual terrain, not a fixed left/right endpoint.
  if((atIsland||atMainland)&&lakeLevel(state.x,state.y)<1.01&&!onLakeIsland(state.x,state.y)&&!blockedBySolid(nx,ny)){
@@ -11101,6 +11101,8 @@ function raftMove(dt,dx,dy){
  }
  // Remain on lake water; don't sail through mountains, islands or unrelated terrain.
  if(lakeLevel(nx,ny)>1.06&&!onLakeIsland(nx,ny))return;
+ // Reject solid objects even while afloat; never paddle through a shore structure.
+ if(blockedBySolid(nx,ny))return;
  const oldX=state.x,oldY=state.y;
  state.x=nx;state.y=ny;raft.moving=true;raft.pace=1;
  raft.heading=Math.atan2(vy,vx);
