@@ -3824,8 +3824,11 @@ function autoFreedomTick(dt){
  }
  if(job.kind==='fish'){
   if(state.fish>=4)return finish('Fishing gave us enough food for supper.');
-  autoPlan('go fishing at the jetty','freedom-fishing');
-  if(dist(state,jettyPlot)>140){autoTravel(jettyPlot,dt,120,.12);return true}
+  autoPlan('find a shoreline for fishing','freedom-fishing');
+  if(!nearFishableWater(state.x,state.y)){
+   if(dist(state,jettyPlot)>140){autoTravel(jettyPlot,dt,120,.12);return true}
+   return finish('I need a safe stretch of shoreline to cast.');
+  }
   if(!state.castAt){haigenUseRod();autoPause=1300;return true}
   if(Date.now()>=state.biteAt){haigenUseRod();return finish('I landed a fish myself. Maybe I can cook it later.')}
   autoPause=850;return true;
@@ -11330,12 +11333,16 @@ function haigenUseNet(){
  startHaigenAction('net',650);
  notify('🦋 Sweep the net near a butterfly or frog, or return a carried frog to the water.');return false;
 }
+function fishableWaterAt(x,y){
+ return inPond(x,y)||mountainRiverDistance(x,y)<0||easternRiverDepth(x,y)<0||fenWater(x,y)>.72||islandDepth(x,y)<0;
+}
 function nearFishableWater(x,y){
- // Probe nearby shorelines, never require a constructed jetty.
- // Use the existing region-aware water collision helper where available.
- for(let a=0;a<16;a++){
-  const theta=a*Math.PI/8,px=x+Math.cos(theta)*66,py=y+Math.sin(theta)*66;
-  if((typeof inPond==='function'&&inPond(px,py))||(typeof isWater==='function'&&isWater(px,py))||(typeof islandDepth==='function'&&islandDepth(px,py)<0))return true;
+ // A shoreline requires dry ground under Haigen and nearby water.
+ // Keep the lake, mountain river, eastern river, fen and open sea distinct.
+ if(fishableWaterAt(x,y))return false;
+ for(let a=0;a<24;a++){
+  const theta=a*Math.PI/12,px=x+Math.cos(theta)*64,py=y+Math.sin(theta)*64;
+  if(fishableWaterAt(px,py))return true;
  }
  return false;
 }
