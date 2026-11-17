@@ -11042,7 +11042,7 @@ function raftEnds(){
  for(let x=lakeIsland.x+lakeIsland.rx+20;x<pond.x+pond.rx*9;x+=8){
   if(lakeLevel(x,y)>1.04&&lakeLevel(x,y)<1.2&&!blockedBySolid(x,y)){
    let clear=true;for(let q=lakeIsland.x+lakeIsland.rx+8;q<x-16;q+=8)if(lakeLevel(q,y)>1.05)clear=false;
-   if(clear){raft.a={x,y};raft.b=b;raft.ready=true}break;
+   if(clear&&x-b.x>lakeIsland.rx*2){raft.a={x,y};raft.b=b;raft.ready=true;break}
   }
  }
  return raft;
