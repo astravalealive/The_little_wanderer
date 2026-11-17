@@ -11093,7 +11093,7 @@ function raftMove(dt,dx,dy){
  const nx=state.x+vx*speed,ny=state.y+vy*speed;
  const atIsland=onLakeIsland(nx,ny),atMainland=lakeLevel(nx,ny)>1.02;
  // Shore exit is based on actual terrain, not a fixed left/right endpoint.
- if((atIsland||atMainland)&&!blockedBySolid(nx,ny)){
+ if((atIsland||atMainland)&&lakeLevel(state.x,state.y)<1.01&&!onLakeIsland(state.x,state.y)&&!blockedBySolid(nx,ny)){
   // A shallow bank is an exit, regardless of approach direction.
   const berth=atIsland?'island':'shore';
   state.x=nx;state.y=ny;state.raftAfloat=false;state.raftBerth=berth;raft.moving=false;
