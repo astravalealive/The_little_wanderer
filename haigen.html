@@ -8482,7 +8482,11 @@ function drawWoodlandFloorV391(nightMix){
  if((x1+1)*step<=0||x0*step>=3500||(y1+1)*step<=0||y0*step>=3100)return;
  const hash=(x,y,k)=>{let v=Math.sin(x*127.1+y*311.7+k*74.7)*43758.5453;return v-Math.floor(v)};
  ctx.save();ctx.lineCap='round';
- for(let gx=x0;gx<=x1;gx++)for(let gy=y0;gy<=y1;gy++){
+ // Grid samples are always inside [gx*step,(gx+1)*step). Clamp only
+ // impossible outer grid indices; keep every candidate inside woodland.
+ const gxStart=Math.max(x0,0),gxEnd=Math.min(x1,Math.ceil(3500/step)-1);
+ const gyStart=Math.max(y0,0),gyEnd=Math.min(y1,Math.ceil(3100/step)-1);
+ for(let gx=gxStart;gx<=gxEnd;gx++)for(let gy=gyStart;gy<=gyEnd;gy++){
   const x=gx*step+hash(gx,gy,1)*step,y=gy*step+hash(gx,gy,2)*step;
   if(!rbWoodland(x,y))continue;
   const nearHome=Math.hypot(x-cottage.x,y-cottage.y)<310;
