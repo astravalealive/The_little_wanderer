@@ -1,0 +1,12 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const source=fs.readFileSync(path.join(__dirname,'../../haigen.html'),'utf8');
+const start=source.indexOf('function boatwrightJournal(){'),end=source.indexOf('function journal(){',start);
+assert(start>0&&end>start);
+const render=state=>new vm.Script(source.slice(start,end)+';boatwrightJournal()').runInNewContext({state});
+const base={wood:8,raftBuilt:true,skiffLashing:false,skiffBerth:'saltwick'};
+assert.match(render(base),/use Collect to board at the southeast slipway marked SKIFF on your map/);
+assert.match(render({...base,skiffBerth:'island'}),/return to Saltwick boathouse to recall it/);
+assert.match(render({...base,skiffBerth:undefined}),/swamp reed lashing needed/);
+assert.match(render(base),/Ocean Longship:<\/b> Locked/);
+console.log('PASS Job 211: skiff boarding control and existing voyage states');

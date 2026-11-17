@@ -5,7 +5,7 @@ const start=source.indexOf('function boatwrightJournal(){'),end=source.indexOf('
 assert(start>0&&end>start,'Boatwright helper remains adjacent to journal');
 const render=state=>new vm.Script(source.slice(start,end)+';boatwrightJournal()').runInNewContext({state});
 const base={wood:8,raftBuilt:true,skiffLashing:true,skiffBerth:undefined};
-assert.match(render({...base,skiffBerth:'saltwick'}),/moored at Saltwick · board at the southeast slipway marked SKIFF on your map/);
+assert.match(render({...base,skiffBerth:'saltwick'}),/moored at Saltwick · use Collect to board at the southeast slipway marked SKIFF on your map/);
 assert.match(render({...base,skiffBerth:'island'}),/moored at Riverwatch Lighthouse · return to Saltwick boathouse to recall it/);
 assert.match(render(base),/Materials ready · build at Saltwick boathouse/);
 assert.match(render({...base,wood:4,skiffLashing:false}),/gather 4 more carried wood/);
