@@ -1479,7 +1479,7 @@ function syncChickens(){
  }
 }
 syncChickens();
-function checkFishingBite(){if(state.jettyBuilt&&state.castAt&&Date.now()>=state.biteAt&&!state.biteNotified){state.biteNotified=true;notify('🎣 The float is bobbing! Return to your jetty and reel in!')}}
+function checkFishingBite(){if(state.castAt&&Date.now()>=state.biteAt&&!state.biteNotified){state.biteNotified=true;notify('🎣 The float is bobbing! Reel in with your fishing rod!')}}
 function updateChickens(dt){
  if(!state.coopTier)return;
  const now=Date.now(),cycle=270000/Math.max(1,state.henCount);
@@ -3723,7 +3723,7 @@ function autoFreedomTick(dt){
   if(state.tools.shovel&&state.energy>52&&state.health>70&&state.hunger>42&&now>state.digNextAt)add('dig',.95+haigenMind.curiosity/130);
   if(!state.tools.pickaxe)add('forge',2);
   if(state.food<4&&(state.fish||state.rawMeat||state.eggs>=2||state.mushrooms>=3||state.berries>=3))add('cook',3);
-  if(state.fishingRod&&state.jettyBuilt&&state.fish<4)add('fish',2.7);
+  if(state.fishingRod&&state.fish<4)add('fish',2.7);
   if(state.gardenTier&&gardenRipe())add('garden',2.1);
   if(state.wood<8&&state.tools.axe)add('wood',2.5);
   if(nextHaigenTrailProject()&&state.wood>=3&&state.stone>=2&&state.twigs>=1)add('build',2.6);
@@ -6020,27 +6020,16 @@ function homesteadMenu(kind){
    }
   }
  }else if(kind==='jetty'){
-  if(!state.jettyBuilt){
-   info='A simple lakeside fishing landing with stones and a mooring stake.';
-   items.push(['Build fishing landing · 12 wood, 5 stone, 4 twigs',()=>{
-    if(!homesteadCost(12,5,4))return;state.jettyBuilt=true;
-    notify('🎣 Fishing landing ready! Now craft a fishing rod.');save();homesteadMenu(kind)
-   }]);
-  }else{
-   info='Fish caught: '+state.fish+(state.fishingRod?' · Fishing rod equipped.':' · Craft a rod to go fishing.');
-   if(!state.fishingRod)items.push(['Craft rod · 3 wood, 2 twigs',()=>{
-    if(!homesteadCost(3,0,2))return;state.fishingRod=true;equipTool('rod');notify('🎣 Fishing rod crafted!');save();homesteadMenu(kind)
-   }]);
-   else if(!state.castAt)items.push(['Cast fishing line',()=>{
-    state.castAt=Date.now();state.biteAt=state.castAt+5500+Math.floor(Math.random()*4000);state.biteNotified=false;equipTool('rod');startHaigenAction('cast',1050);
-    notify('🎣 Line cast! Return when the float starts to bob.');save();close();
-   }]);
-   else items.push(['Reel in the line',()=>{
-    if(Date.now()<state.biteAt){notify('🎣 No bite yet. Watch the float a little longer.');close();return}
-    const qty=Math.random()<.25?2:1;state.fish+=qty;state.castAt=0;state.biteAt=0;state.biteNotified=false;equipTool('rod');startHaigenAction('land',1350);
-    notify('🐟 Caught '+qty+' lake fish! Cook them at camp.');save();close()
-   }]);
-  }
+  info='ᛟ Boat Building · Craft vessels for voyages. Fish at any accessible shoreline with your rod equipped.';
+  if(!state.fishingRod)items.push(['Craft fishing rod · 3 wood, 2 twigs',()=>{
+   if(!homesteadCost(3,0,2))return;state.fishingRod=true;equipTool('rod');notify('🎣 Rod ready. Fish beside any accessible water.');save();homesteadMenu(kind)
+  }]);
+  if(!state.raftBuilt)items.push(['Build timber lake raft · 8 wood',()=>{
+   if(state.wood<8){notify('🪵 Gather 8 wood for the raft.');return}
+   state.wood-=8;state.raftBuilt=true;state.raftBerth='shore';save();notify('🛶 Timber raft built at the Great Lake landing.');homesteadMenu(kind)
+  }]);
+  else items.push(['Timber lake raft · built ✓',()=>notify('🛶 Walk onto the raft at the Great Lake landing.')]);
+  items.push(['Future vessels · plans locked',()=>notify('ᛟ Gather resources from new lands to unlock larger boats.')]);
  }
  open('<h2>'+plot.name+'</h2><p>'+info+'</p><p class="small">🪵 '+state.wood+' carried + '+state.woodStored+' stored · 🪨 '+state.stone+' · 🌿 '+state.twigs+' · 🍓 '+state.berries+'</p>'+items.map((a,i)=>'<p><button class="btn" style="width:100%" id="homesteadAction'+i+'">'+a[0]+'</button></p>').join('')+'<p class="small">Tap the build patch or press X Collect beside it. Saves automatically.</p>');
  items.forEach((a,i)=>{$('homesteadAction'+i).onclick=a[1]});
@@ -11341,10 +11330,19 @@ function haigenUseNet(){
  startHaigenAction('net',650);
  notify('🦋 Sweep the net near a butterfly or frog, or return a carried frog to the water.');return false;
 }
+function nearFishableWater(x,y){
+ // Probe nearby shorelines, never require a constructed jetty.
+ // Use the existing region-aware water collision helper where available.
+ for(let a=0;a<16;a++){
+  const theta=a*Math.PI/8,px=x+Math.cos(theta)*66,py=y+Math.sin(theta)*66;
+  if((typeof inPond==='function'&&inPond(px,py))||(typeof isWater==='function'&&isWater(px,py))||(typeof islandDepth==='function'&&islandDepth(px,py)<0))return true;
+ }
+ return false;
+}
 function haigenUseRod(){
- if(!state.fishingRod){notify('🎣 Craft a fishing rod at the jetty.');return false}
- if(!state.jettyBuilt||dist(state,jettyPlot)>158){
-  notify('🎣 Find the fishing jetty before casting.');return false;
+ if(!state.fishingRod){notify('🎣 Craft a fishing rod at the boat landing.');return false}
+ if(!nearFishableWater(state.x,state.y)){
+  notify('🎣 Stand near accessible water to cast your line.');return false;
  }
  if(!state.castAt){
   state.castAt=Date.now();
