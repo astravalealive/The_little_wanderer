@@ -1,0 +1,17 @@
+name: Woodland rock base 217
+on:
+  pull_request:
+    paths:
+      - haigen.html
+      - tests/live/rock-base-217.cjs
+      - .github/workflows/rock-base-217.yml
+  workflow_dispatch:
+jobs:
+  rock-base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/live/rock-base-217.cjs
