@@ -8988,7 +8988,9 @@ const visible=objects.filter(o=>!trollDoorwayTree(o)&&!worldEditorHidden.has(o.i
  moon.addColorStop(0,'rgba(143,185,240,'+(darkness*.15)+')');
  moon.addColorStop(1,'rgba(143,185,240,0)');
  ctx.fillStyle=moon;ctx.fillRect(state.x-155,state.y-155,310,310);ctx.restore();
-} ctx.restore();ctx.restore();const regionLabel=$('regionName');if(regionLabel){const place=expandedRegion(state.x,state.y)?.name||'Haigen’s Woodlands';regionLabel.textContent=place+(state.autonomy&&autoJobLabel?' · 🤖 '+autoJobLabel:'');}const day=1+Math.floor(state.daytime/180),phase=['Morning','Afternoon','Evening','Night'][Math.floor(state.daytime%180/45)];$('day').textContent=`Day ${day} • ${phase} • ${state.weather.mode==='rain'?'🌧️ Showers':'🌤️ Clear'}`;$('resources').textContent=`🪵 ${state.wood}   🪨 ${state.stone}   🍓 ${state.berries}   🪓 ${state.tools.axe}   🔦 ${state.tools.torch}   🍲 ${state.food}   🌿 ${state.twigs}   🍃 ${state.leaves}   🥚 ${state.eggs}   🍄 ${state.mushrooms}   🌼 ${Object.values(state.herbs).reduce((a,b)=>a+b,0)}   🧪 ${state.potions}`;}function controllerMove(){if(!navigator.getGamepads)return {x:0,y:0};const pad=Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);if(!pad)return {x:0,y:0};const axis=i=>Math.abs(pad.axes[i]||0)>.18?pad.axes[i]:0;const down=i=>pad.buttons[i]&&pad.buttons[i].pressed?1:0;let x=axis(0),y=axis(1);if(pad.mapping==='standard'){x+=down(15)-down(14);y+=down(13)-down(12)}return {x,y}}const playerMotion={dir:'down',moving:false,anim:0};function trackMotion(m,x0,y0,x1,y1,dt){const dx=x1-x0,dy=y1-y0,amount=Math.hypot(dx,dy);m.moving=amount>.25;if(m.moving){m.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');m.anim=(m.anim||0)+dt}else m.anim=0}// V192: on-device visual world editor. Layout is separate from story saves.
+} ctx.restore();ctx.restore();const regionLabel=$('regionName');if(regionLabel){const place=expandedRegion(state.x,state.y)?.name||'Haigen’s Woodlands';regionLabel.textContent=place+(state.autonomy&&autoJobLabel?' · 🤖 '+autoJobLabel:'');}const day=1+Math.floor(state.daytime/180),phase=['Morning','Afternoon','Evening','Night'][Math.floor(state.daytime%180/45)];$('day').textContent=`Day ${day} • ${phase} • ${state.weather.mode==='rain'?'🌧️ Showers':'🌤️ Clear'}`;$('resources').textContent=`🪵 ${state.wood}   🪨 ${state.stone}   🍓 ${state.berries}   🪓 ${state.tools.axe}   🔦 ${state.tools.torch}   🍲 ${state.food}   🌿 ${state.twigs}   🍃 ${state.leaves}   🥚 ${state.eggs}   🍄 ${state.mushrooms}   🌼 ${Object.values(state.herbs).reduce((a,b)=>a+b,0)}   🧪 ${state.potions}`;}function controllerMove(){if(!navigator.getGamepads)return {x:0,y:0};const pad=Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);if(!pad)return {x:0,y:0};const axis=i=>Math.abs(pad.axes[i]||0)>.18?pad.axes[i]:0;const down=i=>pad.buttons[i]&&pad.buttons[i].pressed?1:0;let x=axis(0),y=axis(1);if(pad.mapping==='standard'){x+=down(15)-down(14);y+=down(13)-down(12)}return {x,y}}const playerMotion={dir:'down',moving:false,anim:0};function trackMotion(m,x0,y0,x1,y1,dt){const dx=x1-x0,dy=y1-y0,amount=Math.hypot(dx,dy);m.moving=amount>.25;if(m.moving){m.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');m.anim=(m.anim||0)+dt}else m.anim=0}// Shared-layout safety mode: pause device-local world edits without deleting saved layouts.
+const worldLayoutEditingPaused=true;
+// V192: on-device visual world editor. Layout is separate from story saves.
 const worldEditorKindGroups=[
  ['Buildings',[
   ['hamlet-house','Cottage'],['hamlet-shop','Shop'],['hamlet-inn','Inn'],
@@ -9018,7 +9020,7 @@ for(let i=objects.length-1;i>=0;i--){
 {
  const editedIds=new Set();
  try{
-  const saved=JSON.parse(localStorage.getItem('haigenWorldEditorLayoutV1')||'{}');
+  const saved=JSON.parse((worldLayoutEditingPaused?null:localStorage.getItem('haigenWorldEditorLayoutV1'))||'{}');
   if(saved.moves&&typeof saved.moves==='object')for(const id of Object.keys(saved.moves))editedIds.add(Number(id));
  }catch(e){}
  for(let i=objects.length-1;i>=0;i--){
@@ -9035,7 +9037,7 @@ for(let i=objects.length-1;i>=0;i--){
 {
  let editedIds=new Set();
  try{
-  const saved=JSON.parse(localStorage.getItem('haigenWorldEditorLayoutV1')||'{}');
+  const saved=JSON.parse((worldLayoutEditingPaused?null:localStorage.getItem('haigenWorldEditorLayoutV1'))||'{}');
   if(saved.moves&&typeof saved.moves==='object')editedIds=new Set(Object.keys(saved.moves).map(Number));
  }catch(e){}
  for(let i=objects.length-1;i>=0;i--){
@@ -9073,7 +9075,7 @@ function worldEditorNormalise(raw){
  }
  return result;
 }
-let worldEditorData=(()=>{try{return worldEditorNormalise(JSON.parse(localStorage.getItem(worldEditorStorageKey)||'null'))}catch(_){return worldEditorNormalise(null)}})();
+let worldEditorData=(()=>{try{return worldEditorNormalise(JSON.parse((worldLayoutEditingPaused?null:localStorage.getItem(worldEditorStorageKey))||'null'))}catch(_){return worldEditorNormalise(null)}})();
 // V199: one-time surgical cleanup of the unwanted Riverwatch editor settlement.
 // Preserve the rest of the player's layout and keep a recovery copy.
 (function cleanupRiverwatchEditorLayout(){
@@ -9550,6 +9552,7 @@ function worldEditorDrawPanel(){
  });
 }
 function worldEditorOpen(){
+ if(worldLayoutEditingPaused){notify('World editing is temporarily paused so devices share the same layout.');return}
  if(worldEditorActive)return;
  close();worldEditorActive=true;cameraDetached=true;worldEditorMinimised=false;
  worldEditorPanel=document.createElement('div');
@@ -11960,18 +11963,18 @@ const hwRealItems=()=>[...objects.filter(o=>['tree','bareTree','fir','rock','bus
 function hwRealId(o){const k=hwRealNamed.indexOf(o);return k>=0?'named:'+hwRealNamedId[k]:'object:'+o.id}
 function hwRealStore(){try{const changes={};for(const o of hwRealItems()){const id=hwRealId(o),original=hwRealOriginal.get(id);if(original&&(o.x!==original.x||o.y!==original.y))changes[id]={x:o.x,y:o.y}}changes.__deleted=[...hwRealDeleted];localStorage.setItem(hwRealKey,JSON.stringify(changes))}catch(e){notify('Editor save failed')}}
 for(const o of hwRealItems())hwRealOriginal.set(hwRealId(o),{x:o.x,y:o.y});
-try{const saved=JSON.parse(localStorage.getItem(hwRealKey)||'{}');if(Array.isArray(saved.__deleted))for(const id of saved.__deleted)if(/^object:\d+$/.test(id)){hwRealDeleted.add(id);worldEditorHidden.add(Number(id.slice(7)))}for(const o of hwRealItems()){const p=saved[hwRealId(o)];if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.y>=0&&p.x<=5000&&p.y<=5000){o.x=p.x;o.y=p.y}}}catch(e){}
+try{const saved=JSON.parse((worldLayoutEditingPaused?null:localStorage.getItem(hwRealKey))||'{}');if(Array.isArray(saved.__deleted))for(const id of saved.__deleted)if(/^object:\d+$/.test(id)){hwRealDeleted.add(id);worldEditorHidden.add(Number(id.slice(7)))}for(const o of hwRealItems()){const p=saved[hwRealId(o)];if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.y>=0&&p.x<=5000&&p.y<=5000){o.x=p.x;o.y=p.y}}}catch(e){}
 function hwRealPoint(e){const r=cv.getBoundingClientRect(),z=worldZoom();return{x:cam.x+(e.clientX-r.left-r.width/2)/z,y:cam.y+(e.clientY-r.top-r.height/2)/z}}
 function hwRealHit(p){let best=null,d=Infinity;for(const o of [...hwRealNamed,...hwRealItems().filter(o=>!hwRealNamed.includes(o))]){const r=o===trollStumpHome?185:o===cottage?185:hwRealNamed.includes(o)?120:o.type==='tree'||o.type==='fir'?60:35;const oy=o===cottage?o.y-70:o===trollStumpHome?o.y-55:o.y;const distance=Math.hypot(o.x-p.x,oy-p.y);if(distance<r&&distance<d){best=o;d=distance-(hwRealNamed.includes(o)?65:0)}}return best}
 function hwRealAllowed(o,p){if(p.x<70||p.y<70||p.x>4900||p.y>4900)return false;const radius=hwRealNamed.includes(o)?120:30;if(hwRealItems().some(q=>q!==o&&Math.hypot(q.x-p.x,q.y-p.y)<radius+(hwRealNamed.includes(q)?90:15)))return false;return true}
 const hwRealBar=document.createElement('div');hwRealBar.style.cssText='position:fixed;z-index:999999;bottom:10px;left:10px;right:10px;display:flex;gap:5px;flex-wrap:wrap;pointer-events:none';
 function hwRealButton(label,fn){const b=document.createElement('button');b.textContent=label;b.style.cssText='pointer-events:auto;background:#253b34;color:#fff;border:1px solid #cbb98a;border-radius:8px;padding:9px;font:600 13px system-ui';b.onclick=fn;hwRealBar.append(b);return b}
-const hwRealToggle=hwRealButton('🛠 Edit World',()=>{hwRealEnabled=!hwRealEnabled;hwRealToggle.textContent=hwRealEnabled?'✓ Finish Editing':'🛠 Edit World';hwRealControls.forEach(b=>b.style.display=hwRealEnabled?'':'none');hwRealDrag=null;hwRealStore();notify(hwRealEnabled?'Tap a real tree, rock or building to move':'World layout saved')});
+const hwRealToggle=hwRealButton('🛠 Edit World',()=>{if(worldLayoutEditingPaused)return;hwRealEnabled=!hwRealEnabled;hwRealToggle.textContent=hwRealEnabled?'✓ Finish Editing':'🛠 Edit World';hwRealControls.forEach(b=>b.style.display=hwRealEnabled?'':'none');hwRealDrag=null;hwRealStore();notify(hwRealEnabled?'Tap a real tree, rock or building to move':'World layout saved')});
 const hwRealControls=[];
 hwRealControls.push(hwRealButton('✋ Grab',()=>{hwRealMode='move';notify('Drag objects directly. Right side pans camera.')}));hwRealControls.push(hwRealButton('🗑 Delete',()=>{hwRealMode=hwRealMode==='delete'?'move':'delete';notify(hwRealMode==='delete'?'Tap a tree or rock to delete. Tap Delete again to exit.':'Grab mode restored')}));
 hwRealControls.push(hwRealButton('↶ Undo',()=>{const p=hwRealUndo.pop();if(p){if(p.deleted){hwRealDeleted.delete(hwRealId(p.o));worldEditorHidden.delete(p.o.id)}p.o.x=p.x;p.o.y=p.y;hwRealStore()}}));
 hwRealControls.push(hwRealButton('↺ Reset selected',()=>{if(!hwRealSelected)return;const p=hwRealOriginal.get(hwRealId(hwRealSelected));if(p){hwRealUndo.push({o:hwRealSelected,x:hwRealSelected.x,y:hwRealSelected.y});hwRealSelected.x=p.x;hwRealSelected.y=p.y;hwRealStore()}}));
-hwRealControls.forEach(b=>b.style.display='none');document.body.append(hwRealBar);
+hwRealControls.forEach(b=>b.style.display='none');document.body.append(hwRealBar);if(worldLayoutEditingPaused)hwRealBar.style.display='none';
 function hwRealRightSide(e){const r=cv.getBoundingClientRect();return e.clientX-r.left>=r.width*.58}
 cv.addEventListener('pointerdown',e=>{if(!hwRealEnabled||hwRealRightSide(e))return;const p=hwRealPoint(e),o=hwRealHit(p);if(!o)return;
 e.preventDefault();e.stopImmediatePropagation();hwRealSelected=o;
@@ -12455,5 +12458,5 @@ function refreshFrogHud(){
  lastFrogReleaseReady=ready;
 }
 setInterval(refreshFrogHud,300);refreshFrogHud();
- placeArtCart();restoreTrollPosition();try{const moved=JSON.parse(localStorage.getItem(hwRealKey)||'{}')['named:troll-stump'];if(moved&&Number.isFinite(moved.x)&&Number.isFinite(moved.y)&&moved.x>=0&&moved.y>=0&&moved.x<=5000&&moved.y<=5000){trollStumpHome.x=moved.x;trollStumpHome.y=moved.y}}catch(e){}stumpPositionReady=true;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
+ placeArtCart();restoreTrollPosition();try{const moved=JSON.parse((worldLayoutEditingPaused?null:localStorage.getItem(hwRealKey))||'{}')['named:troll-stump'];if(moved&&Number.isFinite(moved.x)&&Number.isFinite(moved.y)&&moved.x>=0&&moved.y>=0&&moved.x<=5000&&moved.y<=5000){trollStumpHome.x=moved.x;trollStumpHome.y=moved.y}}catch(e){}stumpPositionReady=true;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
 </script><script src="./swamp-bosses-v420.js?v=425"></script><script src="./v127-ornate-ui.js?v=418"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><!-- Tactical Gloamjaw adapter retired: original real-time boss remains active. --><script src="./thrummaw-v148.js?v=410"></script><script src="./krakkle-v407.js?v=417"></script></body></html>
