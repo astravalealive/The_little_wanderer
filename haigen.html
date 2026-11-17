@@ -4394,7 +4394,17 @@ function drawWoodlandPathEdges(){
  ctx.restore();
 }
 function path(){
- if(paintedTrailsReady){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();drawWoodlandPathEdges();return}
+ if(paintedTrailsReady){
+  ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();
+  // Keep the original hand-painted paths and their geometry; apply a restrained
+  // storybook soil glaze to the actual loaded path layer, not only its fallback.
+  ctx.save();ctx.beginPath();ctx.rect(0,0,3500,3100);ctx.clip();
+  ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#917b5860';
+  for(let i=0;i<roadRoutes.length;i++){
+   ctx.lineWidth=Math.max(7,roadWidths[i]-11);roadTrace(ctx,roadRoutes[i]);ctx.stroke();
+  }
+  ctx.restore();drawWoodlandPathEdges();return
+ }
  // Draw full road network one material layer at a time so the junctions merge.
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
  const bands=[{pad:22,c:'#4c634750'},{pad:14,c:'#87765c94'},{pad:5,c:'#ad946d'},{pad:-7,c:'#cfb98f'}];
@@ -4515,7 +4525,9 @@ function rbDrawGround(){
    const wobbleY=80*Math.sin(cx/280)+32*Math.sin(cx/107+cy/270);
    const edge=Math.min(cx+wobble,3500+wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-20);
    // Smooth continuous fade across the woodland boundary, no binary dither.
-   const fade=Math.max(0,Math.min(1,(edge+170)/350));
+   // Smoothstep avoids a hard linear transition at the outer edge.
+   const transition=Math.max(0,Math.min(1,(edge+230)/460));
+   const fade=transition*transition*(3-2*transition);
    if(fade<=0)continue;
    ctx.globalAlpha=fade;
    ctx.fillRect(x,y,cell,cell);
