@@ -11068,7 +11068,14 @@ function raftInteract(){
 }
 function raftMove(dt,dx,dy){const r=raftEnds();if(!r.ready){state.raftAfloat=false;notify('The raft has returned to its mooring.');return}const old=state.x;const mag=Math.hypot(dx,dy);const along=mag>.10?dx/Math.max(mag,1):0;state.x=clamp(state.x+along*dt*.24,Math.min(r.a.x,r.b.x),Math.max(r.a.x,r.b.x));state.y=r.b.y;raft.stroke+=Math.abs(state.x-old)*.06}
 function drawRaft(){
- if(!state.raftBuilt)return;const r=raftEnds();if(!r.ready)return;
+ const r=raftEnds();if(!r.ready)return;
+ if(!state.raftBuilt){
+  const p=r.a;
+  if(Math.abs(p.x-cam.x)>W/worldZoom()/2+90||Math.abs(p.y-cam.y)>H/worldZoom()/2+90)return;
+  ctx.save();ctx.translate(p.x,p.y);ellipse(0,5,26,11,'#4d382b');
+  for(let i=-2;i<=2;i++){ctx.strokeStyle=i%2?'#a8875c':'#d0ae78';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-20,i*5);ctx.lineTo(20,i*5);ctx.stroke()}
+  ctx.fillStyle='#f5d7a2';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText('BUILD RAFT',0,-24);ctx.restore();return;
+ }
  const p=state.raftAfloat?state:(state.raftBerth==='island'?r.b:r.a);
  if(Math.abs(p.x-cam.x)>W/worldZoom()/2+80||Math.abs(p.y-cam.y)>H/worldZoom()/2+80)return;
  ctx.save();ctx.translate(p.x,p.y+10);ellipse(0,9,38,12,'#24495788');const raftPlank=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
