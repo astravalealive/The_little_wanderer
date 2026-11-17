@@ -4410,6 +4410,10 @@ function drawWoodlandPathEdges(){
   if(Math.abs(f.x-cam.x)>950||Math.abs(f.y-cam.y)>750)continue;
   // Keep the camp clearing readable while preserving trail-edge flecks elsewhere.
   if(Math.hypot(f.x-cottage.x,f.y-cottage.y)<245)continue;
+  // Two faint, overlapping earth-and-moss tones soften the trail/forest seam.
+  // Positions and collision routes are unchanged; detail stays deterministic.
+  ctx.fillStyle=f.moss?'#536d4838':'#9c866038';
+  ctx.beginPath();ctx.ellipse(f.x,f.y,f.size*2.5,f.size*1.35,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle=f.moss?'#536d4860':'#9c86605c';
   ctx.beginPath();ctx.ellipse(f.x,f.y,f.size*1.8,f.size,0,0,Math.PI*2);ctx.fill();
  }
