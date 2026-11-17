@@ -10879,7 +10879,7 @@ for(let i=1;i<skiffRoute.length;i++){
  skiffDistances.push(skiffDistances[i-1]+Math.hypot(b.x-a.x,b.y-a.y));
 }
 const skiffRouteLength=skiffDistances[skiffDistances.length-1];
-let skiffDistance=0, skiffHeading=0, skiffVisualHeading=null, skiffStroke=0, skiffRouteChecked=false;
+let skiffDistance=0, skiffHeading=0, skiffVisualHeading=null, skiffStroke=0, skiffRowing=false, skiffOarSwing=0, skiffRouteChecked=false;
 
 function skiffLanding(berth){
  if(berth!=='island'&&berth!=='saltwick')return null;
@@ -10934,7 +10934,7 @@ function skiffInteract(){
  return true;
 }
 function skiffMove(dt,dx,dy){
- const mag=Math.hypot(dx,dy);
+ const mag=Math.hypot(dx,dy);skiffRowing=false;
  let segment=1;
  while(segment<skiffRoute.length-1&&skiffDistance>=skiffDistances[segment])segment++;
  const a=skiffRoute[segment-1], b=skiffRoute[segment], length=skiffDistances[segment]-skiffDistances[segment-1];
@@ -10948,6 +10948,7 @@ function skiffMove(dt,dx,dy){
  const t=(skiffDistance-skiffDistances[segment-1])/(skiffDistances[segment]-skiffDistances[segment-1]);
  state.x=start.x+(end.x-start.x)*t;state.y=start.y+(end.y-start.y)*t;
  if(skiffDistance!==previous){
+  skiffRowing=true;
   skiffHeading=Math.atan2(end.y-start.y,end.x-start.x)+(force<0?Math.PI:0);
   skiffStroke+=Math.abs(skiffDistance-previous)*.05;
   if(skiffDistance===0||skiffDistance===skiffRouteLength)notify('🪢 At the mooring. Press Collect to step ashore.');
@@ -10974,10 +10975,14 @@ function drawSkiff(){
   const turn=Math.atan2(Math.sin(skiffHeading-skiffVisualHeading),Math.cos(skiffHeading-skiffVisualHeading));
   skiffVisualHeading+=turn*.20;
  }else skiffVisualHeading=null;
+ const targetSwing=occupied&&skiffRowing?Math.sin(skiffStroke)*.48:0;
+ skiffOarSwing+=(targetSwing-skiffOarSwing)*.24;
+ if(!occupied)skiffOarSwing=0;
  ctx.save();ctx.translate(p.x,p.y+3);ctx.scale(1,.74);ctx.rotate(occupied?skiffVisualHeading:-.25);
  ellipse(-1,4,29,12,'#254a567a');
  for(const side of [-1,1]){
-  const swing=occupied?Math.sin(skiffStroke)*.48:0;
+  // Actual travel drives the stroke; oars ease into a resting position when stopped.
+  const swing=skiffOarSwing;
   ctx.save();ctx.translate(0,side*7);ctx.rotate(side*swing);
   ctx.fillStyle='#aa8054';ctx.fillRect(-1,side<0?-17:0,3,17);
   ctx.fillStyle='#c79c62';ctx.fillRect(-2,side<0?-22:15,5,8);ctx.restore();
