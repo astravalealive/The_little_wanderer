@@ -105,7 +105,11 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
   const previewSnapshot=useLiveSnapshot?null:localStorage.getItem('wandererV127PreviewSave');
   const existingSave=localStorage.getItem('wandererV126PreviewSave')||localStorage.getItem('wandererV125PreviewSave')||localStorage.getItem('wandererV121PreviewSave')||localStorage.getItem('wandererTestSave');
   state=Object.assign(fresh(),JSON.parse(previewSnapshot||existingSave||'{}'));
- }catch{state=fresh()}state.campTier=Math.max(0,Math.min(5,Number(state.campTier)||0));if(state.campTier===0&&state.structures.some(q=>q.kind==='shelter'))state.campTier=1;state.hunger=Math.max(0,Math.min(100,Number.isFinite(state.hunger)?state.hunger:85));state.hungerClock=0;state.energy=Math.max(0,Math.min(100,Number.isFinite(state.energy)?state.energy:85));state.resting=false;state.hairStyle=['waves','curls','short','wild'].includes(state.hairStyle)?state.hairStyle:'waves';state.fun=Math.max(0,Math.min(100,Number.isFinite(state.fun)?state.fun:75));state.activity=Math.max(0,Math.min(100,Number.isFinite(state.activity)?state.activity:65));state.diaryEntries=Array.isArray(state.diaryEntries)?state.diaryEntries:[];state.requests=Array.isArray(state.requests)?state.requests:[];state.health=Math.max(1,Math.min(100,Number.isFinite(state.health)?state.health:100));state.lastHitAt=Number(state.lastHitAt)||0;state.tools=Object.assign({axe:0,torch:0,shovel:0,pickaxe:0,net:0},state.tools||{});state.carriedFrogId=Number.isInteger(state.carriedFrogId)&&state.carriedFrogId>=0&&state.carriedFrogId<22?state.carriedFrogId:-1;state.frogsReleased=Math.max(0,Number(state.frogsReleased)||0);state.butterfliesCaught=Math.max(0,Number(state.butterfliesCaught)||0);state.minerals=Object.assign({clay:0,flint:0,iron:0,copper:0,quartz:0,crystal:0},state.minerals||{});state.excavations=state.excavations||{};state.food=Number(state.food)||0;state.autonomy=!!state.autonomy;state.returnReport=Array.isArray(state.returnReport)?state.returnReport:[];state.autoSteps=Number(state.autoSteps)||0;state.harvestedAt=state.harvestedAt||{};state.mushrooms=Number(state.mushrooms)||0;state.herbs=state.herbs||{};state.potions=Number(state.potions)||0;state.flowerFinds=Number(state.flowerFinds)||0;state.fallen=Array.isArray(state.fallen)?state.fallen:[];state.treeHits=state.treeHits||{};state.boulderHits=state.boulderHits&&typeof state.boulderHits==='object'?state.boulderHits:{};state.stoneDrops=Array.isArray(state.stoneDrops)?state.stoneDrops.filter(d=>d&&Number.isFinite(d.x)&&Number.isFinite(d.y)&&Number(d.amount)>0).slice(0,300):[];state.autoFreeJob=state.autoFreeJob&&typeof state.autoFreeJob==='object'?state.autoFreeJob:null;state.looseWoodTaken=state.looseWoodTaken&&typeof state.looseWoodTaken==='object'?state.looseWoodTaken:{};state.twigs=Number(state.twigs)||0;state.leaves=Number(state.leaves)||0;state.equipped=state.equipped||'hands';state.memories=state.memories.map(m=>m.replaceAll('Héri','Dylan').replaceAll('Dillon','Dylan').replaceAll('Skolli','Skölli'));if(state.worldLayout!==3000){const shift=p=>{if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.y))return;p.x=clamp(1500+(p.x-1420)*.39,WORLD_MIN+55,WORLD-55);p.y=clamp(1500+(p.y-1150)*.39,WORLD_MIN+55,WORLD-55)};shift(state);for(const p of state.structures||[])shift(p);for(const p of state.fallen||[])shift(p);state.worldLayout=3000;try{localStorage.setItem('wandererV127PreviewSave',JSON.stringify(state))}catch(e){}}const seeded=n=>{let x=Math.sin(n*127.1+78.233)*43758.5453;return x-Math.floor(x)};
+ }catch{state=fresh()}
+ if(state.skiffBerth!=='saltwick'&&state.skiffBerth!=='island')delete state.skiffBerth;
+ delete state.skiffAtSea;
+ let skiffDeparture=null;
+ state.campTier=Math.max(0,Math.min(5,Number(state.campTier)||0));if(state.campTier===0&&state.structures.some(q=>q.kind==='shelter'))state.campTier=1;state.hunger=Math.max(0,Math.min(100,Number.isFinite(state.hunger)?state.hunger:85));state.hungerClock=0;state.energy=Math.max(0,Math.min(100,Number.isFinite(state.energy)?state.energy:85));state.resting=false;state.hairStyle=['waves','curls','short','wild'].includes(state.hairStyle)?state.hairStyle:'waves';state.fun=Math.max(0,Math.min(100,Number.isFinite(state.fun)?state.fun:75));state.activity=Math.max(0,Math.min(100,Number.isFinite(state.activity)?state.activity:65));state.diaryEntries=Array.isArray(state.diaryEntries)?state.diaryEntries:[];state.requests=Array.isArray(state.requests)?state.requests:[];state.health=Math.max(1,Math.min(100,Number.isFinite(state.health)?state.health:100));state.lastHitAt=Number(state.lastHitAt)||0;state.tools=Object.assign({axe:0,torch:0,shovel:0,pickaxe:0,net:0},state.tools||{});state.carriedFrogId=Number.isInteger(state.carriedFrogId)&&state.carriedFrogId>=0&&state.carriedFrogId<22?state.carriedFrogId:-1;state.frogsReleased=Math.max(0,Number(state.frogsReleased)||0);state.butterfliesCaught=Math.max(0,Number(state.butterfliesCaught)||0);state.minerals=Object.assign({clay:0,flint:0,iron:0,copper:0,quartz:0,crystal:0},state.minerals||{});state.excavations=state.excavations||{};state.food=Number(state.food)||0;state.autonomy=!!state.autonomy;state.returnReport=Array.isArray(state.returnReport)?state.returnReport:[];state.autoSteps=Number(state.autoSteps)||0;state.harvestedAt=state.harvestedAt||{};state.mushrooms=Number(state.mushrooms)||0;state.herbs=state.herbs||{};state.potions=Number(state.potions)||0;state.flowerFinds=Number(state.flowerFinds)||0;state.fallen=Array.isArray(state.fallen)?state.fallen:[];state.treeHits=state.treeHits||{};state.boulderHits=state.boulderHits&&typeof state.boulderHits==='object'?state.boulderHits:{};state.stoneDrops=Array.isArray(state.stoneDrops)?state.stoneDrops.filter(d=>d&&Number.isFinite(d.x)&&Number.isFinite(d.y)&&Number(d.amount)>0).slice(0,300):[];state.autoFreeJob=state.autoFreeJob&&typeof state.autoFreeJob==='object'?state.autoFreeJob:null;state.looseWoodTaken=state.looseWoodTaken&&typeof state.looseWoodTaken==='object'?state.looseWoodTaken:{};state.twigs=Number(state.twigs)||0;state.leaves=Number(state.leaves)||0;state.equipped=state.equipped||'hands';state.memories=state.memories.map(m=>m.replaceAll('Héri','Dylan').replaceAll('Dillon','Dylan').replaceAll('Skolli','Skölli'));if(state.worldLayout!==3000){const shift=p=>{if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.y))return;p.x=clamp(1500+(p.x-1420)*.39,WORLD_MIN+55,WORLD-55);p.y=clamp(1500+(p.y-1150)*.39,WORLD_MIN+55,WORLD-55)};shift(state);for(const p of state.structures||[])shift(p);for(const p of state.fallen||[])shift(p);state.worldLayout=3000;try{localStorage.setItem('wandererV127PreviewSave',JSON.stringify(state))}catch(e){}}const seeded=n=>{let x=Math.sin(n*127.1+78.233)*43758.5453;return x-Math.floor(x)};
 // The original 4200-unit woodland remains in its exact location for old saves and story quests.
 const expandedRegions=[
  {id:'downs',name:'The Open Downs',x:-5500,y:3050,w:8800,h:4100,color:'#b8c77e',animals:['🦬','🐇','🦊']},
@@ -1348,8 +1352,16 @@ function lakeLevel(x,y){const dx=(x-pond.x)/pond.rx,dy=(y-pond.y)/pond.ry;return
  }
  ctx.closePath();
 }const landmarks=[{x:1540,y:480,kind:'highlands',name:'The Stoneback Highlands'},{x:2470,y:1280,kind:'grove',name:'The Whispering Grove'},{x:2100,y:2420,kind:'marsh',name:'Mossfen Marsh'}];for(const l of landmarks){l.detailOffsets=Array.from({length:24},(_,j)=>{const a=j*2.399,r=Math.sqrt((j+1)/25);return{x:Math.cos(a)*r*390,y:Math.sin(a)*r*245,shape:j%3,shade:j%2}})}for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(inPond(o.x,o.y,o.type==='tree'?100:30)||!canPlaceScenery(o))objects.splice(i,1)}const cottage={x:1500,y:1500};
-// V228: open near the homestead for immediate testing; do not overwrite saved location.
-state.x=cottage.x+30;state.y=cottage.y+155;state.autonomy=true; // V295: Haigen lives independently; player may briefly take the controls.
+// Preserve the usual homestead start except when resuming a skiff visit at its shore.
+function resumeAtSkiffShore(){
+ if(!state.skiffBerth||!Number.isFinite(state.x)||!Number.isFinite(state.y))return false;
+ const island=state.skiffBerth==='island';
+ const distance=island?Math.hypot(state.x-6100,state.y-6600):Math.hypot(state.x-3430,state.y-8390);
+ return distance<255&&islandDepth(state.x,state.y)>=0;
+}
+if(!resumeAtSkiffShore()){
+ state.x=cottage.x+30;state.y=cottage.y+155;state.autonomy=true;
+}
 const campProtectionRadius=365;
 state.campClearingDone=state.campClearingDone===true||state.campTier>0;
 state.campClearingPicked=Array.isArray(state.campClearingPicked)?state.campClearingPicked:[];
@@ -1730,7 +1742,7 @@ function updateSurvival(dt){
  if(collapseRemaining>0){
   collapseRemaining=Math.max(0,collapseRemaining-dt);
   if(collapseRemaining===0){
-   state.x=cottage.x;state.y=cottage.y+85;state.health=22;state.rescuePending=false;
+   leaveSkiffBehind();state.x=cottage.x;state.y=cottage.y+85;state.health=22;state.rescuePending=false;
    state.energy=Math.min(state.energy,30);state.poisonMs=0;
    state.hunger=Math.max(20,state.hunger);state.lastHitAt=time;
    for(const b of beasts){b.mode='retreating';b.cooldown=15000}
@@ -2564,7 +2576,40 @@ function notify(s){
  if(uiPanelOpen()){toast.classList.remove('show');return}
  toast.classList.add('show');
  toastTimer=setTimeout(()=>toast.classList.remove('show'),3000);
-}function memory(s){if(!state.memories.includes(s)){state.memories.unshift(s);state.memories=state.memories.slice(0,80);notify('📖 '+s)}}const toolSlots=[{id:'hands',icon:'✋',name:'Hands'},{id:'axe',icon:'🪓',name:'Axe'},{id:'torch',icon:'🔦',name:'Torch'},{id:'shovel',icon:'🥄',name:'Shovel'},{id:'pickaxe',icon:'⛏️',name:'Pickaxe'},{id:'rod',icon:'🎣',name:'Rod'},{id:'net',icon:'🦋',name:'Net'}];function availableTools(){return toolSlots.filter(t=>t.id==='hands'||(t.id==='rod'?state.fishingRod:state.tools[t.id]>0))}function equipTool(id){if(!availableTools().some(t=>t.id===id))return;state.equipped=id;renderHotbar();save()}function cycleTool(direction){const list=availableTools();const i=list.findIndex(t=>t.id===state.equipped);equipTool(list[(i+direction+list.length)%list.length].id)}function renderHotbar(){const bar=$('hotbar');if(!bar)return;bar.innerHTML=toolSlots.map((t,i)=>{const owned=t.id==='hands'||(t.id==='rod'?state.fishingRod:state.tools[t.id]>0);return `<button class="slot ${state.equipped===t.id?'selected':''}" data-equip="${t.id}" ${owned?'':'disabled'} aria-label="Equip ${t.name}"><span class="rpg-index">${i+1}</span>${window.__v127ToolIcon?window.__v127ToolIcon(t.id):t.icon}<small>${t.name}</small></button>`}).join('');bar.querySelectorAll('[data-equip]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();equipTool(b.dataset.equip)});b.addEventListener('click',()=>equipTool(b.dataset.equip))})}let shoulderLeft=false,shoulderRight=false;function checkShoulders(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const left=!!(p&&p.buttons&&p.buttons[4]&&p.buttons[4].pressed),right=!!(p&&p.buttons&&p.buttons[5]&&p.buttons[5].pressed);if(left&&!shoulderLeft)cycleTool(-1);if(right&&!shoulderRight)cycleTool(1);shoulderLeft=left;shoulderRight=right}function save(){if(stumpPositionReady)saveTrollPosition();state.lastSavedAt=Date.now();try{localStorage.setItem('wandererV127PreviewSave',JSON.stringify(state))}catch{}}setInterval(save,5000);addEventListener('pagehide',save);
+}function memory(s){if(!state.memories.includes(s)){state.memories.unshift(s);state.memories=state.memories.slice(0,80);notify('📖 '+s)}}const toolSlots=[{id:'hands',icon:'✋',name:'Hands'},{id:'axe',icon:'🪓',name:'Axe'},{id:'torch',icon:'🔦',name:'Torch'},{id:'shovel',icon:'🥄',name:'Shovel'},{id:'pickaxe',icon:'⛏️',name:'Pickaxe'},{id:'rod',icon:'🎣',name:'Rod'},{id:'net',icon:'🦋',name:'Net'}];function availableTools(){return toolSlots.filter(t=>t.id==='hands'||(t.id==='rod'?state.fishingRod:state.tools[t.id]>0))}function equipTool(id){if(!availableTools().some(t=>t.id===id))return;state.equipped=id;renderHotbar();save()}function cycleTool(direction){const list=availableTools();const i=list.findIndex(t=>t.id===state.equipped);equipTool(list[(i+direction+list.length)%list.length].id)}function renderHotbar(){const bar=$('hotbar');if(!bar)return;bar.innerHTML=toolSlots.map((t,i)=>{const owned=t.id==='hands'||(t.id==='rod'?state.fishingRod:state.tools[t.id]>0);return `<button class="slot ${state.equipped===t.id?'selected':''}" data-equip="${t.id}" ${owned?'':'disabled'} aria-label="Equip ${t.name}"><span class="rpg-index">${i+1}</span>${window.__v127ToolIcon?window.__v127ToolIcon(t.id):t.icon}<small>${t.name}</small></button>`}).join('');bar.querySelectorAll('[data-equip]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();equipTool(b.dataset.equip)});b.addEventListener('click',()=>equipTool(b.dataset.equip))})}let shoulderLeft=false,shoulderRight=false;function checkShoulders(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const left=!!(p&&p.buttons&&p.buttons[4]&&p.buttons[4].pressed),right=!!(p&&p.buttons&&p.buttons[5]&&p.buttons[5].pressed);if(left&&!shoulderLeft)cycleTool(-1);if(right&&!shoulderRight)cycleTool(1);shoulderLeft=left;shoulderRight=right}
+function beginSkiffCrossing(){
+ if(skiffDeparture||!state.skiffBerth||!Number.isFinite(state.x)||!Number.isFinite(state.y))return false;
+ skiffDeparture={x:state.x,y:state.y};
+ state.skiffAtSea=true;
+ return true;
+}
+// Teleports leave the boat at the shore where Haigen last boarded.
+function leaveSkiffBehind(){
+ delete state.skiffAtSea;
+ skiffDeparture=null;
+}
+function finishSkiffCrossing(berth,landing){
+ if(!skiffDeparture||!landing||(berth!=='saltwick'&&berth!=='island')||
+    !Number.isFinite(landing.x)||!Number.isFinite(landing.y))return false;
+ state.x=landing.x;
+ state.y=landing.y;
+ state.skiffBerth=berth;
+ leaveSkiffBehind();
+ save();
+ return true;
+}
+function save(){
+ if(stumpPositionReady)saveTrollPosition();
+ state.lastSavedAt=Date.now();
+ // A crossing can be interrupted by iPad Safari at any frame. Save both travellers at the departure shore.
+ let snapshot=state;
+ if(skiffDeparture){
+  snapshot={...state,...skiffDeparture};
+  delete snapshot.skiffAtSea;
+ }
+ try{localStorage.setItem('wandererV127PreviewSave',JSON.stringify(snapshot))}catch{}
+}
+setInterval(save,5000);addEventListener('pagehide',save);
 // Haigen's autonomous routines are local, bounded and require no server.
 const regrowMs={bush:45000,flower:70000,mushroom:55000,tree:12*60000,rock:35*60000};const flowerKinds=[{name:'Sunpetal',icon:'🌼',color:'#f4d45a',use:'Healing salves'},{name:'Moonbell',icon:'🪻',color:'#a6a1f7',use:'Night-time remedies'},{name:'Emberbloom',icon:'🌺',color:'#ef7358',use:'Warmth and dyes'},{name:'Frostleaf',icon:'❄️',color:'#a9e6ef',use:'Cooling medicine'},{name:'Honeyheart',icon:'🌸',color:'#f6a9c6',use:'Sweet teas'},{name:'Starwort',icon:'✨',color:'#f8f1b0',use:'Rare restorative potions'}];function flowerKind(o){return flowerKinds[Math.floor(seeded(o.id*9+17)*flowerKinds.length)]}function gatherFlower(o){const f=flowerKind(o);state.herbs[f.name]=(state.herbs[f.name]||0)+1;state.flowerFinds++;mindEvent('gather',f.name);notify(f.icon+' '+f.name+' collected! '+f.use);if(!state.discoveries.includes(f.name)){state.discoveries.push(f.name);memory('Haigen discovered '+f.name+', a flower used for '+f.use.toLowerCase()+'.')}}// A berry harvest takes only fruit: the living bush stays visible between harvests.
 // Existing saves that removed the whole bush are migrated by regenerate().
@@ -4124,6 +4169,7 @@ function showReturnReport(){
   open('<h2>🌅 Welcome back!</h2><p><b>Haigen has been busy while you were away.</b></p>'+lines.map(t=>'<p>'+t+'</p>').join('')+'<p>He is ready to adventure together again.</p>');
 }
 function setAutonomy(enabled,keepInstruction=false){
+  if(enabled&&state.skiffAtSea){notify('Beach the skiff before letting Haigen explore.');return}
   if(enabled&&!keepInstruction)state.playerInstruction=null;
   state.autonomy=enabled;haigenMind.controlSwitches++;independentAgenda.remaining=0;autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';autoPause=enabled?700:0;if(enabled){nextThoughtAt=0;speak(currentThoughtTopic(),4600)}else {autoBubbleTimer=0;idleTime=0;}
   $('modeBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';
@@ -8498,8 +8544,8 @@ function drawFenDetail(night){
  ctx.save();ctx.lineCap='round';
  for(let iy=Math.floor(top/size);iy<=Math.floor(bottom/size);iy++)
  for(let ix=Math.floor(left/size);ix<=Math.floor(right/size);ix++){
-  const x=(ix+.2+seeded(ix*103+iy*311)*.6)*size;
-  const y=(iy+.2+seeded(ix*71-iy*107)*.6)*size;
+  const x=fenPlantX(ix,iy);
+  const y=fenPlantY(ix,iy);
   if(expandedRegion(x,y)?.id!=='fen'||fenTrailDistance(x,y)<90||fenArenaDistance(x,y)<220)continue;
   const v=seeded(ix*293+iy*499+9021),wet=fenWater(x,y);
   if(wet>.35){
@@ -8882,7 +8928,7 @@ for(let i=0;i<11;i++){
 for(let i=0;i<13;i++){const a=i*2.399,bx=pond.x+Math.cos(a)*pond.rx*lakeRadius(a)*.96,by=pond.y+Math.sin(a)*pond.ry*lakeRadius(a)*.96;ctx.strokeStyle='#4e9566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(bx,by+9);ctx.lineTo(bx+Math.sin(time*.001+i)*5,by-22);ctx.stroke()}drawRegionalWildlife();function trollDoorwayTree(o){return (o.type==='tree'||o.type==='fir'||o.type==='bareTree'||o.kind==='tree'||o.kind==='fir')&&Math.abs(o.x-trollStumpHome.x)<310&&o.y>trollStumpHome.y-120&&o.y<trollStumpHome.y+310;}
 const visible=objects.filter(o=>!trollDoorwayTree(o)&&!worldEditorHidden.has(o.id)&&!o.type.startsWith('hamlet-')&&!state.removed.includes(o.id)&&canPlaceScenery(o)&&flowerHasHabitat(o)&&!campsiteProtected(o)&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150);homesteadPlots.forEach(p=>{drawHomesteadPlotGround(p);drawLifeConstruction(p,false)});drawHaigenLookout();const drawables=[...homesteadPlots.filter(p=>homesteadTier(p)>0&&p.kind!=='jetty').map(p=>({y:homesteadSortY(p),draw:()=>drawHomesteadPlotForeground(p)})),...homesteadPlots.filter(p=>state.lifeProject?.kind===p.kind&&homesteadTier(p)===0).map(p=>({y:homesteadSortY(p),draw:()=>drawLifeConstruction(p,true)})),...remainingCampDebris().map(d=>({y:d.y,draw:()=>drawCampDebris(d)})),...state.meatDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawMeatDrop(o)})),...state.stoneDrops.filter(o=>Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>drawStonePiece(o)})),...state.fallen.filter(o=>!campsiteProtected(o)&&islandDepth(o.x,o.y)>70&&Math.abs(o.x-cam.x)<W/zoom/2+150&&Math.abs(o.y-cam.y)<H/zoom/2+150).map(o=>({y:o.y,draw:()=>{ellipse(o.x,o.y+5,17,8,'#385e39');if(o.kind==='log'){ctx.save();ctx.translate(o.x,o.y);ctx.rotate((Math.abs(o.x*7+o.y*3)%9-4)*.035);ctx.fillStyle='#302f29';ctx.fillRect(-26,-10,54,22);ctx.fillStyle='#79563b';ctx.fillRect(-24,-9,49,19);ctx.fillStyle='#a47a50';ctx.fillRect(-22,-8,46,5);ctx.fillStyle='#56432f';for(let j=0;j<4;j++)ctx.fillRect(-18+j*11,-2+(j%2)*5,3,7);ellipse(25,1,10,11,'#3b322a');ellipse(25,1,8,9,'#d0ad79');ellipse(25,1,5,6,'#96734f');ellipse(25,1,2,3,'#d0ad79');ctx.restore()}else if(o.kind==='twig'){ctx.strokeStyle='#745039';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(o.x-15,o.y+9);ctx.lineTo(o.x+15,o.y-12);ctx.moveTo(o.x-6,o.y);ctx.lineTo(o.x-9,o.y-12);ctx.stroke()}else{for(let j=0;j<5;j++)ellipse(o.x+(j-2)*7,o.y+(j%2)*5,7,4,j%2?'#6da04b':'#93b85e')}}})),...visible.filter(o=>o.type!=='specter'||spectorsActive()).map(o=>({y:o.type==='specter'?o.y+145:o.y,draw:()=>drawSceneryNearHaigen(o)})),...worldEditorData.placed.filter(o=>!worldEditorGroundKinds.has(o.type)&&Math.abs(o.x-cam.x)<W/zoom/2+250&&Math.abs(o.y-cam.y)<H/zoom/2+250).map(o=>({y:o.y,draw:()=>worldEditorSprite(o)})),{y:6600,draw:drawRiverwatchLighthouse},...objects.filter(o=>o.type.startsWith('hamlet-')&&!worldEditorHidden.has(o.id)&&Math.abs(o.x-cam.x)<W/zoom/2+190&&Math.abs(o.y-cam.y)<H/zoom/2+190).map(o=>({y:o.y,draw:()=>drawHamletScenery(o)})),...woodlandDetails.filter(o=>!trollDoorwayTree(o)&&(o.kind!=='fungi'||woodlandFungiReady(o))&&canPlaceScenery(o)&&!campsiteProtected(o)&&!homesteadPlots.some(p=>Math.hypot(o.x-p.x,o.y-p.y)<120)&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandDetail(o)})),...woodlandCritters.filter(o=>islandDepth(o.x,o.y)>80&&Math.abs(o.x-cam.x)<1150&&Math.abs(o.y-cam.y)<900).map(o=>({y:o.y,draw:()=>drawWoodlandCritter(o)})),...frogs.filter(f=>Math.abs(f.x-cam.x)<1150&&Math.abs(f.y-cam.y)<900).map(f=>({y:f.y,draw:()=>drawFrog(f)})),{y:ruins.y,draw:()=>ruin(ruins.x,ruins.y)},...state.structures.filter(s=>s.kind!=='shelter'&&s.kind!=='hut'&&s.kind!=='lodge'&&s.kind!=='castle').map(s=>({y:s.y,draw:()=>structure(s)})),...(state.campTier>0?[{y:homeInside?-999999:cottage.y+42,draw:drawCampHome}]:[]),...(window.__gloamAddon?[{y:window.__gloamAddon.y,draw:()=>window.__gloamAddon.drawBoss()}]:[]),...(window.__thrummaw?[{y:window.__thrummaw.y,draw:()=>window.__thrummaw.creature()}]:[]),...(travelCamp&&state.resting?[{y:travelCamp.y+1,draw:drawTravelCamp}]:[]),{y:state.y+1,draw:()=>{if(homeInside||trollStumpInside)return;ctx.save();
  if(collapseRemaining<=0&&time<damageFlashUntil)ctx.globalAlpha*=Math.floor(time/95)%2===0?.34:1;
- const depth=walkingLakeLevel(state.x,state.y),seaDepth=islandDepth(state.x,state.y);if(depth>=1&&seaDepth<0){character(state.x,state.y,'boy');ctx.save();ctx.fillStyle='rgba(58,157,179,'+Math.min(.62,.16+(-seaDepth/62)*.38)+')';ctx.beginPath();ctx.ellipse(state.x,state.y+3,24,10,0,Math.PI,Math.PI*2);ctx.lineTo(state.x+24,state.y+4);ctx.ellipse(state.x,state.y+4,24,9,0,0,Math.PI);ctx.fill();ctx.strokeStyle='#d8f6edaa';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,27,7,0,0,Math.PI*2);ctx.stroke();ctx.restore()}else if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else if(paintingNow)paintHaigen();else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));trollHabitats.forEach((t,i)=>{if(caveTrolls.find(r=>r.sprite===i).room==='habitat'&&t.pos&&Math.abs(t.pos.x-cam.x)<1050&&Math.abs(t.pos.y-cam.y)<800)drawables.push({y:t.pos.y,draw:()=>drawTroll(t,i)})});for(const t of caveTrolls){if(t.room==='woods'&&Math.abs(t.x-cam.x)<1050&&Math.abs(t.y-cam.y)<800)drawables.push({y:t.y,draw:()=>drawTrollSprite(t.sprite,t.x,t.y,trollSpriteSize,t.dir,t.walking,t.clock)});}artDrawables(drawables);if(nico.ready)drawables.push({y:nico.y,draw:drawNico});drawables.push({y:trollStumpHome.y-2,draw:drawTrollStump});drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());worldEditorOutline();drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+ const depth=walkingLakeLevel(state.x,state.y),seaDepth=islandDepth(state.x,state.y);if(state.skiffAtSea){drawSkiff();character(state.x,state.y,'boy')}else if(depth>=1&&seaDepth<0){character(state.x,state.y,'boy');ctx.save();ctx.fillStyle='rgba(58,157,179,'+Math.min(.62,.16+(-seaDepth/62)*.38)+')';ctx.beginPath();ctx.ellipse(state.x,state.y+3,24,10,0,Math.PI,Math.PI*2);ctx.lineTo(state.x+24,state.y+4);ctx.ellipse(state.x,state.y+4,24,9,0,0,Math.PI);ctx.fill();ctx.strokeStyle='#d8f6edaa';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,27,7,0,0,Math.PI*2);ctx.stroke();ctx.restore()}else if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else if(paintingNow)paintHaigen();else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));trollHabitats.forEach((t,i)=>{if(caveTrolls.find(r=>r.sprite===i).room==='habitat'&&t.pos&&Math.abs(t.pos.x-cam.x)<1050&&Math.abs(t.pos.y-cam.y)<800)drawables.push({y:t.pos.y,draw:()=>drawTroll(t,i)})});for(const t of caveTrolls){if(t.room==='woods'&&Math.abs(t.x-cam.x)<1050&&Math.abs(t.y-cam.y)<800)drawables.push({y:t.y,draw:()=>drawTrollSprite(t.sprite,t.x,t.y,trollSpriteSize,t.dir,t.walking,t.clock)});}artDrawables(drawables);if(nico.ready)drawables.push({y:nico.y,draw:drawNico});drawables.push({y:trollStumpHome.y-2,draw:drawTrollStump});if(state.skiffBerth&&!state.skiffAtSea)drawSkiff();drawables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());worldEditorOutline();if(!state.skiffAtSea)drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
@@ -9422,7 +9468,7 @@ function worldEditorFindSafeHaigenSpot(cx,cy){
 function worldEditorBringHaigenHere(){
  const spot=worldEditorFindSafeHaigenSpot(cam.x,cam.y);
  if(!spot){notify('No safe ground nearby. Pan to a clearer area and try again.');return}
- state.x=spot.x;state.y=spot.y;state.resting=false;state.autonomy=false;
+ leaveSkiffBehind();state.x=spot.x;state.y=spot.y;state.resting=false;state.autonomy=false;
  autoDestination=null;autoPause=1000;cam.x=spot.x;cam.y=spot.y;
  cameraDetached=true;save();notify('Haigen has arrived safely.');
 }
@@ -9644,7 +9690,7 @@ function update(dt){updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=M
     Math.hypot(state.x-(cottage.x+35),state.y-(cottage.y-10))<310){
   state.resting=false;travelCamp=null;
  }
- const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>15000){idleTime=0;setAutonomy(true);notify('🌲 Haigen has resumed his own adventures.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput){setAutonomy(false);idleTime=0;}if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=walkingLakeLevel(state.x,state.y)<.82,sea=islandDepth(state.x,state.y)<0;state.x=clamp(state.x+dx*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.steps+=dt*.19}if(!homeInside){const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;}
+ const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.skiffAtSea&&!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>15000){idleTime=0;setAutonomy(true);notify('🌲 Haigen has resumed his own adventures.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput){setAutonomy(false);idleTime=0;}if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(state.skiffAtSea){skiffMove(dt,dx,dy)}else if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=walkingLakeLevel(state.x,state.y)<.82,sea=islandDepth(state.x,state.y)<0;state.x=clamp(state.x+dx*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.steps+=dt*.19}if(!homeInside&&!state.skiffAtSea){const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;}
 // Homestead collision and persistent entry/exit. Door is the only passage.
 if(state.campTier>0){
  const hx=cottage.x+35,hy=cottage.y-10,tier=displayedHouseTier();
@@ -10827,7 +10873,165 @@ function drawTrollStumpInterior(visiting=false){
  ctx.restore();
 }
 ctx.canvas.addEventListener('pointerdown',e=>{if(visitorRoom||!trollStumpInside)return;const rect=ctx.canvas.getBoundingClientRect();const x=(e.clientX-rect.left)*ctx.canvas.width/rect.width,y=(e.clientY-rect.top)*ctx.canvas.height/rect.height;if(Math.abs(x-ctx.canvas.width/2)<110&&y>=ctx.canvas.height-110&&y<=ctx.canvas.height-50){interact()}});
-function interact(){if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
+// Saltwick's marked coastal passage skirts the mainland before turning in toward the lighthouse.
+const skiffRoute = [
+ {x:3450,y:8450}, {x:3500,y:8500}, {x:3620,y:8240}, {x:3780,y:8000},
+ {x:4040,y:7700}, {x:4330,y:7600}, {x:4700,y:7480}, {x:5100,y:7350},
+ {x:5400,y:7070}, {x:5600,y:6820}, {x:5740,y:6720}, {x:5850,y:6680}, {x:5870,y:6630}
+];
+const skiffDistances = [0];
+for(let i=1;i<skiffRoute.length;i++){
+ const a=skiffRoute[i-1], b=skiffRoute[i];
+ skiffDistances.push(skiffDistances[i-1]+Math.hypot(b.x-a.x,b.y-a.y));
+}
+const skiffRouteLength=skiffDistances[skiffDistances.length-1];
+let skiffDistance=0, skiffHeading=0, skiffStroke=0, skiffRouteChecked=false;
+
+function skiffLanding(berth){
+ if(berth!=='island'&&berth!=='saltwick')return null;
+ const island=berth==='island', x=island?5940:3430, y=island?6630:8390;
+ // Build Mode can place a solid at a berth. Find nearby dry ground with room to walk away.
+ for(let radius=0;radius<=75;radius+=15){
+  for(let i=0;i<(radius?12:1);i++){
+   const a=i*Math.PI/6, lx=x+radius*Math.cos(a), ly=y+radius*Math.sin(a);
+   if(islandDepth(lx,ly)<15||blockedBySolid(lx,ly))continue;
+   if([[14,0],[-14,0],[0,14],[0,-14]].every(([ox,oy])=>!blockedBySolid(lx+ox,ly+oy)))return {x:lx,y:ly};
+  }
+ }
+ return null;
+}
+function skiffCourseClear(){
+ if(skiffRouteChecked)return true;
+ for(let i=1;i<skiffRoute.length;i++){
+  const a=skiffRoute[i-1], b=skiffRoute[i], steps=Math.ceil((skiffDistances[i]-skiffDistances[i-1])/10);
+  for(let j=0;j<=steps;j++){
+   const t=j/steps;
+   if(islandDepth(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t)>-5)return false;
+  }
+ }
+ skiffRouteChecked=true;
+ return true;
+}
+function skiffInteract(){
+ if(!['saltwick','island'].includes(state.skiffBerth))return false;
+ if(state.skiffAtSea){
+  const berth=skiffDistance<=1?'saltwick':skiffDistance>=skiffRouteLength-1?'island':null;
+  if(!berth){notify('🛶 Row to either shore to step out.');return true}
+  const landing=skiffLanding(berth);
+  if(!landing){notify('🛶 This landing is blocked. You can row back.');return true}
+  if(!finishSkiffCrossing(berth,landing))return true;
+  notify(berth==='island'?'🗼 Lighthouse island. Your skiff is moored here.':'🛶 Back on the Saltwick shore.');
+  return true;
+ }
+ const island=state.skiffBerth==='island', water=skiffRoute[island?skiffRoute.length-1:0];
+ if(Math.hypot(state.x-water.x,state.y-water.y)>165)return false;
+ const shore=skiffLanding(state.skiffBerth);
+ if(!shore||Math.hypot(state.x-shore.x,state.y-shore.y)>95)return false;
+ if(islandDepth(state.x,state.y)<5||blockedBySolid(state.x,state.y)){notify('🛶 Board from dry ground beside the skiff.');return true}
+ if(!skiffCourseClear()){notify('🛶 This passage has no clear channel.');return true}
+ if(state.autonomy)setAutonomy(false);
+ state.resting=false;idleTime=0;
+ if(!beginSkiffCrossing())return true;
+ skiffDistance=island?skiffRouteLength:0;
+ const next=skiffRoute[island?skiffRoute.length-2:1];
+ skiffHeading=Math.atan2(next.y-water.y,next.x-water.x);
+ state.x=water.x;state.y=water.y;
+ notify(island?'🛶 Row southwest along the marked channel.':'🛶 Row east along the marked channel.');
+ return true;
+}
+function skiffMove(dt,dx,dy){
+ const mag=Math.hypot(dx,dy);
+ let segment=1;
+ while(segment<skiffRoute.length-1&&skiffDistance>=skiffDistances[segment])segment++;
+ const a=skiffRoute[segment-1], b=skiffRoute[segment], length=skiffDistances[segment]-skiffDistances[segment-1];
+ const ux=(b.x-a.x)/length, uy=(b.y-a.y)/length;
+ const force=mag>.10?(dx*ux+dy*uy)/Math.max(mag,1):0;
+ const previous=skiffDistance;
+ skiffDistance=clamp(previous+force*.32*dt,0,skiffRouteLength);
+ while(segment<skiffRoute.length-1&&skiffDistance>skiffDistances[segment])segment++;
+ while(segment>1&&skiffDistance<skiffDistances[segment-1])segment--;
+ const start=skiffRoute[segment-1], end=skiffRoute[segment];
+ const t=(skiffDistance-skiffDistances[segment-1])/(skiffDistances[segment]-skiffDistances[segment-1]);
+ state.x=start.x+(end.x-start.x)*t;state.y=start.y+(end.y-start.y)*t;
+ if(skiffDistance!==previous){
+  skiffHeading=Math.atan2(end.y-start.y,end.x-start.x)+(force<0?Math.PI:0);
+  skiffStroke+=Math.abs(skiffDistance-previous)*.05;
+  if(skiffDistance===0||skiffDistance===skiffRouteLength)notify('🪢 At the mooring. Press Collect to step ashore.');
+ }
+}
+function drawSkiff(){
+ const island=state.skiffBerth==='island';
+ if(!island&&state.skiffBerth!=='saltwick')return;
+ const occupied=state.skiffAtSea, p=occupied?state:skiffRoute[island?skiffRoute.length-1:0];
+ if(Math.abs(p.x-cam.x)>W/worldZoom()/2+55||Math.abs(p.y-cam.y)>H/worldZoom()/2+60)return;
+ if(occupied){
+  const rangeX=W/worldZoom()/2+16, rangeY=H/worldZoom()/2+16;
+  for(const mark of skiffRoute){
+   const x=mark.x+12,y=mark.y+15;
+   if(Math.abs(x-cam.x)>rangeX||Math.abs(y-cam.y)>rangeY)continue;
+   ellipse(x,y+1,7,3,'#395665');ellipse(x,y-2,5,4,'#ac7954');
+   ctx.fillStyle='#574735';ctx.fillRect(x-1,y-14,2,11);
+   poly([[x,y-14],[x+8,y-12],[x,y-9]],'#e9d7a4');
+  }
+ }
+ ctx.save();ctx.translate(p.x,p.y+3);ctx.scale(1,.74);ctx.rotate(occupied?skiffHeading:-.25);
+ ellipse(-1,4,29,12,'#254a567a');
+ for(const side of [-1,1]){
+  const swing=occupied?Math.sin(skiffStroke)*.48:0;
+  ctx.save();ctx.translate(0,side*7);ctx.rotate(side*swing);
+  ctx.fillStyle='#aa8054';ctx.fillRect(-1,side<0?-17:0,3,17);
+  ctx.fillStyle='#c79c62';ctx.fillRect(-2,side<0?-22:15,5,8);ctx.restore();
+ }
+ poly([[-30,-2],[-21,-9],[-9,-13],[12,-12],[25,-7],[33,-1],[23,6],[10,11],[-10,12],[-23,7]],'#44382f');
+ poly([[-27,-2],[-11,-10],[12,-9],[28,-1],[11,7],[-11,8]],'#bd8a50');
+ poly([[-23,-2],[-10,-7],[12,-6],[23,-1],[9,5],[-11,5]],'#70503a');
+ ctx.fillStyle='#d8aa6a';ctx.fillRect(-11,-7,4,13);ctx.fillRect(8,-7,4,12);
+ ctx.restore();
+}
+
+// The fen renderer and the gathering action use the same planted reed locations.
+function fenPlantX(ix,iy){return (ix+.2+seeded(ix*103+iy*311)*.6)*105}
+function fenPlantY(ix,iy){return (iy+.2+seeded(ix*71-iy*107)*.6)*105}
+function gatherSkiffLashing(){
+ if(state.skiffBerth||state.skiffLashing||expandedRegion(state.x,state.y)?.id!=='fen')return false;
+ const col=Math.floor(state.x/105),row=Math.floor(state.y/105);
+ for(let iy=row-1;iy<=row+1;iy++)for(let ix=col-1;ix<=col+1;ix++){
+  const x=fenPlantX(ix,iy),y=fenPlantY(ix,iy);
+  if(Math.hypot(x-state.x,y-state.y)>75||expandedRegion(x,y)?.id!=='fen'||
+     fenTrailDistance(x,y)<90||fenArenaDistance(x,y)<220||fenWater(x,y)>.35||
+     seeded(ix*293+iy*499+9021)>=.65)continue;
+  state.skiffLashing=true;
+  save();notify('Haigen twists the swamp reeds into a lashing. Bring it to the Saltwick boathouse with 8 wood.');
+  return true;
+ }
+ return false;
+}
+const skiffBoathouse=objects.find(o=>o.id===280009);
+function skiffWorkshop(){
+ const house=skiffBoathouse;
+ if(!house||worldEditorHidden.has(house.id)||dist(state,house)>135)return false;
+ if(state.skiffBerth==='island'){
+  open('<h2>Saltwick boathouse</h2><p>Your skiff is at Riverwatch Lighthouse.</p><button class="btn" id="recallSkiff">Bring skiff back to Saltwick</button>');
+  $('recallSkiff').onclick=()=>{if(state.skiffAtSea||dist(state,house)>135)return;state.skiffBerth='saltwick';close();notify('Your skiff is back at the southeast slipway.')};
+  return true;
+ }
+ if(state.skiffBerth){
+  notify('Your skiff is at the southeast slipway. Look for SKIFF on the map.');
+  return true;
+ }
+ const ready=state.wood>=8&&state.skiffLashing;
+ open('<h2>Saltwick boathouse</h2><p>Build a rowing skiff for the passage to Riverwatch Lighthouse.</p>'+
+  '<p>Wood: '+Math.min(8,state.wood)+'/8 · Reed lashing: '+(state.skiffLashing?'1':'0')+'/1</p>'+
+  '<p>Gather wood in the woodland. Use Collect beside a clump of reeds in the Forgotten Swamps to twist a lashing.</p>'+
+  '<button class="btn" id="buildSaltwickSkiff" '+(ready?'':'disabled')+'>Build rowing skiff</button>');
+ $('buildSaltwickSkiff').onclick=()=>{
+  if(state.skiffBerth||state.wood<8||!state.skiffLashing||dist(state,house)>135)return;
+  state.wood-=8;delete state.skiffLashing;state.skiffBerth='saltwick';
+  close();notify('Skiff built! Walk southeast to the slipway marked SKIFF on your map. Use Collect to board.');
+ };
+ return true;
+}
+function interact(){if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
  ...objects.filter(o=>(o.type==='mushroom'||o.type==='bush')&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:o.type})),
  ...woodlandDetails.filter(o=>o.kind==='fungi'&&woodlandFungiReady(o)&&!campsiteProtected(o)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:'fungi'}))
  ].sort((a,b)=>a.d-b.d)[0];
@@ -11046,7 +11250,7 @@ function haigenUseRod(){
  startHaigenAction('land',1400);
  notify('🐟 Haigen landed '+qty+' fish!');save();return true;
 }
-function useTool(){if(collapseRemaining>0)return;if(state.autonomy)setAutonomy(false);if(window.__krakkle&&window.__krakkle.strike())return;if(window.__swampBosses&&window.__swampBosses.strike())return;if(window.__thrummaw&&window.__thrummaw.useTool&&window.__thrummaw.useTool())return;if(window.__gloamAddon&&window.__gloamAddon.useTool())return;if(state.equipped==='net'){haigenUseNet();return}if(state.equipped==='rod'){haigenUseRod();return}if(hitWildlife()){if(state.equipped!=='hands')startToolSwing(state.equipped);return}if(state.equipped!=='hands'&&state.tools[state.equipped])startToolSwing(state.equipped);if(state.equipped==='pickaxe'&&state.tools.pickaxe){const rock=objects.filter(o=>o.type==='rock'&&!state.removed.includes(o.id)&&!campsiteProtected(o)&&dist(o,state)<130).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(rock){breakBoulder(rock);return}digGround('pickaxe');return}if(state.equipped==='shovel'&&state.tools.shovel){digGround('shovel');return}if(state.equipped==='axe'&&state.tools.axe){const tree=objects.filter(o=>o.type==='tree'&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&near(o,145)).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(tree){soundEffect('chop',tree);const hits=(state.treeHits[tree.id]||0)+1;state.treeHits[tree.id]=hits;if(hits>=3){harvest(tree);mindEvent('gather','tree');delete state.treeHits[tree.id];if(tree.id===runeGuardianId)memory('ᚠ Haigen cleared the guardian tree and uncovered the ancient rune stone!');const base=Date.now()+'-'+tree.id;for(const [i,kind] of ['log','log','twig','leaves'].entries())state.fallen.push({id:base+'-'+i,x:clamp(tree.x+(i-1.5)*23,WORLD_MIN+50,WORLD-50),y:clamp(tree.y+20+(i%2)*25,WORLD_MIN+50,WORLD-50),kind});notify('🌲 TIMBER! Collect logs, twigs and leaves with X.')}else notify('🪓 Chop! '+hits+'/3 hits.');save()}else{soundEffect('swing');notify('🪓 Swing! Move closer to a tree.')}}else if(state.equipped==='torch'&&state.tools.torch){soundEffect('swing');notify('🔦 Haigen raises his torch.')}else notify('✋ Equip a tool using LB/RB or the hotbar.')}let gamepadXHeld=false,gamepadRTHeld=false;let gamepadStartHeld=false,gamepadBHeld=false;
+function useTool(){if(state.skiffAtSea||collapseRemaining>0)return;if(state.autonomy)setAutonomy(false);if(window.__krakkle&&window.__krakkle.strike())return;if(window.__swampBosses&&window.__swampBosses.strike())return;if(window.__thrummaw&&window.__thrummaw.useTool&&window.__thrummaw.useTool())return;if(window.__gloamAddon&&window.__gloamAddon.useTool())return;if(state.equipped==='net'){haigenUseNet();return}if(state.equipped==='rod'){haigenUseRod();return}if(hitWildlife()){if(state.equipped!=='hands')startToolSwing(state.equipped);return}if(state.equipped!=='hands'&&state.tools[state.equipped])startToolSwing(state.equipped);if(state.equipped==='pickaxe'&&state.tools.pickaxe){const rock=objects.filter(o=>o.type==='rock'&&!state.removed.includes(o.id)&&!campsiteProtected(o)&&dist(o,state)<130).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(rock){breakBoulder(rock);return}digGround('pickaxe');return}if(state.equipped==='shovel'&&state.tools.shovel){digGround('shovel');return}if(state.equipped==='axe'&&state.tools.axe){const tree=objects.filter(o=>o.type==='tree'&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&near(o,145)).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(tree){soundEffect('chop',tree);const hits=(state.treeHits[tree.id]||0)+1;state.treeHits[tree.id]=hits;if(hits>=3){harvest(tree);mindEvent('gather','tree');delete state.treeHits[tree.id];if(tree.id===runeGuardianId)memory('ᚠ Haigen cleared the guardian tree and uncovered the ancient rune stone!');const base=Date.now()+'-'+tree.id;for(const [i,kind] of ['log','log','twig','leaves'].entries())state.fallen.push({id:base+'-'+i,x:clamp(tree.x+(i-1.5)*23,WORLD_MIN+50,WORLD-50),y:clamp(tree.y+20+(i%2)*25,WORLD_MIN+50,WORLD-50),kind});notify('🌲 TIMBER! Collect logs, twigs and leaves with X.')}else notify('🪓 Chop! '+hits+'/3 hits.');save()}else{soundEffect('swing');notify('🪓 Swing! Move closer to a tree.')}}else if(state.equipped==='torch'&&state.tools.torch){soundEffect('swing');notify('🔦 Haigen raises his torch.')}else notify('✋ Equip a tool using LB/RB or the hotbar.')}let gamepadXHeld=false,gamepadRTHeld=false;let gamepadStartHeld=false,gamepadBHeld=false;
 let menuAHeld=false, menuDirection=0, menuRepeatAt=0, menuChoice=null;
 let viewSince=null, viewOpened=false;
 const menuOpen=()=>$('overlay').classList.contains('open');
@@ -11076,7 +11280,7 @@ function regionDestinations(){
 }
 function travelToPoint(point){
  state.autonomy=false;state.resting=false;
- cam.x=state.x=point.x;cam.y=state.y=point.y;
+ leaveSkiffBehind();cam.x=state.x=point.x;cam.y=state.y=point.y;
  close();notify('Arrived at '+point.name);
 }
 function markPlaytestSpot(){
@@ -11121,7 +11325,10 @@ function menuController(){
 }
 function checkActions(){const p=navigator.getGamepads&&Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);const x=!!(p&&p.buttons&&p.buttons[2]&&p.buttons[2].pressed),rt=!!(p&&p.buttons&&p.buttons[7]&&(p.buttons[7].pressed||p.buttons[7].value>.55));if(x&&!gamepadXHeld){if(state.autonomy)setAutonomy(false);interact()}if(rt&&!gamepadRTHeld)useTool();gamepadXHeld=x;gamepadRTHeld=rt}function call(){for(let c of companions){c.target={x:clamp(state.x+rand(-60,60),WORLD_MIN+60,WORLD-60),y:clamp(state.y+rand(-60,60),WORLD_MIN+60,WORLD-60)};c.mode='called';c.t=7000}notify('📣 You called Dylan and Skölli! Skölli may take his time...')}let mapZoom=1,mapBase=null;function showMap(){mapZoom=1;open('<h2>🗺️ Haigen’s World</h2><p class="small">Choose whether Haigen travels with the camera. Pinch to zoom. Press B to exit.</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin:10px 0"><button class="btn" id="mapCloseBtn" type="button">✕ Close map (B)</button><div><button class="btn" id="mapZoomOut" type="button">−</button> <span id="mapZoomLabel">1.0×</span> <button class="btn" id="mapZoomIn" type="button">+</button></div></div><label style="display:flex;align-items:center;gap:10px;margin:10px 0;padding:8px 10px;border:1px solid #a98c62;border-radius:8px"><input id="mapBringHaigen" type="checkbox" style="width:20px;height:20px;accent-color:#cda76c"> <span>⚔️ Bring Haigen with me (teleport)</span></label><canvas id="worldMap" width="560" height="560" style="width:100%;height:auto;aspect-ratio:1;background:#93b47b;border:2px solid #e8d4a1;border-radius:12px"></canvas><p class="small">🏕️ First Clearing · 🐟 Lake · ᚠ Rune stone · ⛰️ Highlands · 🌳 Grove · 🌿 Marsh</p><p class="small">Default: camera only. Tick Bring Haigen to move him safely too. Tap Haigen’s marker to return to him.</p>');$('mapCloseBtn').onclick=close;const canvas=$('worldMap'),g=canvas.getContext('2d'),sc=canvas.width/WORLD_SPAN;const mini=islandOverview();g.drawImage(mini,0,0,560,560);g.save();g.translate(-WORLD_MIN*sc,-WORLD_MIN*sc);
 for(const r of expandedRegions){g.fillStyle='#35483f';g.font='bold 9px system-ui';g.textAlign='center';g.fillText(r.name,(r.x+r.w*.5)*sc,(r.y+r.h*.5)*sc);g.textAlign='left'}for(const l of landmarks){g.beginPath();g.ellipse(l.x*sc,l.y*sc,(l.kind==='highlands'?620:510)*sc,(l.kind==='highlands'?400:360)*sc,0,0,Math.PI*2);g.fillStyle=l.kind==='highlands'?'#85928a':l.kind==='marsh'?'#6a9b87':'#51865b';g.fill()}g.beginPath();for(let i=0;i<=96;i++){const a=i*Math.PI*2/96,rad=lakeRadius(a),x=(pond.x+Math.cos(a)*pond.rx*rad)*sc,y=(pond.y+Math.sin(a)*pond.ry*rad)*sc;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fillStyle='#448caa';g.fill();
-g.save();g.lineCap='round';g.lineJoin='round';g.beginPath();mountainRiverPoints.forEach((p,i)=>i?g.lineTo(p.x*sc,p.y*sc):g.moveTo(p.x*sc,p.y*sc));g.strokeStyle='#3f9fba';g.lineWidth=Math.max(2,110*sc);g.stroke();g.restore();for(const o of objects){if(o.type!=='tree'||o.x>4200||o.y>4200||islandDepth(o.x,o.y)<25||state.removed.includes(o.id))continue;g.fillStyle='#4d8051';g.fillRect(o.x*sc,o.y*sc,2,2)}for(const [p,label,color] of [[cottage,'CAMP','#f9e6a0'],[ruins,'RUNE','#e5c6f7'],[landmarks[0],'HIGHLANDS','#e7e4d4'],[storyStep().place,'QUEST','#f9bd64']]){if(!p)continue;g.fillStyle=color;g.beginPath();g.arc(p.x*sc,p.y*sc,4,0,Math.PI*2);g.fill();g.font='bold 10px system-ui';g.fillText(label,p.x*sc+7,p.y*sc-6)}for(const l of landmarks.slice(1)){g.fillStyle='#f4eed3';g.font='bold 10px system-ui';g.fillText(l.name,l.x*sc+6,l.y*sc-6)}for(const b of state.structures){g.fillStyle=b.kind==='campfire'?'#efaa5a':'#fff0bc';g.fillRect(b.x*sc-2,b.y*sc-2,4,4)}for(const bridge of easternBridges){const bx=easternRiverX(bridge.y)*sc,by=bridge.y*sc;g.fillStyle='#dfb678';g.fillRect(bx-7,by-2,14,4)}g.restore();mapBase=document.createElement('canvas');mapBase.width=560;mapBase.height=560;mapBase.getContext('2d').drawImage(canvas,0,0);canvas.style.touchAction='none';const pointers=new Map();let pinch=0;canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});});canvas.addEventListener('pointermove',e=>{const p=pointers.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;if(pointers.size===2){const q=[...pointers.values()],d=Math.hypot(q[0].x-q[1].x,q[0].y-q[1].y);if(pinch)changeMapZoom((d/pinch-1)*mapZoom);pinch=d;}});canvas.addEventListener('pointerup',e=>{const p=pointers.get(e.pointerId),single=pointers.size===1;pointers.delete(e.pointerId);pinch=0;if(!single||!p||Math.hypot(e.clientX-p.sx,e.clientY-p.sy)>12)return;const rect=canvas.getBoundingClientRect(),u=clamp((e.clientX-rect.left)/rect.width,0,1),v=clamp((e.clientY-rect.top)/rect.height,0,1),size=560/mapZoom,sc=560/WORLD_SPAN,cx=clamp((state.x-WORLD_MIN)*sc-size/2,0,560-size),cy=clamp((state.y-WORLD_MIN)*sc-size/2,0,560-size);const hx=((state.x-WORLD_MIN)*sc-cx)*560/size,hy=((state.y-WORLD_MIN)*sc-cy)*560/size;if(Math.hypot(u*560-hx,v*560-hy)<22){cam.x=state.x;cam.y=state.y;cameraDetached=false;close();notify('🧭 Camera following Haigen.');return;}const tx=clamp(WORLD_MIN+(cx+u*size)/sc,WORLD_MIN,WORLD),ty=clamp(WORLD_MIN+(cy+v*size)/sc,WORLD_MIN,WORLD);if($('mapBringHaigen').checked){const spot=worldEditorFindSafeHaigenSpot(tx,ty);if(!spot){notify('⚠️ No safe landing spot here. Choose clearer ground.');return;}state.x=spot.x;state.y=spot.y;state.resting=false;autoDestination=null;autoPause=1000;cam.x=spot.x;cam.y=spot.y;cameraDetached=false;save();close();notify('⚔️ Haigen travelled with you to safe ground.');return;}cam.x=tx;cam.y=ty;cameraDetached=true;cameraLastPanAt=performance.now();close();notify('🗺️ Camera moved. Haigen keeps exploring.');});canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);pinch=0;});$('mapZoomIn').onclick=()=>changeMapZoom(.5);$('mapZoomOut').onclick=()=>changeMapZoom(-.5);drawMapZoom()}$('regionsQuickBtn').onclick=showMap;
+g.save();g.lineCap='round';g.lineJoin='round';g.beginPath();mountainRiverPoints.forEach((p,i)=>i?g.lineTo(p.x*sc,p.y*sc):g.moveTo(p.x*sc,p.y*sc));g.strokeStyle='#3f9fba';g.lineWidth=Math.max(2,110*sc);g.stroke();g.restore();for(const o of objects){if(o.type!=='tree'||o.x>4200||o.y>4200||islandDepth(o.x,o.y)<25||state.removed.includes(o.id))continue;g.fillStyle='#4d8051';g.fillRect(o.x*sc,o.y*sc,2,2)}for(const [p,label,color] of [[cottage,'CAMP','#f9e6a0'],[ruins,'RUNE','#e5c6f7'],[landmarks[0],'HIGHLANDS','#e7e4d4'],[storyStep().place,'QUEST','#f9bd64']]){if(!p)continue;g.fillStyle=color;g.beginPath();g.arc(p.x*sc,p.y*sc,4,0,Math.PI*2);g.fill();g.font='bold 10px system-ui';g.fillText(label,p.x*sc+7,p.y*sc-6)}for(const l of landmarks.slice(1)){g.fillStyle='#f4eed3';g.font='bold 10px system-ui';g.fillText(l.name,l.x*sc+6,l.y*sc-6)}for(const b of state.structures){g.fillStyle=b.kind==='campfire'?'#efaa5a':'#fff0bc';g.fillRect(b.x*sc-2,b.y*sc-2,4,4)}for(const bridge of easternBridges){const bx=easternRiverX(bridge.y)*sc,by=bridge.y*sc;g.fillStyle='#dfb678';g.fillRect(bx-7,by-2,14,4)}if(state.skiffBerth){
+ const dock=skiffLanding(state.skiffBerth);
+ if(dock){g.fillStyle='#172e39';g.fillRect(dock.x*sc-3,dock.y*sc-3,6,6);g.font='bold 9px system-ui';g.fillText('SKIFF',dock.x*sc+5,dock.y*sc-2)}
+}g.restore();mapBase=document.createElement('canvas');mapBase.width=560;mapBase.height=560;mapBase.getContext('2d').drawImage(canvas,0,0);canvas.style.touchAction='none';const pointers=new Map();let pinch=0;canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});});canvas.addEventListener('pointermove',e=>{const p=pointers.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;if(pointers.size===2){const q=[...pointers.values()],d=Math.hypot(q[0].x-q[1].x,q[0].y-q[1].y);if(pinch)changeMapZoom((d/pinch-1)*mapZoom);pinch=d;}});canvas.addEventListener('pointerup',e=>{const p=pointers.get(e.pointerId),single=pointers.size===1;pointers.delete(e.pointerId);pinch=0;if(!single||!p||Math.hypot(e.clientX-p.sx,e.clientY-p.sy)>12)return;const rect=canvas.getBoundingClientRect(),u=clamp((e.clientX-rect.left)/rect.width,0,1),v=clamp((e.clientY-rect.top)/rect.height,0,1),size=560/mapZoom,sc=560/WORLD_SPAN,cx=clamp((state.x-WORLD_MIN)*sc-size/2,0,560-size),cy=clamp((state.y-WORLD_MIN)*sc-size/2,0,560-size);const hx=((state.x-WORLD_MIN)*sc-cx)*560/size,hy=((state.y-WORLD_MIN)*sc-cy)*560/size;if(Math.hypot(u*560-hx,v*560-hy)<22){cam.x=state.x;cam.y=state.y;cameraDetached=false;close();notify('🧭 Camera following Haigen.');return;}const tx=clamp(WORLD_MIN+(cx+u*size)/sc,WORLD_MIN,WORLD),ty=clamp(WORLD_MIN+(cy+v*size)/sc,WORLD_MIN,WORLD);if($('mapBringHaigen').checked){const spot=worldEditorFindSafeHaigenSpot(tx,ty);if(!spot){notify('⚠️ No safe landing spot here. Choose clearer ground.');return;}leaveSkiffBehind();state.x=spot.x;state.y=spot.y;state.resting=false;autoDestination=null;autoPause=1000;cam.x=spot.x;cam.y=spot.y;cameraDetached=false;save();close();notify('⚔️ Haigen travelled with you to safe ground.');return;}cam.x=tx;cam.y=ty;cameraDetached=true;cameraLastPanAt=performance.now();close();notify('🗺️ Camera moved. Haigen keeps exploring.');});canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);pinch=0;});$('mapZoomIn').onclick=()=>changeMapZoom(.5);$('mapZoomOut').onclick=()=>changeMapZoom(-.5);drawMapZoom()}$('regionsQuickBtn').onclick=showMap;
 setInterval(()=>{if($('worldMap')&&mapBase)drawMapZoom()},220);
 function changeMapZoom(delta){if(!mapBase||!$('worldMap'))return;mapZoom=clamp(mapZoom+delta,1,6);drawMapZoom()}function drawMapZoom(){const c=$('worldMap');if(!c||!mapBase)return;const g=c.getContext('2d'),size=560/mapZoom,sc=560/WORLD_SPAN,cx=clamp((state.x-WORLD_MIN)*sc-size/2,0,560-size),cy=clamp((state.y-WORLD_MIN)*sc-size/2,0,560-size);g.clearRect(0,0,560,560);g.imageSmoothingEnabled=true;g.drawImage(mapBase,cx,cy,size,size,0,0,560,560);const px=((state.x-WORLD_MIN)*sc-cx)*560/size,py=((state.y-WORLD_MIN)*sc-cy)*560/size,pulse=2+Math.sin(Date.now()*.006)*1.5;g.fillStyle='#ffe46e';g.strokeStyle='#1d302b';g.lineWidth=2;g.beginPath();g.arc(px,py,6+pulse,0,Math.PI*2);g.fill();g.stroke();g.fillStyle='#fff5d7';g.font='bold 12px system-ui';g.fillText('HAIGEN',Math.min(490,px+12),Math.max(15,py-9));$('mapZoomLabel').textContent=mapZoom.toFixed(1)+'×'}function safeText(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function mood(){if(state.health<35)return 'hurt';if(state.energy<25)return 'sleepy';if(state.hunger<25)return 'hungry';if(state.fun<25)return 'bored';if(state.health>75&&state.energy>55&&state.hunger>45&&state.fun>55)return 'happy';return 'thoughtful'}
@@ -11226,7 +11433,7 @@ function backpack(){
    ['🍄 Mushrooms',state.mushrooms],['🩵 Medicinal fungi',state.medicinalMushrooms]
   ]},
   {title:'🪵 Materials',items:[
-   ['🪵 Carried wood',state.wood],['🪨 Stone',state.stone],
+   ['🪵 Carried wood',state.wood],['🪨 Stone',state.stone],...(state.skiffLashing?[['🌿 Reed lashing',1]]:[]),
    ['🌿 Twigs',state.twigs],['🍃 Leaves',state.leaves]
   ].concat(Object.entries(state.minerals||{}).map(([name,count])=>['🪨 '+name,count]))},
   {title:'🏺 Unearthed artefacts',items:Object.entries((state.buriedArtifacts||[]).reduce((counts,a)=>{
@@ -11608,7 +11815,7 @@ function drawSaltwickInterior(){
  else {rect(.12,.38,.24,.26,'#7a5b46');rect(.14,.40,.20,.19,'#e4d5b1');ellipse(.74,.48,.09,.06,'#728c62')}
  rect(.43,.88,.14,.12,'#493427');rect(.45,.89,.10,.11,'#c2a17a');
  ctx.fillStyle='#f1d8a7';ctx.textAlign='center';ctx.font='bold '+Math.max(15,Math.round(s*.035))+'px Georgia';ctx.fillText(title,w/2,Math.max(26,y-13));
- ctx.font=Math.max(12,Math.round(s*.023))+'px Georgia';ctx.fillText('Tap the doorway to leave · Haigen continues exploring',w/2,Math.min(h-8,y+s+24));
+ ctx.font=Math.max(12,Math.round(s*.023))+'px Georgia';ctx.fillText(kind==='boathouse'?'Stand outside the boathouse and use Collect to build a skiff.':'Tap the doorway to leave · Haigen continues exploring',w/2,Math.min(h-8,y+s+24));
  setVisitorDoorBounds(x+s*.5,y+s*.94,s*.19,s*.13);
  ctx.restore();
 }
@@ -11821,7 +12028,7 @@ function frame(now){
    {x:pond.x,y:pond.y+pond.ry*1.5}
   ];
   const bank=candidates.find(q=>lakeLevel(q.x,q.y)>1.25&&islandDepth(q.x,q.y)>130&&!blockedBySolid(q.x,q.y))||candidates[0];
-  state.x=bank.x;state.y=bank.y;state.resting=false;state.autonomy=false;
+  leaveSkiffBehind();state.x=bank.x;state.y=bank.y;state.resting=false;state.autonomy=false;
   // Showcase the classic V65 leap sequence in the isolated preview without
   // changing the original frog lifecycle or saving temporary hop state.
   const nearby=frogs.filter(q=>Math.abs(q.x-bank.x)<500&&Math.abs(q.y-bank.y)<420);
