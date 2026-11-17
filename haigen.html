@@ -8490,9 +8490,11 @@ function drawWoodlandFloorV391(nightMix){
   const x=gx*step+hash(gx,gy,1)*step,y=gy*step+hash(gx,gy,2)*step;
   if(!rbWoodland(x,y))continue;
   const nearHome=Math.hypot(x-cottage.x,y-cottage.y)<310;
-  const routeDistance=roadDistance(x,y);
   const density=nearHome?.36:.86;
   if(hash(gx,gy,3)>density)continue;
+  // Road distance is pure and only used by surviving decorative samples.
+  // Avoid scanning every road segment for rejected woodland cells.
+  const routeDistance=roadDistance(x,y);
   const dark=nightMix*.48;
   // Fade floor strokes at road edges rather than drawing grass over the paths.
   const routeFade=coastSmooth(45,125,routeDistance);
