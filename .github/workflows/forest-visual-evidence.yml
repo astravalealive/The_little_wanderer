@@ -6,6 +6,7 @@ on:
       - 'tests/live/forest-evidence.cjs'
       - 'tests/live/woodland-ground-contract.test.cjs'
       - 'tests/live/woodland-perf.test.cjs'
+      - 'tests/live/woodland-viewport-cull.test.cjs'
       - '.github/workflows/forest-visual-evidence.yml'
   workflow_dispatch:
 permissions:
@@ -25,6 +26,8 @@ jobs:
         run: node tests/live/woodland-ground-contract.test.cjs
       - name: Check exact woodland edge math and benchmark
         run: node tests/live/woodland-perf.test.cjs
+      - name: Check viewport culling preserves woodland samples
+        run: node tests/live/woodland-viewport-cull.test.cjs
       - name: Capture fixed-camera woodland screenshots
         run: node tests/live/forest-evidence.cjs
       - name: Upload forest screenshots
