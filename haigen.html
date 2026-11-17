@@ -11084,29 +11084,34 @@ function raftInteract(){
 }
 // Walking onto the built raft boards automatically. Stepping toward dry land docks automatically.
 function raftWalkBoard(dx,dy){
- if(!state.raftBuilt||state.raftAfloat||state.skiffAtSea||homeInside||visitorRoom||worldEditorActive||state.autonomy)return false;
+ if(!state.raftBuilt||state.raftAfloat||state.skiffAtSea||homeInside||visitorRoom||worldEditorActive||state.autonomy||state.resting)return false;
  const r=raftEnds();if(!r.ready)return false;
  const berth=state.raftBerth==='island'?'island':'shore',p=berth==='island'?r.b:r.a;
- const outward=berth==='shore'?1:-1;
- if(dx*outward>=-.15||Math.hypot(state.x-p.x,state.y-p.y)>48)return false;
- state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.moving=false;raft.facing=-outward;raft.stroke=0;
- notify('🛶 Aboard the raft. Paddle towards the opposite bank.');return true;
+ const towardWater=berth==='shore'?-1:1;
+ // The raft is drawn at its mooring; walking toward the water from any close approach boards it.
+ if(dx*towardWater<.12||Math.hypot(state.x-p.x,state.y-p.y)>62)return false;
+ state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.moving=false;raft.facing=towardWater;raft.stroke=0;
+ notify('🛶 Aboard. Steer freely; paddle into a bank to step ashore.');return true;
 }
 function raftMove(dt,dx,dy){
  const r=raftEnds();if(!r.ready){state.raftAfloat=false;raft.moving=false;notify('The raft has returned to its mooring.');return}
- const mag=Math.hypot(dx,dy),along=mag>.10?dx/Math.max(mag,1):0;
- const berth=Math.abs(state.x-r.a.x)<62?'shore':Math.abs(state.x-r.b.x)<62?'island':null;
- if(berth&&along*(berth==='shore'?1:-1)>.25){
-  const p=berth==='shore'?r.a:r.b;
-  if(!blockedBySolid(p.x,p.y)){
-   state.x=p.x;state.y=p.y;state.raftAfloat=false;state.raftBerth=berth;raft.moving=false;
-   notify('🪢 Stepped ashore.');save();return;
-  }
+ const mag=Math.hypot(dx,dy);raft.moving=false;
+ if(mag<=.10)return;
+ const vx=dx/Math.max(1,mag),vy=dy/Math.max(1,mag),speed=dt*.24;
+ const nx=state.x+vx*speed,ny=state.y+vy*speed;
+ const atIsland=onLakeIsland(nx,ny),atMainland=lakeLevel(nx,ny)>1.02;
+ // Shore exit is based on actual terrain, not a fixed left/right endpoint.
+ if((atIsland||atMainland)&&lakeLevel(state.x,state.y)<1.01&&!onLakeIsland(state.x,state.y)&&!blockedBySolid(nx,ny)){
+  const berth=atIsland?'island':'shore';
+  state.x=nx;state.y=ny;state.raftAfloat=false;state.raftBerth=berth;raft.moving=false;
+  notify('🪢 Stepped ashore.');save();return;
  }
- const old=state.x;
- state.x=clamp(state.x+along*dt*.24,Math.min(r.a.x,r.b.x),Math.max(r.a.x,r.b.x));state.y=r.b.y;
- raft.moving=Math.abs(state.x-old)>.001;raft.pace=raft.moving?Math.min(1,Math.abs(state.x-old)/Math.max(1,dt*.24)):0;
- if(raft.moving){raft.facing=Math.sign(state.x-old);raft.stroke+=Math.abs(state.x-old)*.095}
+ // Remain on lake water; don't sail through mountains, islands or unrelated terrain.
+ if(lakeLevel(nx,ny)>1.06&&!onLakeIsland(nx,ny))return;
+ const oldX=state.x,oldY=state.y;
+ state.x=nx;state.y=ny;raft.moving=true;raft.pace=1;
+ if(Math.abs(vx)>.1)raft.facing=Math.sign(vx);
+ raft.stroke+=Math.hypot(state.x-oldX,state.y-oldY)*.095;
 }
 function drawRaft(){
  const r=raftEnds();if(!r.ready)return;
