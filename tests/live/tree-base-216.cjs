@@ -1,0 +1,15 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const s=fs.readFileSync('haigen.html','utf8');
+const start=s.indexOf('function rbDrawTree(o){'),end=s.indexOf('\n// V163:',start);
+assert(start>=0&&end>start,'tree renderer found');
+const body=s.slice(start,end);
+assert(body.includes("ellipse(o.x+1,o.y+5,30*s,9*s,'#53764b30')"),'moss apron retained');
+assert(body.includes("ellipse(o.x+1,o.y+4,26*s,8*s,'#24423766')"),'original shadow retained');
+assert(body.indexOf('#53764b30')<body.indexOf('#24423766'),'moss lies beneath shadow');
+assert(body.includes('rbTreeImage(o.id)')&&body.includes('ctx.drawImage(c,'),'existing tree sprite preserved');
+assert(!body.includes('Math.random'),'deterministic tree bases');
+assert(s.includes('rbTileCache.grass=ctx.createPattern'),'cached forest floor remains');
+assert(s.includes('setInterval(save,5000)'),'autosave unchanged');
+console.log('PASS Job 216 woodland tree base regression');
