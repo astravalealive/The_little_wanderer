@@ -1,0 +1,17 @@
+name: Woodland tree base 216
+on:
+  pull_request:
+    paths:
+      - haigen.html
+      - tests/live/tree-base-216.cjs
+      - .github/workflows/tree-base-216.yml
+  workflow_dispatch:
+jobs:
+  tree-base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/live/tree-base-216.cjs
