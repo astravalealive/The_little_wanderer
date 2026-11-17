@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const source=fs.readFileSync(path.join(__dirname,'../../haigen.html'),'utf8');
+const start=source.indexOf('function boatwrightJournal(){'),end=source.indexOf('function journal(){',start);
+assert(start>0&&end>start);
+const render=state=>new vm.Script(source.slice(start,end)+';boatwrightJournal()').runInNewContext({state});
+const base={wood:8,raftBuilt:true,skiffLashing:false,skiffBerth:'saltwick',skiffAtSea:false};
+assert.match(render({...base,skiffAtSea:true}),/underway · row toward Saltwick or Riverwatch Lighthouse to land/);
+assert.doesNotMatch(render({...base,skiffAtSea:true}),/moored at Saltwick/);
+assert.match(render({...base,skiffBerth:'island',skiffAtSea:true}),/underway · row toward Saltwick or Riverwatch Lighthouse to land/);
+assert.doesNotMatch(render({...base,skiffBerth:'island',skiffAtSea:true}),/moored at Riverwatch Lighthouse/);
+assert.match(render(base),/use Collect to board at the southeast slipway/);
+assert.match(render({...base,skiffBerth:'island'}),/return to Saltwick boathouse to recall it/);
+assert.match(render({...base,skiffBerth:undefined,skiffAtSea:false}),/swamp reed lashing needed/);
+assert.match(render(base),/Ocean Longship:<\/b> Locked/);
+console.log('PASS Job 212: underway status and prior voyage states');
