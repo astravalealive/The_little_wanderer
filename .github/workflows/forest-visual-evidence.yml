@@ -1,0 +1,30 @@
+name: Forest visual evidence
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'tests/live/forest-evidence.cjs'
+      - '.github/workflows/forest-visual-evidence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  forest-captures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        run: npm install --no-save playwright-core@1.56.1
+      - name: Capture fixed-camera woodland screenshots
+        run: node tests/live/forest-evidence.cjs
+      - name: Upload forest screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forest-visual-evidence
+          path: forest-visual-evidence/*.png
+          if-no-files-found: warn
