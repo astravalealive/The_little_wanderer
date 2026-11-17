@@ -5758,25 +5758,20 @@ function onJetty(x,y){
  return (dx<=51&&dy>=-8&&dy<=136)||(dx<=35&&dy>=-31&&dy< -8);
 }
 function walkingLakeLevel(x,y){return onJetty(x,y)||onLakeIsland(x,y)?1.1:lakeLevel(x,y)}
+// A modest lakeside fishing landing. Save the large timber jetty design for the coastal harbour.
 function worldDrawDock(p){
- const x=p.x,y=p.y;ctx.save();ctx.imageSmoothingEnabled=false;
- for(let i=0;i<2;i++){
-  const top=y-31+i*12;
-  ctx.fillStyle='#554332';ctx.fillRect(x-35,top,70,13);
-  ctx.fillStyle=i?'#ba9669':'#997950';ctx.fillRect(x-35,top,70,9);
-  ctx.fillStyle='#dbc099';ctx.fillRect(x-32,top+1,64,2);
+ const x=p.x,y=p.y;ctx.save();
+ ellipse(x,y+14,71,38,'#8b76524a');
+ ellipse(x,y+7,57,27,'#b6a07580');
+ for(const [dx,dy,r] of [[-47,12,8],[38,24,6],[-26,-12,5],[48,-8,5]]){
+  ellipse(x+dx,y+dy,r,r*.65,'#8f8b7a');
+  ellipse(x+dx-1,y+dy-2,r*.65,r*.3,'#c2b9a1');
  }
- for(let i=0;i<9;i++){
-  const yy=y-6+i*16;
-  ctx.fillStyle='#493b2d';ctx.fillRect(x-51,yy-2,104,16);
-  ctx.fillStyle=i%2?'#a68156':'#b79569';ctx.fillRect(x-47,yy,96,11);
-  ctx.fillStyle='#dac198';ctx.fillRect(x-45,yy+1,84,2);
-  ctx.fillStyle='#5a4433';ctx.fillRect(x-40,yy+10,83,2);
+ for(const dx of [-36,30]){
+  ctx.strokeStyle='#5a4630';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x+dx,y-15);ctx.lineTo(x+dx+2,y+12);ctx.stroke();
+  ctx.strokeStyle='#c2a17a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+dx-2,y-12);ctx.lineTo(x+dx+5,y-12);ctx.stroke();
  }
- for(const dx of [-46,46])for(const yy of [y-5,y+112]){
-  ctx.fillStyle='#49392d';ctx.fillRect(x+dx-5,yy-13,10,26);
-  ctx.fillStyle='#b09265';ctx.fillRect(x+dx-2,yy-12,5,23);
- }
+ ctx.strokeStyle='#c5a57a';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x-34,y-10,12,0,Math.PI*1.7);ctx.stroke();
  ctx.restore();
 }
 
@@ -11115,6 +11110,17 @@ function raftMove(dt,dx,dy){
 }
 function drawRaft(){
  const r=raftEnds();if(!r.ready)return;
+ // The first raft has a natural shore landing, with a mooring stake and cleared approach.
+ const shore=r.a;
+ if(Math.abs(shore.x-cam.x)<W/worldZoom()/2+100&&Math.abs(shore.y-cam.y)<H/worldZoom()/2+100){
+  ctx.save();ellipse(shore.x+26,shore.y,65,34,'#9b85635c');
+  for(const [dx,dy] of [[32,-15],[46,12],[16,18]]){
+   ellipse(shore.x+dx,shore.y+dy,7,4,'#a9a08a');
+  }
+  ctx.strokeStyle='#59422e';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(shore.x+7,shore.y-15);ctx.lineTo(shore.x+7,shore.y+8);ctx.stroke();
+  ctx.strokeStyle='#d3b68c';ctx.lineWidth=2;ctx.beginPath();ctx.arc(shore.x+7,shore.y-8,6,.2,Math.PI*1.9);ctx.stroke();ctx.restore();
+ }
+
  if(!state.raftBuilt){
   const p=r.a;
   if(Math.abs(p.x-cam.x)>W/worldZoom()/2+90||Math.abs(p.y-cam.y)>H/worldZoom()/2+90)return;
