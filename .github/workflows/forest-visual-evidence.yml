@@ -8,6 +8,7 @@ on:
       - 'tests/live/woodland-perf.test.cjs'
       - 'tests/live/woodland-viewport-cull.test.cjs'
       - 'tests/live/woodland-grid-range.test.cjs'
+      - 'tests/live/woodland-road-density.test.cjs'
       - '.github/workflows/forest-visual-evidence.yml'
   workflow_dispatch:
 permissions:
@@ -31,6 +32,8 @@ jobs:
         run: node tests/live/woodland-viewport-cull.test.cjs
       - name: Verify bounded woodland grid preserves sample order
         run: node tests/live/woodland-grid-range.test.cjs
+      - name: Check density-filtered road distance work
+        run: node tests/live/woodland-road-density.test.cjs
       - name: Capture fixed-camera woodland screenshots
         run: node tests/live/forest-evidence.cjs
       - name: Upload forest screenshots
