@@ -4453,6 +4453,8 @@ const rbTileCache={grass:null,tree:new Map(),rock:new Map()};
 function rbWoodland(x,y){return x>=0&&x<3500&&y>=0&&y<3100&&!expandedRegion(x,y)}
 // Repeating 8x8 atlas of 16x16 ground tiles, with sub-tile 8x8 details.
 function rbGrass(){
+ // Opt-in storybook woodland art preview. Production visuals remain unchanged by default.
+ if(new URLSearchParams(location.search).get('forestArtPreview')==='1')return rbStorybookGrass();
  // V399: large seamless painterly ground pattern, no 16px square atlas.
  if(rbTileCache.grass)return rbTileCache.grass;
  const size=512,tile=document.createElement('canvas');tile.width=tile.height=size;
@@ -4491,6 +4493,37 @@ function rbGrass(){
  }
  rbTileCache.grass=ctx.createPattern(tile,'repeat');
  return rbTileCache.grass;
+}
+function rbStorybookGrass(){
+ if(rbTileCache.storybookGrass)return rbTileCache.storybookGrass;
+ const size=512,tile=document.createElement('canvas');tile.width=tile.height=size;
+ const g=tile.getContext('2d');
+ let seed=884211;const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+ g.fillStyle='#648b62';g.fillRect(0,0,size,size);
+ // Seamless, broad woodland colour variation rather than dense uniform grass speckling.
+ const blob=(x,y,rx,ry,color,alpha)=>{
+  g.fillStyle=color;g.globalAlpha=alpha;
+  for(let ox=-size;ox<=size;ox+=size)for(let oy=-size;oy<=size;oy+=size){
+   g.beginPath();g.ellipse(x+ox,y+oy,rx,ry,0,0,Math.PI*2);g.fill();
+  }
+  g.globalAlpha=1;
+ };
+ for(let i=0;i<220;i++)blob(rng()*size,rng()*size,15+rng()*54,9+rng()*36,['#426b52','#86a475','#537f58','#9caa79'][i%4],.10+rng()*.14);
+ for(let i=0;i<520;i++){
+  const x=rng()*size,y=rng()*size;
+  blob(x,y,1+rng()*3,.6+rng()*1.6,['#b7b48b','#375c48','#92ac7e'][i%3],.20+rng()*.22);
+ }
+ g.lineCap='round';
+ for(let i=0;i<420;i++){
+  const x=rng()*size,y=rng()*size,h=3+rng()*7;
+  g.strokeStyle=['#3e684b','#a1b58a','#537f59'][i%3];g.globalAlpha=.28+rng()*.25;g.lineWidth=.8+rng()*.8;
+  for(let ox=-size;ox<=size;ox+=size)for(let oy=-size;oy<=size;oy+=size){
+   g.beginPath();g.moveTo(x+ox,y+oy);g.lineTo(x+ox+1,y+oy-h);g.stroke();
+  }
+ }
+ g.globalAlpha=1;
+ rbTileCache.storybookGrass=ctx.createPattern(tile,'repeat');
+ return rbTileCache.storybookGrass;
 }
 function rbDrawGround(){
  // V403: one continuous woodland surface, with smooth world-space feathering.
