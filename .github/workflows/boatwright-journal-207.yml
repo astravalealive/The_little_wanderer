@@ -1,0 +1,15 @@
+name: Boatwright journal 207
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'tests/live/boatwright-journal-207.cjs'
+      - '.github/workflows/boatwright-journal-207.yml'
+  workflow_dispatch:
+jobs:
+  journal-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Boatwright journal state scenarios
+        run: node tests/live/boatwright-journal-207.cjs
