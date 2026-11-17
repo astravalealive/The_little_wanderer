@@ -1,0 +1,21 @@
+name: Haigen save contract checks
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'tests/save/**'
+      - '.github/workflows/haigen-save-contract.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  save-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check save fixtures against canonical game
+        run: node tests/save/save-contract.test.cjs
