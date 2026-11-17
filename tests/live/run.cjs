@@ -64,6 +64,21 @@ async function run(){
    // Do not overwrite unknown production save keys or fabricate save schemas.
    const key='__haigen_regression_sentinel__';
    await page.evaluate(k=>localStorage.setItem(k,'qa-preserved'),key);
+   const saveKeys=await page.evaluate(()=>window.__haigenSaveKeys);
+   assert.equal(saveKeys?.live,'haigenWorldSave','live save key probe missing');
+   assert.equal(saveKeys?.legacyLive,'wandererV127PreviewSave','legacy live save key probe missing');
+   await page.evaluate(()=>{
+    const qa=window.__haigenSaveQA;
+    if(typeof qa==='function')qa().flush();
+   });
+   const dual=await page.evaluate(()=>({
+    live:!!localStorage.getItem('haigenWorldSave'),
+    legacy:!!localStorage.getItem('wandererV127PreviewSave'),
+    sentinel:localStorage.getItem('__haigen_regression_sentinel__')
+   }));
+   assert.equal(dual.live,true,'canonical live key not written');
+   assert.equal(dual.legacy,true,'legacy live key not dual-written');
+   assert.equal(dual.sentinel,'qa-preserved','sentinel lost during save flush');
    await page.reload({waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>window.__haigenWorldReady===true,{timeout:25000});
    assert.equal(await page.evaluate(k=>localStorage.getItem(k),key),'qa-preserved','storage lost after reload');
@@ -71,7 +86,7 @@ async function run(){
    // Observational only: check the running game remains error-free after reload.
    await page.waitForTimeout(500);
    assert.equal(errors.length,0,'JavaScript error after reload: '+errors.join('; '));
-   console.log('PASS '+vp.name+' startup, mobile controls, assets, isolated storage, reload');
+   console.log('PASS '+vp.name+' startup, mobile controls, assets, isolated storage, dual-save, reload');
    await context.close();
   }
  }finally{if(browser)await browser.close();server.kill()}
