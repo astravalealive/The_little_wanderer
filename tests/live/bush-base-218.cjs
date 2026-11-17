@@ -1,0 +1,15 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const s=fs.readFileSync('haigen.html','utf8');
+const a=s.indexOf('function rbDrawBush(o){'),b=s.indexOf('\n// Matching detailed',a);
+assert(a>=0&&b>a,'bush renderer');
+const body=s.slice(a,b);
+assert(body.includes("ellipse(0,6,33,11,'#547b4b2b')"),'moss base');
+assert(body.includes("ellipse(0,5,29,9,'#23473870')"),'original shadow');
+assert(body.indexOf('#547b4b2b')<body.indexOf('#23473870'),'layering');
+assert(body.includes('if(berryReady(o))'),'berry gameplay preserved');
+assert(body.includes("ctx.translate(Math.round(o.x),Math.round(o.y))"),'placement preserved');
+assert(!body.includes('Math.random'),'no random rendering');
+assert(s.includes('setInterval(save,5000)'),'autosave preserved');
+console.log('PASS Job 218 bush base regression');
