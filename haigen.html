@@ -11006,7 +11006,7 @@ function skiffWorkshop(){
  if(!house||worldEditorHidden.has(house.id)||dist(state,house)>135)return false;
  if(state.skiffBerth==='island'){
   open('<h2>Saltwick boathouse</h2><p>Your skiff is at Riverwatch Lighthouse.</p><button class="btn" id="recallSkiff">Bring skiff back to Saltwick</button>');
-  $('recallSkiff').onclick=()=>{if(state.skiffAtSea||dist(state,house)>135)return;state.skiffBerth='saltwick';close();notify('Your skiff is back at the southeast slipway.')};
+  $('recallSkiff').onclick=()=>{if(state.skiffAtSea||dist(state,house)>135)return;state.skiffBerth='saltwick';save();close();notify('Your skiff is back at the southeast slipway.')};
   return true;
  }
  if(state.skiffBerth){
