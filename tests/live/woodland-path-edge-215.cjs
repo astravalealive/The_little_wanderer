@@ -1,0 +1,17 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const src=fs.readFileSync('haigen.html','utf8');
+const start=src.indexOf('function drawWoodlandPathEdges(){');
+const end=src.indexOf('\nfunction path(){',start);
+assert(start>=0&&end>start,'woodland edge renderer exists');
+const renderer=src.slice(start,end);
+assert(renderer.includes("f.size*2.5,f.size*1.35"),'feather halo drawn');
+assert(renderer.includes("f.size*1.8,f.size"),'original detail retained');
+assert(renderer.includes("Math.hypot(f.x-cottage.x,f.y-cottage.y)<245"),'camp clearing remains protected');
+assert(renderer.includes("Math.abs(f.x-cam.x)>950"),'existing camera culling retained');
+assert(!renderer.includes('Math.random'),'no frame-random details');
+assert(src.includes("drawWoodlandPathEdges();return"),'painted trail path remains supported');
+assert(src.includes("const paintedTrails=new Image()"),'original artwork remains');
+assert(src.includes("setInterval(save,5000)"),'save interval remains');
+console.log('PASS Job 215 woodland path edge visual regression');
