@@ -1,0 +1,17 @@
+name: Save corruption recovery 214
+on:
+  pull_request:
+    paths:
+      - haigen.html
+      - tests/live/save-corruption-214.cjs
+      - .github/workflows/save-corruption-214.yml
+  workflow_dispatch:
+jobs:
+  save-recovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/live/save-corruption-214.cjs
