@@ -1,0 +1,30 @@
+name: Render profile evidence
+on:
+  pull_request:
+    paths:
+      - 'tests/live/render-profile.cjs'
+      - '.github/workflows/render-profile-evidence.yml'
+      - 'haigen.html'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser dependency
+        run: npm install --no-save playwright-core@1.56.1
+      - name: Profile iPhone and iPad emulated viewports
+        run: node tests/live/render-profile.cjs
+      - name: Upload benchmark findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-profile-evidence
+          path: render-profile-evidence/
+          if-no-files-found: error
