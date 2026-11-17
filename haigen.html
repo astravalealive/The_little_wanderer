@@ -4645,6 +4645,8 @@ function rbDrawRock(o){
 }
 function rbDrawBush(o){
  ctx.save();ctx.translate(Math.round(o.x),Math.round(o.y));const p=(x,y,w,h,c)=>rbPixel(ctx,x,y,w,h,c);
+ // Soft forest-floor moss behind the existing shrub shadow, with no new scenery.
+ ellipse(0,6,33,11,'#547b4b2b');
  ellipse(0,5,29,9,'#23473870');
  for(const [bx,by] of [[-23,-15],[-8,-26],[9,-20],[18,-13],[-8,-9]]){
   p(bx-7,by-1,19,13,'#2e594d');p(bx-5,by-4,17,11,'#407a63');
