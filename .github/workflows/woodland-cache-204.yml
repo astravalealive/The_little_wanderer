@@ -5,6 +5,7 @@ on:
       - 'haigen.html'
       - 'tests/live/woodland-cache-204.cjs'
       - 'tests/live/woodland-cache-204-extended.cjs'
+      - 'tests/live/cache-compare-205.test.cjs'
       - '.github/workflows/woodland-cache-204.yml'
   workflow_dispatch:
 permissions:
@@ -24,6 +25,8 @@ jobs:
         run: node tests/live/woodland-cache-204.cjs
       - name: Extended zoom, night, traversal, memory and repeat-sample checks
         run: node tests/live/woodland-cache-204-extended.cjs
+      - name: Validate opt-in Safari comparison controls
+        run: node tests/live/cache-compare-205.test.cjs
       - name: Upload cache evidence
         if: always()
         uses: actions/upload-artifact@v4
