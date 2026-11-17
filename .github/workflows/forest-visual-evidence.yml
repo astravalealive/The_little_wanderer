@@ -4,6 +4,7 @@ on:
     paths:
       - 'haigen.html'
       - 'tests/live/forest-evidence.cjs'
+      - 'tests/live/woodland-ground-contract.test.cjs'
       - '.github/workflows/forest-visual-evidence.yml'
   workflow_dispatch:
 permissions:
@@ -19,6 +20,8 @@ jobs:
           node-version: '22'
       - name: Install browser test dependency
         run: npm install --no-save playwright-core@1.56.1
+      - name: Verify woodland ground alpha contract
+        run: node tests/live/woodland-ground-contract.test.cjs
       - name: Capture fixed-camera woodland screenshots
         run: node tests/live/forest-evidence.cjs
       - name: Upload forest screenshots
