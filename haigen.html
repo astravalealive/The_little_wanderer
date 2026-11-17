@@ -11101,13 +11101,13 @@ function raftMove(dt,dx,dy){
  const nx=state.x+vx*speed,ny=state.y+vy*speed;
  const atIsland=onLakeIsland(nx,ny),atMainland=lakeLevel(nx,ny)>1.02;
  // Shore exit is based on actual terrain, not a fixed left/right endpoint.
- if((atIsland||atMainland)&&!blockedBySolid(nx,ny)){
+ if((atIsland||atMainland)&&lakeLevel(state.x,state.y)<1.01&&!onLakeIsland(state.x,state.y)&&!blockedBySolid(nx,ny)){
   const berth=atIsland?'island':'shore';
   state.x=nx;state.y=ny;state.raftAfloat=false;state.raftBerth=berth;raft.moving=false;
   notify('🪢 Stepped ashore.');save();return;
  }
  // Remain on lake water; don't sail through mountains, islands or unrelated terrain.
- if(lakeLevel(nx,ny)>.99||blockedBySolid(nx,ny)&&!onLakeIsland(nx,ny))return;
+ if(lakeLevel(nx,ny)>1.06&&!onLakeIsland(nx,ny))return;
  const oldX=state.x,oldY=state.y;
  state.x=nx;state.y=ny;raft.moving=true;raft.pace=1;
  if(Math.abs(vx)>.1)raft.facing=Math.sign(vx);
