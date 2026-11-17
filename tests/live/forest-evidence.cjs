@@ -27,14 +27,19 @@ async function run(){
   const context=await browser.newContext({viewport:{width:1024,height:768},deviceScaleFactor:1,hasTouch:true,isMobile:true});
   const page=await context.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  // Inject a camera probe into the browser response only; repository source stays untouched.
+  await page.route('**/haigen.html?qa=forest-evidence',async route=>{
+   const response=await route.fetch();
+   const html=await response.text();
+   const marker='function worldZoom(){return baseCameraScale()*cameraZoom}';
+   assert(html.includes(marker),'camera hook insertion point changed');
+   const patched=html.replace(marker,marker+';window.__forestQAView=(x,y)=>{cam.x=x;cam.y=y;cameraDetached=true;cameraLastPanAt=performance.now();return {x:cam.x,y:cam.y}};');
+   await route.fulfill({response,body:patched});
+  });
   await page.goto('http://127.0.0.1:18765/haigen.html?qa=forest-evidence',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.__haigenWorldReady===true,{timeout:30000});
   for(const view of views){
-   const result=await page.evaluate(({x,y})=>{
-    // Lexical variables are accessed in the existing game script context through eval.
-    // A failed probe is a test failure, not a reason to change production code.
-    return (0,eval)('(()=>{cam.x='+x+';cam.y='+y+';cameraDetached=true;cameraLastPanAt=performance.now();return {x:cam.x,y:cam.y}})()');
-   },view);
+   const result=await page.evaluate(({x,y})=>window.__forestQAView(x,y),view);
    assert.equal(result.x,view.x);assert.equal(result.y,view.y);
    await page.waitForTimeout(180);
    await page.locator('canvas#game').screenshot({path:path.join(out,view.name+'.png'),animations:'disabled'});
