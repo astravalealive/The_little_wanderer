@@ -11165,7 +11165,16 @@ function drawRaft(){
   raft.visualHeading+=turn*.22;
   ctx.rotate(raft.visualHeading+Math.PI/2);
  }
- const pulse=rowing?Math.sin(raft.stroke*2.1):0;ctx.translate(0,afloat?Math.sin(raft.stroke*.65)*1.25:0);if(afloat){
+ const pulse=rowing?Math.sin(raft.stroke*2.1):0;
+ // Time-based idle motion keeps the raft alive when the paddle stroke is stationary.
+ const idleWave=afloat?Math.sin(Date.now()*.0017):0;
+ ctx.translate(0,afloat?(rowing?Math.sin(raft.stroke*.65)*1.25:idleWave*1.5):0);
+ if(afloat){
+  if(!rowing){
+   // A faint waterline ring expands and contracts beneath the moored-in-place hull.
+   ctx.strokeStyle='rgba(188,225,217,.20)';ctx.lineWidth=1.2;
+   ctx.beginPath();ctx.ellipse(0,10,39+idleWave*2,14+idleWave,0,0,Math.PI*2);ctx.stroke();
+  }
   // Small, low-cost wake behind the stern, tied to actual paddling distance.
   if(rowing){
    ctx.strokeStyle='rgba(209,237,226,.42)';ctx.lineWidth=1.7;
