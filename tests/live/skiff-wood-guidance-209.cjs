@@ -1,0 +1,17 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const source=fs.readFileSync(path.join(__dirname,'../../haigen.html'),'utf8');
+const start=source.indexOf('function boatwrightJournal(){'),end=source.indexOf('function journal(){',start);
+assert(start>0&&end>start);
+const script=new vm.Script(source.slice(start,end)+';boatwrightJournal()');
+const base={wood:0,raftBuilt:false,skiffBerth:undefined,skiffLashing:false};
+const render=state=>script.runInNewContext({state});
+assert.match(render(base),/Wood 0\/8 · gather 8 more carried wood/);
+assert.match(render({...base,wood:5}),/Wood 5\/8 · gather 3 more carried wood/);
+assert.match(render({...base,wood:8}),/Wood 8\/8 · swamp reed lashing needed/);
+assert.doesNotMatch(render({...base,wood:8}),/gather 0 more/);
+assert.match(render({...base,wood:8,skiffLashing:true}),/Materials ready · build at Saltwick boathouse/);
+assert.match(render({...base,skiffBerth:'island'}),/moored at Riverwatch Lighthouse/);
+assert.match(render({...base,skiffBerth:'saltwick'}),/moored at Saltwick/);
+assert.match(render(base),/Ocean Longship:<\/b> Locked/);
+console.log('PASS Job 209: remaining skiff wood guidance and existing milestones');
