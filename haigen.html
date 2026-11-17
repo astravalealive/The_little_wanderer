@@ -2604,7 +2604,7 @@ function save(){
  state.lastSavedAt=Date.now();
  // A crossing can be interrupted by iPad Safari at any frame. Save both travellers at the departure shore.
  let snapshot=state;
- if(state.raftAfloat){const r=raftEnds();if(r.ready)snapshot={...state,x:state.raftBerth==='island'?r.b.x:r.a.x,y:state.raftBerth==='island'?r.b.y:r.a.y,raftAfloat:false};else snapshot={...state,raftAfloat:false}}
+ if(state.raftAfloat){const r=raftEnds();if(r.ready){const berth=state.raftBerth==='island'?'island':'shore';const p=berth==='island'?r.b:r.a;snapshot={...state,x:p.x,y:p.y,raftBerth:berth,raftAfloat:false};}else snapshot={...state,raftAfloat:false}}
  if(skiffDeparture){
   snapshot={...state,...skiffDeparture};
   delete snapshot.skiffAtSea;
@@ -11067,20 +11067,20 @@ function raftInteract(){
  if(state.skiffAtSea||homeInside||visitorRoom||worldEditorActive)return false;
  const r=raftEnds();if(!r.ready)return false;
  if(state.raftAfloat){
-  const berth=Math.abs(state.x-r.a.x)<38?'shore':Math.abs(state.x-r.b.x)<38?'island':null;
+  const berth=Math.abs(state.x-r.a.x)<62?'shore':Math.abs(state.x-r.b.x)<62?'island':null;
   if(!berth){notify('Paddle to a mooring before stepping ashore.');return true}
   const p=berth==='shore'?r.a:r.b;
   if(blockedBySolid(p.x,p.y)){notify('Landing blocked.');return true}
-  state.x=p.x;state.y=p.y;state.raftAfloat=false;state.raftBerth=berth;save();notify('🪢 Raft moored.');return true;
+  state.x=p.x;state.y=p.y;state.raftAfloat=false;state.raftBerth=berth;raft.moving=false;save();notify('🪢 Raft moored.');return true;
  }
  const berth=state.raftBerth||'shore',p=berth==='shore'?r.a:r.b;
- if(Math.hypot(state.x-p.x,state.y-p.y)>85)return false;
+ if(Math.hypot(state.x-p.x,state.y-p.y)>110)return false;
  if(!state.raftBuilt){
   if(berth!=='shore')return false;
   open('<h2>ᛟ Timber Lake Raft</h2><p>Eight seasoned logs, lashed and cross-braced, with a carved paddle.</p><p>Wood: '+state.wood+'/8</p><button class="btn" id="raftBuild" '+(state.wood>=8?'':'disabled')+'>Build raft</button>');
   $('raftBuild').onclick=()=>{if(state.raftBuilt||state.wood<8)return;state.wood-=8;state.raftBuilt=true;state.raftBerth='shore';close();save();notify('🛶 Raft built. Collect to board.');};return true;
  }
- state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.stroke=0;notify('🛶 Paddle to the island. Collect to disembark.');return true;
+ state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.stroke=0;raft.moving=false;notify('🛶 Paddle to the island. Collect to disembark.');return true;
 }
 function raftMove(dt,dx,dy){const r=raftEnds();if(!r.ready){state.raftAfloat=false;raft.moving=false;notify('The raft has returned to its mooring.');return}const old=state.x;const mag=Math.hypot(dx,dy);const along=mag>.10?dx/Math.max(mag,1):0;state.x=clamp(state.x+along*dt*.24,Math.min(r.a.x,r.b.x),Math.max(r.a.x,r.b.x));state.y=r.b.y;raft.moving=Math.abs(state.x-old)>.001;raft.pace=raft.moving?Math.min(1,Math.abs(state.x-old)/Math.max(1,dt*.24)) : 0;if(raft.moving)raft.stroke+=Math.abs(state.x-old)*.095}
 function drawRaft(){
@@ -11088,16 +11088,16 @@ function drawRaft(){
  if(!state.raftBuilt){
   const p=r.a;
   if(Math.abs(p.x-cam.x)>W/worldZoom()/2+90||Math.abs(p.y-cam.y)>H/worldZoom()/2+90)return;
-  ctx.save();ctx.translate(p.x,p.y);ellipse(0,5,26,11,'#4d382b');
+  ctx.save();ctx.translate(p.x,p.y);ellipse(0,5,26,11,'#4d382b');ctx.strokeStyle='#e4c88a';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,5,35,18,0,0,Math.PI*2);ctx.stroke();
   for(let i=-2;i<=2;i++){ctx.strokeStyle=i%2?'#a8875c':'#d0ae78';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-20,i*5);ctx.lineTo(20,i*5);ctx.stroke()}
-  ctx.fillStyle='#f5d7a2';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText('BUILD RAFT',0,-24);ctx.restore();return;
+  ctx.fillStyle='#f5d7a2';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText('BUILD RAFT · 8 WOOD',0,-29);ctx.font='11px system-ui';ctx.fillText('Collect (X) to build',0,-44);ctx.restore();return;
  }
  const p=state.raftAfloat?state:(state.raftBerth==='island'?r.b:r.a);
  if(Math.abs(p.x-cam.x)>W/worldZoom()/2+80||Math.abs(p.y-cam.y)>H/worldZoom()/2+80)return;
  ctx.save();ctx.translate(p.x,p.y+10);const afloat=!!state.raftAfloat,rowing=afloat&&raft.moving;const pulse=rowing?Math.sin(raft.stroke*2.1):0;ctx.translate(0,afloat?Math.sin(raft.stroke*.65)*1.25:0);if(afloat){for(let side of [-1,1]){const xx=side*35;ctx.strokeStyle='rgba(192,225,220,'+(rowing?.45:.22)+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(xx,9,rowing?12+Math.abs(pulse)*7:11,5,0,0,Math.PI*2);ctx.stroke();if(rowing){ctx.beginPath();ctx.arc(xx+side*8,5-pulse*3,2.2,0,Math.PI*2);ctx.stroke()}}}ellipse(0,9,38,12,'#24495788');const raftPlank=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
  for(let i=-4;i<=4;i++){const y=i*5.4,tip=32-Math.abs(i)*1.3;poly([[-tip+4,y-3],[-tip,y],[tip,y],[tip-4,y+4],[-tip+4,y+4]],i%2?'#967047':'#ae8658');ctx.strokeStyle='#4e392b';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-tip+5,y+1);ctx.lineTo(tip-5,y+1);ctx.stroke();for(const x of [-19,19]){raftPlank(x-2,y-3,4,7,'#6e5336');raftPlank(x-1,y-3,1,7,'#d8b781')}}
  for(const x of [-21,21]){raftPlank(x-3,-26,6,52,'#55402d');raftPlank(x-1,-26,2,52,'#b99a68')}
- ctx.save();ctx.translate(afloat?19:0,afloat?-6:0);ctx.rotate(rowing?Math.sin(raft.stroke*2.1)*.48:(afloat?-.2:0));raftPlank(-2,-36,4,54,'#6e5135');poly([[-5,15],[5,15],[7,31],[-7,31]],'#c5a173');ctx.restore();ctx.restore();
+ ctx.save();ctx.translate(afloat?19:0,afloat?-6:0);ctx.rotate(rowing?Math.sin(raft.stroke*2.1)*.48:(afloat?-.2:0));if(afloat){ctx.strokeStyle='#b48b62';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-12,-19);ctx.lineTo(-1,-13);ctx.lineTo(5,-7+Math.sin(raft.stroke*2.1)*4);ctx.stroke();}raftPlank(-2,-36,4,54,'#6e5135');poly([[-5,15],[5,15],[7,31],[-7,31]],'#c5a173');ctx.restore();ctx.restore();
 }
 
 function interact(){if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(raftInteract()||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
