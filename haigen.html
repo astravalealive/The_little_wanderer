@@ -115,14 +115,18 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
    }catch(_){}
    if(key===previewKey){
     // Retain the damaged original before a subsequent autosave replaces it.
-    try{storage.setItem('wandererV127CorruptBackup',raw)}
-    catch(_){window.__haigenSaveWriteBlocked=true}
+    try{
+     // Never overwrite an earlier damaged save that the user may need.
+     if(storage.getItem('wandererV127CorruptBackup'))window.__haigenSaveWriteBlocked=true;
+     else storage.setItem('wandererV127CorruptBackup',raw);
+    }catch(_){window.__haigenSaveWriteBlocked=true}
    }
   }
   return {};
  }
  const useLiveSnapshot=new URLSearchParams(location.search).get('restore')==='1';
- state=Object.assign(fresh(),readHaigenSave(localStorage,useLiveSnapshot));
+ try{state=Object.assign(fresh(),readHaigenSave(localStorage,useLiveSnapshot))}
+ catch(_){state=fresh();window.__haigenSaveWriteBlocked=true}
  if(state.skiffBerth!=='saltwick'&&state.skiffBerth!=='island')delete state.skiffBerth;
  delete state.skiffAtSea;
  state.raftAfloat=false;
