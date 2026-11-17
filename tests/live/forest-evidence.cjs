@@ -28,7 +28,7 @@ async function run(){
   const page=await context.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   // Inject a camera probe into the browser response only; repository source stays untouched.
-  await page.route('**/haigen.html?qa=forest-evidence',async route=>{
+  await page.route('**/haigen.html?qa=forest-evidence*',async route=>{
    const response=await route.fetch();
    const html=await response.text();
    const marker='function worldZoom(){return baseCameraScale()*cameraZoom}';
@@ -38,12 +38,18 @@ async function run(){
   });
   await page.goto('http://127.0.0.1:18765/haigen.html?qa=forest-evidence',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.__haigenWorldReady===true,{timeout:30000});
-  for(const view of views){
-   const result=await page.evaluate(({x,y})=>window.__forestQAView(x,y),view);
-   assert.equal(result.x,view.x);assert.equal(result.y,view.y);
-   await page.waitForTimeout(180);
-   await page.locator('canvas#game').screenshot({path:path.join(out,view.name+'.png'),animations:'disabled'});
-   console.log('CAPTURE '+view.name+' '+view.x+','+view.y);
+  for(const mode of ['before','storybook-preview']){
+   if(mode==='storybook-preview'){
+    await page.goto('http://127.0.0.1:18765/haigen.html?qa=forest-evidence&forestArtPreview=1',{waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>window.__haigenWorldReady===true,{timeout:30000});
+   }
+   for(const view of views){
+    const result=await page.evaluate(({x,y})=>window.__forestQAView(x,y),view);
+    assert.equal(result.x,view.x);assert.equal(result.y,view.y);
+    await page.waitForTimeout(180);
+    await page.locator('canvas#game').screenshot({path:path.join(out,mode+'-'+view.name+'.png'),animations:'disabled'});
+    console.log('CAPTURE '+mode+' '+view.name+' '+view.x+','+view.y);
+   }
   }
   assert.equal(errors.length,0,'browser errors: '+errors.join('; '));
   await context.close();
