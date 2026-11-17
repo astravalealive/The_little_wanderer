@@ -4516,6 +4516,29 @@ function rbGrass(){
  rbTileCache.grass=ctx.createPattern(tile,'repeat');
  return rbTileCache.grass;
 }
+// Job 204 opt-in prototype: bounded cache of deterministic woodland cell alpha.
+// Keeps the original fillRect and globalAlpha draw commands, avoiding image
+// resampling, texture seams and differences from offscreen canvas compositing.
+const woodlandCache204={enabled:new URLSearchParams(location.search).get('woodlandCache204')==='1',tiles:new Map(),maxTiles:64,cell:6,tileCells:64,hits:0,misses:0,
+ clear(){this.tiles.clear();this.hits=0;this.misses=0},
+ stats(){return {enabled:this.enabled,tiles:this.tiles.size,bytes:this.tiles.size*this.tileCells*this.tileCells*8,hits:this.hits,misses:this.misses}},
+ fade(x,y){
+  const gx=Math.round(x/this.cell),gy=Math.round(y/this.cell),tx=Math.floor(gx/this.tileCells),ty=Math.floor(gy/this.tileCells),key=tx+','+ty;
+  let tile=this.tiles.get(key);
+  if(tile){this.tiles.delete(key);this.tiles.set(key,tile)}
+  else{tile=new Float64Array(this.tileCells*this.tileCells);tile.fill(NaN);this.tiles.set(key,tile);if(this.tiles.size>this.maxTiles)this.tiles.delete(this.tiles.keys().next().value)}
+  const ix=gx-tx*this.tileCells,iy=gy-ty*this.tileCells,index=iy*this.tileCells+ix;
+  if(!Number.isNaN(tile[index])){this.hits++;return tile[index]}
+  const cx=x+this.cell*.5,cy=y+this.cell*.5;
+  const wobble=90*Math.sin(cy/245)+40*Math.sin(cy/91+cx/310)+24*Math.sin(cx/133+cy/170);
+  const wobbleY=80*Math.sin(cx/280)+32*Math.sin(cx/107+cy/270);
+  const edge=Math.min(cx+wobble,3500+wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-20);
+  const transition=Math.max(0,Math.min(1,(edge+230)/460));
+  const fade=transition*transition*(3-2*transition);
+  tile[index]=fade;this.misses++;return fade;
+ }
+};
+window.__woodlandCache204=woodlandCache204;
 function rbDrawGround(){
  // V403: one continuous woodland surface, with smooth world-space feathering.
  // Do not use 16px binary mask cells: they created the checkerboard seams.
@@ -4532,14 +4555,18 @@ function rbDrawGround(){
  for(let y=firstY;y<b;y+=cell){
   const cy=y+cell*.5,yWobble=90*Math.sin(cy/245);
   for(let x=firstX;x<r;x+=cell){
-   const cx=x+cell*.5;
-   const wobble=yWobble+40*Math.sin(cy/91+cx/310)+24*Math.sin(cx/133+cy/170);
-   const wobbleY=xWobble[(x-firstX)/cell]+32*Math.sin(cx/107+cy/270);
-   const edge=Math.min(cx+wobble,3500+wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-20);
-   // Smooth continuous fade across the woodland boundary, no binary dither.
-   // Smoothstep avoids a hard linear transition at the outer edge.
-   const transition=Math.max(0,Math.min(1,(edge+230)/460));
-   const fade=transition*transition*(3-2*transition);
+   let fade;
+   if(woodlandCache204.enabled)fade=woodlandCache204.fade(x,y);
+   else{
+    const cx=x+cell*.5;
+    const wobble=yWobble+40*Math.sin(cy/91+cx/310)+24*Math.sin(cx/133+cy/170);
+    const wobbleY=xWobble[(x-firstX)/cell]+32*Math.sin(cx/107+cy/270);
+    const edge=Math.min(cx+wobble,3500+wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-20);
+    // Smooth continuous fade across the woodland boundary, no binary dither.
+    // Smoothstep avoids a hard linear transition at the outer edge.
+    const transition=Math.max(0,Math.min(1,(edge+230)/460));
+    fade=transition*transition*(3-2*transition);
+   }
    if(fade<=0)continue;
    ctx.globalAlpha=fade;
    ctx.fillRect(x,y,cell,cell);
