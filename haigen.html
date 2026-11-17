@@ -12214,6 +12214,31 @@ function frame(now){
  const perfPanel=document.createElement('div');perfPanel.id='haigenPerfPanel';perfPanel.style.cssText='position:fixed;z-index:30;right:9px;top:calc(env(safe-area-inset-top,0px) + 9px);max-width:min(88vw,270px);padding:8px 10px;border:1px solid #c7b47b;border-radius:8px;background:#102b25ed;color:#fff0cf;font:11px/1.45 ui-monospace,monospace;white-space:pre-line;pointer-events:none;display:none';document.body.appendChild(perfPanel);
  window.__haigenPerfDiag={enabled:false,frames:0,updateMs:0,renderMs:0,frameMs:[],frameGapMs:[],lastFrame:0,lastPanel:0,renderPanel(){const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;const mem=performance.memory&&Number.isFinite(performance.memory.usedJSHeapSize)?'Heap: '+(performance.memory.usedJSHeapSize/1048576).toFixed(1)+' MB':'Heap: unavailable in this browser';perfPanel.textContent='PERFORMANCE DIAGNOSTICS\nFPS: '+(1000/Math.max(1,avg(this.frameGapMs))).toFixed(1)+'\nFrame work: '+avg(this.frameMs).toFixed(2)+' ms avg\nUpdate: '+(this.updateMs/Math.max(1,this.frames)).toFixed(2)+' ms avg\nRender: '+(this.renderMs/Math.max(1,this.frames)).toFixed(2)+' ms avg\n'+mem+'\nSamples: '+this.frameMs.length;perfPanel.style.display=this.enabled?'block':'none'}};
  $('previewPerfToggle').onclick=()=>{const d=window.__haigenPerfDiag;d.enabled=!d.enabled;d.frames=0;d.updateMs=0;d.renderMs=0;d.frameMs=[];d.frameGapMs=[];d.lastFrame=0;d.lastPanel=0;$('previewPerfToggle').textContent='📊 Performance: '+(d.enabled?'On':'Off');perfPanel.style.display=d.enabled?'block':'none';if(d.enabled)d.renderPanel()};
+
+ // Job 205: explicitly opt-in, read-only Safari comparison panel. No storage.
+ if(new URLSearchParams(location.search).get('cacheCompare205')==='1'){
+  const cache=window.__woodlandCache204,diag=window.__haigenPerfDiag;
+  const panel=document.createElement('section');
+  panel.id='cacheCompare205';panel.setAttribute('aria-label','Woodland cache comparison');
+  panel.style.cssText='position:fixed;z-index:45;left:9px;top:calc(env(safe-area-inset-top,0px) + 175px);max-width:min(90vw,315px);padding:9px;background:#102b25f2;color:#fff0cf;border:1px solid #c7b47b;border-radius:9px;font:12px/1.4 system-ui;pointer-events:auto';
+  panel.innerHTML='<strong>🐦‍⬛ Woodland Safari test</strong><div id="cache205Mode"></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin:7px 0"><button type="button" id="cache205Toggle">Use cache</button><button type="button" id="cache205Sample">Record 8 sec</button></div><pre id="cache205Stats" style="white-space:pre-wrap;font:11px/1.5 monospace;margin:4px 0">Move to the woodland, then record each mode.</pre><small>Opt-in only. No save changes. Memory may be unavailable on Safari.</small>';
+  document.body.appendChild(panel);
+  const mode=$('cache205Mode'),stats=$('cache205Stats'),toggle=$('cache205Toggle'),sample=$('cache205Sample');
+  const records={};let recording=false;
+  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+  const label=()=>{mode.textContent='Mode: '+(cache.enabled?'CACHED':'ORIGINAL')+' (default: original)';toggle.textContent=cache.enabled?'Use original':'Use cache'};
+  const reset=()=>{diag.frames=0;diag.updateMs=0;diag.renderMs=0;diag.frameMs=[];diag.frameGapMs=[];diag.lastFrame=0;diag.lastPanel=0};
+  const snapshot=()=>{
+   const gaps=diag.frameGapMs.filter(v=>v>0),frameMs=diag.frameMs,heap=performance.memory&&Number.isFinite(performance.memory.usedJSHeapSize)?(performance.memory.usedJSHeapSize/1048576).toFixed(1)+' MiB':'unavailable';
+   return {fps:gaps.length?1000/avg(gaps):0,frameMs:avg(frameMs),renderMs:diag.renderMs/Math.max(1,diag.frames),updateMs:diag.updateMs/Math.max(1,diag.frames),heap,cacheBytes:cache.stats().bytes};
+  };
+  const format=r=>'FPS '+r.fps.toFixed(1)+' | Frame '+r.frameMs.toFixed(1)+' ms\\nRender '+r.renderMs.toFixed(1)+' ms | Update '+r.updateMs.toFixed(1)+' ms\\nJS heap '+r.heap+' | Cache '+(r.cacheBytes/1048576).toFixed(2)+' MiB';
+  toggle.onclick=()=>{if(recording)return;cache.enabled=!cache.enabled;reset();label();stats.textContent='Mode changed. Record 8 seconds at the same location.'};
+  sample.onclick=()=>{if(recording)return;recording=true;toggle.disabled=true;sample.disabled=true;const prior=diag.enabled;diag.enabled=true;reset();const modeName=cache.enabled?'CACHED':'ORIGINAL';stats.textContent='Recording '+modeName+' for 8 seconds… keep camera steady.';
+   setTimeout(()=>{const result=snapshot();records[modeName]=result;diag.enabled=prior;recording=false;toggle.disabled=false;sample.disabled=false;label();stats.textContent=modeName+'\\n'+format(result)+(records.ORIGINAL&&records.CACHED?'\\n\\nOriginal: '+records.ORIGINAL.fps.toFixed(1)+' FPS / '+records.ORIGINAL.frameMs.toFixed(1)+' ms\\nCached: '+records.CACHED.fps.toFixed(1)+' FPS / '+records.CACHED.frameMs.toFixed(1)+' ms':'\\n\\nSwitch modes and record again.');},8000);
+  };
+  label();window.__cacheCompare205={panel,records,snapshot};
+ }
  // Optional field guide for visual inspection. Never inserts artificial wildlife
  // into the actual map, changes the creature AI or writes to saved progress.
  const guideNames=['Skölli','Dylan','frog',...Object.keys(illustratedFaunaCells).filter(k=>k!=='frog'),...Object.keys(extraFaunaCells)];
