@@ -1,0 +1,22 @@
+name: Save round-trip
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'tests/live/save-round-trip.cjs'
+      - 'docs/haigen-save-keys.md'
+      - '.github/workflows/save-round-trip.yml'
+  workflow_dispatch:
+jobs:
+  save-round-trip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        run: npm install --no-save playwright-core@1.56.1
+      - name: Run save round-trip checks
+        run: node tests/live/save-round-trip.cjs
