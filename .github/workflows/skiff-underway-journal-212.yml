@@ -1,0 +1,17 @@
+name: Skiff underway journal 212
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'tests/live/skiff-underway-journal-212.cjs'
+      - '.github/workflows/skiff-underway-journal-212.yml'
+  workflow_dispatch:
+jobs:
+  skiff-underway-journal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/live/skiff-underway-journal-212.cjs
