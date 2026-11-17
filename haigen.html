@@ -6023,7 +6023,7 @@ function homesteadMenu(kind){
    }
   }
  }else if(kind==='jetty'){
-  info='ᛟ Nordic Boatwright · Build vessels in stages. Tier I: Timber Lake Raft (8 wood). Tier II: Coastal Knarr (unlocked in a later voyage update). Tier III: Ocean Longship (requires future island materials). Fishing remains available at accessible shorelines.';
+  info='ᛟ Nordic Boatwright · Tier I: Timber Lake Raft (8 wood). Tier II: Saltwick Rowing Skiff (8 carried wood + swamp reed lashing, crafted at Saltwick boathouse). Tier III: Ocean Longship (future distant-island materials). Fishing is available at accessible shorelines.';
   if(!state.fishingRod)items.push(['Craft fishing rod · 3 wood, 2 twigs',()=>{
    if(!homesteadCost(3,0,2))return;state.fishingRod=true;equipTool('rod');notify('🎣 Rod ready. Fish beside any accessible water.');save();homesteadMenu(kind)
   }]);
@@ -6032,7 +6032,7 @@ function homesteadMenu(kind){
    state.raftBuilt=true;state.raftBerth='shore';save();notify('🛶 Tier I complete: timber raft launched at the Great Lake.');homesteadMenu(kind)
   }]);
   else items.push(['Timber lake raft · built ✓',()=>notify('🛶 Walk onto the raft at the Great Lake landing.')]);
-  items.push(['Tier II · Coastal Knarr (locked)',()=>notify('ᛟ The coastal knarr will need materials from future island voyages.')]);
+  items.push(['Tier II · Saltwick Rowing Skiff '+(state.skiffBerth?'· built ✓':'· 8 carried wood + swamp reed lashing'),()=>notify(state.skiffBerth?'🛶 Your rowing skiff is ready at '+(state.skiffBerth==='island'?'Riverwatch Lighthouse.':'Saltwick slipway.'):'🛶 Find swamp reeds in the Forgotten Swamps, then build your skiff at Saltwick boathouse with 8 carried wood.')]);
   items.push(['Tier III · Ocean Longship (locked)',()=>notify('ᛟ The ocean longship will require rare materials from distant lands.')]);
  }
  open('<h2>'+plot.name+'</h2><p>'+info+'</p><p class="small">🪵 '+state.wood+' carried + '+state.woodStored+' stored · 🪨 '+state.stone+' · 🌿 '+state.twigs+' · 🍓 '+state.berries+'</p>'+items.map((a,i)=>'<p><button class="btn" style="width:100%" id="homesteadAction'+i+'">'+a[0]+'</button></p>').join('')+'<p class="small">Tap the build patch or press X Collect beside it. Saves automatically.</p>');
