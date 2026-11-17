@@ -10979,6 +10979,15 @@ function drawSkiff(){
  skiffOarSwing+=(targetSwing-skiffOarSwing)*.24;
  if(!occupied)skiffOarSwing=0;
  ctx.save();ctx.translate(p.x,p.y+3);ctx.scale(1,.74);ctx.rotate(occupied?skiffVisualHeading:-.25);
+ // Low-cost wake: three short strokes trail behind the moving hull, none at rest.
+ if(occupied&&skiffRowing){
+  ctx.strokeStyle='rgba(194,224,225,.42)';ctx.lineWidth=1.6;
+  for(let i=0;i<3;i++){
+   const x=-31-i*9,spread=8+i*4;
+   ctx.beginPath();ctx.moveTo(x,-spread);ctx.quadraticCurveTo(x-6,-spread-3,x-11,-spread-1);
+   ctx.moveTo(x,spread);ctx.quadraticCurveTo(x-6,spread+3,x-11,spread+1);ctx.stroke();
+  }
+ }
  ellipse(-1,4,29,12,'#254a567a');
  for(const side of [-1,1]){
   // Actual travel drives the stroke; oars ease into a resting position when stopped.
