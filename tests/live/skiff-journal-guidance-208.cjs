@@ -1,0 +1,18 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const source=fs.readFileSync(path.join(__dirname,'../../haigen.html'),'utf8');
+const start=source.indexOf('function boatwrightJournal(){');
+const end=source.indexOf('function journal(){',start);
+assert(start>0&&end>start,'Boatwright journal helper exists');
+const script=new vm.Script(source.slice(start,end)+';boatwrightJournal()');
+const base={wood:0,raftBuilt:false,skiffBerth:undefined,skiffLashing:false};
+const render=state=>script.runInNewContext({state});
+assert.match(render(base),/use Collect beside reeds in the Forgotten Swamps/);
+assert.match(render({...base,skiffLashing:true}),/swamp reed lashing ready/);
+assert.doesNotMatch(render({...base,skiffLashing:true}),/use Collect beside reeds/);
+assert.match(render({...base,wood:8,skiffLashing:true}),/Materials ready · build at Saltwick boathouse/);
+assert.match(render({...base,skiffBerth:'island'}),/moored at Riverwatch Lighthouse/);
+assert.match(render({...base,skiffBerth:'saltwick'}),/moored at Saltwick/);
+assert.match(render(base),/Ocean Longship:<\/b> Locked/);
+console.log('PASS Job 208: skiff reed guidance, progression, no save mutation');
