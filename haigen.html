@@ -6032,7 +6032,7 @@ function homesteadMenu(kind){
    state.raftBuilt=true;state.raftBerth='shore';save();notify('🛶 Tier I complete: timber raft launched at the Great Lake.');homesteadMenu(kind)
   }]);
   else items.push(['Timber lake raft · built ✓',()=>notify('🛶 Walk onto the raft at the Great Lake landing.')]);
-  items.push(['Tier II · Saltwick Rowing Skiff '+(state.skiffBerth?'· built ✓':'· 8 carried wood + swamp reed lashing'),()=>notify(state.skiffBerth?'🛶 Your rowing skiff is ready at '+(state.skiffBerth==='island'?'Riverwatch Lighthouse.':'Saltwick slipway.'):'🛶 Find swamp reeds in the Forgotten Swamps, then build your skiff at Saltwick boathouse with 8 carried wood.')]);
+  items.push(['Tier II · Saltwick Rowing Skiff '+(state.skiffBerth?'· built ✓':'· wood '+Math.min(8,state.wood)+'/8 · reeds '+(state.skiffLashing?'1':'0')+'/1'),()=>notify(state.skiffBerth?'🛶 Your rowing skiff is ready at '+(state.skiffBerth==='island'?'Riverwatch Lighthouse.':'Saltwick slipway.'):'🛶 '+(state.wood<8?'Collect '+(8-state.wood)+' more carried wood. ':'Wood ready. ')+(state.skiffLashing?'Reed lashing ready. ':'Collect swamp reeds in the Forgotten Swamps. ')+'Build at Saltwick boathouse.')]);
   items.push(['Tier III · Ocean Longship (locked)',()=>notify('ᛟ The ocean longship will require rare materials from distant lands.')]);
  }
  open('<h2>'+plot.name+'</h2><p>'+info+'</p><p class="small">🪵 '+state.wood+' carried + '+state.woodStored+' stored · 🪨 '+state.stone+' · 🌿 '+state.twigs+' · 🍓 '+state.berries+'</p>'+items.map((a,i)=>'<p><button class="btn" style="width:100%" id="homesteadAction'+i+'">'+a[0]+'</button></p>').join('')+'<p class="small">Tap the build patch or press X Collect beside it. Saves automatically.</p>');
@@ -11020,7 +11020,7 @@ function skiffWorkshop(){
   '<button class="btn" id="buildSaltwickSkiff" '+(ready?'':'disabled')+'>Build rowing skiff</button>');
  $('buildSaltwickSkiff').onclick=()=>{
   if(state.skiffBerth||state.wood<8||!state.skiffLashing||dist(state,house)>135)return;
-  state.wood-=8;delete state.skiffLashing;state.skiffBerth='saltwick';
+  state.wood-=8;delete state.skiffLashing;state.skiffBerth='saltwick';save();
   close();notify('Skiff built! Walk southeast to the slipway marked SKIFF on your map. Use Collect to board.');
  };
  return true;
