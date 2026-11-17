@@ -14,7 +14,7 @@ function serve(){
   const child=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{cwd:root,stdio:'ignore'});
   child.once('error',reject);
   let tries=0;
-  const ping=()=>http.get('http://127.0.0.1:'+port+'/haigen.html',r=>{r.resume();resolve(child)}).on('error',e=>{
+  const ping=()=>http.get('http://127.0.0.1:'+port+'/haigen.html',r=>{r.resume();if(r.statusCode===200 && !child.exitCode && child.exitCode!==0)resolve(child);else{child.kill();reject(new Error('Local game server did not return HTTP 200'))}}).on('error',e=>{
    if(++tries>35){child.kill();reject(e)}else setTimeout(ping,150);
   });
   setTimeout(ping,200);
@@ -40,7 +40,7 @@ async function run(){
     menu:!!document.querySelector('.mobile-menu'),
     assetReport:typeof window.__haigenAssetReport==='function'
    }));
-   assert(initial.canvas&&initial.joystick,'missing live-game canvas/controls');
+   assert(initial.canvas&&initial.joystick&&initial.menu,'missing live-game canvas/mobile controls/menu');
    assert(!initial.errorVisible,'startup error visible');
    // Touch interface: tap only a non-destructive menu control.
    const menu=page.locator('.mobile-menu > summary');
@@ -51,7 +51,8 @@ async function run(){
    }
    // The joystick is touched briefly without moving the character.
    const joy=page.locator('#joy');const box=await joy.boundingBox();
-   if(box){await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2)}
+   assert(box,'joystick has no touch target');
+   await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2);
    assert.equal(errors.length,0,'uncaught JavaScript errors: '+errors.join('; '));
    assert.equal(failedAssets.length,0,'HTTP asset errors: '+failedAssets.join('; '));
    if(initial.assetReport){
