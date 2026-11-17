@@ -12232,10 +12232,10 @@ function frame(now){
    const gaps=diag.frameGapMs.filter(v=>v>0),frameMs=diag.frameMs,heap=performance.memory&&Number.isFinite(performance.memory.usedJSHeapSize)?(performance.memory.usedJSHeapSize/1048576).toFixed(1)+' MiB':'unavailable';
    return {fps:gaps.length?1000/avg(gaps):0,frameMs:avg(frameMs),renderMs:diag.renderMs/Math.max(1,diag.frames),updateMs:diag.updateMs/Math.max(1,diag.frames),heap,cacheBytes:cache.stats().bytes};
   };
-  const format=r=>'FPS '+r.fps.toFixed(1)+' | Frame '+r.frameMs.toFixed(1)+' ms\\nRender '+r.renderMs.toFixed(1)+' ms | Update '+r.updateMs.toFixed(1)+' ms\\nJS heap '+r.heap+' | Cache '+(r.cacheBytes/1048576).toFixed(2)+' MiB';
+  const format=r=>'FPS '+r.fps.toFixed(1)+' | Frame '+r.frameMs.toFixed(1)+' ms\nRender '+r.renderMs.toFixed(1)+' ms | Update '+r.updateMs.toFixed(1)+' ms\nJS heap '+r.heap+' | Cache '+(r.cacheBytes/1048576).toFixed(2)+' MiB';
   toggle.onclick=()=>{if(recording)return;cache.enabled=!cache.enabled;reset();label();stats.textContent='Mode changed. Record 8 seconds at the same location.'};
   sample.onclick=()=>{if(recording)return;recording=true;toggle.disabled=true;sample.disabled=true;const prior=diag.enabled;diag.enabled=true;reset();const modeName=cache.enabled?'CACHED':'ORIGINAL';stats.textContent='Recording '+modeName+' for 8 seconds… keep camera steady.';
-   setTimeout(()=>{const result=snapshot();records[modeName]=result;diag.enabled=prior;recording=false;toggle.disabled=false;sample.disabled=false;label();stats.textContent=modeName+'\\n'+format(result)+(records.ORIGINAL&&records.CACHED?'\\n\\nOriginal: '+records.ORIGINAL.fps.toFixed(1)+' FPS / '+records.ORIGINAL.frameMs.toFixed(1)+' ms\\nCached: '+records.CACHED.fps.toFixed(1)+' FPS / '+records.CACHED.frameMs.toFixed(1)+' ms':'\\n\\nSwitch modes and record again.');},8000);
+   setTimeout(()=>{const result=snapshot();records[modeName]=result;diag.enabled=prior;recording=false;toggle.disabled=false;sample.disabled=false;label();stats.textContent=modeName+'\n'+format(result)+(records.ORIGINAL&&records.CACHED?'\n\nOriginal: '+records.ORIGINAL.fps.toFixed(1)+' FPS / '+records.ORIGINAL.frameMs.toFixed(1)+' ms\nCached: '+records.CACHED.fps.toFixed(1)+' FPS / '+records.CACHED.frameMs.toFixed(1)+' ms':'\n\nSwitch modes and record again.');},8000);
   };
   label();window.__cacheCompare205={panel,records,snapshot};
  }
