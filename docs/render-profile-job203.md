@@ -19,3 +19,19 @@ No production source, assets, map, gameplay, collisions, saves or deployed setti
 
 ## Next decision
 Compare per-viewpoint section costs and confirm the worst contributor on a real iPad before approving any large renderer rewrite or offscreen-canvas caching.
+
+## First CI measurements (headless Chrome, 2026-11-17)
+
+| Emulated device | Camera | Render ms/frame | Ground ms/call | Paths ms/call | Expanded terrain ms/call |
+|---|---|---:|---:|---:|---:|
+| iPhone 390×844 | Woodland centre | 147.27 | 80.09 | 0.23 | 2.84 |
+| iPhone 390×844 | Woodland edge | 138.13 | 81.78 | 0.10 | 2.77 |
+| iPhone 390×844 | Outside woodland | 50.26 | 0.004 | 0.019 | 2.74 |
+| iPad 1024×768 | Woodland centre | 132.30 | 19.89 | 0.20 | 1.92 |
+| iPad 1024×768 | Woodland edge | 118.86 | 19.14 | 0.067 | 2.11 |
+| iPad 1024×768 | Outside woodland | 54.21 | 0 | 0.028 | 2.02 |
+
+**Finding:** The woodland ground pass is much more expensive than the path() pass in this Chrome runner. For example, in the emulated iPhone woodland-centre view it averaged 80.09 ms per call versus 0.23 ms for paths. The total render cost is larger still, so other rendering work also matters. These numbers are a short, non-isolated CI sample, not an actual iPhone/iPad benchmark.
+
+**Recommendation:** Do not attempt a large renderer refactor yet. First run the existing opt-in performance overlay on a real iPad and check whether ground rendering is the limiting factor. If corroborated, prototype a reversible, visually pixel-compared woodland ground rendering cache, with strict memory limits and fallback.
+
