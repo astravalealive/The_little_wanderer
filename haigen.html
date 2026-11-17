@@ -4607,6 +4607,8 @@ function rbTreeImage(id){
 function rbDrawTree(o){
  const c=rbTreeImage(o.id),s=(o.size||1)*(.99+seeded(o.id*31)*.31);
  ctx.save();ctx.imageSmoothingEnabled=false;
+ // A muted moss apron blends the existing trunk shadow into the woodland floor.
+ ellipse(o.x+1,o.y+5,30*s,9*s,'#53764b30');
  ellipse(o.x+1,o.y+4,26*s,8*s,'#24423766');
  ctx.drawImage(c,Math.round(o.x-c.width*s/2),Math.round(o.y-c.height*s+4),Math.round(c.width*s),Math.round(c.height*s));ctx.restore();
 }
