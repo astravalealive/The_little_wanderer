@@ -10879,7 +10879,7 @@ for(let i=1;i<skiffRoute.length;i++){
  skiffDistances.push(skiffDistances[i-1]+Math.hypot(b.x-a.x,b.y-a.y));
 }
 const skiffRouteLength=skiffDistances[skiffDistances.length-1];
-let skiffDistance=0, skiffHeading=0, skiffStroke=0, skiffRouteChecked=false;
+let skiffDistance=0, skiffHeading=0, skiffVisualHeading=null, skiffStroke=0, skiffRouteChecked=false;
 
 function skiffLanding(berth){
  if(berth!=='island'&&berth!=='saltwick')return null;
@@ -10928,7 +10928,7 @@ function skiffInteract(){
  if(!beginSkiffCrossing())return true;
  skiffDistance=island?skiffRouteLength:0;
  const next=skiffRoute[island?skiffRoute.length-2:1];
- skiffHeading=Math.atan2(next.y-water.y,next.x-water.x);
+ skiffHeading=Math.atan2(next.y-water.y,next.x-water.x);skiffVisualHeading=skiffHeading;
  state.x=water.x;state.y=water.y;
  notify(island?'🛶 Row southwest along the marked channel.':'🛶 Row east along the marked channel.');
  return true;
@@ -10968,7 +10968,13 @@ function drawSkiff(){
    poly([[x,y-14],[x+8,y-12],[x,y-9]],'#e9d7a4');
   }
  }
- ctx.save();ctx.translate(p.x,p.y+3);ctx.scale(1,.74);ctx.rotate(occupied?skiffHeading:-.25);
+ // Smooth visual direction changes at bends and while reversing, without changing route steering.
+ if(occupied){
+  if(skiffVisualHeading===null)skiffVisualHeading=skiffHeading;
+  const turn=Math.atan2(Math.sin(skiffHeading-skiffVisualHeading),Math.cos(skiffHeading-skiffVisualHeading));
+  skiffVisualHeading+=turn*.20;
+ }else skiffVisualHeading=null;
+ ctx.save();ctx.translate(p.x,p.y+3);ctx.scale(1,.74);ctx.rotate(occupied?skiffVisualHeading:-.25);
  ellipse(-1,4,29,12,'#254a567a');
  for(const side of [-1,1]){
   const swing=occupied?Math.sin(skiffStroke)*.48:0;
