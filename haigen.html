@@ -11087,7 +11087,7 @@ function raftWalkBoard(dx,dy){
  if(!state.raftBuilt||state.raftAfloat||state.skiffAtSea||homeInside||visitorRoom||worldEditorActive||state.autonomy)return false;
  const r=raftEnds();if(!r.ready)return false;
  const berth=state.raftBerth==='island'?'island':'shore',p=berth==='island'?r.b:r.a;
- const outward=berth==='shore'?-1:1;
+ const outward=berth==='shore'?1:-1;
  if(dx*outward>=-.15||Math.hypot(state.x-p.x,state.y-p.y)>48)return false;
  state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.moving=false;raft.facing=-outward;raft.stroke=0;
  notify('🛶 Aboard the raft. Paddle towards the opposite bank.');return true;
