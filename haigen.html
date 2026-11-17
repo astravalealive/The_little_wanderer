@@ -5754,8 +5754,9 @@ function worldDrawGarden(p,tier){
 }
 function onJetty(x,y){
  if(!state.jettyBuilt)return false;
- const dx=Math.abs(x-jettyPlot.x),dy=y-jettyPlot.y;
- return (dx<=51&&dy>=-8&&dy<=136)||(dx<=35&&dy>=-31&&dy< -8);
+ const dx=(x-jettyPlot.x)/68,dy=(y-(jettyPlot.y+11))/36;
+ // Match the small oval ground landing, not the retired 136px wooden pier.
+ return dx*dx+dy*dy<=1;
 }
 function walkingLakeLevel(x,y){return onJetty(x,y)||onLakeIsland(x,y)?1.1:lakeLevel(x,y)}
 // A modest lakeside fishing landing. Save the large timber jetty design for the coastal harbour.
@@ -5782,7 +5783,7 @@ function drawHomesteadPlotGround(p){
  if(tier&&p.kind==='jetty'){
   worldDrawDock(p);
   if(state.castAt){
-   const bx=x+34+Math.sin(time*.002)*8,by=y+154+Math.sin(time*.003)*5;
+   const bx=x-36+Math.sin(time*.002)*8,by=y+43+Math.sin(time*.003)*5;
    ellipse(bx,by,5,5,'#f2e7c9');
   }
   return;
@@ -6020,10 +6021,10 @@ function homesteadMenu(kind){
   }
  }else if(kind==='jetty'){
   if(!state.jettyBuilt){
-   info='A little wooden jetty reaching out into the pond, with a fishing spot at its end.';
-   items.push(['Build jetty · 12 wood, 5 stone, 4 twigs',()=>{
+   info='A simple lakeside fishing landing with stones and a mooring stake.';
+   items.push(['Build fishing landing · 12 wood, 5 stone, 4 twigs',()=>{
     if(!homesteadCost(12,5,4))return;state.jettyBuilt=true;
-    notify('🎣 Jetty built! Now craft a fishing rod.');save();homesteadMenu(kind)
+    notify('🎣 Fishing landing ready! Now craft a fishing rod.');save();homesteadMenu(kind)
    }]);
   }else{
    info='Fish caught: '+state.fish+(state.fishingRod?' · Fishing rod equipped.':' · Craft a rod to go fishing.');
