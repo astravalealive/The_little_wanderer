@@ -4398,12 +4398,18 @@ function path(){
   ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();
   // Keep the original hand-painted paths and their geometry; apply a restrained
   // storybook soil glaze to the actual loaded path layer, not only its fallback.
-  ctx.save();ctx.beginPath();ctx.rect(0,0,3500,3100);ctx.clip();
-  ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#917b5860';
-  for(let i=0;i<roadRoutes.length;i++){
-   ctx.lineWidth=Math.max(7,roadWidths[i]-11);roadTrace(ctx,roadRoutes[i]);ctx.stroke();
+  // The glaze is clipped to woodland. Skip its route tracing entirely when
+  // the camera's visible world rectangle cannot overlap that clip.
+  const z=worldZoom(),halfW=W/(2*z),halfH=H/(2*z);
+  if(cam.x+halfW>0&&cam.x-halfW<3500&&cam.y+halfH>0&&cam.y-halfH<3100){
+   ctx.save();ctx.beginPath();ctx.rect(0,0,3500,3100);ctx.clip();
+   ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#917b5860';
+   for(let i=0;i<roadRoutes.length;i++){
+    ctx.lineWidth=Math.max(7,roadWidths[i]-11);roadTrace(ctx,roadRoutes[i]);ctx.stroke();
+   }
+   ctx.restore();
   }
-  ctx.restore();drawWoodlandPathEdges();return
+  drawWoodlandPathEdges();return
  }
  // Draw full road network one material layer at a time so the junctions merge.
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
