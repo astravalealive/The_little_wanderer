@@ -11035,9 +11035,10 @@ function skiffWorkshop(){
 }
 
 /* Job 80: self-contained lake raft, separate from the coastal skiff. */
-const raft={ready:false,a:null,b:null,stroke:0};
+const raft={ready:false,checked:false,a:null,b:null,stroke:0};
 function raftEnds(){
- if(raft.ready)return raft;
+ if(raft.checked)return raft;
+ raft.checked=true;
  const y=lakeIsland.y, b={x:lakeIsland.x+lakeIsland.rx*.65,y};
  for(let x=lakeIsland.x+lakeIsland.rx+20;x<pond.x+pond.rx*9;x+=8){
   if(lakeLevel(x,y)>1.04&&lakeLevel(x,y)<1.2&&!blockedBySolid(x,y)){
