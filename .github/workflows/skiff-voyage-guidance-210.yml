@@ -1,0 +1,17 @@
+name: Skiff voyage guidance 210
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'tests/live/skiff-voyage-guidance-210.cjs'
+      - '.github/workflows/skiff-voyage-guidance-210.yml'
+  workflow_dispatch:
+jobs:
+  skiff-voyage-guidance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/live/skiff-voyage-guidance-210.cjs
