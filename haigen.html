@@ -4661,7 +4661,10 @@ function rbDrawBush(o){
 // Matching detailed 16-bit-style wildflowers and mushroom patches.
 function rbDrawFlower(o){
  const f=flowerKind(o),x=Math.round(o.x),y=Math.round(o.y);
- ctx.save();ellipse(x,y+3,12,4,'#2e604e7a');
+ ctx.save();
+ // Low-alpha ground tint softens the flower shadow without altering its sprite.
+ ellipse(x,y+4,15,5,'#65855229');
+ ellipse(x,y+3,12,4,'#2e604e7a');
  const p=(xx,yy,w,h,c)=>rbPixel(ctx,xx,yy,w,h,c);
  p(x-1,y-17,2,17,'#396d53');p(x-7,y-10,7,3,'#4c865e');p(x+1,y-7,8,3,'#528a69');
  p(x-7,y-24,14,12,'#294f46');p(x-5,y-25,10,10,f.color);
