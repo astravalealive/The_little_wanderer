@@ -11027,7 +11027,7 @@ function skiffWorkshop(){
 }
 
 /* Job 80: self-contained lake raft, separate from the coastal skiff. */
-const raft={ready:false,checked:false,a:null,b:null,stroke:0,moving:false,pace:0,facing:1,heading:0};
+const raft={ready:false,checked:false,a:null,b:null,stroke:0,moving:false,pace:0,facing:1,heading:0,visualHeading:0};
 function raftEnds(){
  if(raft.checked)return raft;
  raft.checked=true;
@@ -11082,7 +11082,7 @@ function raftWalkBoard(dx,dy){
  // Require the player to step toward the moored raft, not press Collect.
  const tx=p.x-state.x,ty=p.y-state.y,range=Math.hypot(tx,ty);
  if(range>12?(dx*tx+dy*ty)/Math.max(.001,Math.hypot(dx,dy)*range)<.35:dx*towardWater<.12)return false;
- state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.moving=false;raft.facing=towardWater;raft.heading=towardWater<0?Math.PI:0;raft.stroke=0;
+ state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.moving=false;raft.facing=towardWater;raft.heading=towardWater<0?Math.PI:0;raft.visualHeading=raft.heading;raft.stroke=0;
  notify('🛶 Aboard. Steer freely; paddle into a bank to step ashore.');return true;
 }
 function raftMove(dt,dx,dy){
@@ -11133,7 +11133,22 @@ function drawRaft(){
  if(Math.abs(p.x-cam.x)>W/worldZoom()/2+80||Math.abs(p.y-cam.y)>H/worldZoom()/2+80)return;
  ctx.save();ctx.translate(p.x,p.y+10);const afloat=!!state.raftAfloat,rowing=afloat&&raft.moving;
  // Rotate the complete hull and paddle for north, south, east and west movement.
- if(afloat)ctx.rotate((raft.heading||0)+Math.PI/2);const pulse=rowing?Math.sin(raft.stroke*2.1):0;ctx.translate(0,afloat?Math.sin(raft.stroke*.65)*1.25:0);if(afloat){for(let side of [-1,1]){const xx=side*35;ctx.strokeStyle='rgba(192,225,220,'+(rowing?.45:.22)+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(xx,9,rowing?12+Math.abs(pulse)*7:11,5,0,0,Math.PI*2);ctx.stroke();if(rowing){ctx.beginPath();ctx.arc(xx+side*8,5-pulse*3,2.2,0,Math.PI*2);ctx.stroke()}}}ellipse(0,9,38,12,'#24495788');const raftPlank=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+ if(afloat){
+  // Smooth heading across wraparound without changing actual steering or collisions.
+  const turn=Math.atan2(Math.sin(raft.heading-raft.visualHeading),Math.cos(raft.heading-raft.visualHeading));
+  raft.visualHeading+=turn*.22;
+  ctx.rotate(raft.visualHeading+Math.PI/2);
+ }
+ const pulse=rowing?Math.sin(raft.stroke*2.1):0;ctx.translate(0,afloat?Math.sin(raft.stroke*.65)*1.25:0);if(afloat){
+  // Small, low-cost wake behind the stern, tied to actual paddling distance.
+  if(rowing){
+   ctx.strokeStyle='rgba(209,237,226,.42)';ctx.lineWidth=1.7;
+   for(let i=0;i<3;i++){
+    const spread=12+i*8+Math.abs(pulse)*3,trail=29+i*12;
+    ctx.beginPath();ctx.moveTo(-spread,trail);ctx.quadraticCurveTo(0,trail+8,spread,trail);ctx.stroke();
+   }
+  }
+  for(let side of [-1,1]){const xx=side*35;ctx.strokeStyle='rgba(192,225,220,'+(rowing?.45:.22)+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(xx,9,rowing?12+Math.abs(pulse)*7:11,5,0,0,Math.PI*2);ctx.stroke();if(rowing){ctx.beginPath();ctx.arc(xx+side*8,5-pulse*3,2.2,0,Math.PI*2);ctx.stroke()}}}ellipse(0,9,38,12,'#24495788');const raftPlank=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
  for(let i=-4;i<=4;i++){const y=i*5.4,tip=32-Math.abs(i)*1.3;poly([[-tip+4,y-3],[-tip,y],[tip,y],[tip-4,y+4],[-tip+4,y+4]],i%2?'#967047':'#ae8658');ctx.strokeStyle='#4e392b';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-tip+5,y+1);ctx.lineTo(tip-5,y+1);ctx.stroke();for(const x of [-19,19]){raftPlank(x-2,y-3,4,7,'#6e5336');raftPlank(x-1,y-3,1,7,'#d8b781')}}
  for(const x of [-21,21]){raftPlank(x-3,-26,6,52,'#55402d');raftPlank(x-1,-26,2,52,'#b99a68')}
  // Directional paddle sprite: mirrored left/right with alternating blade and arm poses.
