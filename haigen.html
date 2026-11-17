@@ -4638,6 +4638,8 @@ function rbDrawRock(o){
  const c=rbRockImage(o.id),v=Math.abs(o.id)%6;
  const scale=(.78+v*.12)*(o.size||1);
  ctx.save();ctx.imageSmoothingEnabled=false;
+ // Low-alpha lichen tint connects the rock shadow to the woodland ground.
+ ellipse(o.x,o.y+7,29*scale,9,'#6178582c');
  ellipse(o.x,o.y+6,25*scale,7,'#283e3955');
  ctx.drawImage(c,Math.round(o.x-c.width*scale/2),Math.round(o.y-c.height*scale+8),Math.round(c.width*scale),Math.round(c.height*scale));ctx.restore();
 }
