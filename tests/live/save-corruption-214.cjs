@@ -1,0 +1,36 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const source=fs.readFileSync('haigen.html','utf8');
+const begin=source.indexOf(' function readHaigenSave(storage,restore){');
+const finish=source.indexOf('\n const useLiveSnapshot=',begin);
+assert(begin>=0&&finish>begin,'live save reader must exist');
+const context={window:{}};
+vm.createContext(context);
+vm.runInContext(source.slice(begin,finish),context);
+const read=context.readHaigenSave;
+function storage(entries,failBackup=false){
+ const data=new Map(Object.entries(entries));
+ return {data,getItem:k=>data.get(k)||null,setItem(k,v){if(failBackup)throw Error('quota');data.set(k,v)}};
+}
+let s=storage({wandererV127PreviewSave:'{bad',wandererV126PreviewSave:JSON.stringify({wood:42,structures:[],memories:[]})});
+assert.equal(read(s,false).wood,42,'valid legacy progress survives malformed preview');
+assert.equal(s.data.get('wandererV127CorruptBackup'),'{bad','damaged bytes are retained');
+s=storage({wandererV127PreviewSave:JSON.stringify({wood:17,structures:[],memories:[]}),wandererV126PreviewSave:JSON.stringify({wood:42})});
+assert.equal(read(s,false).wood,17,'valid preview remains preferred');
+assert.equal(read(s,true).wood,42,'restore mode skips preview');
+s=storage({wandererV127PreviewSave:'[]',wandererV125PreviewSave:JSON.stringify({wood:9})});
+assert.equal(read(s,false).wood,9,'invalid top-level preview falls back');
+s=storage({wandererV127PreviewSave:'{broken',wandererV127CorruptBackup:'original damaged bytes'});
+context.window.__haigenSaveWriteBlocked=false;
+read(s,false);
+assert.equal(s.data.get('wandererV127CorruptBackup'),'original damaged bytes','previous corrupt backup is never overwritten');
+assert.equal(context.window.__haigenSaveWriteBlocked,true,'existing backup prevents destructive overwrite');
+s=storage({wandererV127PreviewSave:'{broken'},true);
+read(s,false);
+assert.equal(context.window.__haigenSaveWriteBlocked,true,'failed backup blocks destructive autosave');
+assert(source.includes('if(window.__haigenSaveWriteBlocked)return;'),'autosave respects backup failure');
+assert(source.includes("setInterval(save,5000)"),'existing autosave cadence retained');
+assert(source.includes("addEventListener('pagehide',save)"),'pagehide save retained');
+console.log('PASS Job 214 malformed save fallback and autosave protection');
