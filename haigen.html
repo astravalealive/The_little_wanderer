@@ -4510,7 +4510,7 @@ function rbDrawGround(){
    const fade=Math.max(0,Math.min(1,(edge+170)/350));
    if(fade<=0)continue;
    ctx.globalAlpha=fade;
-   ctx.fillRect(x,y,cell+.35,cell+.35);
+   // Adjacent translucent cells must not overlap: overlap double-blends alpha into a visible 6-unit grid.\n   ctx.fillRect(x,y,cell,cell);
   }
  }
  if(night>.01){ctx.globalAlpha=night*.44;ctx.fillStyle='#192030';ctx.fillRect(l,t,r-l,b-t)}
