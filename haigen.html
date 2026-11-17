@@ -8476,6 +8476,10 @@ function drawWoodlandFloorV391(nightMix){
  const zoom=worldZoom(),halfW=W/(2*zoom)+110,halfH=H/(2*zoom)+110,step=94;
  const x0=Math.floor((cam.x-halfW)/step),x1=Math.ceil((cam.x+halfW)/step);
  const y0=Math.floor((cam.y-halfH)/step),y1=Math.ceil((cam.y+halfH)/step);
+ // Each decorative sample is inside its own 94-unit grid cell. If every
+ // sampled cell misses the woodland rectangle, none can draw anything.
+ // Keep the original per-sample rbWoodland() check for all visible cells.
+ if((x1+1)*step<=0||x0*step>=3500||(y1+1)*step<=0||y0*step>=3100)return;
  const hash=(x,y,k)=>{let v=Math.sin(x*127.1+y*311.7+k*74.7)*43758.5453;return v-Math.floor(v)};
  ctx.save();ctx.lineCap='round';
  for(let gx=x0;gx<=x1;gx++)for(let gy=y0;gy<=y1;gy++){
