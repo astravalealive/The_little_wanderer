@@ -44,7 +44,7 @@ async function run(){
    assert(!initial.errorVisible,'startup error visible');
    // Touch interface: tap only a non-destructive menu control.
    const menu=page.locator('.mobile-menu > summary');
-   if(await menu.count()){
+   if(await menu.count() && await menu.isVisible()){
     await menu.tap();
     assert(await page.locator('.mobile-menu').evaluate(e=>e.open),'mobile menu did not open');
     await menu.tap();
