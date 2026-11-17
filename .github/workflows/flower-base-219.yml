@@ -1,0 +1,17 @@
+name: Woodland flower base 219
+on:
+  pull_request:
+    paths:
+      - haigen.html
+      - tests/live/flower-base-219.cjs
+      - .github/workflows/flower-base-219.yml
+  workflow_dispatch:
+jobs:
+  flower-base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/live/flower-base-219.cjs
