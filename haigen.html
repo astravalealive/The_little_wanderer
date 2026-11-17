@@ -4522,6 +4522,23 @@ function rbStorybookGrass(){
   }
  }
  g.globalAlpha=1;
+ // Low-contrast forest-floor material clusters: moss, leaf litter and exposed earth.
+ // Deterministic and seamlessly wrapped, with no changes to collision or world layout.
+ for(let i=0;i<95;i++){
+  const x=rng()*size,y=rng()*size,rx=5+rng()*15,ry=2+rng()*8;
+  blob(x,y,rx,ry,['#496d4b','#8d9262','#776e4c'][i%3],.12+rng()*.13);
+ }
+ // Small grouped leaf silhouettes rather than full-screen uniform noise.
+ for(let i=0;i<160;i++){
+  const x=rng()*size,y=rng()*size,angle=rng()*6.283;
+  const c=['#c0ad78','#9d8759','#6e774d','#d0bb88'][i%4];
+  g.strokeStyle=c;g.globalAlpha=.28+rng()*.23;g.lineWidth=1.3;
+  for(let ox=-size;ox<=size;ox+=size)for(let oy=-size;oy<=size;oy+=size){
+   g.beginPath();g.moveTo(x+ox,y+oy);
+   g.lineTo(x+ox+Math.cos(angle)*3.8,y+oy+Math.sin(angle)*2.4);g.stroke();
+  }
+ }
+ g.globalAlpha=1;
  rbTileCache.storybookGrass=ctx.createPattern(tile,'repeat');
  return rbTileCache.storybookGrass;
 }
