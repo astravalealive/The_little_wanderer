@@ -98,14 +98,31 @@ body:has(.overlay.open) .haigen-speech{visibility:hidden!important}
  cv.height=Math.max(1,Math.round(H*dpr));
  ctx.setTransform(cv.width/W,0,0,cv.height/H,0,0);
  ctx.imageSmoothingEnabled=true;
-}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD_MIN=-7500, WORLD=10500, WORLD_SPAN=WORLD-WORLD_MIN;let state;const fresh=()=>({x:1500,y:1500,worldLayout:3000,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dylan. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:false,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});// Preview only: initialise from a READ-ONLY copy of the user's V120 save, if present.
- // All subsequent writes continue to use the independent preview key.
- try{
-  const useLiveSnapshot=new URLSearchParams(location.search).get('restore')==='1';
-  const previewSnapshot=useLiveSnapshot?null:localStorage.getItem('wandererV127PreviewSave');
-  const existingSave=localStorage.getItem('wandererV126PreviewSave')||localStorage.getItem('wandererV125PreviewSave')||localStorage.getItem('wandererV121PreviewSave')||localStorage.getItem('wandererTestSave');
-  state=Object.assign(fresh(),JSON.parse(previewSnapshot||existingSave||'{}'));
- }catch{state=fresh()}
+}addEventListener('resize',resize);if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(cv);resize();const $=id=>document.getElementById(id),rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const WORLD_MIN=-7500, WORLD=10500, WORLD_SPAN=WORLD-WORLD_MIN;let state;const fresh=()=>({x:1500,y:1500,worldLayout:3000,wood:0,stone:0,berries:0,daytime:0,structures:[],removed:[],memories:['Day 1: Haigen arrived in the woodland clearing with Dylan. Somewhere beyond the trees, Skölli was exploring.'],discoveries:[],friends:{heri:48,skolli:12},quests:{collect:false,home:false,friend:false},steps:0,tools:{axe:0,torch:0},food:0,autonomy:false,autoGoal:"gather",lastSavedAt:0,returnReport:[],autoSteps:0,equipped:'hands',harvestedAt:{},mushrooms:0,herbs:{},potions:0,flowerFinds:0,fallen:[],treeHits:{},twigs:0,leaves:0});// Read save slots independently so damaged preview JSON cannot hide older progress.
+ function readHaigenSave(storage,restore){
+  const previewKey='wandererV127PreviewSave';
+  const keys=restore?[]:[previewKey];
+  keys.push('wandererV126PreviewSave','wandererV125PreviewSave','wandererV121PreviewSave','wandererTestSave');
+  for(const key of keys){
+   let raw;
+   try{raw=storage.getItem(key)}catch(_){continue}
+   if(!raw)continue;
+   try{
+    const data=JSON.parse(raw);
+    if(data&&typeof data==='object'&&!Array.isArray(data)&&
+       (!('structures' in data)||Array.isArray(data.structures))&&
+       (!('memories' in data)||Array.isArray(data.memories)))return data;
+   }catch(_){}
+   if(key===previewKey){
+    // Retain the damaged original before a subsequent autosave replaces it.
+    try{storage.setItem('wandererV127CorruptBackup',raw)}
+    catch(_){window.__haigenSaveWriteBlocked=true}
+   }
+  }
+  return {};
+ }
+ const useLiveSnapshot=new URLSearchParams(location.search).get('restore')==='1';
+ state=Object.assign(fresh(),readHaigenSave(localStorage,useLiveSnapshot));
  if(state.skiffBerth!=='saltwick'&&state.skiffBerth!=='island')delete state.skiffBerth;
  delete state.skiffAtSea;
  state.raftAfloat=false;
@@ -2609,7 +2626,8 @@ function save(){
   snapshot={...state,...skiffDeparture};
   delete snapshot.skiffAtSea;
  }
- try{localStorage.setItem('wandererV127PreviewSave',JSON.stringify(snapshot))}catch{}
+ if(window.__haigenSaveWriteBlocked)return;
+ try{localStorage.setItem('wandererV127PreviewSave',JSON.stringify(snapshot));window.__haigenLastSaveError=null}catch(e){window.__haigenLastSaveError=String(e&&e.message||e)}
 }
 setInterval(save,5000);addEventListener('pagehide',save);
 // Haigen's autonomous routines are local, bounded and require no server.
