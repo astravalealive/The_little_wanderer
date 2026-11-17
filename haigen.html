@@ -11131,6 +11131,22 @@ function drawRaft(){
  }
  const p=state.raftAfloat?state:(state.raftBerth==='island'?r.b:r.a);
  if(Math.abs(p.x-cam.x)>W/worldZoom()/2+80||Math.abs(p.y-cam.y)>H/worldZoom()/2+80)return;
+ // Contextual, non-interactive hints only; no change to boarding or docking rules.
+ const nearRaft=Math.hypot(state.x-p.x,state.y-p.y)<125;
+ if(!state.raftAfloat&&nearRaft){
+  ctx.save();ctx.font='bold 12px system-ui';ctx.textAlign='center';
+  ctx.fillStyle='#f3e5bd';ctx.strokeStyle='#28352b';ctx.lineWidth=3;
+  const hint='WALK ONTO RAFT';ctx.strokeText(hint,p.x,p.y-48);ctx.fillText(hint,p.x,p.y-48);
+  ctx.restore();
+ }else if(state.raftAfloat){
+  const nearShore=Math.min(Math.hypot(state.x-r.a.x,state.y-r.a.y),Math.hypot(state.x-r.b.x,state.y-r.b.y))<125;
+  if(nearShore){
+   ctx.save();ctx.font='bold 12px system-ui';ctx.textAlign='center';
+   ctx.fillStyle='#f3e5bd';ctx.strokeStyle='#28352b';ctx.lineWidth=3;
+   const hint='PADDLE INTO SHORE TO STEP OFF';
+   ctx.strokeText(hint,p.x,p.y-55);ctx.fillText(hint,p.x,p.y-55);ctx.restore();
+  }
+ }
  ctx.save();ctx.translate(p.x,p.y+10);const afloat=!!state.raftAfloat,rowing=afloat&&raft.moving;
  // Rotate the complete hull and paddle for north, south, east and west movement.
  if(afloat){
