@@ -4,6 +4,7 @@ on:
     paths:
       - 'haigen.html'
       - 'tests/live/woodland-cache-204.cjs'
+      - 'tests/live/woodland-cache-204-extended.cjs'
       - '.github/workflows/woodland-cache-204.yml'
   workflow_dispatch:
 permissions:
@@ -21,10 +22,14 @@ jobs:
         run: npm install --no-save playwright-core@1.56.1
       - name: Compare cached versus original woodland pixels and memory
         run: node tests/live/woodland-cache-204.cjs
+      - name: Extended zoom, night, traversal, memory and repeat-sample checks
+        run: node tests/live/woodland-cache-204-extended.cjs
       - name: Upload cache evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: woodland-cache-204-evidence
-          path: woodland-cache-204-evidence/
+          path: |
+            woodland-cache-204-evidence/
+            woodland-cache-204-extended/
           if-no-files-found: warn
