@@ -4518,11 +4518,17 @@ function rbDrawGround(){
  if(r<=l||b<=t)return;
  const cell=6,night=nightStrength(),pattern=rbGrass();
  ctx.save();ctx.fillStyle=pattern;
- for(let y=Math.floor(t/cell)*cell;y<b;y+=cell){
-  for(let x=Math.floor(l/cell)*cell;x<r;x+=cell){
-   const cx=x+cell*.5,cy=y+cell*.5;
-   const wobble=90*Math.sin(cy/245)+40*Math.sin(cy/91+cx/310)+24*Math.sin(cx/133+cy/170);
-   const wobbleY=80*Math.sin(cx/280)+32*Math.sin(cx/107+cy/270);
+ // Precompute the single-axis sine terms once per row/column. Preserve
+ // expression order and every world-space sample, alpha and draw operation.
+ const firstX=Math.floor(l/cell)*cell,firstY=Math.floor(t/cell)*cell;
+ const xWobble=new Map();
+ for(let x=firstX;x<r;x+=cell){const cx=x+cell*.5;xWobble.set(x,80*Math.sin(cx/280))}
+ for(let y=firstY;y<b;y+=cell){
+  const cy=y+cell*.5,yWobble=90*Math.sin(cy/245);
+  for(let x=firstX;x<r;x+=cell){
+   const cx=x+cell*.5;
+   const wobble=yWobble+40*Math.sin(cy/91+cx/310)+24*Math.sin(cx/133+cy/170);
+   const wobbleY=xWobble.get(x)+32*Math.sin(cx/107+cy/270);
    const edge=Math.min(cx+wobble,3500+wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-20);
    // Smooth continuous fade across the woodland boundary, no binary dither.
    // Smoothstep avoids a hard linear transition at the outer edge.
