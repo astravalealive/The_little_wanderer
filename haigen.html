@@ -11039,12 +11039,24 @@ const raft={ready:false,checked:false,a:null,b:null,stroke:0};
 function raftEnds(){
  if(raft.checked)return raft;
  raft.checked=true;
- const y=lakeIsland.y, b={x:lakeIsland.x+lakeIsland.rx*.65,y};
+ const y=lakeIsland.y,b={x:lakeIsland.x+lakeIsland.rx*.65,y};
+ // Find the first dry, walkable bank immediately after continuous open water.
+ // The irregular lake's radial level is discontinuous at some shore angles:
+ // requiring a narrow 1.04–1.2 band can make the raft impossible to build.
+ let wetSeen=false;
  for(let x=lakeIsland.x+lakeIsland.rx+20;x<pond.x+pond.rx*9;x+=8){
-  if(lakeLevel(x,y)>1.04&&lakeLevel(x,y)<1.2&&!blockedBySolid(x,y)){
-   let clear=true;for(let q=lakeIsland.x+lakeIsland.rx+8;q<x-16;q+=8)if(lakeLevel(q,y)>1.05)clear=false;
-   if(clear&&x-b.x>lakeIsland.rx*2&&onLakeIsland(b.x,b.y)){let wet=true;for(let q=b.x+lakeIsland.rx*.6;q<x-90;q+=12){if(lakeLevel(q,y)>1.02){wet=false;break}}if(wet){raft.a={x,y};raft.b=b;raft.ready=true;break}}
+  const level=lakeLevel(x,y);
+  if(level<.95){wetSeen=true;continue}
+  if(!wetSeen||level<=1.02||x-b.x<=lakeIsland.rx*2)continue;
+  let clear=true;
+  for(let q=b.x+lakeIsland.rx*.6;q<x-20;q+=12){
+   if(lakeLevel(q,y)>1.02){clear=false;break}
   }
+  if(clear&&!blockedBySolid(x,y)&&onLakeIsland(b.x,b.y)){
+   raft.a={x,y};raft.b=b;raft.ready=true;break;
+  }
+  // Don't silently select a more distant bank beyond intervening land.
+  if(level>1.02)break;
  }
  return raft;
 }
