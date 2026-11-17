@@ -1,0 +1,18 @@
+name: Journal story honesty
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'v127-ornate-ui.js'
+      - 'tests/live/journal-story-honesty.cjs'
+      - '.github/workflows/journal-story-honesty.yml'
+  workflow_dispatch:
+jobs:
+  journal-story-honesty:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/live/journal-story-honesty.cjs
