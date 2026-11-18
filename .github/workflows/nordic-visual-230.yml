@@ -1,0 +1,30 @@
+name: Nordic visual unification 230
+on:
+  push:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - docs/nordic-visual-bible-230/**
+      - tests/live/nordic-visual-230.cjs
+      - .github/workflows/nordic-visual-230.yml
+  pull_request:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - docs/nordic-visual-bible-230/**
+      - tests/live/nordic-visual-230.cjs
+      - .github/workflows/nordic-visual-230.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  nordic-visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - run: node tests/live/nordic-visual-230.cjs
