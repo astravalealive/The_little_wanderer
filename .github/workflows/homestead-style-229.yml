@@ -1,0 +1,28 @@
+name: Homestead visual unification 229
+on:
+  push:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - tests/live/homestead-style-229.cjs
+      - .github/workflows/homestead-style-229.yml
+  pull_request:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - tests/live/homestead-style-229.cjs
+      - .github/workflows/homestead-style-229.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  homestead-style:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - run: node tests/live/homestead-style-229.cjs
