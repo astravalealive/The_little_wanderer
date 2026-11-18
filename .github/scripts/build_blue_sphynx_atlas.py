@@ -43,9 +43,10 @@ RIGHT_BOXES = [
     (766, 266, 877, 356),
     (879, 265, 997, 357),
 ]
-# Locked front idle (Views / Idle) — head+chest; crop stops above panel chrome.
-FRONT_IDLE_BOX = (52, 148, 134, 252)
-# Side sitting idle for DOWN body proportions assist.
+# Locked front face/ears from Views / Idle (bust). Full-body DOWN uses UP walk
+# silhouettes so paws stay planted — never ship a head-only cell.
+FRONT_FACE_BOX = (52, 148, 134, 252)
+# Optional side sit for palette assist.
 SIDE_IDLE_BOX = (268, 155, 350, 278)
 
 
@@ -212,68 +213,92 @@ def reinforce_eyes(im: Image.Image) -> Image.Image:
     return out
 
 
-def build_down_walk(
-    front_idle: Image.Image,
+def build_down_frames(
+    front_face: Image.Image,
     up_frames: list[Image.Image],
     palette: list[tuple[int, int, int]],
 ) -> list[Image.Image]:
-    """Pose-complete front walk from locked front idle + UP leg cadence.
+    """Full-body DOWN idle/walk: UP silhouette (paws planted) + locked front face.
 
-    Preserves front face/horn-ears from the approved idle. Standing body height
-    matches UP walk. Leg phase offsets follow UP without inventing a new design.
+    Never emits a head-only cell. Face overlay is limited to the crown/head band
+    so torso, legs and tail from the approved UP walk stay visible.
     """
-    head = trim_alpha(front_idle)
-    # Keep upper ~70% as locked face/ears/chest identity (sitting crop is already bust-ish).
-    head_cut = max(8, int(head.height * 0.72))
+    head = trim_alpha(front_face)
+    # Upper ~55% = ears + face only (exclude long bust that swallowed the body).
+    head_cut = max(8, int(head.height * 0.55))
     face = head.crop((0, 0, head.width, head_cut))
+    face = reinforce_eyes(face)
 
     frames: list[Image.Image] = []
     for i, up in enumerate(up_frames):
         up_s = trim_alpha(up)
-        W, H = 128, 160
+        W, H = 120, 150
         canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
 
-        body_h = int(H * 0.70)
+        # Keep the entire UP body — this is what plants the paws.
+        body_h = int(H * 0.88)
         body = up_s.resize(
-            (max(1, int(up_s.width * (body_h / up_s.height) * 1.05)), body_h),
+            (max(1, int(up_s.width * (body_h / up_s.height))), body_h),
             Image.Resampling.LANCZOS,
         )
-        drop = int(body.height * 0.38)
-        body_lower = body.crop((0, drop, body.width, body.height))
-        # Soften back-highlight spine so it reads less as "back view" under the face.
-        bl = body_lower.load()
-        for yy in range(body_lower.height):
-            for xx in range(body_lower.width):
+        # Soften rear spine highlight so the front face reads as toward-camera.
+        bl = body.load()
+        for yy in range(int(body.height * 0.42)):
+            for xx in range(body.width):
                 r, g, b, a = bl[xx, yy]
                 if a < 18:
                     continue
-                # Dim pale back ridge toward mid mauve
-                if r > 170 and g > 150 and b > 140:
-                    bl[xx, yy] = (int(r * 0.72 + 110 * 0.28), int(g * 0.72 + 95 * 0.28), int(b * 0.72 + 105 * 0.28), a)
-        bx = (W - body_lower.width) // 2
-        by = H - FOOT_PAD - body_lower.height
-        canvas.alpha_composite(body_lower, (bx, by))
+                if r > 165 and g > 145 and b > 135:
+                    bl[xx, yy] = (
+                        int(r * 0.65 + 105 * 0.35),
+                        int(g * 0.65 + 90 * 0.35),
+                        int(b * 0.65 + 100 * 0.35),
+                        a,
+                    )
+        bx = (W - body.width) // 2
+        by = H - FOOT_PAD - body.height
+        canvas.alpha_composite(body, (bx, by))
 
-        face_h = int(H * 0.52)
+        # Widen the upper torso so the front face does not sit on a pinching neck.
+        px = canvas.load()
+        neck_y0 = by + int(body.height * 0.18)
+        neck_y1 = by + int(body.height * 0.48)
+        for yy in range(neck_y0, neck_y1):
+            xs = [xx for xx in range(W) if px[xx, yy][3] > 40]
+            if len(xs) < 2:
+                continue
+            x0, x1 = min(xs), max(xs)
+            widen = 3 if yy < (neck_y0 + neck_y1) // 2 else 2
+            sample = px[(x0 + x1) // 2, yy]
+            for xx in range(max(0, x0 - widen), min(W, x1 + widen + 1)):
+                if px[xx, yy][3] < 40:
+                    px[xx, yy] = sample
+
+        # Face only — ~32% of canvas height, anchored on UP crown.
+        face_h = max(18, int(H * 0.32))
         face_s = face.resize(
             (max(1, int(face.width * (face_h / face.height))), face_h),
             Image.Resampling.LANCZOS,
         )
-        face_s = reinforce_eyes(face_s)
         fx = (W - face_s.width) // 2
-        bob = [0, 2, 0, 3][i % 4]
-        fy = max(0, by - int(face_s.height * 0.55) - bob)
+        bob = [0, 1, 0, 2][i % 4]
+        fy = max(0, by + int(body.height * 0.02) - bob)
         canvas.alpha_composite(face_s, (fx, fy))
 
-        # Light chest patch (locked peach) under chin so front reads clearly.
+        # Peach chest cue under chin (locked palette) without covering legs.
         chest = nearest((190, 150, 145), palette)
         px = canvas.load()
-        for oy in range(4):
-            for ox in range(-4, 5):
-                x = W // 2 + ox
-                y = fy + face_s.height - 6 + oy
-                if 0 <= x < W and 0 <= y < H and px[x, y][3] > 30:
-                    r, g, b, a = px[x, y]
+        chin_y = fy + face_s.height - 2
+        for oy in range(8):
+            for ox in range(-7, 8):
+                x, y = W // 2 + ox, chin_y + oy
+                if not (0 <= x < W and 0 <= y < H):
+                    continue
+                r, g, b, a = px[x, y]
+                if a < 40:
+                    # Fill tiny chin gaps so head and torso stay connected.
+                    px[x, y] = (chest[0], chest[1], chest[2], 220)
+                else:
                     px[x, y] = (
                         int(r * 0.55 + chest[0] * 0.45),
                         int(g * 0.55 + chest[1] * 0.45),
@@ -281,19 +306,7 @@ def build_down_walk(
                         a,
                     )
 
-        paw = nearest((95, 82, 96), palette)
-        base_y = H - FOOT_PAD - 1
-        lift_l, lift_r = i in (1, 2), i in (0, 3)
-        for dx, lift in ((-8, lift_l), (7, lift_r)):
-            py = base_y - (4 if lift else 0)
-            for ox in range(-2, 3):
-                for oy in range(-1, 2):
-                    x, y = W // 2 + dx + ox, py + oy
-                    if 0 <= x < W and 0 <= y < H:
-                        if px[x, y][3] < 30:
-                            px[x, y] = (*paw, 220)
-
-        frames.append(reinforce_eyes(soft_posterize(trim_alpha(canvas), palette, mix=0.22)))
+        frames.append(reinforce_eyes(soft_posterize(trim_alpha(canvas), palette, mix=0.18)))
     return frames
 
 
@@ -304,10 +317,10 @@ def main() -> None:
 
     up = [extract(src, b) for b in UP_BOXES]
     right = [extract(src, b) for b in RIGHT_BOXES]
-    front_idle = extract(src, FRONT_IDLE_BOX)
+    front_face = extract(src, FRONT_FACE_BOX)
     side_idle = extract(src, SIDE_IDLE_BOX)
 
-    palette = sample_palette(front_idle, 14)
+    palette = sample_palette(front_face, 14)
     palette += sample_palette(right[0], 10)
     # Dedup
     uniq = []
@@ -316,10 +329,7 @@ def main() -> None:
             uniq.append(c)
     palette = uniq
 
-    down_walk = build_down_walk(front_idle, up, palette)
-    # Frame 0 of DOWN prefers the locked sitting idle (true approved front expression).
-    down_idle = reinforce_eyes(soft_posterize(front_idle, palette, mix=0.20))
-    down_frames = [down_idle] + down_walk[1:]
+    down_frames = build_down_frames(front_face, up, palette)
 
     up_frames = [soft_posterize(f, palette, mix=0.18) for f in up]
     right_frames = [soft_posterize(f, palette, mix=0.18) for f in right]
@@ -347,13 +357,13 @@ def main() -> None:
         "asset": str(OUT.relative_to(ROOT)),
         "cell": [CELL_W, CELL_H],
         "layout": "rows=down,up,right,left; cols=idle+walk×3",
-        "drawHint": {"width": 58, "height": 48, "footPad": FOOT_PAD},
+        "drawHint": {"width": 78, "height": 66, "footPad": 7},
         "source": str(SRC.relative_to(ROOT)),
         "sourceSha256": sha256(SRC),
         "outputSha256": sha256(OUT),
         "size": list(atlas.size),
         "left": "mirror(right)",
-        "downWalk": "pose-completed from locked front idle + UP cadence; face/ears from approved idle",
+        "downWalk": "full-body UP silhouette + locked front face overlay (no head-only cells)",
         "paletteSample": ["#%02x%02x%02x" % c for c in palette[:10]],
     }
     META.write_text(json.dumps(meta, indent=2) + "\n")

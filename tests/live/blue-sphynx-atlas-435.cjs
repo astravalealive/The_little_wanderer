@@ -16,6 +16,7 @@ const {chromium}=require('playwright-core');
  assert.match(html,/kind:'sphynx'/);
  assert.match(html,/wandererV127PreviewSave/);
  assert.match(html,/window\.__blueQAPlace/);
+ assert.match(html,/window\.__blueQALineup/);
  assert.match(html,/if\(fox\)\{/);
  assert.ok(fs.existsSync(path.join(root,'assets/blue-sphynx-atlas-v435.webp')));
  assert.ok(fs.existsSync(path.join(root,'docs/blue-sphynx-atlas/atlas-preview-4x.png')));
@@ -104,15 +105,79 @@ const {chromium}=require('playwright-core');
  await shot('homestead-iphone-walk-right',{width:390,height:844},{dir:'right',moving:true});
  await shot('homestead-ipad-landscape',{width:1024,height:768},{dir:'down',moving:true});
 
- const {page,errors}=await openPage({width:390,height:844});
- await page.evaluate(()=>window.__blueQAPlace({dir:'down',moving:false,close:true}));
- await page.waitForTimeout(300);
- await page.locator('canvas#game').screenshot({
-  path:path.join(evidence,'after','blue-close-iphone.png'),
-  animations:'disabled'
- });
- assert.ok(!errors.length,'close page errors '+JSON.stringify(errors));
- await page.close();
+ // Close-up matrix: all 4 dirs × idle + walk; assert draw size / foot pad.
+ const closeFiles=[];
+ {
+  const {page,errors}=await openPage({width:390,height:844});
+  for(const dir of ['down','up','right','left']){
+   for(const moving of [false,true]){
+    const label=`blue-close-${dir}-${moving?'walk':'idle'}`;
+    const info=await page.evaluate((o)=>window.__blueQAPlace(o),{dir,moving,close:true});
+    assert.ok(info.blue&&info.blue.loaded,'Blue atlas must be ready for close-up');
+    await page.waitForTimeout(moving?480:280);
+    const frame=await page.evaluate(()=>window.__v435BlueLastFrame);
+    assert.ok(frame,'lastFrame must be set after draw');
+    assert.equal(frame.width,148,'Blue draw width accounts for in-cell top pad');
+    assert.equal(frame.height,124,'Blue draw height accounts for in-cell top pad');
+    assert.equal(frame.footPad,5,'Blue foot pad matches Dylan plant');
+    assert.equal(frame.dir,dir);
+    assert.equal(!!frame.moving,moving);
+    const file=label+'.png';
+    closeFiles.push(file);
+    await page.locator('canvas#game').screenshot({
+     path:path.join(evidence,'after',file),
+     animations:'disabled'
+    });
+   }
+  }
+  // Keep legacy filename as the DOWN idle close-up.
+  fs.copyFileSync(
+   path.join(evidence,'after','blue-close-down-idle.png'),
+   path.join(evidence,'after','blue-close-iphone.png')
+  );
+  closeFiles.push('blue-close-iphone.png');
+  assert.ok(!errors.length,'close page errors '+JSON.stringify(errors));
+  await page.close();
+ }
+
+ // Dylan + Skölli regression: park others offscreen, frame each companion close.
+ {
+  const {page,errors}=await openPage({width:390,height:844});
+  for(const kind of ['rabbit','fox']){
+   const label=kind==='rabbit'?'dylan-close-regression':'skolli-close-regression';
+   await page.evaluate((k)=>window.__blueQAPlace({dir:'down',moving:false,close:true,focus:k}),kind);
+   await page.waitForTimeout(300);
+   await page.locator('canvas#game').screenshot({
+    path:path.join(evidence,'after',label+'.png'),
+    animations:'disabled'
+   });
+   closeFiles.push(label+'.png');
+  }
+  assert.ok(!errors.length,'regression page errors '+JSON.stringify(errors));
+  await page.close();
+ }
+
+ // Scale lineup: Blue beside Haigen + Dylan + Skölli (iPhone + iPad).
+ assert.match(html,/window\.__blueQALineup/);
+ for(const [label,viewport] of [
+  ['scale-lineup-iphone',{width:390,height:844}],
+  ['scale-lineup-ipad',{width:1024,height:768}]
+ ]){
+  const {page,errors}=await openPage(viewport);
+  const info=await page.evaluate(()=>window.__blueQALineup());
+  assert.ok(info.lineup);
+  await page.waitForTimeout(400);
+  const frame=await page.evaluate(()=>window.__v435BlueLastFrame);
+  assert.equal(frame.width,148);
+  assert.equal(frame.height,124);
+  await page.locator('canvas#game').screenshot({
+   path:path.join(evidence,'after',label+'.png'),
+   animations:'disabled'
+  });
+  closeFiles.push(label+'.png');
+  assert.ok(!errors.length,'lineup errors '+JSON.stringify(errors));
+  await page.close();
+ }
 
  await browser.close();
  server.close();
@@ -120,7 +185,11 @@ const {chromium}=require('playwright-core');
  const artifactDir='/opt/cursor/artifacts';
  if(fs.existsSync(path.dirname(artifactDir))){
   fs.mkdirSync(artifactDir,{recursive:true});
-  for(const f of ['homestead-iphone.png','homestead-iphone-walk-right.png','homestead-ipad-landscape.png','blue-close-iphone.png']){
+  const copy=[
+   'homestead-iphone.png','homestead-iphone-walk-right.png','homestead-ipad-landscape.png',
+   ...closeFiles
+  ];
+  for(const f of copy){
    const src=path.join(evidence,'after',f);
    if(fs.existsSync(src))fs.copyFileSync(src,path.join(artifactDir,'blue-'+f));
   }
