@@ -4649,11 +4649,12 @@ function rbDrawTree(o){
  const homestead=nearHomestead(o.x,o.y);
  ctx.save();ctx.imageSmoothingEnabled=false;
  // A muted moss apron blends the existing trunk shadow into the woodland floor.
- ellipse(o.x+1,o.y+5,30*s,9*s,homestead?homesteadStyle.moss+'55':'#53764b30');
- ellipse(o.x+1,o.y+4,26*s,8*s,homestead?homesteadStyle.shadow:'#24423766');
+ ellipse(o.x+1,o.y+5,30*s,9*s,'#53764b30');
+ ellipse(o.x+1,o.y+4,26*s,8*s,'#24423766');
  ctx.drawImage(c,Math.round(o.x-c.width*s/2),Math.round(o.y-c.height*s+4),Math.round(c.width*s),Math.round(c.height*s));
  if(homestead){
   // Soft Nordic canopy wash — keeps approved tree art, harmonises leaf colour at camp.
+  ctx.globalAlpha=.22;ellipse(o.x+1,o.y+5,32*s,10*s,homesteadStyle.moss+'66');
   ctx.globalAlpha=.2;ellipse(o.x-2*s,o.y-c.height*s*.55,c.width*s*.38,c.height*s*.28,homesteadStyle.leaf);
   ctx.globalAlpha=.16;ellipse(o.x+6*s,o.y-c.height*s*.72,c.width*s*.3,c.height*s*.22,homesteadStyle.moss);
   ctx.globalAlpha=1;
@@ -4688,18 +4689,22 @@ function rbDrawRock(o){
  const homestead=nearHomestead(o.x,o.y);
  ctx.save();ctx.imageSmoothingEnabled=false;
  // Low-alpha lichen tint connects the rock shadow to the woodland ground.
- ellipse(o.x,o.y+7,29*scale,9,homestead?homesteadStyle.moss+'40':'#6178582c');
- ellipse(o.x,o.y+6,25*scale,7,homestead?homesteadStyle.shadow:'#283e3955');
+ ellipse(o.x,o.y+7,29*scale,9,'#6178582c');
+ ellipse(o.x,o.y+6,25*scale,7,'#283e3955');
  ctx.drawImage(c,Math.round(o.x-c.width*scale/2),Math.round(o.y-c.height*scale+8),Math.round(c.width*scale),Math.round(c.height*scale));
- if(homestead){ctx.globalAlpha=.18;ellipse(o.x-4*scale,o.y-10*scale,10*scale,5*scale,homesteadStyle.leaf);ctx.globalAlpha=1}
+ if(homestead){
+  ctx.globalAlpha=.2;ellipse(o.x,o.y+7,30*scale,9,homesteadStyle.moss+'55');
+  ctx.globalAlpha=.18;ellipse(o.x-4*scale,o.y-10*scale,10*scale,5*scale,homesteadStyle.leaf);
+  ctx.globalAlpha=1;
+ }
  ctx.restore();
 }
 function rbDrawBush(o){
  const homestead=nearHomestead(o.x,o.y);
  ctx.save();ctx.translate(Math.round(o.x),Math.round(o.y));const p=(x,y,w,h,c)=>rbPixel(ctx,x,y,w,h,c);
  // Soft forest-floor moss behind the existing shrub shadow, with no new scenery.
- ellipse(0,6,33,11,homestead?homesteadStyle.moss+'44':'#547b4b2b');
- ellipse(0,5,29,9,homestead?homesteadStyle.shadow:'#23473870');
+ ellipse(0,6,33,11,'#547b4b2b');
+ ellipse(0,5,29,9,'#23473870');
  const deep=homestead?homesteadStyle.moss:'#2e594d';
  const mid=homestead?homesteadStyle.leaf:'#407a63';
  const hi=homestead?'#96aa68':'#7da48a';
@@ -4710,6 +4715,7 @@ function rbDrawBush(o){
  if(berryReady(o))for(const [x,y] of [[-19,-15],[-4,-26],[16,-12],[7,-18],[-13,-6]]){
   p(x,y,5,5,'#aa4e58');p(x+1,y,2,2,'#e0a89c');
  }
+ if(homestead){ellipse(0,6,34,12,homesteadStyle.moss+'40')}
  ctx.restore();
 }
 
