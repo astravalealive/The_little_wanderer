@@ -10,19 +10,25 @@ alwaysApply: true
 - Prefer implementation over planning when an approved brief exists.
 
 ## Context (read only what you need)
+- **Master plan:** `docs/master-development-plan/README.md` + `PHASE1.md`
 - Visual lock: `docs/nordic-visual-bible-230/README.md`, `docs/HAIGENS_WORLD_GAME_BIBLE.md`
-- Transition plan / Job 233 brief: `docs/visual-transition-plan/` (PR #238)
-- Do not re-audit completed Jobs 228–232 or re-open Quiet Nordic HUD (#234) unless asked.
+- Do not re-audit completed Jobs 228–233 / Heartland #239 unless asked.
+- Quiet Nordic HUD = PR #234 (rebase if dirty). Haigen sprite PoC = PR #241.
 
 ## Preserve always
 Gameplay, AI, collisions/`solidRadius`, landmarks, NPCs, bosses, controls, boats, `wandererV127PreviewSave`, approved atlases until migrated. Prefer draw/packing/atlas swaps; never renumber object IDs.
 
+## Parallelism
+- One `haigen.html` writer at a time (or stack PRs). Asset atlases may parallel.
+- Huginn=art, Worldbuilder=terrain, Muninn=review/tests.
+- Independent review once per head SHA only.
+
 ## PR discipline
 - One job per PR; bump `haigen-version.json` + `GAME_BUILD` together.
 - Evidence: iPhone 390×844 + iPad landscape before/after at fixed cams.
-- Independent review once per head SHA; skip duplicate reviews of the same commit.
 - Reports: PR numbers, changes, evidence, tests, blockers, approval asks — keep short.
 
-## Open gates (do not merge without Captain)
-- PR #234 Quiet Nordic HUD V431
-- Heartland Readability implementation (Job 233)
+## Open gates (Captain merge only)
+- PR #241 Nordic Haigen sprite V433 — READY
+- PR #234 Quiet Nordic HUD V431 — needs rebase
+- Supersede #235/#237; absorb #238 into master plan
