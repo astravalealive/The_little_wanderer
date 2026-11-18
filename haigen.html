@@ -1743,7 +1743,7 @@ function bumpCompanionTrust(c,amount){
  state.companionTrust[k]=Math.min(100,(state.companionTrust[k]||0)+amount);
 }
 function resetDailyGatherIfNeeded(){
- const day=Math.floor(Number(state.daytime)||0);
+ const day=Math.floor((Number(state.daytime)||0)/180);
  if(state.companionGatherDay!==day){state.companionGatherDay=day;state.companionDayGather=0}
 }
 function companionDialog(f){
@@ -1853,7 +1853,6 @@ function livingBlueHuntResolve(c){
    prey.scaredUntil=time+rand(8000,14000);
    if(prey.kind==='squirrel')startSquirrelFlee(prey,5000);
    bumpCompanionTrust(c,.4);
-   if(Math.random()<.35&&state.companionDayGather<6){state.companionDayGather++;state.rawMeat=Math.max(0,Number(state.rawMeat)||0);/* no meat from squirrel — just pest control */}
    notify('🐈 Blue pounces! The little creature scatters.');
   }
   c.huntTarget=null;
