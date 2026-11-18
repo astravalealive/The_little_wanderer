@@ -116,11 +116,15 @@ const {chromium}=require('playwright-core');
 
  await browser.close();
  server.close();
- // Copy evidence into artifacts for the PR walkthrough
- for(const f of ['homestead-iphone.png','homestead-iphone-walk-right.png','homestead-ipad-landscape.png','blue-close-iphone.png']){
-  const src=path.join(evidence,'after',f);
-  if(fs.existsSync(src))fs.copyFileSync(src,path.join('/opt/cursor/artifacts','blue-'+f));
+ // Copy evidence into artifacts when that path exists (Cloud Agent); skip on CI runners.
+ const artifactDir='/opt/cursor/artifacts';
+ if(fs.existsSync(path.dirname(artifactDir))){
+  fs.mkdirSync(artifactDir,{recursive:true});
+  for(const f of ['homestead-iphone.png','homestead-iphone-walk-right.png','homestead-ipad-landscape.png','blue-close-iphone.png']){
+   const src=path.join(evidence,'after',f);
+   if(fs.existsSync(src))fs.copyFileSync(src,path.join(artifactDir,'blue-'+f));
+  }
+  fs.copyFileSync(path.join(evidence,'atlas-preview-4x.png'),path.join(artifactDir,'blue_atlas_preview_4x.png'));
  }
- fs.copyFileSync(path.join(evidence,'atlas-preview-4x.png'),'/opt/cursor/artifacts/blue_atlas_preview_4x.png');
  console.log('PASS blue-sphynx-atlas-435');
 })().catch(err=>{console.error(err);process.exit(1)});
