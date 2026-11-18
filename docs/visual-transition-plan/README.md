@@ -4,9 +4,17 @@
 **Benchmark:** Zelda: A Link to the Past readability + Haigen’s own Nordic / Scandinavian fantasy identity.  
 **Do not** merge, deploy, delete content, or begin sweeping rewrites from this document alone.
 
-Companion sources already in-repo: `docs/HAIGENS_WORLD_GAME_BIBLE.md`, `docs/style-guide-and-asset-inventory.md`, `docs/nordic-visual-bible-230/README.md`, `docs/priority-repairs-proposal.md`.
+Companion sources already in-repo: `docs/HAIGENS_WORLD_GAME_BIBLE.md`, `docs/style-guide-and-asset-inventory.md`, `docs/nordic-visual-bible-230/README.md`, `docs/priority-repairs-proposal.md`, `HAIGEN_VISUAL_REBIRTH.md`, `APPROVED-ART-BASELINE.md`, `HAIGEN_HAIR_STYLE_BIBLE.md`, `docs/mobile-presentation-v426/README.md`.
 
 Baseline frames (main / V429): `baseline/homestead-iphone.png`, `baseline/forest-edge-iphone.png`, `baseline/lake-shore-iphone.png`.
+
+### Independent audit cross-check
+An independent codebase audit confirmed the same top risks and added these live-world anchors to preserve while restyling:
+- Homestead cam refs: cottage `(1500,1500)`, player capture `~(1530,1655)`, atelier seat `~(1555,1725)`, pond/Great Lake `~(850,1700)`.
+- Settlements/landmarks already in code: Saltwick Hamlet `~(1000,5850)`, Riverwatch + lighthouse island `~(6100,6600)`, Nico the Mothkeeper `~(2660,2370)`, Gloamjaw arena `~(930,2710)`, Krakkle beach `~(-2500,7750)`, Thrummaw desert `~(9000,7200)`.
+- Boss art is split (atlas vs procedural); Veiled Isle remains proposal-only.
+- Live companions are **Dylan / Skölli / Nico** — bible “Niko/Blue” stay aspirational until approved.
+- Already improved — treat as **preserve**, not re-open as first bugs: painting stool (230), Nordic fish draw (228), Quiet Nordic HUD lanes (#234 / 232), coords opt-in / speech framing (426).
 
 ---
 
@@ -28,7 +36,7 @@ Baseline frames (main / V429): `baseline/homestead-iphone.png`, `baseline/forest
 | 5 | Weak landform grammar: hills/cliffs/rivers/shorelines exist as colour blends more than readable relief | Terrain functions in `haigen.html` |
 | 6 | Paths do not always read as routes to destinations | Trails atlas + world labels |
 | 7 | Living-world aspiration ahead of art: villages/NPCs/routines are sparse vs bible | Region tables vs actual NPC systems |
-| 8 | Boss / enemy combat presentation uneven across atlases + procedural FX | Gloamjaw / Thrummaw / Krakkle / swamp |
+| 8 | Boss / enemy combat presentation uneven across atlases + procedural FX | Gloamjaw / Thrummaw / Krakkle / swamp; night still has purple `#514d87` mixes to retire |
 
 ### World map (live regions)
 | Id | Name | Role today |
