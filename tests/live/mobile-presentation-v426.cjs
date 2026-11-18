@@ -44,7 +44,8 @@ async function openPage(browser,vp){
 async function run(){
  assert(fs.existsSync(path.join(root,'haigen.html')));
  const version=JSON.parse(fs.readFileSync(path.join(root,'haigen-version.json'),'utf8'));
- assert.equal(Number(version.build),426,'haigen-version.json must be 426 for this suite');
+ assert.ok(Number(version.build)>=426,'haigen-version.json must be at least V426 for this suite');
+ const expectedBuild=Number(version.build);
  const server=await serve();let browser;
  try{
   browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
@@ -130,9 +131,9 @@ async function run(){
   assert.match(source,/presentationPortraitFraming/);
   assert.match(source,/__haigenSetCoordsVisible/);
   assert.match(source,/viewport-fit=cover/);
-  assert.match(source,/const GAME_BUILD=426/);
+  assert.match(source,new RegExp('const GAME_BUILD='+expectedBuild+'\\b'));
   const css=fs.readFileSync(path.join(root,'v127-ornate-ui.css'),'utf8');
-  assert.match(css,/V426: quiet mobile presentation/);
+  assert.match(css,/quiet mobile presentation/);
   const ui=fs.readFileSync(path.join(root,'v127-ornate-ui.js'),'utf8');
   assert.match(ui,/v127ToggleCoords/);
   console.log('PASS static presentation contracts');
