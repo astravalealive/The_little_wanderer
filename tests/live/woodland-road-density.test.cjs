@@ -12,7 +12,7 @@ for(let gx=0;gx<38;gx++)for(let gy=0;gy<33;gy++){
  const x=gx*94+hash(gx,gy,1)*94,y=gy*94+hash(gx,gy,2)*94;
  if(x>=3500||y>=3100)continue;
  const nearHome=Math.hypot(x-1600,y-1500)<310;
- const density=nearHome?.36:.86;
+ const density=nearHome?.28:.78;
  originalCalls++;
  const keep=hash(gx,gy,3)<=density;
  if(keep){optimizedCalls++;accepted++}

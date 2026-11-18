@@ -1,0 +1,28 @@
+---
+description: Haigen's World — token-efficient agent rules (additive; do not overwrite)
+alwaysApply: true
+---
+
+# Haigen's World — agent rules
+
+## Authority
+- Captain approval required before merge or deploy. Never merge/deploy without explicit approval.
+- Prefer implementation over planning when an approved brief exists.
+
+## Context (read only what you need)
+- Visual lock: `docs/nordic-visual-bible-230/README.md`, `docs/HAIGENS_WORLD_GAME_BIBLE.md`
+- Transition plan / Job 233 brief: `docs/visual-transition-plan/` (PR #238)
+- Do not re-audit completed Jobs 228–232 or re-open Quiet Nordic HUD (#234) unless asked.
+
+## Preserve always
+Gameplay, AI, collisions/`solidRadius`, landmarks, NPCs, bosses, controls, boats, `wandererV127PreviewSave`, approved atlases until migrated. Prefer draw/packing/atlas swaps; never renumber object IDs.
+
+## PR discipline
+- One job per PR; bump `haigen-version.json` + `GAME_BUILD` together.
+- Evidence: iPhone 390×844 + iPad landscape before/after at fixed cams.
+- Independent review once per head SHA; skip duplicate reviews of the same commit.
+- Reports: PR numbers, changes, evidence, tests, blockers, approval asks — keep short.
+
+## Open gates (do not merge without Captain)
+- PR #234 Quiet Nordic HUD V431
+- Heartland Readability implementation (Job 233)
