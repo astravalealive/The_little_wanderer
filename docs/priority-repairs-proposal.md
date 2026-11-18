@@ -163,38 +163,45 @@ These are **documentation / concept only** — not wired into `haigen.html`.
 
 ## 4. Staged implementation plan (after style + Captain approval)
 
-### Stage 0 — Style gate (bible Gate 1)
-- Lock pixel metric + palette from bible before production sprite replacement.
-- Rollback: no production assets changed yet.
+Style metrics and KEEP/RESTYLE inventory: `docs/style-guide-and-asset-inventory.md`.  
+Gate 1 mockups: `docs/previews/style-homestead-mockup.html`, `docs/previews/style-character-trees-mockup.html`.
+
+### Stage 0 — Style gate (bible Gate 1) — this proposal
+- Lock pixel metric + palette + camera reference coords.
+- **Files (docs only):** style guide, mockups, this proposal.
+- Rollback: delete nothing in production; proposal branch only.
 
 ### Stage 1 — Painting pose repair (small PR)
-- **Files:** `haigen.html` (`paintHaigen` + optional tiny atlas crop), maybe `assets/haigen-paint-pose.webp` (new, additive).
+- **Files:** `haigen.html` (`paintHaigen` ~10380 only + draw call site), optional additive `assets/haigen-paint-pose.webp`.
 - **Preserve:** atelier economy, cart, AI schedule.
-- **Tests:** live smoke; visual before/after; no save schema break.
+- **Tests:** `tests/live/run.cjs`; phone before/after video; `game-build-identity` if build bumps.
 - **Risk:** low–medium (rebirth vs classic draw paths).
 
 ### Stage 2 — Fish sprites + schooling v2 (medium PR)
-- **Files:** `haigen.html` (`drawLakeFish`, nursery), new `assets/lake-fish-atlas.webp`, optional rod soft-deplete behind flag.
+- **Files:** `haigen.html` (`drawLakeFish`, nursery block ~8737–9003), additive `assets/lake-fish-atlas.webp`.
 - **Preserve:** fishing controls, fish counts, osprey loop, lifecycle saves.
 - **Tests:** lake performance on emulated iPhone; boat proximity flee; asset report clean.
 - **Risk:** medium (draw-loop cost; economy coupling).
 
 ### Stage 3 — Chapter II story flags + raven/waystone beats (medium PR)
-- **Files:** `haigen.html` story/journal/raven; `v127-ornate-ui.js` quest panel; honesty tests updated for new chapter only.
+- **Files:** `haigen.html` story/journal/raven; `v127-ornate-ui.js` quest panel; `tests/live/journal-story-honesty.cjs` extended for chapter2 only.
 - **Preserve:** `oldStreamQuestRetired`, all Ch.I fields.
 - **Tests:** save round-trip with/without `chapter2`; journal honesty.
 - **Risk:** medium (UI/quest panel); avoid reopening Silent Pond.
 
 ### Stage 4 — Veiled Isle vertical slice (large, still reviewable)
-- **4a** Map stub + landing cove + fog falloff (no full landmass).
-- **4b** Three enemy types + telegraphs.
-- **4c** Multi-phase boss addon module (pattern: `gloamjaw-v128.js`).
-- **4d** Wayfinder Rune reward + one sea passage unlock.
+- **4a** Map stub + landing cove + fog falloff — `haigen.html` region list + draw fog helper.
+- **4b** Enemy types — new addon or in-file archetypes with telegraphs.
+- **4c** Boss module — `veiled-isle-boss-vNNN.js` pattern of `gloamjaw-v128.js`.
+- **4d** Wayfinder Rune + one sea passage unlock.
 - **Preserve:** skiff rails until longship materials explicitly approved; existing islands/bosses.
-- **Risk:** high — ship as gated prototype behind `state.story.chapter2.veiledIsleUnlocked`.
+- **Risk:** high — gated behind `state.story.chapter2.veiledIsleUnlocked`.
 
 ### Stage 5 — Polish
 - Mobile performance, audio stingers, accessibility, save migration notes, real-device screenshots.
+
+### Unified art restyle (parallel after Gate 1, not blocking Stage 1–2)
+- Small PRs per atlas family (trees, props, Nico) tagged RESTYLE; never delete KEEP assets until migration tests pass.
 
 ---
 

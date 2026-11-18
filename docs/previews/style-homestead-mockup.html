@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Style mockup — woodland homestead</title>
+<style>
+body{margin:0;font:16px/1.45 Georgia,serif;background:#cbb894;color:#1c2420}
+header,main{max-width:920px;margin:0 auto;padding:18px}
+h1{font-size:1.35rem;margin:0 0 8px}.note{font-size:.92rem;color:#3e463f}
+.frame{background:#122b25;border:3px solid #8d7348;border-radius:12px;overflow:hidden;max-width:390px}
+canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:14px}
+.sw{border:2px solid #8d7348;border-radius:8px;padding:8px;background:#f4ecd6;font-size:.88rem}
+.sw i{display:inline-block;width:14px;height:14px;border-radius:2px;vertical-align:middle;margin-right:6px}
+</style>
+</head>
+<body>
+<header>
+ <h1>Woodland homestead mockup (Gate 1)</h1>
+ <p>Phone-width (390) composition using proposed 16-bit Nordic grammar: one perspective, bounded palette, readable paths, cabin silhouette, Haigen at hero scale.</p>
+ <p class="note">Concept only — not wired into production. Camera metaphor: cottage (1500,1500) looking south toward garden/clearing.</p>
+</header>
+<main>
+ <div class="frame"><canvas id="c" width="390" height="694" aria-label="Homestead style mockup"></canvas></div>
+ <div class="legend">
+  <div class="sw"><i style="background:#3f5a45"></i>Moss ground</div>
+  <div class="sw"><i style="background:#6f925c"></i>Leaf canopy</div>
+  <div class="sw"><i style="background:#5a4330"></i>Bark / timber</div>
+  <div class="sw"><i style="background:#b8894a"></i>Warm wood accent</div>
+  <div class="sw"><i style="background:#4f87a0"></i>Water / wet path</div>
+  <div class="sw"><i style="background:#f3ead2"></i>Parchment / stone trim</div>
+ </div>
+</main>
+<script>
+(()=>{
+ const ctx=document.getElementById('c').getContext('2d');
+ const W=390,H=694;
+ function px(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x|0,y|0,w,h)}
+ // sky band subtle
+ px(0,0,W,H,'#7ea06a');
+ // ground texture 16px-ish cells
+ for(let y=0;y<H;y+=8)for(let x=0;x<W;x+=8){
+  const n=((x*13+y*7)%17);px(x,y,8,8,n>12?'#64885a':n>6?'#6f925c':'#5f8052');
+ }
+ // path to cabin
+ ctx.fillStyle='#a89068';
+ ctx.beginPath();ctx.moveTo(170,H);ctx.lineTo(210,H);ctx.lineTo(205,420);ctx.lineTo(185,420);ctx.closePath();ctx.fill();
+ for(let i=0;i<18;i++)px(178+(i%3)*6,430+i*12,10,4,'#9a825c');
+ // cabin
+ px(118,300,150,110,'#6b4a2e');
+ px(110,290,166,24,'#8a5a34'); // eaves
+ // roof tiles
+ for(let r=0;r<7;r++)for(let c=0;c<10;c++)px(118+c*15,250+r*7,14,6,((c+r)%2)?'#7a5130':'#925f38');
+ px(175,350,36,60,'#3a2a20'); // door
+ px(140,330,22,22,'#cfe3ef'); px(220,330,22,22,'#cfe3ef'); // windows
+ px(130,408,126,10,'#4a3a28'); // porch
+ // garden beds
+ px(250,470,90,54,'#5a4330');
+ for(let i=0;i<6;i++){px(258+i*13,478,10,10,'#4f87a0');px(258+i*13,498,10,14,'#4f7a48')}
+ // trees (simple 16-bit crowns)
+ function tree(x,y,s){
+  px(x-4,y-10,8,28,'#5a4330');
+  px(x-22*s,y-70*s,44*s,50*s,'#3f5a45');
+  px(x-16*s,y-78*s,32*s,28*s,'#6f925c');
+  px(x-2,y+14,12,6,'#2a3528'); // contact shadow
+ }
+ tree(60,520,1); tree(320,500,1.1); tree(40,360,.85); tree(340,340,.9);
+ // stump + mushrooms
+ px(95,560,28,14,'#6b5238'); px(100,548,8,12,'#b94b3b'); px(112,550,8,10,'#b94b3b');
+ // Haigen hero scale (~80x120 metaphor compressed for mock)
+ function haigen(x,y){
+  px(x-10,y-34,20,28,'#2a2f2c');
+  px(x-7,y-48,14,14,'#e0c09a');
+  px(x-8,y-50,16,5,'#d6b56a');
+  px(x-9,y-8,8,16,'#3a322c'); px(x+1,y-8,8,16,'#3a322c');
+  px(x-12,y+8,24,5,'#243028');
+ }
+ haigen(195,560);
+ // dylan small
+ px(230,555,18,14,'#e8d7b2'); px(242,552,8,6,'#e8d7b2');
+ // label strip
+ px(0,0,W,36,'#1d2420');
+ ctx.fillStyle='#f3ead2';ctx.font='700 13px Georgia';ctx.fillText('STYLE LOCK MOCK · homestead · 16-bit Nordic',10,23);
+})();
+</script>
+</body>
+</html>
