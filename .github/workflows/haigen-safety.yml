@@ -1,0 +1,45 @@
+name: Haigen safety checks
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify game script syntax and critical entrypoints
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class Scripts(HTMLParser):
+              def __init__(self): super().__init__(); self.active=False; self.parts=[]; self.scripts=[]
+              def handle_starttag(self, tag, attrs):
+                  if tag=='script' and not dict(attrs).get('src'): self.active=True; self.parts=[]
+              def handle_data(self, data):
+                  if self.active: self.parts.append(data)
+              def handle_endtag(self, tag):
+                  if tag=='script' and self.active: self.scripts.append(''.join(self.parts)); self.active=False
+          html=Path('haigen.html').read_text()
+          for required in ('id="game"','function draw()','function rbDrawGround','function worldZoom'):
+              assert required in html, f'Missing critical game element: {required}'
+          p=Scripts(); p.feed(html)
+          assert p.scripts, 'No inline scripts found'
+          for i,script in enumerate(p.scripts):
+              Path(f'/tmp/haigen-script-{i}.js').write_text(script)
+          PY
+          for script in /tmp/haigen-script-*.js; do node --check "$script"; done
+      - name: Check required local assets
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path('haigen.html').read_text()
+          for asset in re.findall(r'(?:src|href)=["\x27](\./[^"\x27?#]+)',html):
+              assert Path(asset[2:]).exists(), f'Missing local asset: {asset}'
+          PY
