@@ -339,16 +339,17 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"] h3{
  margin:1px 24px 1px 0;font-size:13px;line-height:1.2;
 }
 @media (min-width:601px) and (max-width:1100px){
+ /* Job 232 correction: keep pack/map/journal and gear clear above the joystick. */
  body.v127-rpg .v127-utilities{
-  left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 97px);gap:6px;
+  left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 220px);gap:6px;
  }
  body.v127-rpg .v127-utility{width:44px;height:44px;padding:7px}
  body.v127-rpg .v127-gear{
-  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 97px);
+  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 220px);
   width:44px;height:44px;padding:7px;
  }
  body.v127-rpg .v127-settings{
-  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);
+  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 274px);
   max-height:min(65dvh,460px);
  }
 }
@@ -447,11 +448,12 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"]{
  body.v127-rpg .haigen-speech{max-width:min(260px,42vw)}
 }
 
-/* Job 232: Quiet Nordic HUD — portrait lanes for toast / quest / minimap / speech.
-   Presentation-only; controls, art, gameplay and saves unchanged. */
+/* Job 232: Quiet Nordic HUD — toast / quest / minimap / speech lanes.
+   Presentation-only; controls, art, gameplay and saves unchanged.
+   Correction: clear day-chip vs toast, and iPad landscape toast vs quest. */
 @media(max-width:600px){
  body.v127-rpg .toast{
-  top:calc(env(safe-area-inset-top,0px) + 104px);
+  top:calc(env(safe-area-inset-top,0px) + 112px);
   left:8px;right:auto;transform:none;
   max-width:min(188px,46vw);
   z-index:9;text-align:left;font-size:12px;line-height:1.25;
@@ -478,12 +480,36 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"]{
 }
 @media(min-width:601px) and (max-width:900px) and (orientation:portrait){
  body.v127-rpg .toast{
-  top:calc(env(safe-area-inset-top,0px) + 132px);
+  top:calc(env(safe-area-inset-top,0px) + 156px);
   left:14px;right:auto;transform:none;
   max-width:min(260px,34vw);
  }
  body.v127-rpg #v127Root .v127-quest{
   top:calc(env(safe-area-inset-top,0px) + 140px);
   max-height:min(24dvh,220px);
+ }
+}
+/* iPad / wide landscape: keep toast on the left rail; park quest under minimap. */
+@media(min-width:601px) and (orientation:landscape){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 156px);
+  left:14px;right:auto;transform:none;
+  max-width:min(280px,30vw);text-align:left;
+ }
+ body.v127-rpg #v127Root .v127-quest{
+  top:calc(env(safe-area-inset-top,0px) + 150px);
+  right:14px;width:min(240px,24vw);min-width:0;
+  max-height:min(36dvh,250px);z-index:10;
+ }
+ body.v127-rpg .v127-mini{z-index:11}
+ body.v127-rpg .haigen-speech{max-width:min(280px,34vw)}
+ body.v127-rpg .v127-utilities{
+  bottom:calc(env(safe-area-inset-bottom,0px) + 230px);
+ }
+ body.v127-rpg .v127-gear{
+  bottom:calc(env(safe-area-inset-bottom,0px) + 230px);
+ }
+ body.v127-rpg .v127-settings{
+  bottom:calc(env(safe-area-inset-bottom,0px) + 284px);
  }
 }
