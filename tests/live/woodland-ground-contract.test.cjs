@@ -19,6 +19,7 @@ assert(pathStart>=0&&pathEnd>pathStart,'path renderer must exist');
 const paths=html.slice(pathStart,pathEnd);
 assert.match(paths,/if\(paintedTrailsReady\)/,'painted trail rendering retained');
 assert.match(paths,/ctx\.drawImage\(paintedTrails/,'hand-painted path artwork retained');
-assert.match(paths,/ctx\.strokeStyle='#917b5860'/,'painted paths must receive woodland soil glaze');
+assert.match(paths,/ctx\.strokeStyle='#7a654888'/,'painted paths must receive woodland soil glaze');
+assert.match(paths,/ctx\.strokeStyle='#5e4d36a0'/,'Job 233 centre path band retained');
 assert.match(ground,/transition\*transition\*\(3-2\*transition\)/,'woodland edge must use eased fade');
 console.log('PASS: painted path visual treatment and eased woodland transition');
