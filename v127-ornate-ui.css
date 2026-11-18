@@ -446,3 +446,54 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"]{
  }
  body.v127-rpg .haigen-speech{max-width:min(260px,42vw)}
 }
+
+/* Job 232: Quiet Nordic HUD. Portrait lanes keep toast, quest, minimap and speech apart.
+   Presentation only — controls, art, gameplay and saves stay as they are. */
+@media(max-width:600px){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 112px);
+  left:calc(env(safe-area-inset-left,0px) + 8px);
+  right:auto;transform:none;
+  max-width:min(188px,calc(100vw - 196px));
+  text-align:left;
+ }
+ body.v127-rpg #v127Root .v127-quest{
+  top:calc(env(safe-area-inset-top,0px) + 112px);
+  right:calc(env(safe-area-inset-right,0px) + 8px);
+  width:min(164px,42vw);
+  max-height:min(168px,24dvh);
+ }
+ body.v127-rpg .v127-mini{
+  right:calc(env(safe-area-inset-right,0px) + 10px);
+ }
+}
+@media(min-width:601px) and (max-width:1100px){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 156px);
+  left:calc(env(safe-area-inset-left,0px) + 16px);
+  right:auto;transform:none;
+  max-width:min(280px,34vw);
+  text-align:left;
+ }
+ body.v127-rpg #v127Root .v127-quest{
+  max-height:min(150px,22dvh);
+ }
+}
+@media(max-height:550px) and (orientation:landscape){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 8px);
+  left:calc(env(safe-area-inset-left,0px) + 8px);
+  right:auto;transform:none;
+  max-width:min(220px,34vw);
+ }
+ body.v127-rpg #v127Root .v127-quest{
+  top:calc(env(safe-area-inset-top,0px) + 8px);
+  right:calc(env(safe-area-inset-right,0px) + 150px);
+  max-height:min(120px,34dvh);
+ }
+}
+body.v127-rpg:has(.overlay.open) #v127Quest,
+body.v127-rpg:has(#v127Settings.open) #v127Quest,
+body.v127-rpg:has(.mobile-menu[open]) #v127Quest{
+ visibility:hidden;
+}
