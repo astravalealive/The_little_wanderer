@@ -398,3 +398,51 @@ body.v127-rpg #v127Root .v127-settings button{
   max-height:min(62dvh,450px);
  }
 }
+
+/* V426: quiet mobile presentation — opt-in coordinates, clearer stacking, iPad layout. */
+body.v127-rpg #coordinateReadout{display:none!important}
+body.v127-rpg.haigen-diagnostics #coordinateReadout{display:flex!important}
+body.v127-rpg #controllerIndicator[hidden]{display:none!important}
+body.v127-rpg #controllerIndicator:not([hidden]){display:block!important}
+body.v127-rpg .haigen-speech{
+ z-index:6;max-width:min(300px,calc(100vw - 28px));
+}
+body.v127-rpg #v127Root .v127-quest[data-collapsed="true"]{
+ max-width:min(168px,40vw);
+}
+@media(max-width:600px){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 118px);
+  left:10px;right:auto;transform:none;
+  max-width:min(220px,54vw);text-align:left;font-size:12px;
+ }
+ body.v127-rpg .haigen-speech{
+  max-width:min(250px,calc(100vw - 32px));font-size:13px;padding:8px 10px;
+ }
+ body.v127-rpg #frogPassengerHud{
+  top:calc(env(safe-area-inset-top,0px) + 214px);
+  right:8px;
+ }
+ body.v127-rpg.haigen-diagnostics #coordinateReadout{
+  top:calc(env(safe-area-inset-top,0px) + 112px)!important;
+  right:12px!important;
+ }
+ body.v127-rpg .bottom{bottom:calc(env(safe-area-inset-bottom,0px) + 78px)}
+ body.v127-rpg .v127-utilities{bottom:calc(env(safe-area-inset-bottom,0px) + 168px)}
+ body.v127-rpg .v127-gear{bottom:calc(env(safe-area-inset-bottom,0px) + 168px)}
+}
+/* Portrait iPad: keep ornate chrome readable without crowding the playfield. */
+@media(min-width:601px) and (max-width:900px) and (orientation:portrait){
+ body.v127-rpg .v127-mini{width:118px;height:118px}
+ body.v127-rpg #v127Root .v127-quest{width:min(220px,30vw);max-height:28dvh}
+ body.v127-rpg .hotbar{max-width:min(calc(100vw - 180px),720px)}
+ body.v127-rpg .toast{top:calc(env(safe-area-inset-top,0px) + 150px);max-width:min(320px,42vw)}
+}
+@media(max-height:550px) and (orientation:landscape){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 54px);
+  left:auto;right:calc(env(safe-area-inset-right,0px) + 160px);
+  max-width:min(280px,36vw);
+ }
+ body.v127-rpg .haigen-speech{max-width:min(260px,42vw)}
+}
