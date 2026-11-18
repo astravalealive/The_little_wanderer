@@ -70,10 +70,22 @@ el.innerHTML=[
  '<button data-action="helpBtn">Controls & Help</button>',
  '<button data-action="artBtn">World appearance</button>',
  '<button data-action="devKitBtn">🧰 Developer testing</button>',
+ '<button type="button" id="v127ToggleCoords">📍 Show coordinates</button>',
  '</details>',
  '<button id="v127CloseSettings">Close menu</button></aside>'
 ].join('');
 document.body.appendChild(el);
+const coordsToggle=$('v127ToggleCoords');
+function syncCoordsToggleLabel(){
+ const on=!!window.__haigenCoordsVisible?.();
+ coordsToggle.textContent=on?'📍 Hide coordinates':'📍 Show coordinates';
+ coordsToggle.setAttribute('aria-pressed',String(on));
+}
+coordsToggle.addEventListener('click',()=>{
+ window.__haigenSetCoordsVisible?.(!window.__haigenCoordsVisible?.());
+ syncCoordsToggleLabel();
+});
+syncCoordsToggleLabel();
 // V217: portrait acts as a camera locator, not a teleport.
 const haigenPortrait=el.querySelector('.v127-portrait');
 haigenPortrait.setAttribute('role','button');

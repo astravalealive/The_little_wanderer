@@ -1,0 +1,34 @@
+name: Mobile presentation V426
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'haigen-version.json'
+      - 'v127-ornate-ui.css'
+      - 'v127-ornate-ui.js'
+      - 'tests/live/mobile-presentation-v426.cjs'
+      - 'tests/live/capture-mobile-presentation.cjs'
+      - '.github/workflows/mobile-presentation-v426.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mobile-presentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        run: npm install --no-save playwright-core@1.56.1
+      - name: Run mobile presentation regression
+        run: node tests/live/mobile-presentation-v426.cjs
+      - name: Upload presentation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-presentation-v426-evidence
+          path: tests/live/mobile-presentation-evidence/
+          if-no-files-found: ignore
