@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Style mockup — character & trees</title>
+<style>
+body{margin:0;font:16px/1.45 Georgia,serif;background:#cbb894;color:#1c2420}
+header,main{max-width:960px;margin:0 auto;padding:18px}
+h1{font-size:1.35rem;margin:0 0 8px}.note{font-size:.92rem;color:#3e463f}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:#f4ecd6;border:2px solid #8d7348;border-radius:10px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+figcaption{padding:10px;font-size:.9rem;border-top:1px solid #cbb892}
+</style>
+</head>
+<body>
+<header>
+ <h1>Character & trees mockup (Gate 1)</h1>
+ <p>Haigen walk-facing silhouettes at locked hero scale beside oak/fir/rock props using the same outline weight and ground contact.</p>
+ <p class="note">Concept only. Target: match live 48×72 Haigen cells visually; trees use 16px-authored clusters, not soft painterly blobs.</p>
+</header>
+<main class="row">
+ <figure class="card">
+  <canvas id="chars" width="320" height="280" aria-label="Haigen facings"></canvas>
+  <figcaption><b>Haigen</b> — down / side / up idle. Outline + foot baseline consistent. Paint pose will add a seated sheet later.</figcaption>
+ </figure>
+ <figure class="card">
+  <canvas id="trees" width="320" height="280" aria-label="Tree and rock props"></canvas>
+  <figcaption><b>Props</b> — oak, fir, rock, stump. Same shadow language; readable occlusion for paths.</figcaption>
+ </figure>
+ <figure class="card">
+  <canvas id="scale" width="320" height="280" aria-label="Scale comparison"></canvas>
+  <figcaption><b>Scale board</b> — Haigen vs Dylan vs perch vs mist-moth. All must stay legible at phone zoom.</figcaption>
+ </figure>
+</main>
+<script>
+(()=>{
+ function ground(ctx,w,h){
+  ctx.fillStyle='#6f925c';ctx.fillRect(0,0,w,h);
+  for(let i=0;i<50;i++){ctx.fillStyle=i%2?'#64885a':'#5f8052';ctx.fillRect((i*37)%w,(i*19)%h,6,4)}
+ }
+ function haigen(ctx,x,y,dir){
+  ctx.fillStyle='#2a2f2c';ctx.fillRect(x-10,y-34,20,28);
+  ctx.fillStyle='#e0c09a';ctx.fillRect(x-7,y-48,14,14);
+  ctx.fillStyle='#d6b56a';ctx.fillRect(x-8,y-50,16,5);
+  ctx.fillStyle='#3a322c';
+  if(dir==='side'){ctx.fillRect(x-6,y-8,7,16);ctx.fillRect(x+2,y-8,7,16);ctx.fillStyle='#e0c09a';ctx.fillRect(x+8,y-28,8,4)}
+  else {ctx.fillRect(x-9,y-8,8,16);ctx.fillRect(x+1,y-8,8,16)}
+  if(dir==='up'){ctx.fillStyle='#d6b56a';ctx.fillRect(x-8,y-48,16,12)}
+  ctx.fillStyle='#243028';ctx.fillRect(x-12,y+8,24,4);
+  ctx.fillStyle='#1d2420';ctx.font='700 11px Georgia';ctx.fillText(dir,x-14,y+28);
+ }
+ function oak(ctx,x,y){
+  ctx.fillStyle='#5a4330';ctx.fillRect(x-4,y-12,8,28);
+  ctx.fillStyle='#3f5a45';ctx.fillRect(x-26,y-70,52,48);
+  ctx.fillStyle='#6f925c';ctx.fillRect(x-18,y-82,36,28);
+  ctx.fillStyle='#2a3528';ctx.fillRect(x-14,y+14,28,5);
+ }
+ function fir(ctx,x,y){
+  ctx.fillStyle='#5a4330';ctx.fillRect(x-3,y-8,6,22);
+  ctx.fillStyle='#355544';
+  for(let i=0;i<4;i++){const w=34-i*6;ctx.fillRect(x-w/2,y-70+i*14,w,16)}
+  ctx.fillStyle='#2a3528';ctx.fillRect(x-10,y+12,20,4);
+ }
+ const a=document.getElementById('chars').getContext('2d');
+ ground(a,320,280); haigen(a,70,150,'down'); haigen(a,160,150,'side'); haigen(a,250,150,'up');
+ a.fillStyle='#1d2420';a.font='700 13px Georgia';a.fillText('Character turnaround',12,24);
+
+ const b=document.getElementById('trees').getContext('2d');
+ ground(b,320,280); oak(b,90,180); fir(b,200,185);
+ b.fillStyle='#7a7a82';b.fillRect(260,170,36,22); b.fillStyle='#92909b';b.fillRect(266,162,24,14);
+ b.fillStyle='#6b5238';b.fillRect(40,200,30,14);
+ b.fillStyle='#1d2420';b.font='700 13px Georgia';b.fillText('Trees · rock · stump',12,24);
+
+ const c=document.getElementById('scale').getContext('2d');
+ ground(c,320,280);
+ haigen(c,70,170,'down');
+ // dylan
+ c.fillStyle='#e8d7b2';c.fillRect(140,175,28,20); c.fillRect(160,170,12,10);
+ // perch
+ c.fillStyle='#8a7a3e';c.fillRect(210,190,22,8); c.fillRect(204,191,6,6);
+ // mist moth
+ c.fillStyle='#dfe7e4';c.beginPath();c.ellipse(270,185,16,8,0,0,Math.PI*2);c.fill();
+ c.fillStyle='#1d2420';c.font='700 13px Georgia';c.fillText('Relative scale board',12,24);
+ c.font='11px Georgia';c.fillText('Haigen',50,220);c.fillText('Dylan',140,220);c.fillText('perch',205,220);c.fillText('moth',255,220);
+})();
+</script>
+</body>
+</html>

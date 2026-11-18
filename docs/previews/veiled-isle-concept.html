@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veiled Isle concept — Haigen’s World</title>
+<style>
+body{margin:0;font:16px/1.45 Georgia,serif;background:#c2b48f;color:#1b221e}
+header,main{max-width:980px;margin:0 auto;padding:18px}
+h1{font-size:1.4rem;margin:0 0 8px}h2{font-size:1.1rem;margin:18px 0 8px}
+.note{color:#3d453f;font-size:.92rem}
+.panel{background:#dfe7e4;border:2px solid #6d7f74;border-radius:10px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.card{background:#f4ecd6;border:2px solid #8a7148;border-radius:8px;padding:10px}
+.card h3{margin:0 0 4px;font-size:1rem}.card p{margin:0;font-size:.88rem}
+ol{padding-left:1.2rem}li{margin:4px 0}
+</style>
+</head>
+<body>
+<header>
+ <h1>The Veiled Isle — vertical slice concept</h1>
+ <p>Unlockable fog island beyond progressed seafaring. Nordic, child-appropriate, practical Wayfinder Rune reward. Proposal only — not in production.</p>
+ <p class="note">Fog uses local falloff around beacons/player. No fullscreen expensive filter.</p>
+</header>
+<main>
+ <div class="panel"><canvas id="map" width="960" height="520" aria-label="Veiled Isle map concept"></canvas></div>
+ <h2>Exploration layers</h2>
+ <ol>
+  <li><b>Shore cove</b> — readable landing, wreck timber, safe birds.</li>
+  <li><b>Lichen heath</b> — mist pockets, path findings via waystones.</li>
+  <li><b>Beacon terrace</b> — three fire bowls; lighting thins fog inland.</li>
+  <li><b>Sealed hollow</b> — multi-phase boss arena revealed after bowls lit.</li>
+ </ol>
+ <h2>Enemies (fair telegraphs)</h2>
+ <div class="grid">
+  <div class="card"><h3>Mist-moth swarm</h3><p>Pulse glow, then dart. Answer with torch gaps / net.</p></div>
+  <div class="card"><h3>Driftwood wight</h3><p>Arms raise 0.6s before shove. Sidestep + collect.</p></div>
+  <div class="card"><h3>Fog hound</h3><p>Paw-scrape dust line. Bait or Skölli distract.</p></div>
+  <div class="card"><h3>False guide echo</h3><p>Friendly outline, delayed voice. Ignore its marked paths.</p></div>
+ </div>
+ <h2>Boss phases — Mirrorkeel of the Sealed Beacon</h2>
+ <div class="grid">
+  <div class="card"><h3>1 · Veil</h3><p>Slow arcs while lighting bowls.</p></div>
+  <div class="card"><h3>2 · Mirror</h3><p>False Haigen/companion; hit the one without warm shadow.</p></div>
+  <div class="card"><h3>3 · Seal</h3><p>Core open windows; timed hits. Drops Wayfinder Rune.</p></div>
+ </div>
+</main>
+<script>
+(()=>{
+ const ctx=document.getElementById('map').getContext('2d');
+ let t=0;
+ function frame(){
+  t++;
+  const w=960,h=520;
+  ctx.fillStyle='#3a5560';ctx.fillRect(0,0,w,h);
+  // fog field
+  for(let i=0;i<80;i++){
+   const x=(i*97+t*.2)%w,y=(i*53)%h;
+   ctx.fillStyle='rgba(210,220,224,'+(0.04+(i%5)*.02)+')';
+   ctx.beginPath();ctx.ellipse(x,y,40+(i%7)*6,16+(i%4)*4,0,0,Math.PI*2);ctx.fill();
+  }
+  // island body
+  ctx.fillStyle='#6d7f5c';ctx.beginPath();ctx.ellipse(520,270,250,160,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#7f9168';ctx.beginPath();ctx.ellipse(500,250,180,110,0,0,Math.PI*2);ctx.fill();
+  // cove landing
+  ctx.fillStyle='#cbb892';ctx.beginPath();ctx.ellipse(300,340,70,28, -.4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#f3ead2';ctx.font='700 13px Georgia';ctx.fillText('1 Cove landing',250,380);
+  // heath
+  ctx.fillStyle='#f3ead2';ctx.fillText('2 Lichen heath',430,210);
+  // beacons
+  [[560,200],[620,240],[560,280]].forEach((p,i)=>{
+   const lit=((t/40)|0)%3===i;
+   ctx.fillStyle=lit?'#e0a35a':'#5a5044';
+   ctx.beginPath();ctx.arc(p[0],p[1],10,0,Math.PI*2);ctx.fill();
+   if(lit){ctx.fillStyle='rgba(255,200,120,.25)';ctx.beginPath();ctx.arc(p[0],p[1],48,0,Math.PI*2);ctx.fill()}
+  });
+  ctx.fillStyle='#f3ead2';ctx.fillText('3 Beacon terrace',540,170);
+  // hollow / boss
+  ctx.fillStyle='#44524c';ctx.beginPath();ctx.ellipse(700,250,55,40,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#e7c989';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#f3ead2';ctx.fillText('4 Sealed hollow / boss',650,310);
+  // boat approach
+  ctx.fillStyle='#6b4a2e';ctx.fillRect(120,400,40,14);
+  ctx.fillStyle='#f3ead2';ctx.fillText('Longship approach (gated)',90,430);
+  // legend
+  ctx.fillStyle='rgba(20,28,24,.72)';ctx.fillRect(16,16,280,70);
+  ctx.fillStyle='#f3ead2';ctx.font='700 14px Georgia';ctx.fillText('Veiled Isle vertical slice',28,40);
+  ctx.font='12px Georgia';ctx.fillText('Fog thins near lit beacons · proposal only',28,62);
+  requestAnimationFrame(frame);
+ }
+ frame();
+})();
+</script>
+</body>
+</html>

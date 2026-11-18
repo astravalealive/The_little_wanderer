@@ -1,0 +1,23 @@
+name: Creative proposal docs
+on:
+  pull_request:
+    paths:
+      - 'docs/priority-repairs-proposal.md'
+      - 'docs/style-guide-and-asset-inventory.md'
+      - 'docs/previews/**'
+      - 'tests/live/creative-proposal-docs.cjs'
+      - '.github/workflows/creative-proposal-docs.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  docs-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify proposal docs and Gate 1 previews
+        run: node tests/live/creative-proposal-docs.cjs

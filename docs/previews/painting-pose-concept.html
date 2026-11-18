@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painting pose concept — Haigen’s World</title>
+<style>
+:root{--ink:#1d2420;--paper:#f3ead2;--moss:#3f5a45;--gold:#b8894a;--water:#6f93a2}
+*{box-sizing:border-box}body{margin:0;font:16px/1.45 Georgia,serif;background:#d9c9a8;color:var(--ink)}
+header{padding:22px 18px 8px;max-width:920px;margin:0 auto}
+h1{font-size:1.45rem;margin:0 0 6px}p{margin:0 0 10px;max-width:62ch}
+.note{font-size:.92rem;color:#3d463f}
+.grid{display:grid;gap:16px;padding:12px 18px 36px;max-width:920px;margin:0 auto;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+figure{margin:0;background:var(--paper);border:2px solid #8d7348;border-radius:10px;overflow:hidden}
+figcaption{padding:10px 12px;border-top:1px solid #cbb892;font-size:.9rem}
+canvas{display:block;width:100%;height:auto;background:#7ea06a;image-rendering:pixelated}
+.controls{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 8px;max-width:920px;margin:0 auto}
+button{font:700 13px Georgia,serif;background:#efe1c0;border:2px solid #8d7348;border-radius:8px;padding:8px 12px;cursor:pointer}
+button[aria-pressed="true"]{background:#c9e0b5}
+</style>
+</head>
+<body>
+<header>
+ <h1>Painting pose concept (proposal only)</h1>
+ <p>Phone-scale frame study. Current pose uses a vertical squash on a standing sprite; proposed pose is a seated three-quarter painter with brush contacting the canvas.</p>
+ <p class="note">Does not change production gameplay. Child-appropriate Nordic silhouette language.</p>
+</header>
+<div class="controls">
+ <button type="button" id="play" aria-pressed="true">Play cycle</button>
+ <button type="button" id="step">Step frame</button>
+</div>
+<div class="grid">
+ <figure>
+  <canvas id="current" width="390" height="320" aria-label="Current awkward painting pose"></canvas>
+  <figcaption><b>Current (live):</b> standing idle, scaleY 0.85, brush strokes from mid-torso. Reads unclear at phone size.</figcaption>
+ </figure>
+ <figure>
+  <canvas id="proposed" width="390" height="320" aria-label="Proposed seated painting pose"></canvas>
+  <figcaption><b>Proposed Concept A:</b> seated side/three-quarter, upright torso, brush tip on canvas, 4-frame stroke cycle.</figcaption>
+ </figure>
+</div>
+<script>
+(()=>{
+ const px=(ctx,x,y,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,1,1)};
+ function ground(ctx,w,h){
+  ctx.fillStyle='#6f925c';ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#5e7f4f';for(let i=0;i<40;i++)ctx.fillRect((i*37)%w,(i*19)%h,3,2);
+  ctx.fillStyle='#8d6a3d';ctx.fillRect(210,210,18,70); // easel leg
+  ctx.fillRect(268,214,14,66);
+  ctx.fillStyle='#d7c39a';ctx.fillRect(218,150,70,70); // canvas
+  ctx.strokeStyle='#5a4330';ctx.strokeRect(218.5,150.5,69,69);
+  ctx.fillStyle='#c7b489';ctx.fillRect(236,228,34,12); // stool
+ }
+ function boyStanding(ctx,x,y,squash){
+  ctx.save();ctx.translate(x,y);ctx.scale(1,squash);
+  // simplified Haigen-like silhouette
+  ctx.fillStyle='#2a2f2c';ctx.fillRect(-10,-34,20,28); // hoodie
+  ctx.fillStyle='#e0c09a';ctx.fillRect(-7,-48,14,14); // head
+  ctx.fillStyle='#d6b56a';ctx.fillRect(-8,-50,16,5); // hair
+  ctx.fillStyle='#3a322c';ctx.fillRect(-9,-8,8,16);ctx.fillRect(1,-8,8,16); // legs
+  ctx.restore();
+ }
+ function brushLines(ctx,x,y,t){
+  const wave=Math.sin(t*.09);
+  ctx.lineCap='round';ctx.strokeStyle='#be9166';ctx.lineWidth=5;
+  ctx.beginPath();ctx.moveTo(x+8,y-39);ctx.lineTo(x+21,y-37+wave*4);ctx.stroke();
+  ctx.strokeStyle='#593d2d';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x+20,y-37+wave*4);ctx.lineTo(x+36,y-47+wave*6);ctx.stroke();
+ }
+ function boySeated(ctx,x,y,frame){
+  const reach=[0,3,6,2][frame%4];
+  const tip=[0,2,5,1][frame%4];
+  ctx.fillStyle='#3a322c';ctx.fillRect(x-14,y-6,12,10); // tucked legs
+  ctx.fillRect(x-2,y-4,10,8);
+  ctx.fillStyle='#2a2f2c';ctx.fillRect(x-11,y-32,22,26); // torso upright
+  ctx.fillStyle='#e0c09a';ctx.fillRect(x-6,y-46,14,14);
+  ctx.fillStyle='#d6b56a';ctx.fillRect(x-7,y-48,16,5);
+  // arm + brush to canvas
+  ctx.strokeStyle='#e0c09a';ctx.lineWidth=4;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x+8,y-28);ctx.lineTo(x+18+reach,y-34);ctx.stroke();
+  ctx.strokeStyle='#7a5230';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(x+18+reach,y-34);ctx.lineTo(x+34+tip,y-40-tip);ctx.stroke();
+  ctx.fillStyle='#6aa0c8';ctx.fillRect(x+34+tip,y-42-tip,3,3); // paint tip
+  // paint mark on canvas
+  ctx.fillStyle=['#6aa0c8','#7fbf7a','#c9a35a','#8f6d4a'][frame%4];
+  ctx.fillRect(230+frame*4,170+frame*3,6,4);
+ }
+ let t=0,frame=0,playing=true;
+ const cur=document.getElementById('current').getContext('2d');
+ const prop=document.getElementById('proposed').getContext('2d');
+ function draw(){
+  ground(cur,390,320);boyStanding(cur,160,250,.85);brushLines(cur,160,250,t);
+  ground(prop,390,320);boySeated(prop,168,248,frame);
+  // labels
+  cur.fillStyle='#1d2420';cur.font='700 14px Georgia';cur.fillText('CURRENT',16,28);
+  prop.fillStyle='#1d2420';prop.font='700 14px Georgia';prop.fillText('PROPOSED A · frame '+(frame+1)+'/4',16,28);
+ }
+ function tick(){
+  t++;
+  if(playing&&t%18===0)frame=(frame+1)%4;
+  draw();
+  requestAnimationFrame(tick);
+ }
+ document.getElementById('play').onclick=e=>{playing=!playing;e.currentTarget.setAttribute('aria-pressed',String(playing));e.currentTarget.textContent=playing?'Play cycle':'Paused'};
+ document.getElementById('step').onclick=()=>{frame=(frame+1)%4;draw()};
+ tick();
+})();
+</script>
+</body>
+</html>
