@@ -10378,11 +10378,28 @@ function artDrawables(list){
  if(guest.phase==='admire'){ctx.save();ctx.fillStyle='#f8ead1';ctx.font='12px Georgia';ctx.textAlign='center';ctx.fillText('“Lovely…”',guest.x,guest.y-59);ctx.restore()}}});
 }
 function paintHaigen(){
- const x=state.x,y=state.y,wave=Math.sin(atelier.progress*.009);
- ctx.save();ctx.translate(x,y-8);ctx.scale(1,.85);
- character(0,0,'boy',{dir:'right',moving:false,anim:0});ctx.restore();
- ctx.save();ctx.lineCap='round';ctx.lineWidth=5;ctx.strokeStyle='#be9166';ctx.beginPath();ctx.moveTo(x+8,y-39);ctx.lineTo(x+21,y-37+wave*4);ctx.stroke();
- ctx.lineWidth=2;ctx.strokeStyle='#593d2d';ctx.beginPath();ctx.moveTo(x+20,y-37+wave*4);ctx.lineTo(x+36,y-47+wave*6);ctx.stroke();ctx.restore();
+ // Job 227: clear, upright three-quarter painting silhouette. Keep the canonical
+ // Haigen atlas, painter's position, atelier timing, and all save/economy state.
+ const x=state.x,y=state.y;
+ const dab=Math.sin(atelier.progress*.009);
+ ctx.save();
+ // A grounded stool behind the actor, rather than squashing his whole sprite.
+ ctx.fillStyle='#463327';ctx.fillRect(x-12,y-19,5,17);ctx.fillRect(x+5,y-19,5,17);
+ ctx.fillStyle='#98714a';ctx.fillRect(x-15,y-23,28,7);
+ character(x,y,'boy',{dir:'right',moving:false,anim:0});
+ // Palette belongs in the off hand; brush begins at the raised shoulder and
+ // ends on the canvas side. No brush or motion originates at the waist.
+ ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.fillStyle='#b38a58';ctx.beginPath();ctx.ellipse(x-14,y-47,11,7,-.25,0,Math.PI*2);ctx.fill();
+ for(const [dx,dy,c] of [[-19,-48,'#426e54'],[-12,-51,'#c68a52'],[-7,-46,'#8b5c54']]){
+  ctx.fillStyle=c;ctx.fillRect(x+dx,y+dy,4,3);
+ }
+ ctx.strokeStyle='#b58b69';ctx.lineWidth=5;
+ ctx.beginPath();ctx.moveTo(x+7,y-57);ctx.lineTo(x+18,y-54+dab*2);ctx.stroke();
+ ctx.strokeStyle='#61432c';ctx.lineWidth=2.5;
+ ctx.beginPath();ctx.moveTo(x+18,y-54+dab*2);ctx.lineTo(x+35,y-57+dab*3);ctx.stroke();
+ ctx.fillStyle='#e9d5a5';ctx.fillRect(x+34,y-59+dab*3,3,4);
+ ctx.restore();
 }
 function artGallery(selected){
  open('<h2>Haigen’s painting cart</h2><p>Coin purse · '+atelier.purse+' gold</p><div id="artWorks"></div>');
