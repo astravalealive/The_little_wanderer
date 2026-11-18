@@ -17,6 +17,7 @@ const {chromium}=require('playwright-core');
  assert.match(html,/wandererV127PreviewSave/);
  assert.match(css,/Job 232: Quiet Nordic HUD/);
  assert.match(css,/iPad \/ wide landscape/);
+ assert.match(css,/safe-area-inset-left/);
  assert.match(css,/quiet mobile presentation/);
  assert.ok(fs.existsSync(path.join(root,'docs/quiet-nordic-hud-232/README.md')));
  assert.ok(fs.existsSync(path.join(root,'docs/quiet-nordic-hud-232/before/iphone-overlap.png')));
@@ -35,9 +36,13 @@ const {chromium}=require('playwright-core');
  const qaHook=`;window.__hudQA=(opts)=>{state.x=opts.x??state.x;state.y=opts.y??state.y;state.story=state.story||{};state.story.stage=opts.stage??1;state.story.oldStreamQuestRetired=false;if(Number.isFinite(opts.x)){cam.x=opts.x;cam.y=opts.y-(typeof presentationPortraitFraming==="function"&&presentationPortraitFraming()?Math.min(110,H*.075)/Math.max(.01,worldZoom()):0);}cameraDetached=false;look.x=0;look.y=0;if(opts.autonomy===false){state.autonomy=false;autoBubble="";autoBubbleTimer=0;}else{state.autonomy=true;autoBubble=opts.speech||"";autoBubbleTimer=opts.ms||16000;}if(opts.toast)notify(opts.toast);const q=document.getElementById("v127Quest");if(q){q.style.display="";q.dataset.collapsed=opts.questCollapsed?"true":"false";const t=document.getElementById("v127QuestToggle");if(t)t.textContent=opts.questCollapsed?"+":"−";const list=document.getElementById("v127QuestList");if(list)list.innerHTML='<li><span class="v127-checkbox"></span><span>Listen near the Silent Pond</span></li><li><span class="v127-checkbox"></span><span>Find what disturbs the water</span></li>';}return {w:W,h:H,x:state.x,y:state.y,equip:state.equipped,portrait:typeof presentationPortraitFraming==="function"&&presentationPortraitFraming()};};`;
 
  async function openPage(vp){
-  const page=await browser.newPage({viewport:vp,deviceScaleFactor:2,isMobile:true,hasTouch:true});
+  const page=await browser.newPage({viewport:{width:vp.width,height:vp.height},deviceScaleFactor:2,isMobile:true,hasTouch:true});
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
+  if(vp.safe){
+   const client=await page.context().newCDPSession(page);
+   await client.send('Emulation.setSafeAreaInsetsOverride',{insets:vp.safe});
+  }
   await page.route('**/haigen.html?qa=quiet-hud-232*',async route=>{
    const response=await route.fetch();
    let body=await response.text();
@@ -50,6 +55,19 @@ const {chromium}=require('playwright-core');
   await page.waitForFunction(()=>window.__haigenWorldReady&&window.__v127UIReady,{timeout:30000});
   await page.waitForTimeout(550);
   return {page,errors};
+ }
+
+ function assertInsideSafe(metrics,expected,label){
+  for(const edge of ['top','right','bottom','left']){
+   assert.ok(Math.abs(metrics.insets[edge]-expected[edge])<=1,label+' inset '+edge+' '+metrics.insets[edge]);
+  }
+  const slack=2;
+  for(const name of ['toast','quest','mini','speech','joy','hotbar','pack','gear']){
+   const box=metrics[name];
+   assert.ok(box,label+' '+name+' missing inside safe area');
+   assert.ok(box.left>=metrics.insets.left-slack&&box.top>=metrics.insets.top-slack&&box.right<=metrics.vw-metrics.insets.right+slack&&box.bottom<=metrics.vh-metrics.insets.bottom+slack,
+    label+' '+name+' leaves the safe area '+JSON.stringify({box,insets:metrics.insets,vw:metrics.vw,vh:metrics.vh}));
+  }
  }
 
  function assertNoHudCollisions(metrics,label){
@@ -77,7 +95,18 @@ const {chromium}=require('playwright-core');
    const interact=box(document.getElementById('interactBtn'));
    const use=box(document.getElementById('useBtn'));
    const touchOk=b=>b&&b.w>=30&&b.h>=30&&b.left>=-2&&b.top>=-2&&b.right<=innerWidth+2&&b.bottom<=innerHeight+2;
+   const readInset=edge=>{
+    const el=document.createElement('div');
+    el.style.cssText='position:fixed;visibility:hidden;pointer-events:none;'+edge+':0;'+(edge==='top'||edge==='bottom'?'height':'width')+':env(safe-area-inset-'+edge+')';
+    document.body.appendChild(el);
+    const b=el.getBoundingClientRect();
+    const v=(edge==='top'||edge==='bottom')?b.height:b.width;
+    el.remove();
+    return v;
+   };
    return {
+    vw:innerWidth,vh:innerHeight,
+    insets:{top:readInset('top'),right:readInset('right'),bottom:readInset('bottom'),left:readInset('left')},
     build:window.__haigenBuild,toastLive:document.body.classList.contains('haigen-toast-live'),
     speech,toast,quest,mini,period,joy,hotbar,pack,gear,interact,use,
     speechToast:overlaps(speech,toast),speechQuest:overlaps(speech,quest),speechMini:overlaps(speech,mini),
@@ -109,6 +138,7 @@ const {chromium}=require('playwright-core');
   assertNoHudCollisions(metrics,label);
   assert.ok(metrics.speechAboveControls,label+' speech above controls');
   assert.ok(metrics.touches.joy&&metrics.touches.hotbar&&metrics.touches.pack&&metrics.touches.gear,label+' touch geometry');
+  if(vp.safe)assertInsideSafe(metrics,vp.safe,label);
 
   // Long toast + long speech + collapsed quest.
   await page.evaluate(()=>window.__hudQA({
@@ -123,6 +153,7 @@ const {chromium}=require('playwright-core');
   assert.equal(long.toastMini,false,label+' long toastMini');
   assert.equal(long.toastPeriod,false,label+' long toastPeriod');
   assert.ok(long.speechAboveControls,label+' long speech above controls');
+  if(vp.safe)assertInsideSafe(long,vp.safe,label+' long');
 
   // Real touch usability: joystick moves Haigen, hotbar selects, pack opens, settings opens.
   await page.evaluate(()=>window.__hudQA({x:1600,y:1700,autonomy:false,questCollapsed:true}));
@@ -168,7 +199,10 @@ const {chromium}=require('playwright-core');
  await runViewport({width:390,height:844},'iphone');
  await runViewport({width:768,height:1024},'ipad-portrait');
  await runViewport({width:1024,height:768},'ipad-landscape');
+ await runViewport({width:390,height:844,safe:{top:47,right:0,bottom:34,left:0}},'iphone-safe');
+ await runViewport({width:1024,height:768,safe:{top:24,right:0,bottom:21,left:0}},'ipad-landscape-safe');
+ await runViewport({width:1024,height:768,safe:{top:0,right:24,bottom:20,left:24}},'ipad-landscape-side-safe');
  await browser.close();
  server.close();
- console.log('PASS Job 232 Quiet Nordic HUD correction: lanes + touch + landscape, V'+ver.build);
+ console.log('PASS Job 232 Quiet Nordic HUD correction: lanes + touch + landscape + safe area, V'+ver.build);
 })().catch(e=>{console.error(e);process.exit(1)});

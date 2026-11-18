@@ -9,7 +9,7 @@ body.v127-rpg .dev-version{
  right:calc(env(safe-area-inset-right,0px) + 5px);bottom:calc(env(safe-area-inset-bottom,0px) + 1px);
  z-index:22;color:#ffe9bd;background:#19201deb;border-color:#896c44;line-height:12px;padding:0 4px;
 }
-body.v127-rpg .bottom{z-index:11;bottom:calc(env(safe-area-inset-bottom,0px) + 97px);left:13px;right:13px}
+body.v127-rpg .bottom{z-index:11;bottom:calc(env(safe-area-inset-bottom,0px) + 97px);left:calc(env(safe-area-inset-left,0px) + 13px);right:calc(env(safe-area-inset-right,0px) + 13px)}
 body.v127-rpg .bottom .joystick{background:#161f1bb5;border:3px solid #b38a55;box-shadow:inset 0 0 0 3px #3b2e23,0 2px 15px #000b;width:106px;height:106px}
 body.v127-rpg .bottom .stick{width:43px;height:43px;left:30px;top:30px;background:#b8a078;border-color:#e8cf93}
 body.v127-rpg .bottom .actions{gap:7px}
@@ -76,7 +76,7 @@ body.v127-rpg .haigen-speech{
 .v127-quest ul{padding:0;margin:0;list-style:none}
 .v127-quest li{display:flex;align-items:start;gap:8px;font:14px/1.22 Georgia,serif;margin:5px 0}
 .v127-checkbox{height:15px;width:15px;flex:0 0 15px;border:2px solid #ad8354;background:#141b19;display:inline-grid;place-items:center;border-radius:2px;color:#c5e866;font:700 12px Georgia,serif}
-.v127-mini{position:absolute;top:calc(env(safe-area-inset-top,0px) + 9px);right:15px;width:151px;height:151px;border-radius:50%;padding:6px;background:#30251c;box-shadow:0 0 0 2px #25160e,0 0 0 5px #a47743,0 0 0 7px #d4a86b,0 5px 11px #000b;pointer-events:auto}
+.v127-mini{position:absolute;top:calc(env(safe-area-inset-top,0px) + 9px);right:calc(env(safe-area-inset-right,0px) + 15px);width:151px;height:151px;border-radius:50%;padding:6px;background:#30251c;box-shadow:0 0 0 2px #25160e,0 0 0 5px #a47743,0 0 0 7px #d4a86b,0 5px 11px #000b;pointer-events:auto}
 .v127-mini canvas{position:static!important;width:100%;height:100%;border-radius:50%;display:block;image-rendering:pixelated}
 .v127-north{position:absolute;top:-12px;left:calc(50% - 12px);width:24px;height:24px;border:2px ridge #d6a55f;background:#1c1d19;border-radius:50%;text-align:center;font:700 15px/20px Georgia,serif;color:#ffe4ac}
 .v127-map-control{position:absolute;right:-18px;bottom:31px;display:flex;flex-direction:column;gap:3px}
@@ -225,7 +225,7 @@ body.v127-rpg #frogPassengerHud canvas{
  .v127-quest{right:185px;width:clamp(205px,27vw,300px);min-width:0}
  .v127-head{transform:scale(.88);transform-origin:top left}
  .v127-mini{width:130px;height:130px}
- body.v127-rpg .hotbar{max-width:min(calc(100vw - 210px),790px)}
+ body.v127-rpg .hotbar{max-width:min(calc(100vw - 210px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)),790px)}
  body.v127-rpg #frogPassengerHud{top:calc(env(safe-area-inset-top,0px) + 205px)}
 }
 @media(max-width:600px){
@@ -341,11 +341,11 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"] h3{
 @media (min-width:601px) and (max-width:1100px){
  /* Job 232 correction: keep pack/map/journal and gear clear above the joystick. */
  body.v127-rpg .v127-utilities{
-  left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 220px);gap:6px;
+  left:calc(env(safe-area-inset-left,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 220px);gap:6px;
  }
  body.v127-rpg .v127-utility{width:44px;height:44px;padding:7px}
  body.v127-rpg .v127-gear{
-  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 220px);
+  right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 220px);
   width:44px;height:44px;padding:7px;
  }
  body.v127-rpg .v127-settings{
@@ -465,7 +465,7 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"]{
  }
  body.v127-rpg .v127-mini{
   top:calc(env(safe-area-inset-top,0px) + 10px);
-  right:10px;z-index:11;
+  right:calc(env(safe-area-inset-right,0px) + 10px);z-index:11;
  }
  body.v127-rpg .haigen-speech{
   z-index:7;max-width:min(236px,calc(100vw - 36px));
@@ -493,12 +493,12 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"]{
 @media(min-width:601px) and (orientation:landscape){
  body.v127-rpg .toast{
   top:calc(env(safe-area-inset-top,0px) + 156px);
-  left:14px;right:auto;transform:none;
+  left:calc(env(safe-area-inset-left,0px) + 14px);right:auto;transform:none;
   max-width:min(280px,30vw);text-align:left;
  }
  body.v127-rpg #v127Root .v127-quest{
   top:calc(env(safe-area-inset-top,0px) + 150px);
-  right:14px;width:min(240px,24vw);min-width:0;
+  right:calc(env(safe-area-inset-right,0px) + 14px);width:min(240px,24vw);min-width:0;
   max-height:min(36dvh,250px);z-index:10;
  }
  body.v127-rpg .v127-mini{z-index:11}

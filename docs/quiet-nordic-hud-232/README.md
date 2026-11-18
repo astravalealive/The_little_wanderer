@@ -8,7 +8,7 @@ On portrait iPhone, toast / speech / quest / minimap could share the same vertic
 ## Bounded fix
 1. **CSS lanes** (`v127-ornate-ui.css`): left toast rail below the day chip; minimap top-right; quest under the minimap; dedicated iPad landscape lanes.
 2. **Speech dodge** (`updateHaigenSpeech` in `haigen.html`): treat live toast, quest panel, and minimap as obstacles; shift the character-anchored bubble to free candidates. `haigen-toast-live` raises the top safe band while a toast is showing.
-3. Modal/menu suppression unchanged. Live suite now covers iPhone, iPad portrait, iPad landscape, long text, and real taps for joystick / hotbar / pack / settings.
+3. Modal/menu suppression unchanged. Live suite covers iPhone, iPad portrait, iPad landscape, long text, safe-area insets, and real taps for joystick / hotbar / pack / settings. Side insets shift the joystick, toast, quest, minimap, pack and settings only when the device reports them.
 
 ## Evidence (isolated QA; never touches real saves)
 | Shot | File |
