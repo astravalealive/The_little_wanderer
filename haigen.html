@@ -8551,8 +8551,12 @@ function updateWoodlandCritters(dt){updateFrogs();updateBirds(dt);updateDucks(dt
 // Paragraph wrapping, touch visibility and font size remain stable at any zoom.
 // V426: prefer above Haigen; if that collides with HUD/controls, use a side safe zone.
 let lastVisibleSpeech='';
+let quietHudObstacleCache={at:0,boxes:null};
 function quietHudObstacleBoxes(){
- // Job 232: toast lane, quest panel and minimap are reserved chrome; speech must dodge them.
+ // Job 232: reserved chrome and touch controls. Cached briefly so the extra
+ // boxes do not force a layout read on every frame while speech is showing.
+ const now=performance.now();
+ if(quietHudObstacleCache.boxes&&now-quietHudObstacleCache.at<160)return quietHudObstacleCache.boxes;
  const boxes=[];
  const push=(el,pad=6)=>{
   if(!el)return;
@@ -8566,7 +8570,23 @@ function quietHudObstacleBoxes(){
  if(toast&&toast.classList.contains('show'))push(toast,10);
  push($('v127Quest'),8);
  push(document.querySelector('.v127-mini'),8);
+ push(document.querySelector('.v127-head'),4);
+ push(document.querySelector('.v127-period'),4);
+ push(document.querySelector('.v127-companions'),4);
+ push($('joy'),6);
+ push(document.querySelector('.hotbar'),6);
+ push($('interactBtn'),4);
+ push($('useBtn'),4);
+ document.querySelectorAll('.v127-utility').forEach(el=>push(el,4));
+ push($('v127Gear'),4);
+ quietHudObstacleCache={at:now,boxes};
  return boxes;
+}
+function heroClearBox(px,py,zoom){
+ const half=Math.max(24,20*zoom);
+ const above=Math.max(70,76*zoom);
+ const below=Math.max(16,14*zoom);
+ return {l:px-half,t:py-above,r:px+half,b:py+below};
 }
 function speechAnchorHits(sx,sy,sw,sh,box){
  // .haigen-speech uses transform:translate(-50%,-100%) so (sx,sy) is the tip under the bubble.
@@ -8607,23 +8627,30 @@ function updateHaigenSpeech(){
  const br=el.getBoundingClientRect();
  const sw=Math.max(120,br.width||el.offsetWidth||220);
  const sh=Math.max(40,br.height||el.offsetHeight||64);
+ const hero=heroClearBox(px,py,zoom);
  const obstacles=quietHudObstacleBoxes();
- if(obstacles.some(box=>speechAnchorHits(sx,sy,sw,sh,box))){
-  const candidates=[];
-  for(const side of [-1,1]){
-   for(const lift of [0,36,72,110]){
-    const cx=clamp(px+side*Math.min(150,W*.36),padding,W-padding);
-    const cy=clamp(py-12+lift,topSafe+24,H-bottomSafe);
-    candidates.push([cx,cy]);
-   }
-  }
-  candidates.push([clamp(px,padding,W-padding),clamp(py+48,topSafe+24,H-bottomSafe)]);
+ const hits=box=>speechAnchorHits(sx,sy,sw,sh,box);
+ if(obstacles.some(hits)||hits(hero)){
+  // On a phone the bubble is too wide to sit beside Haigen, so prefer a
+  // fully-above or fully-below slot that still clears chrome and controls.
+  const half=sw/2+4;
+  const minCx=half+4,maxCx=Math.max(minCx,W-half-4);
+  const spots=[
+   [px,hero.t-12],
+   [px-Math.min(188,W*.42),hero.t-12],
+   [px+Math.min(188,W*.42),hero.t-12],
+   [px,hero.b+sh+10],
+   [px-Math.min(160,W*.36),hero.b+sh+10],
+   [px+Math.min(160,W*.36),hero.b+sh+10]
+  ];
   let best=null,bestScore=1e15;
-  for(const [cx,cy] of candidates){
+  for(const [rawX,rawY] of spots){
+   const cx=clamp(rawX,minCx,maxCx);
+   const cy=rawY;
+   if(cy-sh<8||cy>H-8)continue;
+   if(speechAnchorHits(cx,cy,sw,sh,hero))continue;
    if(obstacles.some(box=>speechAnchorHits(cx,cy,sw,sh,box)))continue;
-   const covers=Math.abs(cx-px)<42&&cy>py-36;
-   if(covers)continue;
-   const score=Math.hypot(cx-px,cy-(py-60))+liftPenalty(cy,py);
+   const score=Math.hypot(cx-px,(cy-sh)-(hero.t-8))+liftPenalty(cy,py);
    if(score<bestScore){bestScore=score;best=[cx,cy]}
   }
   if(best){sx=best[0];sy=best[1];el.style.left=Math.round(sx)+'px';el.style.top=Math.round(sy)+'px'}

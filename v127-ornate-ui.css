@@ -340,15 +340,15 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"] h3{
 }
 @media (min-width:601px) and (max-width:1100px){
  body.v127-rpg .v127-utilities{
-  left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 97px);gap:6px;
+  left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 224px);gap:6px;
  }
  body.v127-rpg .v127-utility{width:44px;height:44px;padding:7px}
  body.v127-rpg .v127-gear{
-  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 97px);
+  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 224px);
   width:44px;height:44px;padding:7px;
  }
  body.v127-rpg .v127-settings{
-  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);
+  right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 280px);
   max-height:min(65dvh,460px);
  }
 }
@@ -478,12 +478,25 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"]{
 }
 @media(min-width:601px) and (max-width:900px) and (orientation:portrait){
  body.v127-rpg .toast{
-  top:calc(env(safe-area-inset-top,0px) + 132px);
+  top:calc(env(safe-area-inset-top,0px) + 168px);
   left:14px;right:auto;transform:none;
   max-width:min(260px,34vw);
  }
  body.v127-rpg #v127Root .v127-quest{
   top:calc(env(safe-area-inset-top,0px) + 140px);
   max-height:min(24dvh,220px);
+ }
+}
+/* iPad landscape: toast sits right of the day chip, clear of companions. */
+@media(min-width:901px) and (max-width:1180px) and (orientation:landscape){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 108px);
+  left:calc(env(safe-area-inset-left,0px) + 248px);
+  right:auto;transform:none;
+  max-width:min(280px,28vw);
+  text-align:left;
+ }
+ body.v127-rpg #v127Root .v127-quest{
+  max-height:min(32dvh,240px);
  }
 }
