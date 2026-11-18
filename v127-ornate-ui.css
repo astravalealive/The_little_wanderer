@@ -446,3 +446,44 @@ body.v127-rpg #v127Root .v127-quest[data-collapsed="true"]{
  }
  body.v127-rpg .haigen-speech{max-width:min(260px,42vw)}
 }
+
+/* Job 232: Quiet Nordic HUD — portrait lanes for toast / quest / minimap / speech.
+   Presentation-only; controls, art, gameplay and saves unchanged. */
+@media(max-width:600px){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 104px);
+  left:8px;right:auto;transform:none;
+  max-width:min(188px,46vw);
+  z-index:9;text-align:left;font-size:12px;line-height:1.25;
+ }
+ body.v127-rpg #v127Root .v127-quest{
+  top:calc(env(safe-area-inset-top,0px) + 112px);
+  right:8px;width:min(150px,38vw);max-height:min(26dvh,210px);
+  z-index:10;
+ }
+ body.v127-rpg .v127-mini{
+  top:calc(env(safe-area-inset-top,0px) + 10px);
+  right:10px;z-index:11;
+ }
+ body.v127-rpg .haigen-speech{
+  z-index:7;max-width:min(236px,calc(100vw - 36px));
+ }
+ body.v127-rpg.haigen-toast-live .haigen-speech{
+  /* Leave the left toast lane clear while a notification is live. */
+  max-width:min(220px,calc(100vw - 42px));
+ }
+ body.v127-rpg #frogPassengerHud{
+  top:calc(env(safe-area-inset-top,0px) + 230px);
+ }
+}
+@media(min-width:601px) and (max-width:900px) and (orientation:portrait){
+ body.v127-rpg .toast{
+  top:calc(env(safe-area-inset-top,0px) + 132px);
+  left:14px;right:auto;transform:none;
+  max-width:min(260px,34vw);
+ }
+ body.v127-rpg #v127Root .v127-quest{
+  top:calc(env(safe-area-inset-top,0px) + 140px);
+  max-height:min(24dvh,220px);
+ }
+}
