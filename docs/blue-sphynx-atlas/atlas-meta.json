@@ -1,0 +1,34 @@
+{
+  "asset": "assets/blue-sphynx-atlas-v435.webp",
+  "cell": [
+    96,
+    80
+  ],
+  "layout": "rows=down,up,right,left; cols=idle+walk\u00d73",
+  "drawHint": {
+    "width": 58,
+    "height": 48,
+    "footPad": 3
+  },
+  "source": "docs/blue-sphynx-atlas/reference/BLUE_APPROVED_REFERENCE.png",
+  "sourceSha256": "b617aa8e1a1347da34b286af01565c96d602030a987aa7c5e2f87337e572353b",
+  "outputSha256": "7d97a8622a928fe54ca14a7d8ced9762a8771ed6e7b8af4d5af1b39a5bd35fec",
+  "size": [
+    384,
+    320
+  ],
+  "left": "mirror(right)",
+  "downWalk": "pose-completed from locked front idle + UP cadence; face/ears from approved idle",
+  "paletteSample": [
+    "#dac0ae",
+    "#b69798",
+    "#a27b7f",
+    "#8a6f72",
+    "#9b554d",
+    "#7e575a",
+    "#6b535b",
+    "#63484e",
+    "#753a39",
+    "#5b3a3f"
+  ]
+}

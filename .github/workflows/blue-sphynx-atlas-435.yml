@@ -1,0 +1,40 @@
+name: Blue Sphynx atlas 435
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'haigen-version.json'
+      - 'assets/blue-sphynx-atlas-v435.webp'
+      - 'docs/blue-sphynx-atlas/**'
+      - '.github/scripts/build_blue_sphynx_atlas.py'
+      - 'tests/live/blue-sphynx-atlas-435.cjs'
+      - '.github/workflows/blue-sphynx-atlas-435.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'assets/blue-sphynx-atlas-v435.webp'
+      - 'tests/live/blue-sphynx-atlas-435.cjs'
+jobs:
+  blue-atlas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Playwright Chromium
+        run: npx --yes playwright@1.49.1 install chromium --with-deps
+      - name: Rebuild atlas (smoke)
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 .github/scripts/build_blue_sphynx_atlas.py
+          python3 - <<'PY'
+          from PIL import Image
+          im=Image.open('assets/blue-sphynx-atlas-v435.webp')
+          assert im.size==(384,320) and im.mode=='RGBA', im.size
+          print('atlas ok', im.size)
+          PY
+      - name: Live Blue atlas test
+        run: node tests/live/blue-sphynx-atlas-435.cjs
+      - name: Game build identity
+        run: node tests/live/game-build-identity.cjs
