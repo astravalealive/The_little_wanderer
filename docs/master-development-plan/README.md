@@ -60,7 +60,9 @@ Track B must match Track A art grammar. Track A keeps receiving Phase 1–4 unti
 | **#239** | Heartland Readability V432 | **Merged** — preserve |
 | **#241** | Nordic Haigen walk atlas PoC V433 | **READY TO MERGE** — first Captain merge ask |
 | **#248** | Ground lattice soften V433 | **READY** — merge after or carefully sequenced vs #241 (both claim V433; rebase loser to V434) |
-| **#234** | Quiet Nordic HUD V431 | Keep — **rebase onto post-#239 main**, then merge |
+| **#258** | Quiet Nordic HUD V435 rebase | **READY** — supersedes conflicting #234 |
+| **#257** | World Readability V434 | **READY** — P1-G1 |
+| **#234** | Quiet Nordic HUD V431 | **Superseded** by #258 |
 | **#235/#237** | Older HUD | **Superseded** by #234 |
 | **#238** | Visual transition proposal | Absorb into this plan |
 | **#242** | Earlier master plan draft | Superseded by this document revision |

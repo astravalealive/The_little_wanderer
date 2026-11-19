@@ -16,8 +16,8 @@ Goal: cohesive Nordic pixel readability on iPhone / iPad before living-world den
 | **P1-C3** | Path & water edge grammar | Worldbuilder | Heartland | path glaze / shores | After C1 |
 | **P1-D1** | Homestead composition / camera framing | Worldbuilder | C1 | packing/draw | After C1 |
 | **P1-E1** | Art pipeline kit (concept→cleanup→atlas) | Huginn | — | `devkit/` | Parallel |
-| **P1-F1** | Quiet Nordic HUD rebase | Presentation | Heartland | HUD CSS/JS | **PR #234 CONFLICTING — rebase** |
-| **P1-G1** | World readability: contact shadows + kill system-font plot/companion spam | Worldbuilder | Heartland | homestead draw labels | **Next implementation (this wave)** |
+| **P1-F1** | Quiet Nordic HUD rebase | Presentation | Heartland | HUD CSS/JS | **PR #258 V435 READY (supersedes #234)** |
+| **P1-G1** | World readability: contact shadows + kill system-font plot/companion spam | Worldbuilder | Heartland | homestead draw labels | **PR #257 V434 READY** |
 
 ## Concurrent-safe now
 
