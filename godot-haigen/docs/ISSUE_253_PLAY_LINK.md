@@ -10,12 +10,22 @@ Single-threaded Godot web export (no SharedArrayBuffer). Served with correct MIM
 
 Open in Safari on iPad (landscape). Cloudflare quick tunnels die when this agent VM stops.
 
-## Durable hosting options (no paid services)
+## Durable hosting after this agent (needs Captain approval)
 
-1. **Cursor publish (preferred, isolated from GitHub Pages)** — propose publish of `godot-haigen/web-preview/` as a public Cursor app so the link survives the agent. Requires one Publish confirmation (choose **public** for iPad without Cursor sign-in).
-2. **GitHub Pages subdirectory** — would put files under the existing Pages site (e.g. `/godot-haigen/web-preview/`). Needs Captain approval because it deploys onto the production Pages host even if `haigen.html` is unchanged. Do not change Pages source/settings without approval.
+No paid services used. Free options checked:
 
-jsDelivr cannot host `index.wasm` (~42 MB; CDN 403).
+| Option | Result |
+| --- | --- |
+| Cursor `publish-app` of `web-preview/` | **Blocked** — security scanner false-positives PEM-like byte sequences inside `index.wasm` (Godot binary; not real keys in source) |
+| jsDelivr / raw.githack CDN | **Blocked** — `index.wasm` ~42 MB → CDN 403 |
+| Cloudflare quick tunnel | **Works now** (this session) — not persistent after the VM stops |
+| GitHub Pages isolated path | **Available** on existing free Pages host — needs Captain approval (see below) |
+
+**Approval required for persistence beyond this agent:** allow a minimal deploy of only `godot-haigen/web-preview/` (or `previews/godot-homestead-v1/`) onto the existing GitHub Pages site from `main`. No Pages settings change, no `haigen.html` / save / gameplay edits, no merge of full PR #252. Resulting URL would be:
+
+`https://astravalealive.github.io/The_little_wanderer/godot-haigen/web-preview/index.html`
+
+(or `/previews/godot-homestead-v1/` if copied to that path). Stopped here per issue rules until that approval is explicit.
 
 ## Verified this session
 
