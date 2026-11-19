@@ -33,6 +33,8 @@ Godot_v4.4.1-stable_linux.x86_64 --path godot-haigen
 The window defaults to the same **1024×768** landscape size used by the HTML evidence suite. Automated checks cover the touch stick, pixel camera, collisions, nearest-neighbour ground, and a frame-time sample:
 
 ```bash
+# Fresh clones have no .godot/imported cache. Import first.
+Godot_v4.4.1-stable_linux.x86_64 --headless --import --path godot-haigen
 xvfb-run -a -s '-screen 0 1024x768x24' \
   Godot_v4.4.1-stable_linux.x86_64 --path godot-haigen --resolution 1024x768 \
   --audio-driver Dummy res://tools/ipad_landscape_validate.tscn

@@ -29,6 +29,10 @@ jobs:
           chmod +x /tmp/godot/Godot_v4.4.1-stable_linux.x86_64
           sudo apt-get update
           sudo apt-get install -y xvfb
+      - name: Import textures
+        run: |
+          # .godot/imported is not committed. Import before the playable check.
+          /tmp/godot/Godot_v4.4.1-stable_linux.x86_64 --headless --import --path godot-haigen
       - name: Run 1024x768 touch, camera, collision and render checks
         run: |
           xvfb-run -a -s '-screen 0 1024x768x24' \
