@@ -5,3 +5,6 @@ export/
 *.tmp
 *~
 .DS_Store
+
+# Godot may write import sidecars next to the web export
+web-preview/*.import

@@ -4,8 +4,10 @@
     "Object positions/types follow seeded(); first-1050 sizes use seeded stand-in (HTML used Math.random).",
     "Trees thinned with V385 road clearance + spacing; sizes boosted like live HTML.",
     "road_routes clipped from live roadRoutes including Job 233 cottage\u2192lake path.",
+    "road_widths paired with clipped routes from live roadWidths.",
     "campTier assumed 1 for door geometry.",
-    "Coordinates are live HTML world space."
+    "Coordinates are live HTML world space.",
+    "Ground uses approved haigen-trails.webp crop (7800 world / 2600 tex) + soil glaze."
   ],
   "cottage": {
     "x": 1500.0,
@@ -159,6 +161,16 @@
         "y": 1700
       }
     ]
+  ],
+  "road_widths": [
+    62.0,
+    42.0,
+    47.0,
+    36.0,
+    44.0,
+    34.0,
+    30.0,
+    34.0
   ],
   "house": {
     "tier": 1,

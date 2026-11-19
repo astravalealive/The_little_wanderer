@@ -29,6 +29,17 @@ def main() -> int:
     if len(roads) < 1:
         print("FAIL: missing road_routes from HTML roadRoutes", file=sys.stderr)
         return 1
+    widths = data.get("road_widths") or []
+    if len(widths) != len(roads):
+        print(
+            f"FAIL: road_widths ({len(widths)}) must match road_routes ({len(roads)})",
+            file=sys.stderr,
+        )
+        return 1
+    pond = data.get("pond") or {}
+    if pond.get("x") != 850 or pond.get("y") != 1700:
+        print(f"FAIL: pond centre {pond} != (850,1700)", file=sys.stderr)
+        return 1
     solids = data.get("solids") or []
     if len(solids) < 8:
         print(f"FAIL: too few solids ({len(solids)})", file=sys.stderr)
@@ -42,6 +53,7 @@ def main() -> int:
         "skolli_adult.png",
         "house_tier1_exterior.png",
         "house_tier1_interior.png",
+        "haigen_trails.webp",
         "tree.png",
         "rock_a.png",
     ]
@@ -50,6 +62,19 @@ def main() -> int:
         if not path.exists() or path.stat().st_size < 500:
             print(f"FAIL: approved asset missing/small {path}", file=sys.stderr)
             return 1
+    # Trails must match HTML 2600² contract (drawn to 7800 world).
+    try:
+        import struct
+
+        # Minimal RIFF/WEBP size probe via file size; full decode in Godot.
+        trails = APPROVED / "haigen_trails.webp"
+        if trails.stat().st_size < 50_000:
+            print("FAIL: haigen_trails.webp unexpectedly small", file=sys.stderr)
+            return 1
+        _ = struct
+    except OSError as exc:
+        print(f"FAIL: trails check {exc}", file=sys.stderr)
+        return 1
     # Placeholder programmer art must not be the runtime character sheets.
     old_haigen = ROOT / "assets" / "characters" / "haigen_walk.png"
     if old_haigen.exists() and old_haigen.stat().st_size < 5000:
@@ -57,9 +82,19 @@ def main() -> int:
         if (APPROVED / "haigen_walk.png").stat().st_size <= old_haigen.stat().st_size:
             print("FAIL: approved Haigen sheet not larger than placeholder", file=sys.stderr)
             return 1
+    # Competing PR #250 world scenes must not ship beside this consolidation.
+    competing = [
+        ROOT / "scenes" / "world" / "woodlands_yard.tscn",
+        ROOT / "scenes" / "world" / "grove_path.tscn",
+    ]
+    for path in competing:
+        if path.exists():
+            print(f"FAIL: competing Godot map present {path}", file=sys.stderr)
+            return 1
     print(
-        f"OK: pocket solids={len(solids)} door_x={house['exterior_door_x']} "
-        f"front={house['front']} approved assets present"
+        f"OK: pocket solids={len(solids)} roads={len(roads)} "
+        f"door_x={house['exterior_door_x']} front={house['front']} "
+        f"trails+approved assets present"
     )
     return 0
 

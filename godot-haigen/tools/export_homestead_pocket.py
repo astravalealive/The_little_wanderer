@@ -20,6 +20,9 @@ POCKET_RADIUS = 720.0
 SAFE_RADIUS = 355.0
 POND = {"x": 850.0, "y": 1700.0, "rx": 330.0, "ry": 240.0}
 
+# From haigen.html roadWidths (index-aligned with full ROAD_ROUTES below).
+ROAD_WIDTHS = [62, 42, 47, 36, 44, 39, 34, 30, 34, 41, 33, 36, 32, 35, 30]
+
 # From haigen.html roadRoutes (Job 233 heartland routes included).
 ROAD_ROUTES = [
     [
@@ -220,10 +223,11 @@ def build_objects() -> list[dict]:
     return thin_trees_v385(objects)
 
 
-def pocket_roads() -> list[list[dict]]:
-    """Keep route segments that intersect the cottage pocket."""
+def pocket_roads() -> tuple[list[list[dict]], list[float]]:
+    """Keep route segments that intersect the cottage pocket + matching widths."""
     clipped: list[list[dict]] = []
-    for route in ROAD_ROUTES:
+    widths: list[float] = []
+    for ri, route in enumerate(ROAD_ROUTES):
         pts = [
             p
             for p in route
@@ -240,12 +244,15 @@ def pocket_roads() -> list[list[dict]]:
                 if math.hypot(mx - COTTAGE["x"], my - COTTAGE["y"]) <= POCKET_RADIUS + 80:
                     keep_idx.add(i - 1)
                     keep_idx.add(i)
+        width = float(ROAD_WIDTHS[ri]) if ri < len(ROAD_WIDTHS) else 34.0
         if len(keep_idx) >= 2:
             ordered = [route[i] for i in sorted(keep_idx)]
             clipped.append(ordered)
+            widths.append(width)
         elif pts and len(pts) >= 2:
             clipped.append(pts)
-    return clipped
+            widths.append(width)
+    return clipped, widths
 
 
 def main() -> int:
@@ -292,7 +299,7 @@ def main() -> int:
     half_width = width * 0.43
     front = hy + 13
     back = hy - height * 0.78
-    roads = pocket_roads()
+    roads, road_widths = pocket_roads()
 
     data = {
         "source": "haigen.html V432 seeded cottage pocket export",
@@ -300,8 +307,10 @@ def main() -> int:
             "Object positions/types follow seeded(); first-1050 sizes use seeded stand-in (HTML used Math.random).",
             "Trees thinned with V385 road clearance + spacing; sizes boosted like live HTML.",
             "road_routes clipped from live roadRoutes including Job 233 cottage→lake path.",
+            "road_widths paired with clipped routes from live roadWidths.",
             "campTier assumed 1 for door geometry.",
             "Coordinates are live HTML world space.",
+            "Ground uses approved haigen-trails.webp crop (7800 world / 2600 tex) + soil glaze.",
         ],
         "cottage": COTTAGE,
         "spawn": {"x": 1530.0, "y": 1655.0},
@@ -314,6 +323,7 @@ def main() -> int:
             "radius": POCKET_RADIUS,
         },
         "road_routes": roads,
+        "road_widths": road_widths,
         "house": {
             "tier": 1,
             "anchor_x": hx,

@@ -46,8 +46,33 @@ func _run() -> void:
 		failures.append("baked ground missing")
 	else:
 		report["ground_texture_size"] = str(baked.texture.get_size())
+		report["ground_scale"] = str(baked.scale)
+		report["ground_mode"] = str(baked.get_meta("ground_mode", "unknown"))
+		report["trails_composited"] = bool(baked.get_meta("trails_composited", false))
 		if baked.texture_filter != CanvasItem.TEXTURE_FILTER_NEAREST:
 			failures.append("ground is not nearest-neighbour")
+		# World-pixel moss base + trails overlay (HTML layering).
+		var gsize := baked.texture.get_size()
+		if gsize.x < 1000.0 or gsize.y < 1000.0:
+			failures.append("ground bake too small for pocket: %s" % gsize)
+		if not bool(baked.get_meta("trails_composited", false)):
+			failures.append("approved haigen_trails.webp was not composited into ground")
+		# Spot-check Job 233 cottage→pond glaze + trails near cottage.
+		var bake_img := baked.texture.get_image()
+		var pond_path := bake_img.get_pixel(int(1100.0 - 780.0), int(1650.0 - 780.0))
+		var trails_hit := bake_img.get_pixel(int(1500.0 - 780.0), int(1440.0 - 780.0))
+		report["pond_path_sample_rgba"] = [pond_path.r, pond_path.g, pond_path.b, pond_path.a]
+		report["trails_sample_rgba"] = [trails_hit.r, trails_hit.g, trails_hit.b, trails_hit.a]
+		var moss := GameConfig.COL_MOSS
+		if pond_path.is_equal_approx(moss):
+			failures.append("cottage→pond path sample still pure moss (glaze missing)")
+		# Trails paint near cottage is brownish soil, not moss green.
+		if trails_hit.g > trails_hit.r and trails_hit.g > 0.3:
+			failures.append("trails sample still moss-green (approved trails not visible)")
+	var glaze := main.get_node_or_null("Homestead/Ground/RoadGlaze")
+	report["road_glaze"] = glaze != null
+	if glaze == null:
+		failures.append("road glaze marker missing")
 
 	var homestead := main.get_node("Homestead")
 	if not ("pocket" in homestead) or homestead.pocket.is_empty():
@@ -132,10 +157,21 @@ func _run() -> void:
 		await get_tree().physics_frame
 	var inside := main.get_node_or_null("CottageInterior") != null
 	report["door_enter"] = inside
+	report["scene_bridge_place"] = SceneBridge.place
 	if not inside:
 		failures.append("walking up into door did not enter interior")
+	elif SceneBridge.place != SceneBridge.PLACE_INTERIOR:
+		failures.append("SceneBridge did not mark interior on enter")
 	else:
 		await _shot(OUT_DIR + "/ipad-landscape-interior.png")
+		# Furniture collisions: push into table footprint and ensure stop.
+		var room := main.get_node("CottageInterior")
+		var furniture: Array = []
+		for node in room.find_children("*", "StaticBody2D", true, false):
+			furniture.append(node)
+		report["interior_static_bodies"] = furniture.size()
+		if furniture.size() < 7:
+			failures.append("expected wall+furniture collisions (>=7), got %s" % furniture.size())
 		# Walk down to exit.
 		InputRouter.touch_vector = Vector2(0, 1)
 		for _i in 120:
@@ -145,8 +181,11 @@ func _run() -> void:
 			await get_tree().physics_frame
 		var still_inside := main.get_node_or_null("CottageInterior") != null
 		report["door_exit"] = not still_inside
+		report["scene_bridge_after_exit"] = SceneBridge.place
 		if still_inside:
 			failures.append("walking down did not exit interior")
+		elif SceneBridge.place != SceneBridge.PLACE_YARD:
+			failures.append("SceneBridge did not mark yard on exit")
 		else:
 			await _shot(OUT_DIR + "/ipad-landscape-after-exit.png")
 

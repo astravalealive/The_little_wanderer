@@ -85,6 +85,7 @@ func enter_home() -> void:
 		return
 	_home_inside = true
 	_cooldown_ms = 500.0
+	SceneBridge.mark_enter_interior("from_yard")
 	homestead.visible = false
 	if _skolli:
 		_skolli.visible = false
@@ -105,6 +106,7 @@ func exit_home() -> void:
 	_home_inside = false
 	_cooldown_ms = 500.0
 	var exit_pos: Vector2 = homestead.get_door_exit_position()
+	SceneBridge.mark_exit_to_yard("from_interior", exit_pos)
 	if _interior:
 		_interior.remove_child(_haigen)
 		_interior.queue_free()

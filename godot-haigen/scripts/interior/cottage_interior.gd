@@ -1,5 +1,7 @@
 extends Node2D
 ## Tier-1 cottage interior from approved house crop. Exit at south doorway.
+## Essential furniture collisions (table / hearth / bed / cupboard) so Haigen
+## cannot walk through the painted fixtures.
 
 const INTERIOR_TEX := preload("res://assets/approved/house_tier1_interior.png")
 
@@ -10,6 +12,7 @@ var _door_half := 40.0
 var _exit_y := 680.0
 
 func _ready() -> void:
+	name = "CottageInterior"
 	_build_room()
 
 func spawn_position() -> Vector2:
@@ -57,6 +60,15 @@ func _build_room() -> void:
 	var wing := (draw_w * 0.5 - _door_half) * 0.9
 	_block(Vector2(_door_x - _door_half - wing * 0.55, _exit_y), Vector2(wing, 40))
 	_block(Vector2(_door_x + _door_half + wing * 0.55, _exit_y), Vector2(wing, 40))
+
+	# Essential furniture footprints (room-relative; idea reused from PR #250
+	# interior blocks, scaled to the approved L1 reference room).
+	var ox := _room_origin.x
+	var oy := _room_origin.y
+	_block(Vector2(ox + draw_w * 0.28, oy + draw_h * 0.42), Vector2(110, 70)) # table
+	_block(Vector2(ox + draw_w * 0.72, oy + draw_h * 0.28), Vector2(70, 55)) # cupboard / shelves
+	_block(Vector2(ox + draw_w * 0.68, oy + draw_h * 0.58), Vector2(90, 50)) # bed / settle
+	_block(Vector2(ox + draw_w * 0.38, oy + draw_h * 0.22), Vector2(80, 45)) # hearth / stove
 
 	var label := Label.new()
 	label.text = "Cottage interior (approved L1 reference)"
