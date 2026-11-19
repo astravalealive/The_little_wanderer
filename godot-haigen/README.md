@@ -36,14 +36,15 @@ Evidence lands in `docs/evidence/` (`before/` = PR #251 baseline, `after/` = con
 
 ## Temporary web preview (iPhone / iPad Safari)
 
-Single-threaded export in `godot-haigen/web-preview/` (no SharedArrayBuffer). **Not** GitHub Pages.
+Single-threaded export in `godot-haigen/web-preview/` (no SharedArrayBuffer). **Not** production Pages.
 
 ```bash
-cd godot-haigen/web-preview && python3 -m http.server 8766 --bind 127.0.0.1
+# Prefer MIME-correct server (.wasm → application/wasm):
+python3 godot-haigen/tools/serve_web_preview.py
 # open http://127.0.0.1:8766/
 ```
 
-A temporary Cloudflare quick tunnel may be posted on the PR for device playtests; it dies when the agent VM stops.
+Issue #253 hosting notes: `godot-haigen/docs/IPAD_PREVIEW_253.md`. A Cloudflare quick tunnel may be posted for device playtests; it dies when the agent VM stops.
 
 ## Isolation
 
