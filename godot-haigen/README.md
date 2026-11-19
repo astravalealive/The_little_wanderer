@@ -29,7 +29,18 @@ xvfb-run -a -s '-screen 0 1024x768x24' \
   --audio-driver Dummy res://tools/ipad_landscape_validate.tscn
 ```
 
-Evidence lands in `docs/evidence/`. See `docs/VISUAL_MISMATCHES.md`.
+Evidence lands in `docs/evidence/`. See `docs/VISUAL_MISMATCHES.md` and `docs/COMPONENTS.md`.
+
+## Temporary web preview (iPhone / iPad Safari)
+
+Single-threaded export in `godot-haigen/web-preview/` (no SharedArrayBuffer). **Not** GitHub Pages.
+
+```bash
+cd godot-haigen/web-preview && python3 -m http.server 8766 --bind 127.0.0.1
+# open http://127.0.0.1:8766/
+```
+
+A temporary Cloudflare quick tunnel may be posted on the PR for device playtests; it dies when the agent VM stops.
 
 ## Isolation
 
