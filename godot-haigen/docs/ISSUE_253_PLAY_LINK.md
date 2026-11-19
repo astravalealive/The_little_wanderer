@@ -6,7 +6,7 @@ Goal: stable iPad Safari play link for the existing PR #252 `godot-haigen/web-pr
 
 Single-threaded Godot web export (no SharedArrayBuffer). Served with correct MIME for `.wasm` / `.pck` / `.js`.
 
-**https://think-antenna-five-silicon.trycloudflare.com/index.html**
+**https://raising-homepage-meter-breakfast.trycloudflare.com/index.html**
 
 Open in Safari on iPad (landscape preferred). Cloudflare quick tunnels **die when this agent VM stops**.
 
