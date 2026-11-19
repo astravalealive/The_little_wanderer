@@ -1,0 +1,19 @@
+{
+  "collision_gap": 10.0,
+  "collision_player": "(408.0, 254.0)",
+  "collision_target": "(408.0, 264.0)",
+  "device": "emulated-ipad-landscape-framebuffer",
+  "failures": [],
+  "frame_ms_avg": 4.45589166666667,
+  "frame_ms_p95": 5.192,
+  "frame_sample_note": "llvmpipe/Xvfb frame gaps, not a physical iPad GPU",
+  "ground_sprite_count": 1,
+  "ground_texture_size": "(768.0, 576.0)",
+  "joystick_delta": "(44.0, 0.0)",
+  "joystick_rect": "[P: (24.0, 568.0), S: (176.0, 176.0)]",
+  "node_count": 230,
+  "ok": true,
+  "physical_ipad": false,
+  "touch_vector_while_held": "(1.0, 0.0)",
+  "viewport": "1024x768"
+}
