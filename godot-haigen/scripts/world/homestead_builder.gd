@@ -97,6 +97,7 @@ func _build() -> void:
 					_add_tile(pos, 0)
 	_place_cabin()
 	_add_world_bounds()
+	_bake_ground()
 
 func _add_tile(pos: Vector2, index: int) -> void:
 	var s := Sprite2D.new()
@@ -111,35 +112,73 @@ func _add_tile(pos: Vector2, index: int) -> void:
 	ground.add_child(s)
 
 func _add_tree(pos: Vector2) -> void:
+	var root := Node2D.new()
+	root.position = pos + Vector2(0, 8)
 	var s := Sprite2D.new()
 	s.texture = TREE_TEX
 	s.centered = true
-	s.position = pos + Vector2(0, -18)
+	s.position = Vector2(0, -26)
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	s.z_index = int(pos.y)
-	ysort.add_child(s)
+	root.add_child(s)
+	ysort.add_child(root)
 	_add_blocking(pos + Vector2(0, 6), Vector2(12, 10))
 
 func _add_sprite_prop(pos: Vector2, tex: Texture2D, block: Vector2) -> void:
+	var root := Node2D.new()
+	root.position = pos
 	var s := Sprite2D.new()
 	s.texture = tex
 	s.centered = true
-	s.position = pos
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	s.z_index = int(pos.y)
-	ysort.add_child(s)
+	root.add_child(s)
+	ysort.add_child(root)
 	_add_blocking(pos, block)
 
 func _place_cabin() -> void:
 	var pos := Vector2(24 * 16 + 8, 7 * 16)
+	var root := Node2D.new()
+	root.position = pos + Vector2(0, 10)
 	var s := Sprite2D.new()
 	s.texture = CABIN_TEX
 	s.centered = true
-	s.position = pos
+	s.position = Vector2(0, -10)
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	s.z_index = int(pos.y)
-	ysort.add_child(s)
+	root.add_child(s)
+	ysort.add_child(root)
 	_add_blocking(pos + Vector2(0, 8), Vector2(40, 24))
+
+func _bake_ground() -> void:
+	## One nearest-neighbour texture instead of one Sprite2D per tile.
+	var ts := GameConfig.TILE_SIZE
+	var img := Image.create(GameConfig.MAP_W * ts, MAP.size() * ts, false, Image.FORMAT_RGBA8)
+	var tile_img := TILE_TEX.get_image()
+	var sprites: Array[Sprite2D] = []
+	for child in ground.get_children():
+		if child is Sprite2D:
+			sprites.append(child)
+	var blits := 0
+	for s in sprites:
+		var atlas := s.texture as AtlasTexture
+		if atlas == null:
+			push_warning("bake skip non-atlas %s" % s.texture)
+			continue
+		var region := atlas.region
+		var src := tile_img.get_region(Rect2i(int(region.position.x), int(region.position.y), ts, ts))
+		if src.get_format() != Image.FORMAT_RGBA8:
+			src.convert(Image.FORMAT_RGBA8)
+		var dest := Vector2i(int(round(s.position.x - float(ts) * 0.5)), int(round(s.position.y - float(ts) * 0.5)))
+		img.blit_rect(src, Rect2i(0, 0, src.get_width(), src.get_height()), dest)
+		blits += 1
+		s.queue_free()
+	if blits < 1:
+		push_error("ground bake produced no tiles")
+	var baked := Sprite2D.new()
+	baked.name = "BakedGround"
+	baked.texture = ImageTexture.create_from_image(img)
+	baked.centered = false
+	baked.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	baked.z_index = -10
+	ground.add_child(baked)
 
 func _add_blocking(pos: Vector2, size: Vector2) -> void:
 	var body := StaticBody2D.new()

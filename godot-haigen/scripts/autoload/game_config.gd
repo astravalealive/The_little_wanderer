@@ -11,7 +11,9 @@ const SKOLLI_FOLLOW_DISTANCE := 28.0
 const SKOLLI_STOP_DISTANCE := 18.0
 
 const WALK_FRAME_MS := 150
-const CAMERA_ZOOM := Vector2(2.5, 2.5)
+## Integer zoom so 16px tiles stay pixel-perfect on the iPad landscape viewport.
+const CAMERA_ZOOM := Vector2(2, 2)
+const IPAD_LANDSCAPE_SIZE := Vector2i(1024, 768)
 const PIXEL_SNAP := true
 
 ## Palette reference (documentation; art embeds these).

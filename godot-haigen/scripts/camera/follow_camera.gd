@@ -20,6 +20,8 @@ func _physics_process(_delta: float) -> void:
 	if _target == null:
 		return
 	var desired := _target.global_position
-	global_position = global_position.lerp(desired, lerp_weight)
+	# Direct snap. Lerp-then-round oscillates by a pixel and shimmers tiles.
 	if GameConfig.PIXEL_SNAP:
-		global_position = global_position.round()
+		global_position = desired.round()
+	else:
+		global_position = global_position.lerp(desired, lerp_weight)

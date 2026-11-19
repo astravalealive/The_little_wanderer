@@ -15,7 +15,7 @@ y_sort_enabled = true
 
 [node name="FollowCamera" type="Camera2D" parent="."]
 position = Vector2(384, 208)
-zoom = Vector2(2.5, 2.5)
+zoom = Vector2(2, 2)
 script = ExtResource("3_cam")
 
 [node name="HUD" type="CanvasLayer" parent="."]
@@ -33,4 +33,4 @@ theme_override_colors/font_shadow_color = Color(0.113725, 0.141176, 0.12549, 1)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 16
-text = "Haigen homestead prototype — WASD / arrows / on-screen stick. Desktop first; iPad landscape required before V0 acceptance."
+text = "Homestead prototype — stick or WASD. iPad landscape 1024×768."
