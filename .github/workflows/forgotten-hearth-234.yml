@@ -1,0 +1,28 @@
+name: Forgotten Hearth 234
+on:
+  push:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - tests/live/forgotten-hearth-234.cjs
+      - .github/workflows/forgotten-hearth-234.yml
+  pull_request:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - tests/live/forgotten-hearth-234.cjs
+      - .github/workflows/forgotten-hearth-234.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  forgotten-hearth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - run: node tests/live/forgotten-hearth-234.cjs
