@@ -1,7 +1,7 @@
 {
-  "collision_gap": 23.3239116668701,
-  "collision_player": "(1664.0, 1663.0)",
-  "collision_target": "(1663.57, 1686.32)",
+  "collision_gap": 41.5447692871094,
+  "collision_player": "(1733.0, 1641.0)",
+  "collision_target": "(1748.88, 1679.39)",
   "cottage": {
     "x": 1500.0,
     "y": 1500.0
@@ -10,17 +10,17 @@
   "door_enter": true,
   "door_exit": true,
   "failures": [],
-  "frame_ms_avg": 7.70995,
-  "frame_ms_p95": 9.056,
+  "frame_ms_avg": 6.52290833333334,
+  "frame_ms_p95": 8.228,
   "frame_sample_note": "llvmpipe/Xvfb frame gaps, not a physical iPad GPU",
   "ground_texture_size": "(1440.0, 1440.0)",
-  "joystick_delta": "(114.0, 0.0)",
+  "joystick_delta": "(126.0, 0.0)",
   "joystick_rect": "[P: (24.0, 568.0), S: (176.0, 176.0)]",
-  "node_count": 428,
+  "node_count": 200,
   "ok": true,
   "physical_ipad": false,
   "slice": "godot-v1-real-homestead-pocket",
-  "solid_count": 93,
+  "solid_count": 36,
   "touch_vector_while_held": "(1.0, 0.0)",
   "viewport": "1024x768"
 }

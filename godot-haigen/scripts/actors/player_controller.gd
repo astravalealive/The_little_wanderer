@@ -48,20 +48,5 @@ func _update_facing(dir: Vector2) -> void:
 	else:
 		_facing = "down" if dir.y > 0.0 else "up"
 
-func _row_for_facing() -> int:
-	# HTML drawApprovedHaigen: down=0, up=1, right=2, left=3
-	match _facing:
-		"down":
-			return 0
-		"up":
-			return 1
-		"right":
-			return 2
-		_:
-			return 3
-
 func _apply_frame() -> void:
-	var atlas := AtlasTexture.new()
-	atlas.atlas = _sheet
-	atlas.region = Rect2(_frame * CELL_W, _row_for_facing() * CELL_H, CELL_W, CELL_H)
-	sprite.texture = atlas
+	sprite.texture = AtlasFrames.make_region(_sheet, _frame, AtlasFrames.haigen_row(_facing), CELL_W, CELL_H)

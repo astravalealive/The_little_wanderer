@@ -4,7 +4,7 @@ File-verified approved assets are used. Frames were not Captain-certified one-by
 
 | Area | Mismatch | Severity | Notes |
 |------|----------|----------|-------|
-| Ground | Procedural moss/path bake, not HTML `rbDrawGround` / trails webp | Medium | Readable clearing + path toward door; not pixel-identical floor |
+| Ground | Procedural moss bake + HTML `roadRoutes` painted as soil bands; not `haigen-trails.webp` pixel art | Medium | Paths now follow live route geometry (incl. Job 233 cottage→lake); trail texture still not ported |
 | House exterior | `house-tier-1-clean.png` scaled to HTML draw width 330; silhouette vs live alpha crop may differ slightly | Low | Same source file as live preferred exterior |
 | Interior | ZIP `level_1_interior_reference.png` with ~7.5% margin crop; room is a dedicated scene, not in-world overlay | Medium | Enter/exit works; furniture collision is simplified walls only |
 | Trees | Woodland scenery 192 cells scaled by HTML `draw_size`; no per-tree variant bob/shadow polish | Low | Colliders use exported `solid_radius` |

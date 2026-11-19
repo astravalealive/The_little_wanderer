@@ -50,6 +50,28 @@ func _build() -> void:
 	_add_world_bounds()
 	_add_door_sensor()
 
+func _road_distance(wx: float, wy: float) -> float:
+	var best := INF
+	for route in pocket.get("road_routes", []):
+		if typeof(route) != TYPE_ARRAY:
+			continue
+		var pts: Array = route
+		for i in range(1, pts.size()):
+			var a: Dictionary = pts[i - 1]
+			var b: Dictionary = pts[i]
+			var ax := float(a.get("x", 0.0))
+			var ay := float(a.get("y", 0.0))
+			var bx := float(b.get("x", 0.0))
+			var by := float(b.get("y", 0.0))
+			var dx := bx - ax
+			var dy := by - ay
+			var denom := dx * dx + dy * dy
+			var t := 0.0
+			if denom > 0.0:
+				t = clampf(((wx - ax) * dx + (wy - ay) * dy) / denom, 0.0, 1.0)
+			best = minf(best, Vector2(wx - ax - t * dx, wy - ay - t * dy).length())
+	return best
+
 func _add_ground() -> void:
 	var p: Dictionary = pocket.get("pocket", {})
 	var min_x := float(p.get("min_x", 780.0))
@@ -61,17 +83,19 @@ func _add_ground() -> void:
 	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
 	var moss := GameConfig.COL_MOSS
 	var leaf := GameConfig.COL_CLEARING
+	var path_col := GameConfig.COL_PATH
 	for y in range(h):
 		for x in range(w):
-			var wx := min_x + x
-			var wy := min_y + y
+			var wx := min_x + float(x)
+			var wy := min_y + float(y)
 			var to_cottage := Vector2(wx - 1500.0, wy - 1500.0).length()
 			var c := leaf if to_cottage < 280.0 else moss
-			# Soft path toward lake / cottage front (Heartland readability feel).
-			var path_dx := absf(wx - 1505.0)
-			var path_dy := wy - 1503.0
-			if path_dx < 28.0 and path_dy > 0.0 and path_dy < 220.0:
-				c = GameConfig.COL_PATH
+			# Live HTML roadRoutes (Job 233 cottage→lake included).
+			var rd := _road_distance(wx, wy)
+			if rd < 22.0:
+				c = path_col
+			elif rd < 34.0:
+				c = path_col.lerp(c, 0.45)
 			if (x * 17 + y * 31) % 47 == 0:
 				c = c.lightened(0.04)
 			img.set_pixel(x, y, c)

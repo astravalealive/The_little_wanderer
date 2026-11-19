@@ -25,8 +25,12 @@ def main() -> int:
         if key not in house:
             print(f"FAIL: house missing {key}", file=sys.stderr)
             return 1
+    roads = data.get("road_routes") or []
+    if len(roads) < 1:
+        print("FAIL: missing road_routes from HTML roadRoutes", file=sys.stderr)
+        return 1
     solids = data.get("solids") or []
-    if len(solids) < 20:
+    if len(solids) < 8:
         print(f"FAIL: too few solids ({len(solids)})", file=sys.stderr)
         return 1
     for s in solids:

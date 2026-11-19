@@ -63,20 +63,5 @@ func _update_facing(dir: Vector2) -> void:
 	else:
 		_facing = "down" if dir.y > 0.0 else "up"
 
-func _row_for_facing() -> int:
-	# HTML drawApprovedSkolli: right=0, left=1, down=2, up=3
-	match _facing:
-		"right":
-			return 0
-		"left":
-			return 1
-		"down":
-			return 2
-		_:
-			return 3
-
 func _apply_frame() -> void:
-	var atlas := AtlasTexture.new()
-	atlas.atlas = _sheet
-	atlas.region = Rect2(_frame * CELL_W, _row_for_facing() * CELL_H, CELL_W, CELL_H)
-	sprite.texture = atlas
+	sprite.texture = AtlasFrames.make_region(_sheet, _frame, AtlasFrames.skolli_row(_facing), CELL_W, CELL_H)
