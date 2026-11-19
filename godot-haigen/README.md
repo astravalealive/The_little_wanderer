@@ -28,6 +28,15 @@ godot --headless --path godot-haigen --quit-after 2
 Godot_v4.4.1-stable_linux.x86_64 --path godot-haigen
 ```
 
+## Temporary web preview
+
+Single-threaded Godot 4.4.1 web export (no SharedArrayBuffer), so iPad Safari does not need cross-origin isolation headers. Files are in `godot-haigen/web-preview/`. This is not the GitHub Pages game.
+
+```bash
+python3 -m http.server 8766 --bind 127.0.0.1
+# open http://127.0.0.1:8766/  from godot-haigen/web-preview
+```
+
 ## iPad landscape (1024×768)
 
 The window defaults to the same **1024×768** landscape size used by the HTML evidence suite. Automated checks cover the touch stick, pixel camera, collisions, nearest-neighbour ground, and a frame-time sample:
