@@ -21,10 +21,19 @@ Open in iPad Safari (landscape). Tunnel dies when the VM stops — not a long-li
 
 ## Persistent hosting options (no paid services)
 
-1. **Cursor App publish** of `godot-haigen/web-preview/` (proposed from this issue run). Needs Captain confirm in the Publish dialog; choose **public** for device Safari without Cursor sign-in.
-2. **GitHub Pages path** after Captain approves landing the preview folder on `main` (or merging PR #252):  
+1. **GitHub Pages path** (recommended durable free host already on this repo) after Captain approves landing the preview folder on `main` (thin preview-only merge or PR #252):  
    `https://astravalealive.github.io/The_little_wanderer/godot-haigen/web-preview/`  
    Does not change `haigen.html`, but does republish the Pages site artifact. **Do not merge/deploy without Captain approval.**
+2. **Cursor App publish** of `godot-haigen/web-preview/` was attempted and **blocked**: the publish security scanner flags false-positive “private key” matches inside Godot’s binary `index.wasm` (not real credentials). Re-trying publish would need either a scanner exception or a different host.
+
+### Approval required for a link that outlives this agent VM
+
+Captain: approve **one** of:
+
+- Merge/land `godot-haigen/web-preview/` onto `main` so GitHub Pages serves the isolated path above (production game files unchanged), **or**
+- Authorize a named Cloudflare tunnel / other free account-bound host (account settings).
+
+Until then, use the session tunnel URL in this doc.
 
 ## Verified in this environment
 
