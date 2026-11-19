@@ -7,7 +7,7 @@ const start=html.indexOf('function rbDrawGround(){');
 const end=html.indexOf('function rbTreeImage(',start);
 assert(start>=0&&end>start,'woodland ground function must exist');
 const ground=html.slice(start,end);
-assert.match(ground,/const cell=6\b/,'woodland cell size unexpectedly changed');
+assert.match(ground,/const cell=8\b/,'woodland cell size unexpectedly changed');
 assert.match(ground,/ctx\.globalAlpha=fade/,'woodland fade unexpectedly changed');
 assert.match(ground,/ctx\.fillRect\(x,y,cell,cell\)/,'woodland cells must not overlap when alpha blending');
 assert.doesNotMatch(ground,/cell\s*\+\s*\.35/,'overlapping woodland alpha cells reintroduced');
