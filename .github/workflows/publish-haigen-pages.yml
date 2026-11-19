@@ -1,0 +1,68 @@
+name: Publish Haigen's World to GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: haigen-pages-production
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify canonical game and build manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s haigen.html
+          test -s index.html
+          test -s haigen-version.json
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          html=Path('haigen.html').read_text()
+          build=json.loads(Path('haigen-version.json').read_text())['build']
+          assert isinstance(build,int) and build>0
+          assert re.search(r'const GAME_BUILD\s*=\s*'+str(build)+r'\b',html), 'Build manifest does not match canonical game'
+          print('Verified game build',build)
+          PY
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Check published game and version identity
+        shell: bash
+        env:
+          SITE: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,time,urllib.request
+          base=os.environ['SITE'].rstrip('/')+'/'
+          expected=json.load(open('haigen-version.json'))['build']
+          for attempt in range(12):
+            try:
+              req=urllib.request.Request(base+'haigen-version.json?verify='+str(time.time()),headers={'Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=15) as response:
+                live=json.load(response)['build']
+              with urllib.request.urlopen(base+'haigen.html?verify='+str(time.time()),timeout=15) as response:
+                html=response.read().decode('utf-8')
+              assert live==expected, f'Live build {live} != source {expected}'
+              assert 'Haigen' in html and 'GAME_BUILD' in html
+              print('Live game and manifest verified:',live)
+              break
+            except Exception as e:
+              if attempt==11: raise
+              print('Waiting for Pages propagation:',e)
+              time.sleep(10)
+          PY
