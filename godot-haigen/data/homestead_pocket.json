@@ -1,0 +1,591 @@
+{
+  "source": "haigen.html V432 seeded cottage pocket export",
+  "notes": [
+    "Object positions/types follow seeded(); first-1050 sizes use seeded stand-in (HTML used Math.random).",
+    "Trees thinned with V385 road clearance + spacing; sizes boosted like live HTML.",
+    "road_routes clipped from live roadRoutes including Job 233 cottage\u2192lake path.",
+    "campTier assumed 1 for door geometry.",
+    "Coordinates are live HTML world space."
+  ],
+  "cottage": {
+    "x": 1500.0,
+    "y": 1500.0
+  },
+  "spawn": {
+    "x": 1530.0,
+    "y": 1655.0
+  },
+  "skolli_spawn": {
+    "x": 1780.0,
+    "y": 1660.0
+  },
+  "pocket": {
+    "min_x": 780.0,
+    "max_x": 2220.0,
+    "min_y": 780.0,
+    "max_y": 2220.0,
+    "radius": 720.0
+  },
+  "road_routes": [
+    [
+      {
+        "x": 760,
+        "y": 1140
+      },
+      {
+        "x": 1050,
+        "y": 1100
+      },
+      {
+        "x": 1350,
+        "y": 980
+      },
+      {
+        "x": 1650,
+        "y": 1030
+      },
+      {
+        "x": 1880,
+        "y": 850
+      }
+    ],
+    [
+      {
+        "x": 1650,
+        "y": 1030
+      },
+      {
+        "x": 1570,
+        "y": 790
+      }
+    ],
+    [
+      {
+        "x": 1930,
+        "y": 1200
+      },
+      {
+        "x": 2200,
+        "y": 1300
+      }
+    ],
+    [
+      {
+        "x": 1880,
+        "y": 850
+      },
+      {
+        "x": 1930,
+        "y": 1200
+      }
+    ],
+    [
+      {
+        "x": 2200,
+        "y": 1300
+      },
+      {
+        "x": 2140,
+        "y": 1630
+      },
+      {
+        "x": 2030,
+        "y": 1950
+      }
+    ],
+    [
+      {
+        "x": 1350,
+        "y": 980
+      },
+      {
+        "x": 1190,
+        "y": 1220
+      },
+      {
+        "x": 1120,
+        "y": 1370
+      },
+      {
+        "x": 1050,
+        "y": 1450
+      },
+      {
+        "x": 920,
+        "y": 1580
+      },
+      {
+        "x": 850,
+        "y": 1700
+      }
+    ],
+    [
+      {
+        "x": 1350,
+        "y": 980
+      },
+      {
+        "x": 1390,
+        "y": 1180
+      },
+      {
+        "x": 1470,
+        "y": 1360
+      },
+      {
+        "x": 1500,
+        "y": 1500
+      }
+    ],
+    [
+      {
+        "x": 1500,
+        "y": 1500
+      },
+      {
+        "x": 1320,
+        "y": 1580
+      },
+      {
+        "x": 1100,
+        "y": 1650
+      },
+      {
+        "x": 900,
+        "y": 1720
+      },
+      {
+        "x": 850,
+        "y": 1700
+      }
+    ]
+  ],
+  "house": {
+    "tier": 1,
+    "anchor_x": 1535.0,
+    "anchor_y": 1490.0,
+    "width": 330.0,
+    "height": 310.0,
+    "half_width": 141.9,
+    "front": 1503.0,
+    "back": 1248.2,
+    "door_half": 26.0,
+    "exterior_door_x": 1505.3,
+    "interior_door_x": 1535.0,
+    "draw_w": 330.0,
+    "exterior_asset": "res://assets/approved/house_tier1_exterior.png",
+    "interior_asset": "res://assets/approved/house_tier1_interior.png"
+  },
+  "plots": [
+    {
+      "kind": "coop",
+      "x": 1215.0,
+      "y": 1395.0,
+      "name": "Chicken Coop",
+      "asset": "res://assets/approved/coop.png",
+      "draw_w": 180.0
+    },
+    {
+      "kind": "garden",
+      "x": 1625.0,
+      "y": 1170.0,
+      "name": "Kitchen Garden",
+      "asset": "res://assets/approved/garden.png",
+      "draw_w": 220.0
+    },
+    {
+      "kind": "woodstore",
+      "x": 1860.0,
+      "y": 1500.0,
+      "name": "Wood Storage",
+      "asset": "",
+      "draw_w": 0.0
+    },
+    {
+      "kind": "jetty",
+      "x": 1050.0,
+      "y": 1490.0,
+      "name": "Fishing Jetty",
+      "asset": "",
+      "draw_w": 0.0
+    }
+  ],
+  "pond": {
+    "x": 850.0,
+    "y": 1700.0,
+    "rx": 330.0,
+    "ry": 240.0
+  },
+  "first_fire": {
+    "x": 1615.0,
+    "y": 1540.0
+  },
+  "solids": [
+    {
+      "id": 33,
+      "type": "rock",
+      "x": 1793.92,
+      "y": 1023.98,
+      "size": 1.0926,
+      "solid_radius": 44.092,
+      "draw_size": 108.02,
+      "art": "rock_b"
+    },
+    {
+      "id": 37,
+      "type": "rock",
+      "x": 1526.71,
+      "y": 2139.53,
+      "size": 1.1509,
+      "solid_radius": 28.795,
+      "draw_size": 70.55,
+      "art": "rock_b"
+    },
+    {
+      "id": 38,
+      "type": "rock",
+      "x": 1761.48,
+      "y": 1709.95,
+      "size": 0.9539,
+      "solid_radius": 30.745,
+      "draw_size": 75.33,
+      "art": "rock_a"
+    },
+    {
+      "id": 53,
+      "type": "rock",
+      "x": 2168.79,
+      "y": 1654.19,
+      "size": 0.9025,
+      "solid_radius": 53.555,
+      "draw_size": 131.21,
+      "art": "rock_b"
+    },
+    {
+      "id": 79,
+      "type": "tree",
+      "x": 1958.08,
+      "y": 1393.26,
+      "size": 1.5916,
+      "solid_radius": 21.759,
+      "draw_size": 216.46,
+      "art": "tree"
+    },
+    {
+      "id": 81,
+      "type": "rock",
+      "x": 1462.46,
+      "y": 1033.26,
+      "size": 1.0428,
+      "solid_radius": 42.081,
+      "draw_size": 103.1,
+      "art": "rock_b"
+    },
+    {
+      "id": 92,
+      "type": "rock",
+      "x": 1538.95,
+      "y": 802.57,
+      "size": 0.9221,
+      "solid_radius": 29.721,
+      "draw_size": 72.82,
+      "art": "rock_a"
+    },
+    {
+      "id": 101,
+      "type": "rock",
+      "x": 1759.44,
+      "y": 1724.52,
+      "size": 1.1645,
+      "solid_radius": 69.1,
+      "draw_size": 169.29,
+      "art": "rock_b"
+    },
+    {
+      "id": 105,
+      "type": "rock",
+      "x": 1122.96,
+      "y": 1050.28,
+      "size": 0.9556,
+      "solid_radius": 38.564,
+      "draw_size": 94.48,
+      "art": "rock_b"
+    },
+    {
+      "id": 124,
+      "type": "tree",
+      "x": 1448.55,
+      "y": 2045.92,
+      "size": 1.617,
+      "solid_radius": 21.722,
+      "draw_size": 219.91,
+      "art": "tree"
+    },
+    {
+      "id": 142,
+      "type": "rock",
+      "x": 1609.93,
+      "y": 2110.98,
+      "size": 1.0523,
+      "solid_radius": 51.973,
+      "draw_size": 127.33,
+      "art": "rock_a"
+    },
+    {
+      "id": 168,
+      "type": "rock",
+      "x": 1333.34,
+      "y": 1159.26,
+      "size": 1.2024,
+      "solid_radius": 22.509,
+      "draw_size": 55.15,
+      "art": "rock_a"
+    },
+    {
+      "id": 290,
+      "type": "tree",
+      "x": 1769.77,
+      "y": 1940.11,
+      "size": 2.19,
+      "solid_radius": 27.928,
+      "draw_size": 297.84,
+      "art": "tree"
+    },
+    {
+      "id": 300,
+      "type": "rock",
+      "x": 1482.87,
+      "y": 920.69,
+      "size": 1.0073,
+      "solid_radius": 18.857,
+      "draw_size": 46.2,
+      "art": "rock_a"
+    },
+    {
+      "id": 383,
+      "type": "rock",
+      "x": 1501.32,
+      "y": 957.84,
+      "size": 1.1409,
+      "solid_radius": 67.7,
+      "draw_size": 165.87,
+      "art": "rock_b"
+    },
+    {
+      "id": 437,
+      "type": "rock",
+      "x": 1099.27,
+      "y": 987.24,
+      "size": 1.0055,
+      "solid_radius": 59.667,
+      "draw_size": 146.18,
+      "art": "rock_b"
+    },
+    {
+      "id": 441,
+      "type": "rock",
+      "x": 1267.04,
+      "y": 1888.54,
+      "size": 1.1929,
+      "solid_radius": 48.142,
+      "draw_size": 117.95,
+      "art": "rock_b"
+    },
+    {
+      "id": 484,
+      "type": "rock",
+      "x": 924.92,
+      "y": 1164.03,
+      "size": 0.9144,
+      "solid_radius": 45.163,
+      "draw_size": 110.65,
+      "art": "rock_a"
+    },
+    {
+      "id": 503,
+      "type": "rock",
+      "x": 1019.95,
+      "y": 974.51,
+      "size": 0.9076,
+      "solid_radius": 53.859,
+      "draw_size": 131.95,
+      "art": "rock_b"
+    },
+    {
+      "id": 538,
+      "type": "tree",
+      "x": 1005.29,
+      "y": 1289.89,
+      "size": 1.6823,
+      "solid_radius": 20.567,
+      "draw_size": 228.79,
+      "art": "tree"
+    },
+    {
+      "id": 551,
+      "type": "rock",
+      "x": 1326.59,
+      "y": 2164.08,
+      "size": 0.8786,
+      "solid_radius": 52.135,
+      "draw_size": 127.73,
+      "art": "rock_b"
+    },
+    {
+      "id": 566,
+      "type": "rock",
+      "x": 1701.51,
+      "y": 1882.26,
+      "size": 1.0038,
+      "solid_radius": 32.353,
+      "draw_size": 79.27,
+      "art": "rock_a"
+    },
+    {
+      "id": 664,
+      "type": "rock",
+      "x": 1759.57,
+      "y": 1586.73,
+      "size": 0.9241,
+      "solid_radius": 45.642,
+      "draw_size": 111.82,
+      "art": "rock_a"
+    },
+    {
+      "id": 723,
+      "type": "rock",
+      "x": 2096.39,
+      "y": 1386.11,
+      "size": 1.0276,
+      "solid_radius": 41.469,
+      "draw_size": 101.6,
+      "art": "rock_b"
+    },
+    {
+      "id": 771,
+      "type": "rock",
+      "x": 1748.88,
+      "y": 1673.39,
+      "size": 0.9075,
+      "solid_radius": 36.623,
+      "draw_size": 89.73,
+      "art": "rock_b"
+    },
+    {
+      "id": 805,
+      "type": "rock",
+      "x": 1543.36,
+      "y": 1964.71,
+      "size": 0.8909,
+      "solid_radius": 22.291,
+      "draw_size": 54.61,
+      "art": "rock_b"
+    },
+    {
+      "id": 874,
+      "type": "rock",
+      "x": 1849.91,
+      "y": 2025.66,
+      "size": 0.8619,
+      "solid_radius": 42.572,
+      "draw_size": 104.3,
+      "art": "rock_a"
+    },
+    {
+      "id": 907,
+      "type": "rock",
+      "x": 1205.06,
+      "y": 1140.29,
+      "size": 0.9295,
+      "solid_radius": 23.257,
+      "draw_size": 56.98,
+      "art": "rock_b"
+    },
+    {
+      "id": 917,
+      "type": "rock",
+      "x": 921.56,
+      "y": 1411.1,
+      "size": 0.9387,
+      "solid_radius": 55.703,
+      "draw_size": 136.47,
+      "art": "rock_b"
+    },
+    {
+      "id": 938,
+      "type": "rock",
+      "x": 2046.37,
+      "y": 1564.97,
+      "size": 1.2189,
+      "solid_radius": 39.288,
+      "draw_size": 96.26,
+      "art": "rock_a"
+    },
+    {
+      "id": 942,
+      "type": "rock",
+      "x": 1303.66,
+      "y": 1275.22,
+      "size": 0.8695,
+      "solid_radius": 16.277,
+      "draw_size": 39.88,
+      "art": "rock_a"
+    },
+    {
+      "id": 945,
+      "type": "rock",
+      "x": 1900.19,
+      "y": 992.8,
+      "size": 1.1898,
+      "solid_radius": 48.016,
+      "draw_size": 117.64,
+      "art": "rock_b"
+    },
+    {
+      "id": 954,
+      "type": "rock",
+      "x": 1830.95,
+      "y": 947.04,
+      "size": 0.9087,
+      "solid_radius": 17.01,
+      "draw_size": 41.67,
+      "art": "rock_a"
+    },
+    {
+      "id": 958,
+      "type": "tree",
+      "x": 1877.99,
+      "y": 1777.47,
+      "size": 1.944,
+      "solid_radius": 25.63,
+      "draw_size": 264.38,
+      "art": "tree"
+    },
+    {
+      "id": 990,
+      "type": "rock",
+      "x": 1166.37,
+      "y": 1209.19,
+      "size": 0.9328,
+      "solid_radius": 17.462,
+      "draw_size": 42.78,
+      "art": "rock_a"
+    },
+    {
+      "id": 1034,
+      "type": "rock",
+      "x": 2164.76,
+      "y": 1404.3,
+      "size": 1.2434,
+      "solid_radius": 40.078,
+      "draw_size": 98.19,
+      "art": "rock_a"
+    }
+  ],
+  "palette": {
+    "moss": "#3f5a45",
+    "leaf": "#6f925c",
+    "path": "#a89068",
+    "clearing": "#6f925c"
+  }
+}
