@@ -71,13 +71,24 @@ Track B must match Track A art grammar. Track A keeps receiving Phase 1–4 unti
 
 ---
 
+## Documents in this folder
+- `README.md` — this overview  
+- `PHASE1.md` — active visual foundation milestones  
+- `PHASE2-4.md` — living world / adventure / package  
+- `HANDOFF_BACKLOG.md` — **every historical idea preserved** + status tags  
+- `ROADMAP.md` — full-game gates S0–S10 + merge queue  
+
+Handoff archive (19 Nov 2026) is the design memory; repo + Captain are authorities.
+
 ## Phases to packaged product
 
 ### Phase 0 — Truth & merge queue (Captain decisions)
-1. Approve merge **#241** (Haigen Nordic atlas) → then rebase build numbers.  
-2. Approve merge **#248** (ground lattice) or its rebased successor.  
-3. Approve rebase+merge **#234** (Quiet Nordic HUD).  
-4. Decide Godot: continue migration vs HTML-only for next vertical slice.
+1. **Play Godot preview** (Issue #253 / PR #259 session link) → Gate 2 visual decision.  
+2. Optional: approve durable Pages path for `web-preview/` only.  
+3. Approve merge **#241** (Haigen Nordic atlas) → then rebase build numbers.  
+4. Approve merge **#248** (ground lattice) or its rebased successor.  
+5. Approve **#257** World Readability + **#258** Quiet HUD (supersedes #234).  
+6. Decide Godot vs HTML for the next vertical slice only.
 
 ### Phase 1 — Visual foundation (IMPLEMENT NOW)
 See `PHASE1.md`. Goal: one Nordic pixel grammar on homestead → lake.
