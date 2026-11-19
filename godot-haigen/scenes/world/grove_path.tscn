@@ -1,0 +1,64 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/grove_path.gd" id="1_grove"]
+[ext_resource type="Script" path="res://scripts/camera/follow_camera.gd" id="2_cam"]
+[ext_resource type="Script" path="res://scripts/world/spawn_points.gd" id="3_spawn"]
+[ext_resource type="Script" path="res://scripts/world/door_zone.gd" id="4_door"]
+[ext_resource type="PackedScene" path="res://scenes/ui/touch_controls.tscn" id="5_touch"]
+
+[sub_resource type="RectangleShape2D" id="RectPath"]
+size = Vector2(40, 48)
+
+[node name="GrovePath" type="Node2D"]
+script = ExtResource("1_grove")
+
+[node name="Ground" type="Polygon2D" parent="."]
+z_index = -20
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="YSort" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="Default" type="Marker2D" parent="Markers"]
+position = Vector2(80, 200)
+
+[node name="from_yard" type="Marker2D" parent="Markers"]
+position = Vector2(60, 200)
+
+[node name="Raven" type="Marker2D" parent="Markers"]
+position = Vector2(300, 140)
+
+[node name="PathToYard" type="Area2D" parent="."]
+position = Vector2(20, 200)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_door")
+target_map = "yard"
+target_spawn = "from_grove"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PathToYard"]
+shape = SubResource("RectPath")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+script = ExtResource("3_spawn")
+
+[node name="FollowCamera" type="Camera2D" parent="."]
+position = Vector2(200, 200)
+zoom = Vector2(2, 2)
+script = ExtResource("2_cam")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TouchControls" parent="HUD" instance=ExtResource("5_touch")]
+
+[node name="Hint" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 800.0
+offset_bottom = 40.0
+theme_override_colors/font_color = Color(0.95, 0.92, 0.82, 1)
+theme_override_font_sizes/font_size = 15
+text = "Woodland path toward Whispering Grove — walk west to return home."

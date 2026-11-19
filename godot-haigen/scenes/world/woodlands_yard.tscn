@@ -1,0 +1,81 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/woodlands_yard.gd" id="1_yard"]
+[ext_resource type="Script" path="res://scripts/camera/follow_camera.gd" id="2_cam"]
+[ext_resource type="Script" path="res://scripts/world/spawn_points.gd" id="3_spawn"]
+[ext_resource type="Script" path="res://scripts/world/door_zone.gd" id="4_door"]
+[ext_resource type="PackedScene" path="res://scenes/ui/touch_controls.tscn" id="5_touch"]
+
+[sub_resource type="RectangleShape2D" id="RectDoor"]
+size = Vector2(52, 28)
+
+[sub_resource type="RectangleShape2D" id="RectPath"]
+size = Vector2(40, 48)
+
+[node name="WoodlandsYard" type="Node2D"]
+script = ExtResource("1_yard")
+
+[node name="Ground" type="Sprite2D" parent="."]
+texture_filter = 0
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="YSort" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="Default" type="Marker2D" parent="Markers"]
+position = Vector2(320, 320)
+
+[node name="from_interior" type="Marker2D" parent="Markers"]
+position = Vector2(320, 250)
+
+[node name="from_grove" type="Marker2D" parent="Markers"]
+position = Vector2(560, 240)
+
+[node name="Raven" type="Marker2D" parent="Markers"]
+position = Vector2(420, 180)
+
+[node name="DoorToInterior" type="Area2D" parent="."]
+position = Vector2(320, 230)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_door")
+target_map = "interior"
+target_spawn = "from_yard"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorToInterior"]
+shape = SubResource("RectDoor")
+
+[node name="PathToGrove" type="Area2D" parent="."]
+position = Vector2(620, 240)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_door")
+target_map = "grove_path"
+target_spawn = "from_yard"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PathToGrove"]
+shape = SubResource("RectPath")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+script = ExtResource("3_spawn")
+
+[node name="FollowCamera" type="Camera2D" parent="."]
+position = Vector2(320, 280)
+zoom = Vector2(2, 2)
+script = ExtResource("2_cam")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TouchControls" parent="HUD" instance=ExtResource("5_touch")]
+
+[node name="Hint" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 900.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(0.95, 0.92, 0.82, 1)
+theme_override_font_sizes/font_size = 15
+text = "Ancient Woodlands — walk into the house door or the east path. Stick / WASD. E unused for auto doors."
