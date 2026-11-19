@@ -10,9 +10,9 @@ alwaysApply: true
 - Prefer implementation over planning when an approved brief exists.
 
 ## Context (read only what you need)
+- Ship plan: `docs/master-development-plan/README.md`, `PHASE1.md`, `PHASE2-4.md`
 - Visual lock: `docs/nordic-visual-bible-230/README.md`, `docs/HAIGENS_WORLD_GAME_BIBLE.md`
-- Transition plan / Job 233 brief: `docs/visual-transition-plan/` (PR #238)
-- Do not re-audit completed Jobs 228–232 or re-open Quiet Nordic HUD (#234) unless asked.
+- Do not re-audit completed Jobs 228–233 unless asked.
 
 ## Preserve always
 Gameplay, AI, collisions/`solidRadius`, landmarks, NPCs, bosses, controls, boats, `wandererV127PreviewSave`, approved atlases until migrated. Prefer draw/packing/atlas swaps; never renumber object IDs.
@@ -23,6 +23,8 @@ Gameplay, AI, collisions/`solidRadius`, landmarks, NPCs, bosses, controls, boats
 - Independent review once per head SHA; skip duplicate reviews of the same commit.
 - Reports: PR numbers, changes, evidence, tests, blockers, approval asks — keep short.
 
-## Open gates (do not merge without Captain)
-- PR #234 Quiet Nordic HUD V431
-- Heartland Readability implementation (Job 233)
+## Open merge gates (Captain only)
+- PR #241 Nordic Haigen atlas (V433) — ready
+- PR #248 Ground lattice (V433) — ready; resolve build clash with #241
+- PR #234 Quiet Nordic HUD — rebase then merge
+- Godot #252/#254 — preview only until Captain accepts engine track
