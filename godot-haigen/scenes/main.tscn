@@ -14,8 +14,8 @@ script = ExtResource("1_main")
 y_sort_enabled = true
 
 [node name="FollowCamera" type="Camera2D" parent="."]
-position = Vector2(384, 208)
-zoom = Vector2(2, 2)
+position = Vector2(1530, 1655)
+zoom = Vector2(1.15, 1.15)
 script = ExtResource("3_cam")
 
 [node name="HUD" type="CanvasLayer" parent="."]
@@ -33,4 +33,4 @@ theme_override_colors/font_shadow_color = Color(0.113725, 0.141176, 0.12549, 1)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 16
-text = "Homestead prototype — stick or WASD. iPad landscape 1024×768."
+text = "Homestead V1 — stick or WASD. Walk up into the cottage door."

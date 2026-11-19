@@ -1,19 +1,20 @@
-# Homestead prototype — style lock
+# Homestead V1 — style lock (real pocket)
 
-Original Nordic fantasy pixel art. **ALTTP is a readability/cohesion benchmark only — no Nintendo assets.**
+Original Nordic fantasy art from the live HTML approved sources. **ALTTP is a readability benchmark only — no Nintendo assets.**
 
 | Rule | Value |
 |------|-------|
 | Engine | Godot **4.4.1** (pin) |
 | Language | GDScript |
 | Renderer | Mobile |
-| Tile | **16×16** |
-| Map pocket | 48×36 tiles (handcrafted) |
-| Haigen cell | 48×72 walk sheet, 4 dir × 4 frames |
-| Skölli cell | 64×40 walk sheet, 4 dir × 4 frames |
+| World space | Live HTML coordinates (cottage `1500,1500`) |
+| Haigen cell | **48×72**, rows down/up/right/left, draw scale **1.67** |
+| Skölli cell | **336×176** adult atlas, draw **148×78**, rows right/left/down/up |
 | Walk cadence | ~150 ms/frame |
-| Camera zoom | Integer **2×** with pixel snap (1024×768 iPad landscape viewport) |
+| Camera zoom | **1.15×** with pixel snap (1024×768 iPad landscape) |
 | Filter | Nearest-neighbour |
-| Palette | moss `#3f5a45`, leaf `#6f925c`, bark `#5a4330`, path `#a89068`, wood `#b8894a`, parchment `#f3ead2`, water `#3f7389`/`#4f87a0`, outline `#1d2420` |
+| Map source | `data/homestead_pocket.json` exported from `haigen.html` seeding |
+| House | Tier-1 `house-tier-1-clean.png` + ZIP L1 interior |
+| Trees/rocks | `woodland-scenery-v333.webp` cells |
 
-V0 art is **temporary placeholder** Nordic pixel work. Replace only with Captain-approved original sheets that keep these metrics.
+V0 placeholder programmer art under `assets/tiles/` and `assets/characters/` is **not used** by the V1 scene.

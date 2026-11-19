@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Skölli — follows Haigen without blocking player commands.
+## Skölli — approved adult atlas (336×176 → 148×78), HTML facing rows.
 
 @export var follow_target_path: NodePath
 
@@ -10,14 +10,18 @@ var _facing := "down"
 var _walk_accum := 0.0
 var _frame := 0
 var _sheet: Texture2D
-const CELL_W := 64
-const CELL_H := 40
+const CELL_W := 336
+const CELL_H := 176
 const FRAMES := 4
 
 func _ready() -> void:
-	_sheet = preload("res://assets/characters/skolli_walk.png")
+	_sheet = preload("res://assets/approved/skolli_adult.png")
 	sprite.centered = true
-	sprite.offset = Vector2(0, -CELL_H * 0.5 + 6)
+	var sx := GameConfig.SKOLLI_DRAW_W / float(CELL_W)
+	var sy := GameConfig.SKOLLI_DRAW_H / float(CELL_H)
+	sprite.scale = Vector2(sx, sy)
+	# HTML draw offset (-74, -76) with foot near y.
+	sprite.offset = Vector2(0, -CELL_H * 0.5 + 6.0 / sy)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_apply_frame()
 	collision_layer = 4
@@ -60,12 +64,13 @@ func _update_facing(dir: Vector2) -> void:
 		_facing = "down" if dir.y > 0.0 else "up"
 
 func _row_for_facing() -> int:
+	# HTML drawApprovedSkolli: right=0, left=1, down=2, up=3
 	match _facing:
-		"down":
+		"right":
 			return 0
 		"left":
 			return 1
-		"right":
+		"down":
 			return 2
 		_:
 			return 3

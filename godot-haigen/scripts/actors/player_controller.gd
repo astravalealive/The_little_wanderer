@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Haigen — player movement with 4-direction walk animation.
+## Haigen — approved walk atlas, HTML facing rows and draw scale.
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -12,9 +12,11 @@ const CELL_H := 72
 const FRAMES := 4
 
 func _ready() -> void:
-	_sheet = preload("res://assets/characters/haigen_walk.png")
+	_sheet = preload("res://assets/approved/haigen_walk.png")
 	sprite.centered = true
-	sprite.offset = Vector2(0, -CELL_H * 0.5 + 8)
+	# HTML foot baseline: top = y - h + 7 with h = 72 * 1.67
+	sprite.scale = Vector2(GameConfig.HAIGEN_DRAW_SCALE, GameConfig.HAIGEN_DRAW_SCALE)
+	sprite.offset = Vector2(0, -CELL_H * 0.5 + 7.0 / GameConfig.HAIGEN_DRAW_SCALE)
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_apply_frame()
 	add_to_group("player")
@@ -47,10 +49,11 @@ func _update_facing(dir: Vector2) -> void:
 		_facing = "down" if dir.y > 0.0 else "up"
 
 func _row_for_facing() -> int:
+	# HTML drawApprovedHaigen: down=0, up=1, right=2, left=3
 	match _facing:
 		"down":
 			return 0
-		"left":
+		"up":
 			return 1
 		"right":
 			return 2

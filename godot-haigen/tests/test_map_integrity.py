@@ -1,41 +1,62 @@
 #!/usr/bin/env python3
-"""Validate homestead MAP rows are rectangular and contain required markers."""
+"""Validate exported homestead pocket JSON against HTML contracts."""
 from __future__ import annotations
 
-import re
+import json
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BUILDER = ROOT / "scripts" / "world" / "homestead_builder.gd"
+POCKET = ROOT / "data" / "homestead_pocket.json"
+APPROVED = ROOT / "assets" / "approved"
 
 
 def main() -> int:
-    text = BUILDER.read_text(encoding="utf-8")
-    start = text.index("const MAP := [")
-    end = text.index("]", start)
-    block = text[start:end]
-    rows = re.findall(r'"([^"]*)"', block)
-    if len(rows) < 20:
-        print(f"FAIL: too few map rows ({len(rows)})", file=sys.stderr)
+    if not POCKET.exists():
+        print(f"FAIL: missing {POCKET}", file=sys.stderr)
         return 1
-    width = len(rows[0])
-    if width != 48:
-        print(f"FAIL: expected width 48, got {width}", file=sys.stderr)
+    data = json.loads(POCKET.read_text(encoding="utf-8"))
+    cottage = data.get("cottage") or {}
+    if cottage.get("x") != 1500 or cottage.get("y") != 1500:
+        print(f"FAIL: cottage {cottage} != (1500,1500)", file=sys.stderr)
         return 1
-    for i, row in enumerate(rows):
-        if len(row) != width:
-            print(f"FAIL: row {i} width {len(row)} != {width}", file=sys.stderr)
+    house = data.get("house") or {}
+    for key in ("exterior_door_x", "front", "back", "door_half", "anchor_x"):
+        if key not in house:
+            print(f"FAIL: house missing {key}", file=sys.stderr)
             return 1
-    joined = "".join(rows)
-    for ch in "@TC":
-        if ch not in joined:
-            print(f"FAIL: missing marker {ch}", file=sys.stderr)
-            return 1
-    if "p" not in joined or "T" not in joined:
-        print("FAIL: missing path or trees", file=sys.stderr)
+    solids = data.get("solids") or []
+    if len(solids) < 20:
+        print(f"FAIL: too few solids ({len(solids)})", file=sys.stderr)
         return 1
-    print(f"OK: map {width}x{len(rows)} with spawn/cabin/trees/paths")
+    for s in solids:
+        if "solid_radius" not in s or "art" not in s:
+            print(f"FAIL: solid incomplete {s.get('id')}", file=sys.stderr)
+            return 1
+    required = [
+        "haigen_walk.png",
+        "skolli_adult.png",
+        "house_tier1_exterior.png",
+        "house_tier1_interior.png",
+        "tree.png",
+        "rock_a.png",
+    ]
+    for name in required:
+        path = APPROVED / name
+        if not path.exists() or path.stat().st_size < 500:
+            print(f"FAIL: approved asset missing/small {path}", file=sys.stderr)
+            return 1
+    # Placeholder programmer art must not be the runtime character sheets.
+    old_haigen = ROOT / "assets" / "characters" / "haigen_walk.png"
+    if old_haigen.exists() and old_haigen.stat().st_size < 5000:
+        # Still present as leftover from V0 — ensure approved sheet is larger.
+        if (APPROVED / "haigen_walk.png").stat().st_size <= old_haigen.stat().st_size:
+            print("FAIL: approved Haigen sheet not larger than placeholder", file=sys.stderr)
+            return 1
+    print(
+        f"OK: pocket solids={len(solids)} door_x={house['exterior_door_x']} "
+        f"front={house['front']} approved assets present"
+    )
     return 0
 
 

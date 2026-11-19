@@ -1,4 +1,4 @@
-name: Godot homestead smoke
+name: Godot homestead V1 smoke
 on:
   pull_request:
     paths:
@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate homestead map
+      - name: Validate homestead pocket JSON + approved assets
         run: python3 godot-haigen/tests/test_map_integrity.py
   ipad-landscape-viewport:
     runs-on: ubuntu-latest
