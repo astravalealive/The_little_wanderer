@@ -1,0 +1,36 @@
+{
+  "asset": "assets/blue-sphynx-atlas-v435.webp",
+  "cell": [
+    96,
+    80
+  ],
+  "layout": "rows=down,up,right,left; cols=idle+walk\u00d73",
+  "drawHint": {
+    "width": 148,
+    "height": 124,
+    "footPad": 5,
+    "haigenHeightApprox": 120,
+    "note": "oversized vs cell pad so visible body ~70%+ Haigen"
+  },
+  "source": "docs/blue-sphynx-atlas/reference/BLUE_APPROVED_REFERENCE.png",
+  "sourceSha256": "b617aa8e1a1347da34b286af01565c96d602030a987aa7c5e2f87337e572353b",
+  "outputSha256": "ed395bf4025c0d190c65ef71381ea322670149c539a53dee98ab3a65bddf8e7f",
+  "size": [
+    384,
+    320
+  ],
+  "left": "mirror(right)",
+  "downWalk": "full-body UP silhouette + locked front face overlay (no head-only cells)",
+  "paletteSample": [
+    "#dac0ae",
+    "#b69798",
+    "#a27b7f",
+    "#8a6f72",
+    "#9b554d",
+    "#7e575a",
+    "#6b535b",
+    "#63484e",
+    "#753a39",
+    "#5b3a3f"
+  ]
+}

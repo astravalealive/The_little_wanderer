@@ -1,0 +1,43 @@
+name: Blue Sphynx atlas 435
+on:
+  push:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - assets/blue-sphynx-atlas-v435.webp
+      - tests/live/blue-sphynx-atlas-435.cjs
+      - .github/scripts/build_blue_sphynx_atlas.py
+      - .github/workflows/blue-sphynx-atlas-435.yml
+  pull_request:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - assets/blue-sphynx-atlas-v435.webp
+      - tests/live/blue-sphynx-atlas-435.cjs
+      - .github/scripts/build_blue_sphynx_atlas.py
+      - .github/workflows/blue-sphynx-atlas-435.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  blue-atlas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - name: Rebuild atlas (smoke)
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 .github/scripts/build_blue_sphynx_atlas.py
+          python3 - <<'PY'
+          from PIL import Image
+          im=Image.open('assets/blue-sphynx-atlas-v435.webp')
+          assert im.size==(384,320) and im.mode=='RGBA', im.size
+          print('atlas ok', im.size)
+          PY
+      - run: node tests/live/blue-sphynx-atlas-435.cjs
+      - run: node tests/live/game-build-identity.cjs
