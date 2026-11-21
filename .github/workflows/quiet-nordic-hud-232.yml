@@ -1,0 +1,34 @@
+name: Quiet Nordic HUD 232
+on:
+  push:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - v127-ornate-ui.css
+      - v127-ornate-ui.js
+      - docs/quiet-nordic-hud-232/**
+      - tests/live/quiet-nordic-hud-232.cjs
+      - .github/workflows/quiet-nordic-hud-232.yml
+  pull_request:
+    paths:
+      - haigen.html
+      - haigen-version.json
+      - v127-ornate-ui.css
+      - v127-ornate-ui.js
+      - docs/quiet-nordic-hud-232/**
+      - tests/live/quiet-nordic-hud-232.cjs
+      - .github/workflows/quiet-nordic-hud-232.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quiet-nordic-hud:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - run: node tests/live/quiet-nordic-hud-232.cjs
