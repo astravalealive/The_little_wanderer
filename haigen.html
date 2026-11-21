@@ -5377,6 +5377,10 @@ function drawEasternIslandLandmarks(){
  ctx.restore();
 }
 function drawSceneryNearHaigen(o){
+ // Route woodland flowers before the cached atlas path, which otherwise returns early.
+ if(rbEnabled&&o.type==='flower'&&rbWoodland(o.x,o.y)){
+  ctx.save();ctx.globalAlpha*=foliageVisibility(o);rbDrawFlower(o);ctx.restore();return;
+ }
  if(drawWoodlandArtwork(o))return;
  if(o.type==='specter'){if(spectorsActive())drawRegionalScenery(wanderingSpecter(o));return}
  if(o.type.startsWith('hamlet-')){drawHamletScenery(o);return}
