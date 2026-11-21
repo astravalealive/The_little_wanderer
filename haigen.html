@@ -3497,6 +3497,15 @@ function autoTravel(target,dt,reach=80,speed=.14){
   while(awakeningPath.length&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<34)awakeningPath.shift();
  }
  autoWaypoint=awakeningPath[0]||null;
+ // A failed grid search must not force Haigen to walk straight into a solid obstacle.
+ // Give the recovery timer time to select another activity rather than oscillating.
+ if(!autoWaypoint&&!autoStand(target.x,target.y)){
+  autoNav.stuck+=dt;
+  if(autoNav.stuck>1200){
+   autoNav.stuck=0;autoNav.failures++;awakeningRoutes.clear();awakeningPath=[];
+  }
+  return false;
+ }
  const aim=autoWaypoint||target;
  const step=Math.min(dt,50)*speed,heading=Math.atan2(aim.y-state.y,aim.x-state.x);
  const offsets=autoNav.side>0?[0,.35,-.35,.73,-.73,1.15,-1.15,1.6,-1.6]:[0,-.35,.35,-.73,.73,-1.15,-1.6,1.6];
@@ -12341,7 +12350,7 @@ function vikingForge(){
  open('<h2>⚒️ Norse travelling smith</h2><p>Woodland homestead trade post. Permanent village and forge artwork are still to come.</p><p><b>Coin purse:</b> '+purse+' gold · <b>Wood:</b> '+Math.max(0,Math.floor(Number(state.wood)||0))+'</p><h3>Forged wares and clothing</h3>'+rows+'<h3>My equipment</h3>'+(ownedRows||'<p>No purchases yet.</p>')+'<h3>Sell gathered goods</h3>'+trade);
  $('modalBody').querySelectorAll('[data-forge]').forEach(b=>b.onclick=()=>{
   const g=vikingForgeStock.find(x=>x.id===b.dataset.forge);
-  if(!g||kit[g.id]||atelier.purse<g.cost||(Number(state.wood)||0)<g.wood)return;
+  if(!g||kit[g.id]||!Number.isFinite(atelier.purse)||atelier.purse<g.cost||(Number(state.wood)||0)<g.wood)return;
   atelier.purse-=g.cost;state.wood-=g.wood;kit[g.id]=true;
   mindWrite('I traded with the Norse smith for '+g.name+'.','memory');
   save();vikingForge();
