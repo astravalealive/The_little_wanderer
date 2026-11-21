@@ -12374,11 +12374,16 @@ function backpack(){
  const forgeButton=document.createElement('button');forgeButton.className='btn';forgeButton.textContent='⚒️ Visit Norse smith (near homestead)';forgeButton.disabled=Math.hypot(state.x-cottage.x,state.y-cottage.y)>450;forgeButton.onclick=vikingForge;$('modalBody').append(forgeButton);
 }
 
+function haigenNorseCodex(){
+ const entries=norseLore.map(e=>'<div class="item"><div><b>'+safeText(e.topic)+'</b><p>'+safeText(e.fact)+'</p></div></div>').join('');
+ open('<h2>ᚠ Haigen’s Norse lorebook</h2><p>Myth, sagas and Viking-age history. Stories are not presented as proven historical events.</p>'+entries);
+}
 function haigenNotes(){
  const icons={thought:'💭 Thought',idea:'🔧 Idea',plan:'🗺️ Plan',memory:'📖 Memory',discovery:'🌍 Discovery',mystery:'✨ Mystery',growth:'🌱 Growth',reflection:'🔍 Reflection'};
  const entries=haigenMind.notes.length?haigenMind.notes.map(n=>'<div class="item"><div><b>'+safeText(icons[n.type]||'💭 Thought')+' · Day '+n.day+'</b><p>'+safeText(n.text)+'</p></div></div>').join(''):'<p>Haigen is still exploring. His notes will appear as he notices things.</p>';
  const legacy=state.requests.length?'<details><summary>Older messages (preserved)</summary>'+state.requests.slice(-12).map(q=>'<p>✉️ '+safeText(q.text)+'</p>').join('')+'</details>':'';
  open('<h2>🧠 Haigen’s Notebook</h2><p>His own simulated memories, observations and development ideas.</p><p><b>Curiosity</b> '+Math.round(haigenMind.curiosity)+' · <b>Courage</b> '+Math.round(haigenMind.courage)+' · <b>Trust</b> '+Math.round(haigenMind.trust)+'</p><p><b>Personality:</b> '+safeText(mindTemperament())+' · <b>Mood:</b> '+safeText(mindMood())+'</p><p><b>Patience:</b> '+Math.round(haigenMind.patience)+' · <b>Kindness:</b> '+Math.round(haigenMind.kindness)+'</p><p><b>Learned from:</b> '+haigenMind.habits.injury+' injuries · '+haigenMind.habits.rescues+' rescues · '+haigenMind.habits.craft+' builds · '+haigenMind.habits.companionship+' friendly moments</p><p><b>Favourite activity:</b> '+safeText(mindFavourite()||'Still exploring')+'</p><p><b>Completed jobs:</b> '+state.autoSteps+'</p><p><b>Next idea:</b> '+safeText(autoJobLabel||haigenMind.lastGoal||mindWish()[1])+'</p><p><b>Explored:</b> '+safeText(haigenMind.visited.map(k=>expandedRegions.find(r=>r.id===k)?.name||'Haigen’s Woodlands').join(', ')||'Still looking around')+'</p><h3>🏡 My building project</h3><p>'+safeText(lifeProjectSummary())+'</p><p class="small">Completed: '+safeText(state.lifeProjectsDone.map(k=>lifeBlueprints[k]?.name).filter(Boolean).join(', ')||'No finished projects yet')+'</p><h3>What experience taught me</h3>'+haigenMind.experiences.slice(0,5).map(e=>'<p class="small">Day '+e.day+': '+safeText(e.text)+'</p>').join('')+'<h3>My notes to the builders</h3>'+entries+legacy);
+ const loreButton=document.createElement('button');loreButton.className='btn';loreButton.textContent='ᚠ Read Norse lorebook';loreButton.onclick=haigenNorseCodex;$('modalBody').append(loreButton);
 }
 function open(html){$('modalBody').innerHTML=html;$('overlay').classList.add('open');silenceWorldToast()}function close(){$('overlay').classList.remove('open');save()}// Job 207: display-only Boatwright milestones, derived from existing progress.
 function boatwrightJournal(){
