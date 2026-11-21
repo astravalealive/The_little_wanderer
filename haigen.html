@@ -3217,9 +3217,23 @@ function mindObserveWorld(dt){
   if(state.autonomy)think(thought,4700);
  }
 }
+// Local, save-compatible decision memory: no network calls, no code-editing privileges.
+function mindChooseIntent(){
+ const region=expandedRegion(state.x,state.y)?.id||'woodland';
+ const lowHealth=state.health<55,lowEnergy=state.energy<35,lowFood=state.hunger<45;
+ const kind=lowHealth?'recover':lowEnergy?'rest':lowFood?'eat':state.poisonMs>0?'heal':state.autonomy?'explore':'observe';
+ const reasons={recover:'I am hurt, so safety comes before exploring.',rest:'I am tired. I should rest before my next journey.',eat:'I am hungry. Food comes before adventures.',heal:'I am poisoned. I need to find a cure.',explore:'I have enough strength to explore carefully.',observe:'I am waiting while Alfather guides me.'};
+ const previous=haigenMind.intent&&typeof haigenMind.intent==='object'?haigenMind.intent:null;
+ if(!previous||previous.kind!==kind||previous.region!==region){
+  haigenMind.intent={kind,region,reason:reasons[kind],since:Date.now()};
+  mindWrite(reasons[kind],'plan');
+ }
+ return haigenMind.intent;
+}
 function mindTick(dt){
  if(document.hidden||collapseRemaining>0)return;
  mindObserveWorld(dt);
+ mindChooseIntent();
  haigenMind.progressMs+=dt;if(state.autonomy)haigenMind.autonomyTime+=dt;
  mindClock+=dt;if(mindClock<18000)return;mindClock=0;
  const region=expandedRegion(state.x,state.y)?.id||'woodland';
