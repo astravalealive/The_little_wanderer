@@ -8792,6 +8792,34 @@ function overhaulBiomeFloor(nightMix){
   const radius=18+hash(gx,gy,3)*48,ry=9+hash(gx,gy,4)*24;
   ctx.fillStyle=p[hash(gx,gy,5)>.52?0:1]+'66';
   ctx.beginPath();ctx.ellipse(x,y,radius,ry,hash(gx,gy,6)*.6,0,Math.PI*2);ctx.fill();
+  // Landscape composition: a few deterministic clustered silhouettes per biome.
+  // All silhouettes are ground decals, not new objects or collision footprints.
+  const landmark=hash(gx,gy,91),group=hash(Math.floor(gx/3),Math.floor(gy/3),92);
+  if(landmark>.68&&group>.34){
+   const ox=x+(hash(gx,gy,93)-.5)*42,oy=y+(hash(gx,gy,94)-.5)*20;
+   ctx.save();ctx.translate(ox,oy);
+   const stone=id==='snow'||id==='wasteland'||id==='desert'||id==='eastDunes'||id==='coast';
+   if(stone){
+    const stoneBase=id==='snow'?'#728993':id==='wasteland'?'#55504b':id==='coast'?'#958b78':'#ac8c63';
+    const stoneLight=id==='snow'?'#d6e6e8':id==='wasteland'?'#948578':id==='coast'?'#c4b8a0':'#dec398';
+    for(let k=0;k<3;k++){
+     const bx=(k-1)*13+hash(gx,gy,100+k)*7,by=k%2*7,sz=7+hash(gx,gy,110+k)*9;
+     ctx.fillStyle=stoneBase;ctx.beginPath();ctx.moveTo(bx-sz,by+4);ctx.lineTo(bx-sz*.6,by-sz*.55);ctx.lineTo(bx+sz*.35,by-sz);ctx.lineTo(bx+sz,by+2);ctx.closePath();ctx.fill();
+     ctx.fillStyle=stoneLight;ctx.beginPath();ctx.moveTo(bx-sz*.6,by-sz*.55);ctx.lineTo(bx+sz*.35,by-sz);ctx.lineTo(bx,by-sz*.3);ctx.closePath();ctx.fill();
+    }
+   }else{
+    const dark=id==='fen'?'#263d35':id==='rainforest'?'#194330':id==='woodland'?'#31543b':'#4b6841';
+    const light=id==='fen'?'#6d8870':id==='rainforest'?'#3b8159':id==='woodland'?'#67945b':'#89a65b';
+    for(let k=0;k<4;k++){
+     const bx=(k-1.5)*12+hash(gx,gy,120+k)*5,by=k%2*5,sz=8+hash(gx,gy,130+k)*9;
+     ctx.fillStyle=dark;ctx.beginPath();ctx.ellipse(bx,by,sz,sz*.55,0,0,Math.PI*2);ctx.fill();
+     ctx.fillStyle=light;ctx.fillRect(bx-3,by-sz*.4,5+sz*.45,3);
+     if(id==='fen'){ctx.strokeStyle='#9caa79';ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx-3,by-sz*1.3);ctx.stroke();}
+     if(id==='rainforest'){ctx.fillStyle='#a1b778';ctx.fillRect(bx+3,by-sz*.5,4,4);}
+    }
+   }
+   ctx.restore();
+  }
   const count=3+Math.floor(hash(gx,gy,7)*5);
   for(let n=0;n<count;n++){
    const px=x+(hash(gx,gy,n+10)-.5)*radius*1.65;
