@@ -3432,32 +3432,50 @@ let awakeningPath=[],awakeningPathKey='',awakeningRetry=0;
 // Routes are bounded and recomputed when the origin, goal or collision state changes.
 function awakeningRoute(target,reach){
  const cell=56,origin={x:Math.round(state.x/cell),y:Math.round(state.y/cell)};
- const key=Math.round(target.x/cell)+','+Math.round(target.y/cell)+':'+Math.round(reach);
- const cacheKey=origin.x+','+origin.y+'>'+key;
+ const cacheKey=state.x+','+state.y+'>'+target.x+','+target.y+':'+reach;
  const cached=awakeningRoutes.get(cacheKey);
  if(cached&&time-cached.at<3000)return cached.path.slice();
  const open=[{x:origin.x,y:origin.y,g:0,h:0}],best=new Map(),closed=new Set();
  const id=(x,y)=>x+','+y;
  best.set(id(origin.x,origin.y),0);
- let found=null,iterations=0;
+ // Check the actual walking segment as trunks can sit between grid centres.
+ const samples=new Map();
+ function clearSegment(ax,ay,bx,by){
+  const steps=Math.max(1,Math.ceil(Math.hypot(bx-ax,by-ay)/14));
+  for(let i=1;i<=steps;i++){
+   const x=ax+(bx-ax)*i/steps,y=ay+(by-ay)*i/steps,k=id(x,y);
+   if(!samples.has(k))samples.set(k,autoStand(x,y));
+   if(!samples.get(k))return false;
+  }
+  return true;
+ }
+ let found=null,finish=null,iterations=0;
  while(open.length&&iterations++<380){
   open.sort((a,b)=>(a.g+a.h)-(b.g+b.h));
   const cur=open.shift(),k=id(cur.x,cur.y);
   if(closed.has(k))continue;
   closed.add(k);
-  if(Math.hypot(cur.x*cell-target.x,cur.y*cell-target.y)<=Math.max(reach,cell*.9)){found=cur;break}
+  const px=cur.parent?cur.x*cell:state.x,py=cur.parent?cur.y*cell:state.y;
+  const distance=Math.hypot(target.x-px,target.y-py);
+  if(distance<=reach){found=cur;break}
+  if(distance<=reach+cell){
+   const fraction=(distance-Math.max(0,reach-1))/distance;
+   const x=px+(target.x-px)*fraction,y=py+(target.y-py)*fraction;
+   if(clearSegment(px,py,x,y)){finish={x,y};found=cur;break}
+  }
   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){
    const x=cur.x+dx,y=cur.y+dy,nk=id(x,y);
    if(closed.has(nk)||Math.abs(x-origin.x)>22||Math.abs(y-origin.y)>22)continue;
-   if(!autoStand(x*cell,y*cell))continue;
+   
    if(dx&&dy&&(!autoStand((cur.x+dx)*cell,cur.y*cell)||!autoStand(cur.x*cell,(cur.y+dy)*cell)))continue;
    const g=cur.g+Math.hypot(dx,dy);
    if(g>=(best.get(nk)??Infinity))continue;
+   if(!clearSegment(px,py,x*cell,y*cell))continue;
    best.set(nk,g);
    open.push({x,y,g,h:Math.hypot(target.x/cell-x,target.y/cell-y),parent:cur});
   }
  }
- const path=[];
+ const path=finish?[finish]:[];
  while(found&&found.parent){path.unshift({x:found.x*cell,y:found.y*cell});found=found.parent}
  if(awakeningRoutes.size>20)awakeningRoutes.clear();
  awakeningRoutes.set(cacheKey,{at:time,path:path.slice()});
@@ -3473,10 +3491,10 @@ function autoTravel(target,dt,reach=80,speed=.14){
  }
  // Use a persistent waypoint path, not a fresh local steering decision every frame.
  // Replanning on every grid-cell boundary was making Haigen pace between two cells.
- while(awakeningPath.length&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<31)awakeningPath.shift();
+ while(awakeningPath.length>1&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<1)awakeningPath.shift();
  if(!awakeningPath.length){
   awakeningPath=awakeningRoute(target,reach);
-  while(awakeningPath.length&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<31)awakeningPath.shift();
+  while(awakeningPath.length>1&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<1)awakeningPath.shift();
  }
  const waypoint=awakeningPath[0];
  if(!waypoint){
@@ -3497,7 +3515,7 @@ function autoTravel(target,dt,reach=80,speed=.14){
   }
   navProgressWindow+=dt;
   if(navProgressWindow>2200){
-   const progressed=navProgressStart&&navProgressStart.d-d>8;
+   const progressed=navProgressStart&&Math.hypot(state.x-navProgressStart.x,state.y-navProgressStart.y)>8;
    if(progressed)autoNav.failures=Math.max(0,autoNav.failures-1);
    else{autoNav.failures++;awakeningPath=[];awakeningRoutes.clear()}
    navProgressStart={x:state.x,y:state.y,d};navProgressWindow=0;
