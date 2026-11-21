@@ -8899,7 +8899,9 @@ function drawFenDetail(night){
 // World overhaul #275: deterministic, render-only biome texture clusters.
 // World-space hash means visual positions never enter save state or change collisions.
 function overhaulBiomeFloor(nightMix){
- const cell=148,extentX=W/(2*worldZoom())+230,extentY=H/(2*worldZoom())+230;
+ // Fewer decorative cells on touch devices, without changing gameplay or saved scenery.
+ const mobileScenery=window.matchMedia&&window.matchMedia('(pointer: coarse)').matches;
+ const cell=mobileScenery?240:148,extentX=W/(2*worldZoom())+230,extentY=H/(2*worldZoom())+230;
  const hash=(a,b,k)=>seeded(a*71.19+b*193.73+k*31.7);
  const palettes={
   downs:['#8cae61','#587a45','#b4bf75'],desert:['#d4b577','#b68e59','#f2d99a'],
@@ -8963,7 +8965,7 @@ function overhaulBiomeFloor(nightMix){
    }
    ctx.restore();
   }
-  const count=3+Math.floor(hash(gx,gy,7)*5);
+  const count=(mobileScenery?1:3)+Math.floor(hash(gx,gy,7)*(mobileScenery?3:5));
   for(let n=0;n<count;n++){
    const px=x+(hash(gx,gy,n+10)-.5)*radius*1.65;
    const py=y+(hash(gx,gy,n+20)-.5)*ry*1.8;
