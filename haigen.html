@@ -3394,48 +3394,111 @@ function autoPlan(label,id){
   haigenMind.lastPlanSaid=time;think('My plan: '+label+'.',3700,true);
  }
 }
-function autoResetNav(){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0}
+function autoResetNav(waypoint=null){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0;awakeningPath=[];awakeningPathKey='';autoWaypoint=waypoint;navProgressWindow=0;navProgressStart=null}
 function autoStand(x,y){return Number.isFinite(x)&&Number.isFinite(y)&&islandDepth(x,y)>73&&walkingLakeLevel(x,y)>1.045&&!blockedBySolid(x,y)}
 let navProgressWindow=0,navProgressStart=null;
-function autoTravel(target,dt,reach=80,speed=.14){
- const d=dist(state,target);if(d<=reach){autoResetNav();return true}
- const key=(target.id===undefined?'place':target.id)+':'+Math.round(target.x/15)+':'+Math.round(target.y/15);
- if(autoNav.key!==key){autoResetNav();autoNav.key=key;navProgressWindow=0;navProgressStart={x:state.x,y:state.y,d}}
- navProgressWindow+=dt;
- if(navProgressWindow>6500){
-  const moved=navProgressStart?Math.hypot(state.x-navProgressStart.x,state.y-navProgressStart.y):0;
-  const gained=navProgressStart?navProgressStart.d-d:0;
-  if(gained<24||moved<22){
-   // No meaningful progress over several seconds: abandon the loop, not merely reverse direction.
-   autoNav.failures=5;
+// Haigen's Awakening: bounded grid routing, remembered obstacles and progress checks.
+// All movement remains subject to the game's existing collision and terrain rules.
+const awakeningRoutes=new Map();
+let awakeningPath=[],awakeningPathKey='',awakeningRetry=0;
+// Routes are bounded and recomputed when the origin, goal or collision state changes.
+function awakeningRoute(target,reach){
+ const cell=56,origin={x:Math.round(state.x/cell),y:Math.round(state.y/cell)};
+ const cacheKey=state.x+','+state.y+'>'+target.x+','+target.y+':'+reach;
+ const cached=awakeningRoutes.get(cacheKey);
+ if(cached&&time-cached.at<3000)return cached.path.slice();
+ const open=[{x:origin.x,y:origin.y,g:0,h:0}],best=new Map(),closed=new Set();
+ const id=(x,y)=>x+','+y;
+ best.set(id(origin.x,origin.y),0);
+ // Check the actual walking segment as trunks can sit between grid centres.
+ const samples=new Map();
+ function clearSegment(ax,ay,bx,by){
+  const steps=Math.max(1,Math.ceil(Math.hypot(bx-ax,by-ay)/14));
+  for(let i=1;i<=steps;i++){
+   const x=ax+(bx-ax)*i/steps,y=ay+(by-ay)*i/steps,k=id(x,y);
+   if(!samples.has(k))samples.set(k,autoStand(x,y));
+   if(!samples.get(k))return false;
   }
-  navProgressWindow=0;navProgressStart={x:state.x,y:state.y,d};
+  return true;
  }
- const step=Math.min(dt,50)*speed,heading=Math.atan2(target.y-state.y,target.x-state.x);
- const offsets=autoNav.side>0?[0,.35,-.35,.73,-.73,1.15,-1.15,1.6,-1.6,2.3,-2.3]:[0,-.35,.35,-.73,.73,-1.15,1.15,-1.6,1.6,-2.3,2.3];
- let best=null,score=Infinity;
- for(const angle of offsets){
-  const dx=Math.cos(heading+angle),dy=Math.sin(heading+angle),x=state.x+dx*step,y=state.y+dy*step;
-  if(!autoStand(x,y))continue;
-  const look=Math.min(54,Math.max(18,d-reach));
-  if(!autoStand(state.x+dx*look,state.y+dy*look))continue;
-  const newDist=Math.hypot(target.x-x,target.y-y);
-  const cost=newDist+Math.abs(angle)*13+(autoNav.stuck>1400&&Math.sign(angle)!==autoNav.side?20:0);
-  if(cost<score){score=cost;best={x,y,angle}}
+ let found=null,finish=null,iterations=0;
+ while(open.length&&iterations++<380){
+  open.sort((a,b)=>(a.g+a.h)-(b.g+b.h));
+  const cur=open.shift(),k=id(cur.x,cur.y);
+  if(closed.has(k))continue;
+  closed.add(k);
+  const px=cur.parent?cur.x*cell:state.x,py=cur.parent?cur.y*cell:state.y;
+  const distance=Math.hypot(target.x-px,target.y-py);
+  if(distance<=reach){found=cur;break}
+  if(distance<=reach+cell){
+   const fraction=(distance-Math.max(0,reach-1))/distance;
+   const x=px+(target.x-px)*fraction,y=py+(target.y-py)*fraction;
+   if(clearSegment(px,py,x,y)){finish={x,y};found=cur;break}
+  }
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){
+   const x=cur.x+dx,y=cur.y+dy,nk=id(x,y);
+   if(closed.has(nk)||Math.abs(x-origin.x)>22||Math.abs(y-origin.y)>22)continue;
+   
+   if(dx&&dy&&(!autoStand((cur.x+dx)*cell,cur.y*cell)||!autoStand(cur.x*cell,(cur.y+dy)*cell)))continue;
+   const g=cur.g+Math.hypot(dx,dy);
+   if(g>=(best.get(nk)??Infinity))continue;
+   if(!clearSegment(px,py,x*cell,y*cell))continue;
+   best.set(nk,g);
+   open.push({x,y,g,h:Math.hypot(target.x/cell-x,target.y/cell-y),parent:cur});
+  }
  }
- if(best){
-  state.x=best.x;state.y=best.y;
-  if(d<autoNav.previous-1){autoNav.previous=d;autoNav.stuck=Math.max(0,autoNav.stuck-dt)}
-  else autoNav.stuck+=dt;
-  if(Math.abs(best.angle)>.5)autoNav.side=best.angle>=0?1:-1;
- }else autoNav.stuck+=dt;
- if(autoNav.stuck>2800){autoNav.side*=-1;autoNav.stuck=0;autoNav.failures++}
- if(autoNav.failures>=5){
+ const path=finish?[finish]:[];
+ while(found&&found.parent){path.unshift({x:found.x*cell,y:found.y*cell});found=found.parent}
+ if(awakeningRoutes.size>20)awakeningRoutes.clear();
+ awakeningRoutes.set(cacheKey,{at:time,path:path.slice()});
+ return path;
+}
+function autoTravel(target,dt,reach=80,speed=.14){
+ const d=dist(state,target);
+ if(d<=reach){autoResetNav();return true}
+ const key=(target.id===undefined?'place':target.id)+':'+Math.round(target.x/15)+':'+Math.round(target.y/15);
+ if(autoNav.key!==key){
+  // Keep the exploration goal while starting its route.
+  autoResetNav(target===autoWaypoint ? target : null);autoNav.key=key;navProgressStart={x:state.x,y:state.y,d};
+ }
+ // Use a persistent waypoint path, not a fresh local steering decision every frame.
+ // Replanning on every grid-cell boundary was making Haigen pace between two cells.
+ while(awakeningPath.length>1&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<1)awakeningPath.shift();
+ if(!awakeningPath.length){
+  awakeningPath=awakeningRoute(target,reach);
+  while(awakeningPath.length>1&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<1)awakeningPath.shift();
+ }
+ const waypoint=awakeningPath[0];
+ if(!waypoint){
+  // No safe route: never fall back to direct steering into an obstacle.
+  navProgressWindow+=dt;
+  if(navProgressWindow>1200){navProgressWindow=0;autoNav.failures++;awakeningRoutes.clear()}
+ }else{
+  const remaining=Math.hypot(waypoint.x-state.x,waypoint.y-state.y);
+  const step=Math.min(remaining,Math.min(dt,50)*speed);
+  const ux=(waypoint.x-state.x)/remaining,uy=(waypoint.y-state.y)/remaining;
+  const nx=state.x+ux*step,ny=state.y+uy*step;
+  // Exact collision checks on each step. If blocked, invalidate this route;
+  // do not bounce left/right or switch sides every frame.
+  if(remaining>0.01&&autoStand(nx,ny)&&autoStand(state.x+ux*Math.min(18,remaining),state.y+uy*Math.min(18,remaining))){
+   state.x=nx;state.y=ny;
+  }else{
+   awakeningPath=[];awakeningRoutes.clear();autoNav.failures++;
+  }
+  navProgressWindow+=dt;
+  if(navProgressWindow>2200){
+   const progressed=navProgressStart&&Math.hypot(state.x-navProgressStart.x,state.y-navProgressStart.y)>8;
+   if(progressed)autoNav.failures=Math.max(0,autoNav.failures-1);
+   else{autoNav.failures++;awakeningPath=[];awakeningRoutes.clear()}
+   navProgressStart={x:state.x,y:state.y,d};navProgressWindow=0;
+  }
+ }
+ if(autoNav.failures>=3){
   if(target.id!==undefined)autoIgnore.set(target.id,Date.now()+90000);
-  if(state.autoFreeJob){state.autoFreeJob=null;independentAgenda.remaining=0;}
-  autoJobId='';
-  autoResetNav();navProgressWindow=0;navProgressStart=null;autoDestination=null;autoWaypoint=null;autoPause=1000;
-  think('That path is blocked. I will try something else.',3900,true);
+  if(state.autoFreeJob){state.autoFreeJob=null;independentAgenda.remaining=0}
+  autoJobId='';autoResetNav();autoDestination=null;autoPause=1700;
+  mindWrite('That route is blocked. I will choose somewhere else.','memory');
+  return false;
  }
  return false;
 }
@@ -4162,7 +4225,7 @@ function autonomousTick(dt){
   autoPlan('finished gathering '+found.type,'done:'+state.autoSteps);
   save();return;
  }
- if(!autoWaypoint||dist(state,autoWaypoint)<95)autoWaypoint=autoExplore();
+ if(!autoWaypoint)autoWaypoint=autoExplore();
  if(autoWaypoint){
   autoPlan('explore for useful places','explore');
   if(autoTravel(autoWaypoint,dt,95,.12)){autoWaypoint=null;autoPause=500}
