@@ -3432,7 +3432,7 @@ let awakeningPath=[],awakeningPathKey='',awakeningRetry=0;
 // Routes are bounded and recomputed when the origin, goal or collision state changes.
 function awakeningRoute(target,reach){
  const cell=56,origin={x:Math.round(state.x/cell),y:Math.round(state.y/cell)};
- const cacheKey=state.x+','+state.y+'>'+target.x+','+target.y+':'+reach;
+ const cacheKey=origin.x+','+origin.y+'>'+Math.round(target.x/cell)+','+Math.round(target.y/cell)+':'+reach;
  const cached=awakeningRoutes.get(cacheKey);
  if(cached&&time-cached.at<3000)return cached.path.slice();
  const open=[{x:origin.x,y:origin.y,g:0,h:0}],best=new Map(),closed=new Set();
@@ -3491,20 +3491,27 @@ function autoTravel(target,dt,reach=80,speed=.14){
  }
  // Use a persistent waypoint path, not a fresh local steering decision every frame.
  // Replanning on every grid-cell boundary was making Haigen pace between two cells.
- while(awakeningPath.length>1&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<1)awakeningPath.shift();
+ while(awakeningPath.length>1&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<Math.max(5,Math.min(dt,50)*speed))awakeningPath.shift();
  if(!awakeningPath.length){
   awakeningPath=awakeningRoute(target,reach);
-  while(awakeningPath.length>1&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<1)awakeningPath.shift();
+  while(awakeningPath.length>1&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<Math.max(5,Math.min(dt,50)*speed))awakeningPath.shift();
  }
  const waypoint=awakeningPath[0];
- if(!waypoint){
+ // A terminal waypoint inside the arrival radius must finish, not oscillate on a tiny step.
+ if(waypoint&&Math.hypot(state.x-waypoint.x,state.y-waypoint.y)<0.5){
+  if(awakeningPath.length>1)awakeningPath.shift();
+  else if(dist(state,target)<=reach+1){autoResetNav();return true}
+ }
+ if(!awakeningPath.length)awakeningPath=awakeningRoute(target,reach);
+ const activeWaypoint=awakeningPath[0];
+ if(!activeWaypoint){
   // No safe route: never fall back to direct steering into an obstacle.
   navProgressWindow+=dt;
   if(navProgressWindow>1200){navProgressWindow=0;autoNav.failures++;awakeningRoutes.clear()}
  }else{
-  const remaining=Math.hypot(waypoint.x-state.x,waypoint.y-state.y);
+  const remaining=Math.hypot(activeWaypoint.x-state.x,activeWaypoint.y-state.y);
   const step=Math.min(remaining,Math.min(dt,50)*speed);
-  const ux=(waypoint.x-state.x)/remaining,uy=(waypoint.y-state.y)/remaining;
+  const ux=remaining>0.01?(activeWaypoint.x-state.x)/remaining:0,uy=remaining>0.01?(activeWaypoint.y-state.y)/remaining:0;
   const nx=state.x+ux*step,ny=state.y+uy*step;
   // Exact collision checks on each step. If blocked, invalidate this route;
   // do not bounce left/right or switch sides every frame.
