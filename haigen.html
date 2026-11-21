@@ -460,7 +460,7 @@ function drawWoodlandDeer(){
  for(const a of woodlandDeer){
   if(Math.abs(a.x-cam.x)>1050||Math.abs(a.y-cam.y)>800)continue;
   // Existing worldFaunaDraw tries illustrated stag atlases and falls back to generated sprites.
-  worldFaunaDraw('stag',a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,1.35,
+  worldFaunaDraw('stag',a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,2.1,
    time<a.scaredUntil?'flee':time<a.alertUntil?'alert':a.walking?'walk':'forage');
  }
 }
