@@ -5177,7 +5177,7 @@ function overhaulBeachScenery(o){
  const id=Math.abs(Math.floor(o.id||0)),v=seeded(id*19+17);
  if(t==='bush')return true;
  if(t==='tree'||t==='fir'||t==='bareTree'||t==='palm'){
-  if(v>.12)return true; // only occasional palms along the coast
+  if(t!=='palm'||v>.12)return true; // only occasional existing palms; no converted beach trees
   ctx.save();ctx.translate(o.x,o.y);ctx.scale(o.size||1,o.size||1);
   ctx.fillStyle='#b8a17155';ctx.beginPath();ctx.ellipse(4,6,27,8,0,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle='#95744f';ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,4);ctx.quadraticCurveTo(14,-45,7,-88);ctx.stroke();
@@ -10120,10 +10120,16 @@ for(let i=objects.length-1;i>=0;i--){
 let idleTime=0;// Solid objects use a small spatial hash for efficient iPad collision checks.
 const solidCellSize=128,solidCells=new Map();
 const solidTypes=new Set(['tree','rock','fir','palm','bareTree','cactus']);
+// The beach is walkable: decorative shells, starfish and hidden legacy vegetation
+// do not create invisible walls. Keep source IDs and saves unchanged.
+function beachScenerySolid(o){
+ if(expandedRegion(o.x,o.y)?.id!=='coast')return true;
+ return o.type==='palm'&&seeded(Math.abs(Math.floor(o.id||0))*19+17)<=.12;
+}
 function rebuildWorldEditorSolids(){
  solidCells.clear();
  for(const o of objects.concat(worldEditorData.placed)){
-  if(!solidTypes.has(o.type)||worldEditorHidden.has(o.id))continue;
+  if(!solidTypes.has(o.type)||worldEditorHidden.has(o.id)||!beachScenerySolid(o))continue;
   if(expandedRegion(o.x,o.y)?.id==='fen'&&(
     fenTrailDistance(o.x,o.y)<185||fenArenaDistance(o.x,o.y)<370||
     seeded(o.id*37+42024)<.77))continue;
