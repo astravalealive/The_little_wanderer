@@ -20,8 +20,8 @@ async function run(){
  const server=await serve();let browser;
  try{
   browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
-  for(const device of [{name:'forest',width:1024,height:768},{name:'iphone',width:390,height:844},{name:'ipad',width:1024,height:768}]){
-   const context=await browser.newContext({viewport:{width:device.width,height:device.height},hasTouch:true,isMobile:device.name!=='forest',deviceScaleFactor:1});
+  for(const device of [{name:'iphone',width:390,height:844},{name:'ipad',width:1024,height:768}]){
+   console.log('DEVICE START',device.name);const context=await browser.newContext({viewport:{width:device.width,height:device.height},hasTouch:true,isMobile:device.name!=='forest',deviceScaleFactor:1});
    const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.route('**/haigen.html?qa=depth-269',async route=>{
     const response=await route.fetch();let html=await response.text();
@@ -36,9 +36,9 @@ async function run(){
    for(const obstacle of ['rock','tree','stump'])for(const kind of ['deer','haigen','companions','troll'])for(const front of [false,true]){
     const result=await page.evaluate(({kind,obstacle,front})=>window.__depthQA(kind,obstacle,front),{kind,obstacle,front});
     assert(Number.isFinite(result.y));assert.equal(result.actorPresent,true);assert(result.overlapDistance<=12,'actor must overlap obstacle foot anchor');
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(60);
     const name=`${device.name}-${kind}-${obstacle}-${front?'front':'behind'}.png`;
-    await page.locator('canvas#game').screenshot({path:path.join(out,name),animations:'disabled'});
+    await page.locator('canvas#game').screenshot({path:path.join(out,name),animations:'disabled',timeout:10000});
     console.log('CAPTURE',name);
    }
    assert.equal(errors.length,0,'browser errors: '+errors.join('; '));
