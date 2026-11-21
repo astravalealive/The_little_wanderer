@@ -3544,7 +3544,13 @@ function autoTravel(target,dt,reach=80,speed=.14){
  }
  if(autoNav.failures>=3){
   if(target.id!==undefined)autoIgnore.set(target.id,Date.now()+90000);
-  if(state.autoFreeJob){state.autoFreeJob=null;independentAgenda.remaining=0}
+  if(state.autoFreeJob){
+   const failed=state.autoFreeJob.kind;
+   haigenMind.failedJobs=haigenMind.failedJobs||{};
+   haigenMind.failedJobs[failed]=Date.now()+90000;
+   haigenMind.lastFailure={job:failed,reason:'blocked route',at:Date.now()};
+   state.autoFreeJob=null;independentAgenda.remaining=0;
+  }
   autoJobId='';autoResetNav();autoDestination=null;autoPause=1700;
   mindWrite('That route is blocked. I will choose somewhere else.','memory');
   return false;
@@ -3855,6 +3861,12 @@ function autoFreedomTick(dt){
  const now=Date.now();
  let job=state.autoFreeJob;
  if(job&&(!['mine','dig','fish','cook','explore','forge','wood','garden','net','build','craft','observe','friends','story'].includes(job.kind)||now-(job.startedAt||now)>85000)){
+  if(now-(job.startedAt||now)>85000){
+   haigenMind.failedJobs=haigenMind.failedJobs||{};
+   haigenMind.failedJobs[job.kind]=now+90000;
+   haigenMind.lastFailure={job:job.kind,reason:'task timed out',at:now};
+   mindWrite('My '+job.kind+' plan took too long. I will try something different before returning to it.','memory');
+  }
   state.autoFreeJob=null;job=null;
  }
  if(!job){
@@ -3876,7 +3888,10 @@ function autoFreedomTick(dt){
   add('friends',1.6+haigenMind.kindness/70);
   add('explore',2.4+haigenMind.curiosity/46);
   const history=Array.isArray(haigenMind.recentJobs)?haigenMind.recentJobs:[];
-  const weighted=choices.map(choice=>({...choice,weight:choice.weight*(history.includes(choice.kind)?.25:1)}));
+  const failed=haigenMind.failedJobs||{};
+  const available=choices.filter(choice=>!(failed[choice.kind]>now));
+  const pool=available.length?available:choices;
+  const weighted=pool.map(choice=>({...choice,weight:choice.weight*(history.includes(choice.kind)?.25:1)}));
   let pick=Math.random()*weighted.reduce((total,choice)=>total+choice.weight,0);
   let selected=weighted[weighted.length-1]?.kind||'explore';
   for(const choice of weighted){pick-=choice.weight;if(pick<=0){selected=choice.kind;break}}
@@ -3890,6 +3905,8 @@ function autoFreedomTick(dt){
  job.steps++;
  const finish=(message)=>{
   if(message)mindWrite(message,'achievement');
+  if(haigenMind.failedJobs)delete haigenMind.failedJobs[job.kind];
+  haigenMind.lastCompletedJob={kind:job.kind,at:Date.now()};
   state.autoFreeJob=null;autoDestination=null;autoWaypoint=null;autoPause=800;save();return true;
  };
  if(job.kind==='dig')return autoDiggingTick(dt,job,finish);
