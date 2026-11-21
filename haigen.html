@@ -8923,8 +8923,26 @@ function overhaulBiomeFloor(nightMix){
   if(landmark>.68&&group>.34){
    const ox=x+(hash(gx,gy,93)-.5)*42,oy=y+(hash(gx,gy,94)-.5)*20;
    ctx.save();ctx.translate(ox,oy);
-   const stone=id==='snow'||id==='wasteland'||id==='desert'||id==='eastDunes'||id==='coast';
-   if(stone){
+   const stone=id==='snow'||id==='wasteland'||id==='desert'||id==='eastDunes';
+   if(id==='coast'){
+    // Beachcombing details: a few shells, starfish and sea-worn driftwood pieces.
+    // Ground-only decoration; no extra resource nodes or collision.
+    for(let k=0;k<3;k++){
+     const bx=(k-1)*23+hash(gx,gy,100+k)*7,by=(k%2)*9;
+     const shape=hash(gx,gy,115+k);
+     if(shape<.23){
+      ctx.fillStyle='#c68163';ctx.beginPath();
+      for(let arm=0;arm<10;arm++){const a=-Math.PI/2+arm*Math.PI/5,rad=arm%2?3.8:10;const xx=bx+Math.cos(a)*rad,yy=by+Math.sin(a)*rad;if(!arm)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.closePath();ctx.fill();
+      ctx.fillStyle='#f4caa6';ctx.fillRect(bx-1,by-1,2,2);
+     }else if(shape<.83){
+      ctx.fillStyle=shape<.5?'#f1dfc4':'#dfb69f';ctx.beginPath();ctx.ellipse(bx,by,10,7,0,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#b48d7c';ctx.lineWidth=1;
+      for(let rib=-2;rib<=2;rib++){ctx.beginPath();ctx.moveTo(bx,by+5);ctx.lineTo(bx+rib*3,by-6);ctx.stroke();}
+     }else{
+      ctx.strokeStyle='#b9a27e';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(bx-10,by+3);ctx.quadraticCurveTo(bx,by-3,bx+11,by);ctx.stroke();
+     }
+    }
+   }else if(stone){
     const stoneBase=id==='snow'?'#728993':id==='wasteland'?'#55504b':id==='coast'?'#958b78':'#ac8c63';
     const stoneLight=id==='snow'?'#d6e6e8':id==='wasteland'?'#948578':id==='coast'?'#c4b8a0':'#dec398';
     for(let k=0;k<3;k++){
