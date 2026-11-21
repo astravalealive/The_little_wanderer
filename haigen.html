@@ -10431,11 +10431,17 @@ trackMotion(c,oldX,oldY,c.x,c.y,dt);
 // Pan feels direct under the finger. Release holds the view briefly before a gentle recenter.
 // Direct pan: no following force while fingers are on the canvas.
 const draggingCamera=cameraTouches.size>0;
-if(playerInput)cameraDetached=false;
-// Do not interrupt active exploration or world editing. Return smoothly after 12 idle seconds.
+// Manual movement never snaps a freely panned camera back onto Haigen.
+// Only resume following when idle autonomy takes over and the camera has been
+// untouched for the idle-return interval. Keep editor and interior views intact.
+if(playerInput){cameraLastPanAt=performance.now();}
 if(draggingCamera)cameraLastPanAt=performance.now();
-// Free exploration stays detached until the player explicitly chooses to follow Haigen.
 const cameraHolding=!draggingCamera&&performance.now()-cameraReleaseAt<950;
+if(cameraDetached&&state.autonomy&&!playerInput&&!draggingCamera&&!cameraHolding&&
+   !worldEditorActive&&!visitorRoom&&!homeInside&&!trollStumpInside&&
+   performance.now()-cameraLastPanAt>=CAMERA_IDLE_RETURN_MS){
+ cameraDetached=false;
+}
 if(!draggingCamera&&!cameraHolding&&!cameraDetached&&!worldEditorActive&&!visitorRoom&&!homeInside&&!trollStumpInside&&!autonomousHomeVisit){
  const follow=1-Math.exp(-dt/1250);
  // V426: portrait presentation bias keeps Haigen slightly lower so cabin/garden stay readable above.
