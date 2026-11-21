@@ -5210,6 +5210,27 @@ function overhaulBiomeScenery(o){
    poly([[-spread*.72,y-5],[0,-h+j*13],[3,y-10]],light);
    if(biome==='snow')poly([[-spread*.67,y-12],[0,-h+j*13],[spread*.5,y-15]],highlight);
   }
+ }else if(biome==='coast'&&type==='tree'){
+  // Wind-shaped salt-tolerant coastal pines: lower, asymmetric canopies.
+  ctx.strokeStyle=stone;ctx.lineWidth=12;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(0,6);ctx.quadraticCurveTo(-7,-36,-19,-65);ctx.stroke();
+  for(let i=0;i<5;i++){
+   const xx=-30+(i-2)*16,yy=-72-(i%2)*11;
+   blob(xx,yy,25,13,i%2?shadow:mid);
+   blob(xx-6,yy-5,15,7,light);
+  }
+  blob(-39,-92,24,12,mid);blob(-46,-97,13,6,highlight);
+ }else if(biome==='fen'&&type==='tree'){
+  // Crooked waterlogged alder with hanging moss and small canopy.
+  ctx.strokeStyle=stone;ctx.lineWidth=11;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(0,7);ctx.lineTo(-7,-57);ctx.lineTo(9,-104);ctx.moveTo(-6,-51);ctx.lineTo(-36,-77);ctx.moveTo(4,-80);ctx.lineTo(30,-94);ctx.stroke();
+  for(let i=0;i<4;i++){
+   const xx=-32+i*20,yy=-94-(i%2)*12;
+   blob(xx,yy,19,14,i%2?shadow:mid);blob(xx-5,yy-5,11,7,light);
+   ctx.strokeStyle='#8a9770';ctx.lineWidth=2;
+   ctx.beginPath();ctx.moveTo(xx+9,yy+8);ctx.lineTo(xx+7,yy+25+variant*3);ctx.stroke();
+  }
+  for(let i=0;i<5;i++){const xx=-24+i*12;ctx.strokeStyle=mid;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(xx,5);ctx.lineTo(xx-4,-10-(i%3)*7);ctx.stroke();}
  }else if(dead||type==='bareTree'){
   ctx.strokeStyle=stone;ctx.lineCap='square';ctx.lineWidth=11;
   ctx.beginPath();ctx.moveTo(0,7);ctx.lineTo(variant*3-5,-117);ctx.moveTo(-3,-70);ctx.lineTo(-33,-106);ctx.moveTo(0,-88);ctx.lineTo(37,-127);ctx.stroke();
