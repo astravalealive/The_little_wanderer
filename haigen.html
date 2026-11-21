@@ -3278,7 +3278,35 @@ const oddThoughts=['Do frogs know they are damp?','Skölli looks like he knows m
 function currentThoughtTopic(){const nearDist=(p,r)=>dist(state,p)<r;if(state.food<2&&state.berries<3)return 'lowFood';if(state.coopTier&&state.nestEggs>=3&&nearDist(chickenNest,260))return 'eggs';if(state.coopTier&&nearDist(chickenNest,240))return 'chicken';if(nearDist(pond,400))return 'lake';if(nearDist(cottage,230))return 'camp';if(companions.some(c=>c.kind==='rabbit'&&nearDist(c,110)))return 'rabbit';if(companions.some(c=>c.kind==='fox'&&nearDist(c,110)))return 'fox';if(state.wood<3)return 'lowWood';if(state.stone<2)return 'lowStone';if(state.daytime%180>=112.5)return 'night';return Math.random()<.32?'silly':'woods'}
 let nextThoughtAt=0;
 function think(message,ms=3400,urgent=false){if(!urgent&&time<nextThoughtAt)return false;autoBubble=message;autoBubbleTimer=ms;nextThoughtAt=time+ms+rand(9000,16000);return true}
-function speak(topic,ms=4300){if(time>=nextThoughtAt)think(Math.random()<.4?mindThought():topic==='silly'&&Math.random()<.65?oddThoughts[Math.floor(Math.random()*oddThoughts.length)]:pickThought(topic),ms)}
+// Little Viking Hero: concise, offline, historically qualified Norse lore.
+const norseLore=[
+ {topic:'Odin',fact:'Odin is linked with wisdom, poetry, war and the dead in Norse myth. He gave up an eye in a quest for wisdom.'},
+ {topic:'Thor',fact:'Thor wields Mjolnir, his hammer, and protects gods and people from giants in many stories.'},
+ {topic:'Freyja',fact:'Freyja is associated with love, beauty, seidr magic and the slain. Her falcon-feather cloak appears in the myths.'},
+ {topic:'Freyr',fact:'Freyr is associated with fertility, prosperity and peace among the Vanir.'},
+ {topic:'Loki',fact:'Loki is a complicated trickster in the surviving myths, sometimes helping the gods and sometimes bringing disaster.'},
+ {topic:'Tyr',fact:'Tyr lost his hand when the gods bound the wolf Fenrir, according to the Prose Edda.'},
+ {topic:'Heimdall',fact:'Heimdall watches over Bifrost, the bridge of the gods, and is said to sound a horn at Ragnarok.'},
+ {topic:'Frigg',fact:'Frigg is associated with Odin and with foreknowledge in Norse mythology.'},
+ {topic:'Yggdrasil',fact:'Yggdrasil is the great tree that connects the mythic worlds in Old Norse poetry and prose.'},
+ {topic:'runes',fact:'Runes were letters used for writing, not simply magical symbols. Viking-age Scandinavians commonly used the Younger Futhark.'},
+ {topic:'ships',fact:'Viking-age ships were built from overlapping planks, often with shallow drafts suited to coasts and rivers.'},
+ {topic:'smithing',fact:'Norse smiths worked iron into tools, nails, knives, spearheads and other everyday necessities.'},
+ {topic:'clothing',fact:'Viking-age clothing commonly used wool and linen, with tunics, dresses, cloaks, belts and leather shoes.'},
+ {topic:'trade',fact:'Viking-age people traded silver, textiles, furs, tools and many other goods across long distances.'},
+ {topic:'sagas',fact:'Many Icelandic sagas were written down centuries after the Viking Age. They mix remembered history and storytelling.'},
+ {topic:'Ragnarok',fact:'Ragnarok is the mythic struggle and transformation of the world, told in the Eddic tradition.'}
+];
+let norseLoreNext=0,norseLoreIndex=0;
+function haigenNorseReflection(){
+ if(time<norseLoreNext)return null;
+ norseLoreNext=time+75000;
+ const entry=norseLore[norseLoreIndex++%norseLore.length];
+ if(haigenMind.notes.length<110||norseLoreIndex%4===0)mindWrite('I remembered a story about '+entry.topic+': '+entry.fact,'lore');
+ return entry.fact;
+}
+
+function speak(topic,ms=4300){if(time>=nextThoughtAt)think(Math.random()<.18?haigenNorseReflection()||mindThought():Math.random()<.4?mindThought():topic==='silly'&&Math.random()<.65?oddThoughts[Math.floor(Math.random()*oddThoughts.length)]:pickThought(topic),ms)}
 // Compact, offline language interpretation. Explicit supported goals only, no fake AI promises.
 function understandInstruction(input){
  const text=input.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
