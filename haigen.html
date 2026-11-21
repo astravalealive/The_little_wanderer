@@ -3230,10 +3230,34 @@ function mindChooseIntent(){
  }
  return haigenMind.intent;
 }
+// Curated Viking-age discoveries: facts are distinct from the world's fantasy lore.
+const vikingLessons=[
+ {id:'ships',title:'Longships',fact:'Viking-age longships used overlapping wooden planks and could travel by sail or oar.'},
+ {id:'runes',title:'Runes',fact:'The Viking Age mostly used Younger Futhark; Elder Futhark was an earlier runic alphabet.'},
+ {id:'craft',title:'Ironworking',fact:'Viking-age smiths heated iron in charcoal-fired forges and shaped it with hammers and anvils.'},
+ {id:'trade',title:'Trade',fact:'Viking-age traders exchanged goods across northern Europe and along rivers reaching distant markets.'},
+ {id:'navigation',title:'Navigation',fact:'Norse seafarers used landmarks, winds, stars and practical experience to navigate.'},
+ {id:'stories',title:'Norse stories',fact:'Odin and Thor belong to Norse mythology; the magical creatures in this game are fantasy.'}
+];
+function vikingKnowledgeTick(){
+ if(!state.autonomy||state.playerInstruction||state.resting)return;
+ if(!haigenMind.vikingKnowledge||typeof haigenMind.vikingKnowledge!=='object')haigenMind.vikingKnowledge={learned:[],nextAt:0};
+ const knowledge=haigenMind.vikingKnowledge;
+ if(!Array.isArray(knowledge.learned))knowledge.learned=[];
+ if(haigenMind.progressMs<(knowledge.nextAt||0))return;
+ const lesson=vikingLessons.find(item=>!knowledge.learned.includes(item.id));
+ if(!lesson)return;
+ knowledge.learned.push(lesson.id);
+ knowledge.nextAt=haigenMind.progressMs+150000;
+ mindWrite('Viking knowledge: '+lesson.title+'. '+lesson.fact,'discovery');
+ haigenMind.lastIdea='viking:'+lesson.id;
+}
+window.__haigenVikingKnowledge=()=>({learned:(haigenMind.vikingKnowledge?.learned||[]).slice(),total:vikingLessons.length});
 function mindTick(dt){
  if(document.hidden||collapseRemaining>0)return;
  mindObserveWorld(dt);
  mindChooseIntent();
+ vikingKnowledgeTick();
  haigenMind.progressMs+=dt;if(state.autonomy)haigenMind.autonomyTime+=dt;
  mindClock+=dt;if(mindClock<18000)return;mindClock=0;
  const region=expandedRegion(state.x,state.y)?.id||'woodland';
