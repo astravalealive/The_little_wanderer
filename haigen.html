@@ -12332,17 +12332,27 @@ function vikingForge(){
   const owned=!!kit[g.id],afford=purse>=g.cost&&(Number(state.wood)||0)>=g.wood;
   return '<div class="item"><span><b>'+safeText(g.name)+'</b><br><small>'+safeText(g.detail)+'</small><br><small>'+g.cost+' gold'+(g.wood?' + '+g.wood+' wood':'')+'</small></span><button class="btn" data-forge="'+g.id+'" '+(owned||!afford?'disabled':'')+'>'+(owned?'Owned':'Buy')+'</button></div>';
  }).join('');
+ const equipped=state.vikingEquipped??={};
+ const ownedRows=vikingForgeStock.filter(g=>kit[g.id]).map(g=>'<div class="item"><span>'+safeText(g.name)+'</span><button class="btn" data-equip="'+g.id+'">'+(equipped[g.id]?'Unequip':'Equip')+'</button></div>').join('');
  const trade=vikingTradeGoods.map(g=>{
   const have=Math.max(0,Math.floor(Number(state[g.field])||0));
   return '<div class="item"><span>'+safeText(g.name)+' <small>('+have+' owned)</small><br><small>'+g.qty+' for '+g.pay+' gold</small></span><button class="btn" data-sell="'+g.id+'" '+(have<g.qty?'disabled':'')+'>Sell</button></div>';
  }).join('');
- open('<h2>⚒️ Norse travelling smith</h2><p>Woodland homestead trade post. Permanent village and forge artwork are still to come.</p><p><b>Coin purse:</b> '+purse+' gold · <b>Wood:</b> '+Math.max(0,Math.floor(Number(state.wood)||0))+'</p><h3>Forged wares and clothing</h3>'+rows+'<h3>Sell gathered goods</h3>'+trade);
+ open('<h2>⚒️ Norse travelling smith</h2><p>Woodland homestead trade post. Permanent village and forge artwork are still to come.</p><p><b>Coin purse:</b> '+purse+' gold · <b>Wood:</b> '+Math.max(0,Math.floor(Number(state.wood)||0))+'</p><h3>Forged wares and clothing</h3>'+rows+'<h3>My equipment</h3>'+(ownedRows||'<p>No purchases yet.</p>')+'<h3>Sell gathered goods</h3>'+trade);
  $('modalBody').querySelectorAll('[data-forge]').forEach(b=>b.onclick=()=>{
   const g=vikingForgeStock.find(x=>x.id===b.dataset.forge);
   if(!g||kit[g.id]||atelier.purse<g.cost||(Number(state.wood)||0)<g.wood)return;
   atelier.purse-=g.cost;state.wood-=g.wood;kit[g.id]=true;
   mindWrite('I traded with the Norse smith for '+g.name+'.','memory');
   save();vikingForge();
+ });
+ $('modalBody').querySelectorAll('[data-equip]').forEach(b=>b.onclick=()=>{
+  const g=vikingForgeStock.find(x=>x.id===b.dataset.equip);
+  if(!g||!kit[g.id])return;
+  if(g.id!=='cloak'&&g.id!=='boots'&&g.id!=='shield'){
+   for(const weapon of ['seax','axe','spear','sword'])equipped[weapon]=false;
+  }
+  equipped[g.id]=!equipped[g.id];save();vikingForge();
  });
  $('modalBody').querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{
   const g=vikingTradeGoods.find(x=>x.id===b.dataset.sell);
@@ -12373,7 +12383,7 @@ function backpack(){
   ].concat(Object.entries(state.herbs||{}).map(([name,count])=>['🌸 '+name,count]))},
   {title:'🧰 Equipment',items:[
    ['🪓 Axes',state.tools?.axe],['🔦 Torches',state.tools?.torch],
-   ['🥄 Shovels',state.tools?.shovel],['⛏️ Pickaxes',state.tools?.pickaxe],['🦋 Nets',state.tools?.net],['🎣 Fishing rods',state.fishingRod?1:0],['🏹 Bows · level',state.tools?.bow],['⚙️ Crossbows · level',state.tools?.crossbow],['🏹 Arrows',state.arrows],...vikingForgeStock.filter(g=>state.vikingKit?.[g.id]).map(g=>['⚔️ '+g.name,1])
+   ['🥄 Shovels',state.tools?.shovel],['⛏️ Pickaxes',state.tools?.pickaxe],['🦋 Nets',state.tools?.net],['🎣 Fishing rods',state.fishingRod?1:0],['🏹 Bows · level',state.tools?.bow],['⚙️ Crossbows · level',state.tools?.crossbow],['🏹 Arrows',state.arrows],...vikingForgeStock.filter(g=>state.vikingKit?.[g.id]).map(g=>['⚔️ '+g.name+(state.vikingEquipped?.[g.id]?' (equipped)':''),1])
   ]}
  ];
  const contents=groups.map(group=>{
