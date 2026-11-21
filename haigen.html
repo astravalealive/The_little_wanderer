@@ -5166,8 +5166,75 @@ function drawHamletScenery(o){
  }
  ctx.restore();
 }
+// Issue #275: biome-specific full-size silhouettes on existing object anchors.
+// Render only: no object generation, movement, collision, or save mutations.
+function overhaulBiomeScenery(o){
+ const region=expandedRegion(o.x,o.y),biome=region?.id||'woodland',type=o.type;
+ if(!['tree','fir','palm','bareTree','rock'].includes(type))return false;
+ if(biome==='woodland')return false; // keep approved central woodland artwork
+ const seed=Math.abs(Math.floor(o.id||0)),variant=seed%4,scale=o.size||1;
+ const conifer=biome==='snow'||(biome==='downs'&&variant===0);
+ const dead=biome==='wasteland'||biome==='fen';
+ const tropical=biome==='rainforest'||(biome==='coast'&&type==='palm');
+ const arid=biome==='desert'||biome==='eastDunes';
+ const rock=type==='rock'||(arid&&type==='bareTree');
+ const palette={
+  snow:['#304b50','#50746e','#a9c9c8','#e4f0ed','#647f8b'],
+  fen:['#293e32','#506c49','#8a9364','#a8ae84','#4e554e'],
+  rainforest:['#184b35','#30764b','#70aa5b','#b0c977','#536c58'],
+  downs:['#385a3b','#5c8751','#a5bc76','#d5cf93','#777d68'],
+  desert:['#786044','#b08b60','#dfbc81','#eed7a1','#9b785b'],
+  eastDunes:['#755d43','#a8855d','#ddbb82','#eed4a0','#987454'],
+  coast:['#3a6556','#5b9472','#a6bb83','#e2d6a4','#8a8e80'],
+  wasteland:['#363a39','#5b5852','#867b70','#a99b85','#66605a']
+ }[biome];
+ if(!palette)return false;
+ const [shadow,mid,light,highlight,stone]=palette;
+ const blob=(x,y,rx,ry,color)=>{ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()};
+ const poly=(pts,color)=>{ctx.fillStyle=color;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fill()};
+ ctx.save();ctx.translate(o.x,o.y);ctx.scale(scale,scale);
+ blob(3,9,rock?37:31,rock?10:8,'#1b292850');
+ if(rock){
+  const w=31+variant*8,h=29+variant*7;
+  poly([[-w,5],[-w*.8,-h*.5],[-w*.3,-h],[w*.35,-h*.85],[w,-h*.3],[w*.83,7]],stone);
+  poly([[-w*.8,-h*.5],[-w*.3,-h],[w*.35,-h*.85],[w*.1,-h*.4],[-w*.5,-h*.2]],highlight);
+  poly([[w*.35,-h*.85],[w,-h*.3],[w*.83,7],[w*.1,-h*.4]],mid);
+  if(biome==='snow')poly([[-w*.8,-h*.5],[-w*.3,-h],[w*.35,-h*.85],[w*.58,-h*.55],[-w*.2,-h*.6]],'#f0f5ec');
+  if(biome==='wasteland')for(let i=0;i<3;i++)blob(-15+i*14,-h*.45+i*3,3,2,shadow);
+ }else if(conifer||type==='fir'){
+  const h=130+variant*12,w=43+variant*4;
+  ctx.fillStyle=stone;ctx.fillRect(-6,-45,12,52);
+  for(let j=0;j<4;j++){
+   const y=-17-j*26,spread=w-j*7;
+   poly([[-spread,y],[0,-h+j*13],[spread,y]],j%2?shadow:mid);
+   poly([[-spread*.72,y-5],[0,-h+j*13],[3,y-10]],light);
+   if(biome==='snow')poly([[-spread*.67,y-12],[0,-h+j*13],[spread*.5,y-15]],highlight);
+  }
+ }else if(dead||type==='bareTree'){
+  ctx.strokeStyle=stone;ctx.lineCap='square';ctx.lineWidth=11;
+  ctx.beginPath();ctx.moveTo(0,7);ctx.lineTo(variant*3-5,-117);ctx.moveTo(-3,-70);ctx.lineTo(-33,-106);ctx.moveTo(0,-88);ctx.lineTo(37,-127);ctx.stroke();
+  ctx.strokeStyle=mid;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-33,-106);ctx.lineTo(-39,-128);ctx.moveTo(37,-127);ctx.lineTo(48,-142);ctx.stroke();
+  if(biome==='fen')for(let i=0;i<3;i++)blob(-26+i*24,-91-i*9,14,8,shadow);
+ }else if(tropical){
+  ctx.fillStyle=stone;ctx.fillRect(-7,-73,14,80);
+  for(let i=0;i<6;i++){
+   const a=i*Math.PI*2/6,xx=Math.cos(a)*44,yy=-102+Math.sin(a)*24;
+   blob(xx,yy,37,27,i%2?mid:shadow);blob(xx-8,yy-7,25,16,light);
+  }
+  blob(0,-132,37,28,mid);blob(-8,-143,23,14,highlight);
+ }else if(arid){
+  ctx.fillStyle=stone;ctx.fillRect(-5,-44,10,51);
+  for(let i=0;i<4;i++){const xx=(i-1.5)*19;blob(xx,-53-(i%2)*16,26,16,i%2?mid:shadow);blob(xx-6,-61-(i%2)*16,15,9,light)}
+ }else{
+  ctx.fillStyle=stone;ctx.fillRect(-7,-64,14,71);
+  for(let i=0;i<5;i++){const xx=(i-2)*23,yy=-85-(i%2)*22;blob(xx,yy,30,24,i%2?shadow:mid);blob(xx-6,yy-8,20,13,light)}
+  blob(0,-118,35,25,mid);blob(-10,-127,21,12,highlight);
+ }
+ ctx.restore();return true;
+}
 function worldArtScenery(o){
  if(o.type.startsWith('hamlet-')){drawHamletScenery(o);return true}
+ if(overhaulBiomeScenery(o))return true;
  const type=o.type;
  const map={tree:'tree',fir:'fir',palm:'palm',bareTree:'bareTree',cactus:'cactus',
   rock:'rock',bush:'bush',flower:'flower',mushroom:'mushroom'};
