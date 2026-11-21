@@ -12306,6 +12306,35 @@ window.__haigenDeveloper=()=>({
  inventory:Object.fromEntries(devStock.map(([k])=>[k,Number(state[k])||0])),
  goal:haigenMind.lastGoal
 });
+// Norse travelling smith: a working, save-backed trading foundation near the homestead.
+// Village placement and dedicated forge artwork follow the map collision audit.
+const vikingForgeStock=[
+ {id:'seax',name:'Iron seax',cost:25,wood:0,stone:0,detail:'A practical iron knife'},
+ {id:'axe',name:'Bearded axe',cost:55,wood:2,stone:0,detail:'A forged axe with a wooden haft'},
+ {id:'shield',name:'Round shield',cost:45,wood:4,stone:0,detail:'A timber shield with an iron boss'},
+ {id:'spear',name:'Iron-tipped spear',cost:35,wood:3,stone:0,detail:'A long ash-wood shaft'},
+ {id:'sword',name:'Iron sword',cost:140,wood:1,stone:0,detail:'A costly warrior weapon'},
+ {id:'cloak',name:'Wool cloak',cost:30,wood:0,stone:0,detail:'A warm woven travelling cloak'},
+ {id:'boots',name:'Leather shoes',cost:20,wood:0,stone:0,detail:'Practical stitched footwear'}
+];
+function vikingForge(){
+ if(Math.hypot(state.x-cottage.x,state.y-cottage.y)>450){notify('Visit the travelling smith near your homestead to trade.');return}
+ const kit=state.vikingKit??={};
+ const purse=Math.max(0,Math.floor(Number(atelier.purse)||0));
+ const rows=vikingForgeStock.map(g=>{
+  const owned=!!kit[g.id],afford=purse>=g.cost&&(Number(state.wood)||0)>=g.wood;
+  return '<div class="item"><span><b>'+safeText(g.name)+'</b><br><small>'+safeText(g.detail)+'</small><br><small>'+g.cost+' gold'+(g.wood?' + '+g.wood+' wood':'')+'</small></span><button class="btn" data-forge="'+g.id+'" '+(owned||!afford?'disabled':'')+'>'+(owned?'Owned':'Trade')+'</button></div>';
+ }).join('');
+ open('<h2>⚒️ Norse travelling smith</h2><p>A smith visiting the woodland homestead. A permanent village forge is planned.</p><p><b>Silver purse:</b> '+purse+' gold · <b>Wood:</b> '+Math.max(0,Math.floor(Number(state.wood)||0))+'</p>'+rows);
+ $('modalBody').querySelectorAll('[data-forge]').forEach(b=>b.onclick=()=>{
+  const g=vikingForgeStock.find(x=>x.id===b.dataset.forge);
+  if(!g||kit[g.id]||atelier.purse<g.cost||(Number(state.wood)||0)<g.wood)return;
+  atelier.purse-=g.cost;state.wood-=g.wood;kit[g.id]=true;
+  mindWrite('I traded with the Norse smith for '+g.name+'.','memory');
+  save();vikingForge();
+ });
+}
+
 function backpack(){
  const n=v=>Math.max(0,Math.floor(Number(v)||0));
  const groups=[
@@ -12342,6 +12371,7 @@ function backpack(){
   button.onclick=()=>{if(!(state.mana>=1)||state.mothlightMs>0)return;state.mana--;state.mothlightMs=60000;close();notify('Your mothlight charm shines for one minute.')};
   $('modalBody').append(button);
  }
+ const forgeButton=document.createElement('button');forgeButton.className='btn';forgeButton.textContent='⚒️ Visit Norse smith (near homestead)';forgeButton.disabled=Math.hypot(state.x-cottage.x,state.y-cottage.y)>450;forgeButton.onclick=vikingForge;$('modalBody').append(forgeButton);
 }
 
 function haigenNotes(){
