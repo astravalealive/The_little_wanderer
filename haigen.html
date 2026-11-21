@@ -12317,20 +12317,38 @@ const vikingForgeStock=[
  {id:'cloak',name:'Wool cloak',cost:30,wood:0,stone:0,detail:'A warm woven travelling cloak'},
  {id:'boots',name:'Leather shoes',cost:20,wood:0,stone:0,detail:'Practical stitched footwear'}
 ];
+const vikingTradeGoods=[
+ {id:'berries',name:'Basket of berries',field:'berries',qty:8,pay:3},
+ {id:'mushrooms',name:'Dried mushrooms',field:'mushrooms',qty:5,pay:4},
+ {id:'fish',name:'Fresh fish',field:'fish',qty:3,pay:6},
+ {id:'wood',name:'Timber bundle',field:'wood',qty:5,pay:5},
+ {id:'stone',name:'Building stone',field:'stone',qty:6,pay:3}
+];
 function vikingForge(){
  if(Math.hypot(state.x-cottage.x,state.y-cottage.y)>450){notify('Visit the travelling smith near your homestead to trade.');return}
  const kit=state.vikingKit??={};
  const purse=Math.max(0,Math.floor(Number(atelier.purse)||0));
  const rows=vikingForgeStock.map(g=>{
   const owned=!!kit[g.id],afford=purse>=g.cost&&(Number(state.wood)||0)>=g.wood;
-  return '<div class="item"><span><b>'+safeText(g.name)+'</b><br><small>'+safeText(g.detail)+'</small><br><small>'+g.cost+' gold'+(g.wood?' + '+g.wood+' wood':'')+'</small></span><button class="btn" data-forge="'+g.id+'" '+(owned||!afford?'disabled':'')+'>'+(owned?'Owned':'Trade')+'</button></div>';
+  return '<div class="item"><span><b>'+safeText(g.name)+'</b><br><small>'+safeText(g.detail)+'</small><br><small>'+g.cost+' gold'+(g.wood?' + '+g.wood+' wood':'')+'</small></span><button class="btn" data-forge="'+g.id+'" '+(owned||!afford?'disabled':'')+'>'+(owned?'Owned':'Buy')+'</button></div>';
  }).join('');
- open('<h2>⚒️ Norse travelling smith</h2><p>A smith visiting the woodland homestead. A permanent village forge is planned.</p><p><b>Silver purse:</b> '+purse+' gold · <b>Wood:</b> '+Math.max(0,Math.floor(Number(state.wood)||0))+'</p>'+rows);
+ const trade=vikingTradeGoods.map(g=>{
+  const have=Math.max(0,Math.floor(Number(state[g.field])||0));
+  return '<div class="item"><span>'+safeText(g.name)+' <small>('+have+' owned)</small><br><small>'+g.qty+' for '+g.pay+' gold</small></span><button class="btn" data-sell="'+g.id+'" '+(have<g.qty?'disabled':'')+'>Sell</button></div>';
+ }).join('');
+ open('<h2>⚒️ Norse travelling smith</h2><p>Woodland homestead trade post. Permanent village and forge artwork are still to come.</p><p><b>Coin purse:</b> '+purse+' gold · <b>Wood:</b> '+Math.max(0,Math.floor(Number(state.wood)||0))+'</p><h3>Forged wares and clothing</h3>'+rows+'<h3>Sell gathered goods</h3>'+trade);
  $('modalBody').querySelectorAll('[data-forge]').forEach(b=>b.onclick=()=>{
   const g=vikingForgeStock.find(x=>x.id===b.dataset.forge);
   if(!g||kit[g.id]||atelier.purse<g.cost||(Number(state.wood)||0)<g.wood)return;
   atelier.purse-=g.cost;state.wood-=g.wood;kit[g.id]=true;
   mindWrite('I traded with the Norse smith for '+g.name+'.','memory');
+  save();vikingForge();
+ });
+ $('modalBody').querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{
+  const g=vikingTradeGoods.find(x=>x.id===b.dataset.sell);
+  if(!g||(Number(state[g.field])||0)<g.qty)return;
+  state[g.field]-=g.qty;atelier.purse=Math.max(0,Math.floor(Number(atelier.purse)||0))+g.pay;
+  mindWrite('I traded '+g.name+' for '+g.pay+' coins at the woodland smith.','memory');
   save();vikingForge();
  });
 }
@@ -12355,7 +12373,7 @@ function backpack(){
   ].concat(Object.entries(state.herbs||{}).map(([name,count])=>['🌸 '+name,count]))},
   {title:'🧰 Equipment',items:[
    ['🪓 Axes',state.tools?.axe],['🔦 Torches',state.tools?.torch],
-   ['🥄 Shovels',state.tools?.shovel],['⛏️ Pickaxes',state.tools?.pickaxe],['🦋 Nets',state.tools?.net],['🎣 Fishing rods',state.fishingRod?1:0],['🏹 Bows · level',state.tools?.bow],['⚙️ Crossbows · level',state.tools?.crossbow],['🏹 Arrows',state.arrows]
+   ['🥄 Shovels',state.tools?.shovel],['⛏️ Pickaxes',state.tools?.pickaxe],['🦋 Nets',state.tools?.net],['🎣 Fishing rods',state.fishingRod?1:0],['🏹 Bows · level',state.tools?.bow],['⚙️ Crossbows · level',state.tools?.crossbow],['🏹 Arrows',state.arrows],...vikingForgeStock.filter(g=>state.vikingKit?.[g.id]).map(g=>['⚔️ '+g.name,1])
   ]}
  ];
  const contents=groups.map(group=>{
