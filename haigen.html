@@ -5168,6 +5168,41 @@ function drawHamletScenery(o){
 }
 // Issue #275: biome-specific full-size silhouettes on existing object anchors.
 // Render only: no object generation, movement, collision, or save mutations.
+// Coastal art-only treatment: existing resource IDs and collision footprints remain untouched.
+// Sparse palms, no beach bushes, and shells/starfish instead of visible boulders.
+function overhaulBeachScenery(o){
+ if(expandedRegion(o.x,o.y)?.id!=='coast')return false;
+ const t=o.type;
+ if(!['tree','fir','palm','bareTree','bush','rock'].includes(t))return false;
+ const id=Math.abs(Math.floor(o.id||0)),v=seeded(id*19+17);
+ if(t==='bush')return true;
+ if(t==='tree'||t==='fir'||t==='bareTree'||t==='palm'){
+  if(v>.12)return true; // only occasional palms along the coast
+  ctx.save();ctx.translate(o.x,o.y);ctx.scale(o.size||1,o.size||1);
+  ctx.fillStyle='#b8a17155';ctx.beginPath();ctx.ellipse(4,6,27,8,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#95744f';ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,4);ctx.quadraticCurveTo(14,-45,7,-88);ctx.stroke();
+  ctx.strokeStyle='#d3b184';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(3,-4);ctx.quadraticCurveTo(18,-45,9,-85);ctx.stroke();
+  for(let k=0;k<7;k++){const a=k*Math.PI*2/7;ctx.strokeStyle=k%2?'#477a59':'#6d9667';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(7,-88);ctx.quadraticCurveTo(7+Math.cos(a)*29,-103+Math.sin(a)*10,7+Math.cos(a)*53,-68+Math.sin(a)*18);ctx.stroke()}
+  ctx.restore();return true;
+ }
+ if(t==='rock'){
+  ctx.save();ctx.translate(o.x,o.y);ctx.scale(Math.min(1,o.size||1),Math.min(1,o.size||1));
+  if(v<.23){ // starfish, five arms and a dotted centre
+   ctx.fillStyle='#b86f55';ctx.beginPath();
+   for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?6:15;const x=Math.cos(a)*r,y=Math.sin(a)*r;if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.closePath();ctx.fill();
+   ctx.fillStyle='#f2c9a0';for(let k=0;k<5;k++){const a=k*Math.PI*2/5;ctx.fillRect(Math.cos(a)*7-1,Math.sin(a)*7-1,2,2)}
+  }else if(v<.8){ // scallop shell with fine radiating ribs
+   ctx.fillStyle=v<.52?'#e9d6b9':'#d5a58e';ctx.beginPath();ctx.ellipse(0,0,13,9,-.2,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle='#aa8877';ctx.lineWidth=1.2;
+   for(let k=-3;k<=3;k++){ctx.beginPath();ctx.moveTo(0,6);ctx.lineTo(k*3,-7);ctx.stroke()}
+  }else{ // small spiral shell
+   ctx.fillStyle='#eee0c4';ctx.beginPath();ctx.ellipse(0,0,10,7,.4,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle='#bd9678';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(1,0,4,0,Math.PI*1.7);ctx.stroke();
+  }
+  ctx.restore();return true;
+ }
+ return false;
+}
 function overhaulBiomeScenery(o){
  const region=expandedRegion(o.x,o.y),biome=region?.id||'woodland',type=o.type;
  if(!['tree','fir','palm','bareTree','rock'].includes(type))return false;
@@ -5255,6 +5290,7 @@ function overhaulBiomeScenery(o){
 }
 function worldArtScenery(o){
  if(o.type.startsWith('hamlet-')){drawHamletScenery(o);return true}
+ if(overhaulBeachScenery(o))return true;
  if(overhaulBiomeScenery(o))return true;
  const type=o.type;
  const map={tree:'tree',fir:'fir',palm:'palm',bareTree:'bareTree',cactus:'cactus',
@@ -5465,6 +5501,7 @@ function drawEasternIslandLandmarks(){
  ctx.restore();
 }
 function drawSceneryNearHaigen(o){
+ if(overhaulBeachScenery(o))return;
  // Route woodland flowers before the cached atlas path, which otherwise returns early.
  if(rbEnabled&&o.type==='flower'&&rbWoodland(o.x,o.y)){
   ctx.save();ctx.globalAlpha*=foliageVisibility(o);rbDrawFlower(o);ctx.restore();return;
@@ -9754,6 +9791,7 @@ function worldEditorGround(left,right,top,bottom){
 }
 // V196: detailed, reusable editor palette scenery drawn in the playable world.
 function drawWorldEditorNatureArt(o){
+ if(overhaulBeachScenery(o))return;
  if(drawWoodlandArtwork(o))return;
  const type=o.type,v=seeded(o.id*19+11),s=o.size||1;
  if(type==='specter'){drawRegionalScenery(o);return}
