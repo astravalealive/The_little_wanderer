@@ -4431,24 +4431,8 @@ function drawWoodlandPathEdges(){
 function path(){
  if(paintedTrailsReady){
   ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();
-  // Keep the original hand-painted paths and their geometry; apply a restrained
-  // storybook soil glaze to the actual loaded path layer, not only its fallback.
-  // The glaze is clipped to woodland. Skip its route tracing entirely when
-  // the camera's visible world rectangle cannot overlap that clip.
-  const z=worldZoom(),halfW=W/(2*z),halfH=H/(2*z);
-  if(cam.x+halfW>0&&cam.x-halfW<3500&&cam.y+halfH>0&&cam.y-halfH<3100){
-   ctx.save();ctx.beginPath();ctx.rect(0,0,3500,3100);ctx.clip();
-   ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#7a654888';
-   for(let i=0;i<roadRoutes.length;i++){
-    ctx.lineWidth=Math.max(8,roadWidths[i]-10);roadTrace(ctx,roadRoutes[i]);ctx.stroke();
-   }
-   // Job 233: deeper centre band so heartland routes read against calmer grass.
-   ctx.strokeStyle='#5e4d36a0';
-   for(let i=0;i<roadRoutes.length;i++){
-    ctx.lineWidth=Math.max(4,roadWidths[i]-22);roadTrace(ctx,roadRoutes[i]);ctx.stroke();
-   }
-   ctx.restore();
-  }
+  // Issue #263: show the original irregular hand-painted dirt paths alone.
+  // No geometric route strokes over the artwork; roadRoutes remain for gameplay.
   drawWoodlandPathEdges();return
  }
  // Draw full road network one material layer at a time so the junctions merge.
