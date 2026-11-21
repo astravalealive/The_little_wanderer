@@ -14,7 +14,7 @@ expect(/\.\.\.companions\.map\(c=>\(\{y:c\.y,draw:/,'companions must remain in w
 const sort=(items)=>items.map((item,i)=>({...item,depthOrder:i})).sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder);
 assert.deepEqual(sort([{id:'deer',y:90},{id:'rock',y:100}]).map(x=>x.id),['deer','rock']);
 assert.deepEqual(sort([{id:'rock',y:100},{id:'deer',y:110}]).map(x=>x.id),['rock','deer']);
-assert.deepEqual(sort([{id:'deer',y:2200},{id:'stump',y:2198}]).map(x=>x.id),['stump','deer']);
+assert.deepEqual(sort([{id:'deer',y:2250},{id:'stump',y:2224}]).map(x=>x.id),['stump','deer']);
 assert.deepEqual(sort([{id:'deer',y:2100},{id:'stump',y:2198}]).map(x=>x.id),['deer','stump']);
 assert.deepEqual(sort([{id:'a',y:100},{id:'b',y:100},{id:'c',y:100}]).map(x=>x.id),['a','b','c']);
 console.log('World depth queue source and ordering regression passed');
