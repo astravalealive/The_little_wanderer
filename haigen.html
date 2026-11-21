@@ -4041,12 +4041,18 @@ function independentChoiceTick(dt){
    ['chores',chores?1.7+(state.hunger<75?0.5:0):0],
    ['adventure',2.3+haigenMind.curiosity/38+(state.energy>65?.8:0)]
   ].map(([kind,weight])=>({kind,weight:Math.max(0,weight)*(independentAgenda.recent.includes(kind)?0.45:1)}));
+  // Needs-aware planner: don't choose another adventure when survival or camp work needs attention.
+  const intent=mindChooseIntent();
+  const canPrepareFood=state.food<2&&(state.rawMeat||state.vegetables>=3||state.eggs>=2||state.fish||state.mushrooms>=3||state.berries>=6);
   let total=weights.reduce((a,b)=>a+b.weight,0),pick=Math.random()*total,chosen='adventure';
   for(const option of weights){pick-=option.weight;if(pick<=0){chosen=option.kind;break}}
+  if(intent.kind==='eat'&&inCamp&&canPrepareFood)chosen='chores';
+  else if((intent.kind==='recover'||intent.kind==='rest'||intent.kind==='heal')&&chosen==='adventure')chosen=inCamp&&chores?'chores':'build';
   independentAgenda.kind=chosen;
   independentAgenda.remaining=chosen==='build'?29000:chosen==='adventure'?24000:14000;
   independentAgenda.recent=[chosen,...independentAgenda.recent].slice(0,2);
   const motivations={build:'work on the homestead',chores:'look after camp',adventure:'follow my curiosity'};
+  haigenMind.lastDecision={kind:chosen,need:intent.kind,region:intent.region,at:Date.now()};
   haigenMind.lastGoal=motivations[chosen];
   if(time>(haigenMind.lastIndependentNoteAt||0)+13000){
    haigenMind.lastIndependentNoteAt=time;
