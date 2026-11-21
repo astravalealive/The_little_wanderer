@@ -1,0 +1,33 @@
+name: Controlled depth evidence 273
+on:
+  pull_request:
+    paths:
+      - haigen.html
+      - tests/live/depth-visual-evidence-273.cjs
+      - tests/live/depth-evidence-audit-273.cjs
+      - .github/workflows/depth-visual-273.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  depth-captures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: npm install --no-save playwright-core@1.56.1
+      - name: Capture overlapping actor-obstacle pairs
+        run: node tests/live/depth-visual-evidence-273.cjs
+      - name: Audit PNG evidence archive
+        run: node tests/live/depth-evidence-audit-273.cjs depth-visual-evidence-273
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: depth-evidence-273
+          path: depth-visual-evidence-273/*.png
+          if-no-files-found: warn

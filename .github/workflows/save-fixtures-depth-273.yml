@@ -1,0 +1,23 @@
+name: Save fixture and world depth regression
+on:
+  pull_request:
+    paths:
+      - haigen.html
+      - tests/live/save-reader-fixtures-20261121.cjs
+      - tests/live/world-depth-order-269.cjs
+      - .github/workflows/save-fixtures-depth-273.yml
+  workflow_dispatch:
+jobs:
+  save-and-depth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify game save fixture
+        run: node tests/live/save-reader-fixtures-20261121.cjs
+      - name: Verify save corruption fallback
+        run: node tests/live/save-corruption-214.cjs
+      - name: Verify depth queue
+        run: node tests/live/world-depth-order-269.cjs
