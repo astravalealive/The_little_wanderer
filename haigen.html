@@ -3400,78 +3400,92 @@ let navProgressWindow=0,navProgressStart=null;
 // Haigen's Awakening: bounded grid routing, remembered obstacles and progress checks.
 // All movement remains subject to the game's existing collision and terrain rules.
 const awakeningRoutes=new Map();
+let awakeningPath=[],awakeningPathKey='',awakeningRetry=0;
+// Routes are bounded and recomputed when the origin, goal or collision state changes.
 function awakeningRoute(target,reach){
- const cell=90,origin={x:Math.round(state.x/cell),y:Math.round(state.y/cell)},goal={x:Math.round(target.x/cell),y:Math.round(target.y/cell)};
- const key=origin.x+','+origin.y+'>'+goal.x+','+goal.y;
- const cached=awakeningRoutes.get(key);if(cached&&time-cached.at<18000)return cached.path;
- const nodes=[{...origin,g:0,h:Math.hypot(goal.x-origin.x,goal.y-origin.y)}],visited=new Map(),closed=new Set();
- const id=(x,y)=>x+','+y;visited.set(id(origin.x,origin.y),nodes[0]);
+ const cell=56,origin={x:Math.round(state.x/cell),y:Math.round(state.y/cell)};
+ const key=Math.round(target.x/cell)+','+Math.round(target.y/cell)+':'+Math.round(reach);
+ const cacheKey=origin.x+','+origin.y+'>'+key;
+ const cached=awakeningRoutes.get(cacheKey);
+ if(cached&&time-cached.at<3000)return cached.path.slice();
+ const open=[{x:origin.x,y:origin.y,g:0,h:0}],best=new Map(),closed=new Set();
+ const id=(x,y)=>x+','+y;
+ best.set(id(origin.x,origin.y),0);
  let found=null,iterations=0;
- while(nodes.length&&iterations++<260){
-  nodes.sort((a,b)=>(a.g+a.h)-(b.g+b.h));const cur=nodes.shift(),k=id(cur.x,cur.y);
-  if(closed.has(k))continue;closed.add(k);
-  if(Math.hypot(cur.x*cell-target.x,cur.y*cell-target.y)<Math.max(reach,cell*1.25)){found=cur;break}
+ while(open.length&&iterations++<380){
+  open.sort((a,b)=>(a.g+a.h)-(b.g+b.h));
+  const cur=open.shift(),k=id(cur.x,cur.y);
+  if(closed.has(k))continue;
+  closed.add(k);
+  if(Math.hypot(cur.x*cell-target.x,cur.y*cell-target.y)<=Math.max(reach,cell*.9)){found=cur;break}
   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){
    const x=cur.x+dx,y=cur.y+dy,nk=id(x,y);
-   if(closed.has(nk)||Math.abs(x-origin.x)>15||Math.abs(y-origin.y)>15)continue;
-   const wx=x*cell,wy=y*cell;
-   if(!autoStand(wx,wy))continue;
+   if(closed.has(nk)||Math.abs(x-origin.x)>22||Math.abs(y-origin.y)>22)continue;
+   if(!autoStand(x*cell,y*cell))continue;
    if(dx&&dy&&(!autoStand((cur.x+dx)*cell,cur.y*cell)||!autoStand(cur.x*cell,(cur.y+dy)*cell)))continue;
-   const g=cur.g+Math.hypot(dx,dy),old=visited.get(nk);
-   if(old&&old.g<=g)continue;
-   const node={x,y,g,h:Math.hypot(goal.x-x,goal.y-y),parent:cur};
-   visited.set(nk,node);nodes.push(node);
+   const g=cur.g+Math.hypot(dx,dy);
+   if(g>=(best.get(nk)??Infinity))continue;
+   best.set(nk,g);
+   open.push({x,y,g,h:Math.hypot(target.x/cell-x,target.y/cell-y),parent:cur});
   }
  }
- const path=[];while(found&&found.parent){path.unshift({x:found.x*cell,y:found.y*cell});found=found.parent}
- if(awakeningRoutes.size>24)awakeningRoutes.clear();
- awakeningRoutes.set(key,{at:time,path});
+ const path=[];
+ while(found&&found.parent){path.unshift({x:found.x*cell,y:found.y*cell});found=found.parent}
+ if(awakeningRoutes.size>20)awakeningRoutes.clear();
+ awakeningRoutes.set(cacheKey,{at:time,path:path.slice()});
  return path;
 }
 function autoTravel(target,dt,reach=80,speed=.14){
- const d=dist(state,target);if(d<=reach){autoResetNav();return true}
+ const d=dist(state,target);
+ if(d<=reach){autoResetNav();awakeningPath=[];autoWaypoint=null;return true}
  const key=(target.id===undefined?'place':target.id)+':'+Math.round(target.x/15)+':'+Math.round(target.y/15);
- if(autoNav.key!==key){autoResetNav();autoNav.key=key;navProgressWindow=0;navProgressStart={x:state.x,y:state.y,d};autoWaypoint=null}
+ if(autoNav.key!==key){
+  autoResetNav();autoNav.key=key;navProgressWindow=0;
+  navProgressStart={x:state.x,y:state.y,d};autoWaypoint=null;
+  awakeningPath=[];awakeningPathKey=key;awakeningRetry=0;
+ }
  navProgressWindow+=dt;
- if(navProgressWindow>4200){
+ if(navProgressWindow>3800){
+  const moved=navProgressStart?Math.hypot(state.x-navProgressStart.x,state.y-navProgressStart.y):0;
   const gained=navProgressStart?navProgressStart.d-d:0;
-  if(gained<18){
-   autoNav.failures++;
-   autoWaypoint=null;
-   awakeningRoutes.clear();
-   if(autoNav.failures===2)think('I am stuck on the scenery. I need another path through this game.',3600,true);
+  if(moved<18||gained<10){
+   autoNav.failures++;awakeningPath=[];autoWaypoint=null;awakeningRoutes.clear();awakeningRetry++;
+   if(autoNav.failures===2)think('That path is blocked. I should find another way.',3000,true);
   }else autoNav.failures=Math.max(0,autoNav.failures-1);
   navProgressWindow=0;navProgressStart={x:state.x,y:state.y,d};
  }
  if(autoNav.failures>=4){
   if(target.id!==undefined)autoIgnore.set(target.id,Date.now()+90000);
   if(state.autoFreeJob){state.autoFreeJob=null;independentAgenda.remaining=0}
-  autoJobId='';autoResetNav();autoWaypoint=null;autoDestination=null;autoPause=900;
-  mindWrite('I could not reach that place. I will remember to try another route.','memory');
-  think('That route is blocked. I will choose a different adventure.',3800,true);
+  autoJobId='';autoResetNav();awakeningPath=[];autoWaypoint=null;autoDestination=null;autoPause=1000;
+  mindWrite('I could not reach that place. I will try a different adventure.','memory');
+  think('I will leave that place for now.',3200,true);
   return false;
  }
- if(!autoWaypoint||Math.hypot(state.x-autoWaypoint.x,state.y-autoWaypoint.y)<36){
-  const path=awakeningRoute(target,reach);
-  autoWaypoint=path.length?path[0]:null;
+ // Advance through waypoints instead of repeatedly selecting the first waypoint.
+ while(awakeningPath.length&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<34)awakeningPath.shift();
+ if(!awakeningPath.length){
+  awakeningPath=awakeningRoute(target,reach);
+  while(awakeningPath.length&&Math.hypot(state.x-awakeningPath[0].x,state.y-awakeningPath[0].y)<34)awakeningPath.shift();
  }
+ autoWaypoint=awakeningPath[0]||null;
  const aim=autoWaypoint||target;
  const step=Math.min(dt,50)*speed,heading=Math.atan2(aim.y-state.y,aim.x-state.x);
- const offsets=autoNav.side>0?[0,.35,-.35,.73,-.73,1.15,-1.15,1.6,-1.6]:[0,-.35,.35,-.73,.73,-1.15,1.15,-1.6,1.6];
- let best=null,score=Infinity;
+ const offsets=autoNav.side>0?[0,.35,-.35,.73,-.73,1.15,-1.15,1.6,-1.6]:[0,-.35,.35,-.73,.73,-1.15,-1.6,1.6];
+ let bestMove=null,score=Infinity;
  for(const angle of offsets){
   const dx=Math.cos(heading+angle),dy=Math.sin(heading+angle),x=state.x+dx*step,y=state.y+dy*step;
   if(!autoStand(x,y))continue;
-  const look=Math.min(42,Math.max(12,Math.hypot(aim.x-state.x,aim.y-state.y)-24));
+  const look=Math.min(36,Math.max(10,Math.hypot(aim.x-state.x,aim.y-state.y)-18));
   if(!autoStand(state.x+dx*look,state.y+dy*look))continue;
   const cost=Math.hypot(aim.x-x,aim.y-y)+Math.abs(angle)*13;
-  if(cost<score){score=cost;best={x,y,angle}}
+  if(cost<score){score=cost;bestMove={x,y,angle}}
  }
- if(best){
-  state.x=best.x;state.y=best.y;
-  if(Math.abs(best.angle)>.5)autoNav.side=best.angle>=0?1:-1;
- }else{autoWaypoint=null;autoNav.stuck+=dt}
- if(autoNav.stuck>1400){autoNav.side*=-1;autoNav.stuck=0;autoWaypoint=null;awakeningRoutes.clear()}
+ if(bestMove){
+  state.x=bestMove.x;state.y=bestMove.y;autoNav.stuck=0;
+  if(Math.abs(bestMove.angle)>.5)autoNav.side=bestMove.angle>=0?1:-1;
+ }else{autoNav.stuck+=dt}
+ if(autoNav.stuck>1200){autoNav.side*=-1;autoNav.stuck=0;awakeningPath=[];autoWaypoint=null;awakeningRoutes.clear()}
  return false;
 }
 // V208: temporary travel camp, separate from permanent structures and saves.
