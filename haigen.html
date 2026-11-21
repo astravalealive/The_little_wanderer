@@ -3278,7 +3278,35 @@ const oddThoughts=['Do frogs know they are damp?','Skölli looks like he knows m
 function currentThoughtTopic(){const nearDist=(p,r)=>dist(state,p)<r;if(state.food<2&&state.berries<3)return 'lowFood';if(state.coopTier&&state.nestEggs>=3&&nearDist(chickenNest,260))return 'eggs';if(state.coopTier&&nearDist(chickenNest,240))return 'chicken';if(nearDist(pond,400))return 'lake';if(nearDist(cottage,230))return 'camp';if(companions.some(c=>c.kind==='rabbit'&&nearDist(c,110)))return 'rabbit';if(companions.some(c=>c.kind==='fox'&&nearDist(c,110)))return 'fox';if(state.wood<3)return 'lowWood';if(state.stone<2)return 'lowStone';if(state.daytime%180>=112.5)return 'night';return Math.random()<.32?'silly':'woods'}
 let nextThoughtAt=0;
 function think(message,ms=3400,urgent=false){if(!urgent&&time<nextThoughtAt)return false;autoBubble=message;autoBubbleTimer=ms;nextThoughtAt=time+ms+rand(9000,16000);return true}
-function speak(topic,ms=4300){if(time>=nextThoughtAt)think(Math.random()<.4?mindThought():topic==='silly'&&Math.random()<.65?oddThoughts[Math.floor(Math.random()*oddThoughts.length)]:pickThought(topic),ms)}
+// Little Viking Hero: concise, offline, historically qualified Norse lore.
+const norseLore=[
+ {topic:'Odin',fact:'Odin is linked with wisdom, poetry, war and the dead in Norse myth. He gave up an eye in a quest for wisdom.'},
+ {topic:'Thor',fact:'Thor wields Mjolnir, his hammer, and protects gods and people from giants in many stories.'},
+ {topic:'Freyja',fact:'Freyja is associated with love, beauty, seidr magic and the slain. Her falcon-feather cloak appears in the myths.'},
+ {topic:'Freyr',fact:'Freyr is associated with fertility, prosperity and peace among the Vanir.'},
+ {topic:'Loki',fact:'Loki is a complicated trickster in the surviving myths, sometimes helping the gods and sometimes bringing disaster.'},
+ {topic:'Tyr',fact:'Tyr lost his hand when the gods bound the wolf Fenrir, according to the Prose Edda.'},
+ {topic:'Heimdall',fact:'Heimdall watches over Bifrost, the bridge of the gods, and is said to sound a horn at Ragnarok.'},
+ {topic:'Frigg',fact:'Frigg is associated with Odin and with foreknowledge in Norse mythology.'},
+ {topic:'Yggdrasil',fact:'Yggdrasil is the great tree that connects the mythic worlds in Old Norse poetry and prose.'},
+ {topic:'runes',fact:'Runes were letters used for writing, not simply magical symbols. Viking-age Scandinavians commonly used the Younger Futhark.'},
+ {topic:'ships',fact:'Viking-age ships were built from overlapping planks, often with shallow drafts suited to coasts and rivers.'},
+ {topic:'smithing',fact:'Norse smiths worked iron into tools, nails, knives, spearheads and other everyday necessities.'},
+ {topic:'clothing',fact:'Viking-age clothing commonly used wool and linen, with tunics, dresses, cloaks, belts and leather shoes.'},
+ {topic:'trade',fact:'Viking-age people traded silver, textiles, furs, tools and many other goods across long distances.'},
+ {topic:'sagas',fact:'Many Icelandic sagas were written down centuries after the Viking Age. They mix remembered history and storytelling.'},
+ {topic:'Ragnarok',fact:'Ragnarok is the mythic struggle and transformation of the world, told in the Eddic tradition.'}
+];
+let norseLoreNext=0,norseLoreIndex=0;
+function haigenNorseReflection(){
+ if(time<norseLoreNext)return null;
+ norseLoreNext=time+75000;
+ const entry=norseLore[norseLoreIndex++%norseLore.length];
+ if(haigenMind.notes.length<110||norseLoreIndex%4===0)mindWrite('I remembered a story about '+entry.topic+': '+entry.fact,'lore');
+ return entry.fact;
+}
+
+function speak(topic,ms=4300){if(time>=nextThoughtAt)think(Math.random()<.18?haigenNorseReflection()||mindThought():Math.random()<.4?mindThought():topic==='silly'&&Math.random()<.65?oddThoughts[Math.floor(Math.random()*oddThoughts.length)]:pickThought(topic),ms)}
 // Compact, offline language interpretation. Explicit supported goals only, no fake AI promises.
 function understandInstruction(input){
  const text=input.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
@@ -4268,7 +4296,7 @@ function showReturnReport(){
 function setAutonomy(enabled,keepInstruction=false){
   if(enabled&&(state.skiffAtSea||state.raftAfloat)){notify('Moor the boat before autonomous exploration.');return}
   if(enabled&&!keepInstruction)state.playerInstruction=null;
-  state.autonomy=enabled;haigenMind.controlSwitches++;independentAgenda.remaining=0;autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';autoPause=enabled?700:0;if(enabled){nextThoughtAt=0;speak(currentThoughtTopic(),4600)}else {autoBubbleTimer=0;idleTime=0;}
+  state.autonomy=enabled;haigenMind.controlSwitches++;independentAgenda.remaining=0;autoDestination=null;autoWaypoint=null;autoResetNav();autoJobId='';autoPause=enabled?700:0;if(enabled){nextThoughtAt=0;think('I am Haigen, exploring Haigen\'s World. Alfather made this game, and I can learn its paths, but I cannot change its rules.',4700,true);if(!haigenMind.awakeningIntroduced){haigenMind.awakeningIntroduced=true;mindWrite('I know I am a character in Haigen\'s World. Alfather created this game. I can explore, remember and choose what to do, but I cannot change the game itself.','memory')}}else {autoBubbleTimer=0;idleTime=0;}
   $('modeBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';$('autoTouchBtn').textContent=enabled?'🎮 Take control':'🤖 Let Haigen play';
   notify(enabled?'🌲 Haigen is exploring on his own.':'🎮 You are in control!');
   save();
@@ -12292,6 +12320,63 @@ window.__haigenDeveloper=()=>({
  inventory:Object.fromEntries(devStock.map(([k])=>[k,Number(state[k])||0])),
  goal:haigenMind.lastGoal
 });
+// Norse travelling smith: a working, save-backed trading foundation near the homestead.
+// Village placement and dedicated forge artwork follow the map collision audit.
+const vikingForgeStock=[
+ {id:'seax',name:'Iron seax',cost:25,wood:0,stone:0,detail:'A practical iron knife'},
+ {id:'axe',name:'Bearded axe',cost:55,wood:2,stone:0,detail:'A forged axe with a wooden haft'},
+ {id:'shield',name:'Round shield',cost:45,wood:4,stone:0,detail:'A timber shield with an iron boss'},
+ {id:'spear',name:'Iron-tipped spear',cost:35,wood:3,stone:0,detail:'A long ash-wood shaft'},
+ {id:'sword',name:'Iron sword',cost:140,wood:1,stone:0,detail:'A costly warrior weapon'},
+ {id:'cloak',name:'Wool cloak',cost:30,wood:0,stone:0,detail:'A warm woven travelling cloak'},
+ {id:'boots',name:'Leather shoes',cost:20,wood:0,stone:0,detail:'Practical stitched footwear'}
+];
+const vikingTradeGoods=[
+ {id:'berries',name:'Basket of berries',field:'berries',qty:8,pay:3},
+ {id:'mushrooms',name:'Dried mushrooms',field:'mushrooms',qty:5,pay:4},
+ {id:'fish',name:'Fresh fish',field:'fish',qty:3,pay:6},
+ {id:'wood',name:'Timber bundle',field:'wood',qty:5,pay:5},
+ {id:'stone',name:'Building stone',field:'stone',qty:6,pay:3}
+];
+function vikingForge(){
+ if(Math.hypot(state.x-cottage.x,state.y-cottage.y)>450){notify('Visit the travelling smith near your homestead to trade.');return}
+ const kit=state.vikingKit??={};
+ const purse=Math.max(0,Math.floor(Number(atelier.purse)||0));
+ const rows=vikingForgeStock.map(g=>{
+  const owned=!!kit[g.id],afford=purse>=g.cost&&(Number(state.wood)||0)>=g.wood;
+  return '<div class="item"><span><b>'+safeText(g.name)+'</b><br><small>'+safeText(g.detail)+'</small><br><small>'+g.cost+' gold'+(g.wood?' + '+g.wood+' wood':'')+'</small></span><button class="btn" data-forge="'+g.id+'" '+(owned||!afford?'disabled':'')+'>'+(owned?'Owned':'Buy')+'</button></div>';
+ }).join('');
+ const equipped=state.vikingEquipped??={};
+ const ownedRows=vikingForgeStock.filter(g=>kit[g.id]).map(g=>'<div class="item"><span>'+safeText(g.name)+'</span><button class="btn" data-equip="'+g.id+'">'+(equipped[g.id]?'Unequip':'Equip')+'</button></div>').join('');
+ const trade=vikingTradeGoods.map(g=>{
+  const have=Math.max(0,Math.floor(Number(state[g.field])||0));
+  return '<div class="item"><span>'+safeText(g.name)+' <small>('+have+' owned)</small><br><small>'+g.qty+' for '+g.pay+' gold</small></span><button class="btn" data-sell="'+g.id+'" '+(have<g.qty?'disabled':'')+'>Sell</button></div>';
+ }).join('');
+ open('<h2>⚒️ Norse travelling smith</h2><p>Woodland homestead trade post. Permanent village and forge artwork are still to come.</p><p><b>Coin purse:</b> '+purse+' gold · <b>Wood:</b> '+Math.max(0,Math.floor(Number(state.wood)||0))+'</p><h3>Forged wares and clothing</h3>'+rows+'<h3>My equipment</h3>'+(ownedRows||'<p>No purchases yet.</p>')+'<h3>Sell gathered goods</h3>'+trade);
+ $('modalBody').querySelectorAll('[data-forge]').forEach(b=>b.onclick=()=>{
+  const g=vikingForgeStock.find(x=>x.id===b.dataset.forge);
+  if(!g||kit[g.id]||!Number.isFinite(atelier.purse)||atelier.purse<g.cost||(Number(state.wood)||0)<g.wood)return;
+  atelier.purse-=g.cost;state.wood-=g.wood;kit[g.id]=true;
+  mindWrite('I traded with the Norse smith for '+g.name+'.','memory');
+  save();vikingForge();
+ });
+ $('modalBody').querySelectorAll('[data-equip]').forEach(b=>b.onclick=()=>{
+  const g=vikingForgeStock.find(x=>x.id===b.dataset.equip);
+  if(!g||!kit[g.id])return;
+  if(g.id!=='cloak'&&g.id!=='boots'&&g.id!=='shield'){
+   for(const weapon of ['seax','axe','spear','sword'])equipped[weapon]=false;
+  }
+  equipped[g.id]=!equipped[g.id];save();vikingForge();
+ });
+ $('modalBody').querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{
+  const g=vikingTradeGoods.find(x=>x.id===b.dataset.sell);
+  if(!g||(Number(state[g.field])||0)<g.qty)return;
+  state[g.field]-=g.qty;atelier.purse=Math.max(0,Math.floor(Number(atelier.purse)||0))+g.pay;
+  mindWrite('I traded '+g.name+' for '+g.pay+' coins at the woodland smith.','memory');
+  save();vikingForge();
+ });
+}
+
 function backpack(){
  const n=v=>Math.max(0,Math.floor(Number(v)||0));
  const groups=[
@@ -12312,7 +12397,7 @@ function backpack(){
   ].concat(Object.entries(state.herbs||{}).map(([name,count])=>['🌸 '+name,count]))},
   {title:'🧰 Equipment',items:[
    ['🪓 Axes',state.tools?.axe],['🔦 Torches',state.tools?.torch],
-   ['🥄 Shovels',state.tools?.shovel],['⛏️ Pickaxes',state.tools?.pickaxe],['🦋 Nets',state.tools?.net],['🎣 Fishing rods',state.fishingRod?1:0],['🏹 Bows · level',state.tools?.bow],['⚙️ Crossbows · level',state.tools?.crossbow],['🏹 Arrows',state.arrows]
+   ['🥄 Shovels',state.tools?.shovel],['⛏️ Pickaxes',state.tools?.pickaxe],['🦋 Nets',state.tools?.net],['🎣 Fishing rods',state.fishingRod?1:0],['🏹 Bows · level',state.tools?.bow],['⚙️ Crossbows · level',state.tools?.crossbow],['🏹 Arrows',state.arrows],...vikingForgeStock.filter(g=>state.vikingKit?.[g.id]).map(g=>['⚔️ '+g.name+(state.vikingEquipped?.[g.id]?' (equipped)':''),1])
   ]}
  ];
  const contents=groups.map(group=>{
@@ -12328,13 +12413,19 @@ function backpack(){
   button.onclick=()=>{if(!(state.mana>=1)||state.mothlightMs>0)return;state.mana--;state.mothlightMs=60000;close();notify('Your mothlight charm shines for one minute.')};
   $('modalBody').append(button);
  }
+ const forgeButton=document.createElement('button');forgeButton.className='btn';forgeButton.textContent='⚒️ Visit Norse smith (near homestead)';forgeButton.disabled=Math.hypot(state.x-cottage.x,state.y-cottage.y)>450;forgeButton.onclick=vikingForge;$('modalBody').append(forgeButton);
 }
 
+function haigenNorseCodex(){
+ const entries=norseLore.map(e=>'<div class="item"><div><b>'+safeText(e.topic)+'</b><p>'+safeText(e.fact)+'</p></div></div>').join('');
+ open('<h2>ᚠ Haigen’s Norse lorebook</h2><p>Myth, sagas and Viking-age history. Stories are not presented as proven historical events.</p>'+entries);
+}
 function haigenNotes(){
  const icons={thought:'💭 Thought',idea:'🔧 Idea',plan:'🗺️ Plan',memory:'📖 Memory',discovery:'🌍 Discovery',mystery:'✨ Mystery',growth:'🌱 Growth',reflection:'🔍 Reflection'};
  const entries=haigenMind.notes.length?haigenMind.notes.map(n=>'<div class="item"><div><b>'+safeText(icons[n.type]||'💭 Thought')+' · Day '+n.day+'</b><p>'+safeText(n.text)+'</p></div></div>').join(''):'<p>Haigen is still exploring. His notes will appear as he notices things.</p>';
  const legacy=state.requests.length?'<details><summary>Older messages (preserved)</summary>'+state.requests.slice(-12).map(q=>'<p>✉️ '+safeText(q.text)+'</p>').join('')+'</details>':'';
  open('<h2>🧠 Haigen’s Notebook</h2><p>His own simulated memories, observations and development ideas.</p><p><b>Curiosity</b> '+Math.round(haigenMind.curiosity)+' · <b>Courage</b> '+Math.round(haigenMind.courage)+' · <b>Trust</b> '+Math.round(haigenMind.trust)+'</p><p><b>Personality:</b> '+safeText(mindTemperament())+' · <b>Mood:</b> '+safeText(mindMood())+'</p><p><b>Patience:</b> '+Math.round(haigenMind.patience)+' · <b>Kindness:</b> '+Math.round(haigenMind.kindness)+'</p><p><b>Learned from:</b> '+haigenMind.habits.injury+' injuries · '+haigenMind.habits.rescues+' rescues · '+haigenMind.habits.craft+' builds · '+haigenMind.habits.companionship+' friendly moments</p><p><b>Favourite activity:</b> '+safeText(mindFavourite()||'Still exploring')+'</p><p><b>Completed jobs:</b> '+state.autoSteps+'</p><p><b>Next idea:</b> '+safeText(autoJobLabel||haigenMind.lastGoal||mindWish()[1])+'</p><p><b>Explored:</b> '+safeText(haigenMind.visited.map(k=>expandedRegions.find(r=>r.id===k)?.name||'Haigen’s Woodlands').join(', ')||'Still looking around')+'</p><h3>🏡 My building project</h3><p>'+safeText(lifeProjectSummary())+'</p><p class="small">Completed: '+safeText(state.lifeProjectsDone.map(k=>lifeBlueprints[k]?.name).filter(Boolean).join(', ')||'No finished projects yet')+'</p><h3>What experience taught me</h3>'+haigenMind.experiences.slice(0,5).map(e=>'<p class="small">Day '+e.day+': '+safeText(e.text)+'</p>').join('')+'<h3>My notes to the builders</h3>'+entries+legacy);
+ const loreButton=document.createElement('button');loreButton.className='btn';loreButton.textContent='ᚠ Read Norse lorebook';loreButton.onclick=haigenNorseCodex;$('modalBody').append(loreButton);
 }
 function open(html){$('modalBody').innerHTML=html;$('overlay').classList.add('open');silenceWorldToast()}function close(){$('overlay').classList.remove('open');save()}// Job 207: display-only Boatwright milestones, derived from existing progress.
 function boatwrightJournal(){
