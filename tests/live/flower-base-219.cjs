@@ -13,6 +13,18 @@ assert(body.includes('ellipse(x-5,y-9,6,2.6')&&body.includes('ellipse(x+5,y-7,6,
 assert(body.includes('for(let j=0;j<petals;j++)')&&body.includes('ellipse(0,0,4.1,2.9,f.color)'),'coloured petals present');
 assert(body.includes('ctx.save()')&&body.includes('ctx.restore()'),'canvas state restored');
 assert(s.includes('flower:woodland?rbDrawFlower:flower'),'woodland flowers use renderer');
+const sceneStart=s.indexOf('function drawSceneryNearHaigen(o){');
+const sceneEnd=s.indexOf('\nfunction tree(o){',sceneStart);
+assert(sceneStart>=0&&sceneEnd>sceneStart,'scene dispatcher exists');
+const scene=s.slice(sceneStart,sceneEnd);
+const earlyFlower=scene.indexOf("if(rbEnabled&&o.type==='flower'&&rbWoodland(o.x,o.y))");
+const atlas=scene.indexOf('worldArtScenery(o)');
+assert(earlyFlower>=0&&atlas>earlyFlower,'woodland flowers bypass cached atlas before its early return');
+assert(scene.slice(earlyFlower,atlas).includes('rbDrawFlower(o)'),'early flower branch actually calls natural renderer');
+assert(scene.slice(earlyFlower,atlas).includes('foliageVisibility(o)'),'flower respects canopy visibility');
+assert(scene.slice(earlyFlower,atlas).includes('return;'),'woodland flower is rendered once');
+assert(scene.includes('worldArtScenery(o)'),'other artwork still uses existing atlas');
+
 assert(s.includes("function flowerKind(o){return flowerKinds[Math.floor(seeded(o.id*9+17)*flowerKinds.length)]}"),'existing flower type assignment unchanged');
 assert(s.includes("state.herbs[f.name]=(state.herbs[f.name]||0)+1;state.flowerFinds++"),'gathering increments inventory and discoveries');
 assert(s.includes("if(o.type==='flower')gatherFlower(o)"),'flower interaction remains collectible');
