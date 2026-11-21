@@ -3422,7 +3422,7 @@ function autoPlan(label,id){
   haigenMind.lastPlanSaid=time;think('My plan: '+label+'.',3700,true);
  }
 }
-function autoResetNav(){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0;awakeningPath=[];awakeningPathKey='';autoWaypoint=null;navProgressWindow=0;navProgressStart=null}
+function autoResetNav(waypoint=null){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0;awakeningPath=[];awakeningPathKey='';autoWaypoint=waypoint;navProgressWindow=0;navProgressStart=null}
 function autoStand(x,y){return Number.isFinite(x)&&Number.isFinite(y)&&islandDepth(x,y)>73&&walkingLakeLevel(x,y)>1.045&&!blockedBySolid(x,y)}
 let navProgressWindow=0,navProgressStart=null;
 // Haigen's Awakening: bounded grid routing, remembered obstacles and progress checks.
@@ -3468,7 +3468,8 @@ function autoTravel(target,dt,reach=80,speed=.14){
  if(d<=reach){autoResetNav();return true}
  const key=(target.id===undefined?'place':target.id)+':'+Math.round(target.x/15)+':'+Math.round(target.y/15);
  if(autoNav.key!==key){
-  autoResetNav();autoNav.key=key;navProgressStart={x:state.x,y:state.y,d};
+  // Keep the exploration goal while starting its route.
+  autoResetNav(target===autoWaypoint ? target : null);autoNav.key=key;navProgressStart={x:state.x,y:state.y,d};
  }
  // Use a persistent waypoint path, not a fresh local steering decision every frame.
  // Replanning on every grid-cell boundary was making Haigen pace between two cells.
@@ -4234,7 +4235,7 @@ function autonomousTick(dt){
   autoPlan('finished gathering '+found.type,'done:'+state.autoSteps);
   save();return;
  }
- if(!autoWaypoint||dist(state,autoWaypoint)<95)autoWaypoint=autoExplore();
+ if(!autoWaypoint)autoWaypoint=autoExplore();
  if(autoWaypoint){
   autoPlan('explore for useful places','explore');
   if(autoTravel(autoWaypoint,dt,95,.12)){autoWaypoint=null;autoPause=500}
