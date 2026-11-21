@@ -1,0 +1,28 @@
+name: PR274 biome visual evidence
+on:
+  pull_request:
+    paths:
+      - 'haigen.html'
+      - 'tests/live/biome-evidence-274.cjs'
+      - '.github/workflows/biome-evidence-274.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  biome-captures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - name: Capture seven biomes on iPhone and iPad
+        run: node tests/live/biome-evidence-274.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: biome-evidence-274
+          path: biome-visual-evidence-274/*.png
+          if-no-files-found: error
