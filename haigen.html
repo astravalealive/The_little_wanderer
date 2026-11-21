@@ -3422,7 +3422,7 @@ function autoPlan(label,id){
   haigenMind.lastPlanSaid=time;think('My plan: '+label+'.',3700,true);
  }
 }
-function autoResetNav(){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0}
+function autoResetNav(){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0;awakeningPath=[];awakeningPathKey='';autoWaypoint=null;navProgressWindow=0;navProgressStart=null}
 function autoStand(x,y){return Number.isFinite(x)&&Number.isFinite(y)&&islandDepth(x,y)>73&&walkingLakeLevel(x,y)>1.045&&!blockedBySolid(x,y)}
 let navProgressWindow=0,navProgressStart=null;
 // Haigen's Awakening: bounded grid routing, remembered obstacles and progress checks.
@@ -3499,7 +3499,7 @@ function autoTravel(target,dt,reach=80,speed=.14){
  autoWaypoint=awakeningPath[0]||null;
  // A failed grid search must not force Haigen to walk straight into a solid obstacle.
  // Give the recovery timer time to select another activity rather than oscillating.
- if(!autoWaypoint&&!autoStand(target.x,target.y)){
+ if(!autoWaypoint&&( !autoStand(target.x,target.y) || !autoStand((state.x+target.x)/2,(state.y+target.y)/2) )){
   autoNav.stuck+=dt;
   if(autoNav.stuck>1200){
    autoNav.stuck=0;autoNav.failures++;awakeningRoutes.clear();awakeningPath=[];
@@ -3522,7 +3522,7 @@ function autoTravel(target,dt,reach=80,speed=.14){
   state.x=bestMove.x;state.y=bestMove.y;autoNav.stuck=0;
   if(Math.abs(bestMove.angle)>.5)autoNav.side=bestMove.angle>=0?1:-1;
  }else{autoNav.stuck+=dt}
- if(autoNav.stuck>1200){autoNav.side*=-1;autoNav.stuck=0;awakeningPath=[];autoWaypoint=null;awakeningRoutes.clear()}
+ if(autoNav.stuck>1200){autoNav.side*=-1;autoNav.stuck=0;autoNav.failures++;awakeningPath=[];autoWaypoint=null;awakeningRoutes.clear()}
  return false;
 }
 // V208: temporary travel camp, separate from permanent structures and saves.
