@@ -91,7 +91,7 @@ body:has(#v127Settings.open) .haigen-speech{visibility:hidden!important}
   window.addEventListener('unhandledrejection',function(e){showStartupError(String(e.reason&&e.reason.message||e.reason||'Startup error'));});
   setTimeout(function(){if(!window.__haigenWorldReady)showStartupError('Startup did not complete. The world is not running.');},9000);
 })();
-</script><script>
+</script><script src="experiments/engine-foundations/navigation-watchdog.js"></script><script>
 (()=>{'use strict';const cv=document.getElementById('game'),ctx=cv.getContext('2d');let W=0,H=0,dpr=1;function resize(){
  const bounds=cv.getBoundingClientRect();
  dpr=Math.min(devicePixelRatio||1,2);
@@ -3451,6 +3451,8 @@ function instructionTick(dt){
 }
 
 const autoNav={key:'',stuck:0,previous:Infinity,side:1,failures:0};
+// Phase 2: independent navigation watchdog; existing collision rules remain authoritative.
+const autoWatchdog=window.HaigenNavigationWatchdog ? new window.HaigenNavigationWatchdog.NavigationWatchdog({minProgress:.2,stuckAfterMs:1300,retargetCooldownMs:1800,maxFailures:3}) : null;
 let autoWaypoint=null,autoJobLabel='',autoJobId='';
 function autoPlan(label,id){
  haigenMind.lastGoal=label;
@@ -3460,7 +3462,7 @@ function autoPlan(label,id){
   haigenMind.lastPlanSaid=time;think('My plan: '+label+'.',3700,true);
  }
 }
-function autoResetNav(waypoint=null){autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0;awakeningPath=[];awakeningPathKey='';autoWaypoint=waypoint;navProgressWindow=0;navProgressStart=null}
+function autoResetNav(waypoint=null){if(autoWatchdog)autoWatchdog.reset();autoNav.key='';autoNav.stuck=0;autoNav.previous=Infinity;autoNav.failures=0;awakeningPath=[];awakeningPathKey='';autoWaypoint=waypoint;navProgressWindow=0;navProgressStart=null}
 function autoStand(x,y){return Number.isFinite(x)&&Number.isFinite(y)&&islandDepth(x,y)>73&&walkingLakeLevel(x,y)>1.045&&!blockedBySolid(x,y)}
 let navProgressWindow=0,navProgressStart=null;
 // Haigen's Awakening: bounded grid routing, remembered obstacles and progress checks.
@@ -3564,6 +3566,17 @@ function autoTravel(target,dt,reach=80,speed=.14){
    if(progressed)autoNav.failures=Math.max(0,autoNav.failures-1);
    else{autoNav.failures++;awakeningPath=[];awakeningRoutes.clear()}
    navProgressStart={x:state.x,y:state.y,d};navProgressWindow=0;
+  }
+ }
+ // Monitor real position progress; request a fresh route only after a sustained stall.
+ // Repath is throttled by the watchdog, preventing per-frame left/right oscillation.
+ if(autoWatchdog){
+  const decision=autoWatchdog.update({position:{x:state.x,y:state.y},target:{x:target.x,y:target.y},now:time,autonomous:!!state.autonomy,moving:true});
+  if(decision.action==='repath'){
+   awakeningPath=[];awakeningRoutes.clear();navProgressWindow=0;
+   navProgressStart={x:state.x,y:state.y,d:dist(state,target)};
+  }else if(decision.action==='abandon-target'){
+   autoNav.failures=3;
   }
  }
  if(autoNav.failures>=3){
