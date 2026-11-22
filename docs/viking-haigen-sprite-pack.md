@@ -18,7 +18,7 @@ Closes nothing until HD walks + verified loops pass QA. Incorporates GitHub issu
 | Tools | `haigenDrawPixelTool` | **40×60**, grip pivot **(20,48)** |
 | Region kits | `travelKits` + `haigen-region-outfits.png` | 7×288 stack |
 | Expressions | — | **none** in live engine (faces baked in cells) |
-| Build | `GAME_BUILD` / `haigen-version.json` | **434** on this branch |
+| Build | `GAME_BUILD` / `haigen-version.json` | **435** on this branch |
 
 Primary loaders: `haigenMovementAtlas` → `./assets/haigen-reference-walk-atlas.webp`; fallback `haigen-v119-movement-atlas.png`; sleep from `haigen-approved-atlas.png`.
 
