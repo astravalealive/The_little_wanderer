@@ -139,37 +139,38 @@ function tick(t){
   requestAnimationFrame(tick);
 }
 
-document.getElementById('modes').addEventListener('click',e=>{
-  const b=e.target.closest('button[data-mode]');
-  if(!b)return;
-  mode=b.dataset.mode; frame=0;
-  if(mode==='idle') dir='front';
-  document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x===b));
+function setMode(next){
+  if(!['walk','axe','idle'].includes(next))return;
+  mode=next; frame=0; last=performance.now();
+  if(mode==='idle')dir='front';
+  document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode===mode));
   document.querySelectorAll('button[data-dir]').forEach(x=>{
-    x.disabled = mode==='idle' && x.dataset.dir!=='front';
-    x.classList.toggle('active', x.dataset.dir===dir);
+    x.disabled=mode==='idle' && x.dataset.dir!=='front';
+    x.classList.toggle('active',x.dataset.dir===dir);
   });
-  refreshPreviews();
+  refreshPreviews(); draw();
+}
+function setDirection(next){
+  if(mode==='idle'||!dirs.includes(next))return;
+  dir=next;frame=0;last=performance.now();
+  document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x.dataset.dir===dir));
+  refreshPreviews();draw();
+}
+document.getElementById('modes').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-mode]');if(b)setMode(b.dataset.mode);
 });
 document.getElementById('dirs').addEventListener('click',e=>{
-  const b=e.target.closest('button[data-dir]');
-  if(!b || b.disabled)return;
-  dir=b.dataset.dir; frame=0;
-  document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x===b));
-  refreshPreviews();
+  const b=e.target.closest('button[data-dir]');if(b&&!b.disabled)setDirection(b.dataset.dir);
 });
 document.getElementById('togglePlay').addEventListener('click',e=>{
-  playing=!playing; e.target.textContent=playing?'Pause':'Play';
+  playing=!playing;e.target.textContent=playing?'Pause':'Play';last=performance.now();
 });
 addEventListener('keydown',e=>{
   const map={ArrowDown:'front',s:'front',ArrowRight:'right',d:'right',ArrowUp:'back',w:'back',ArrowLeft:'left',a:'left'};
-  if(map[e.key] && mode!=='idle'){dir=map[e.key];frame=0;
-    document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x.dataset.dir===dir));
-    refreshPreviews();
-  }
-  if(e.key==='1'){mode='walk';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='walk'));refreshPreviews()}
-  if(e.key==='2'){mode='axe';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='axe'));refreshPreviews()}
-  if(e.key==='3'){mode='idle';dir='front';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='idle'));refreshPreviews()}
+  if(map[e.key]){e.preventDefault();setDirection(map[e.key]);}
+  else if(e.key==='1')setMode('walk');
+  else if(e.key==='2')setMode('axe');
+  else if(e.key==='3')setMode('idle');
 });
 load().catch(err=>{status.innerHTML=`<span class="bad">Load failed: ${err}</span>`});
 </script>
