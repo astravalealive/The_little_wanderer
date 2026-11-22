@@ -18,15 +18,18 @@ Open `hd-poc.html` — 4-direction HD walk with verified loops. Does **not** rep
 
 Optional mini preview in the live game: `haigen.html?vikingHaigen=1` (packed sheets).
 
-## HD walk status
+## HD status
 
-| Direction | Source | QA |
+| Sheet | Source | QA |
 |---|---|---|
-| front | Captain lock frames (unmodified density) | PASS |
-| right | generated strip → HD fit | PASS |
-| back | generated strip → HD fit | PASS |
-| left | mirror(right) | PASS |
-| axe (action) | isolated sheet | PASS |
+| walk/front | Captain lock frames (unmodified density) | PASS |
+| walk/right · back | generated strip → HD fit | PASS |
+| walk/left | mirror(right) | PASS (laterality preview) |
+| axe/{front,right,back} | isolated action sheets + hand grip | PASS |
+| axe/left | mirror(right) | PASS — **preview-mirror-only** |
+| idle/front | micro-idle from lock frame 0 | PASS |
+
+Handoff constraints (Master Daily 2026-11-21 / Complete Handoff 2026-11-19): Godot shelved → HTML only; no merge/deploy without Captain approval; tools must connect to hand anchors.
 
 ## Rebuild
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Viking Haigen HD walk PoC · issue #292</title>
+<title>Viking Haigen HD PoC · issue #292</title>
 <style>
   :root{--bg:#121916;--ink:#f3ead2;--muted:#9bb09a;--accent:#c9a227;--ok:#6f925c;--bad:#b85c4a}
   *{box-sizing:border-box}
@@ -20,116 +20,157 @@
   .meta{font-size:.85rem;color:var(--muted);margin-top:10px}
   .previews{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
   .previews figure{margin:0;background:#1a221c;padding:8px;border:1px solid #3a4a40}
-  .previews img{display:block;height:160px;width:auto;image-rendering:pixelated}
+  .previews img{display:block;height:140px;width:auto;image-rendering:pixelated}
   .previews figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
+  .warn{color:#e2b56b}
 </style>
 </head>
 <body>
 <header>
-  <h1>Viking Haigen · HD walk proof of concept</h1>
-  <p>Issue #292 · production cells <strong>384×720</strong> · 6-frame loops · Captain lock preserved on front.</p>
+  <h1>Viking Haigen · HD playback PoC</h1>
+  <p>Issue #292 · cells <strong>384×720</strong> · verified loops · Captain lock preserved on front walk / micro-idle.</p>
   <p id="status">Loading atlas…</p>
 </header>
 <div id="stageWrap">
-  <canvas id="c" width="720" height="480" aria-label="Haigen walk stage"></canvas>
+  <canvas id="c" width="720" height="480" aria-label="Haigen animation stage"></canvas>
+  <div class="row" id="modes">
+    <button data-mode="walk" class="active">Walk</button>
+    <button data-mode="axe">Axe</button>
+    <button data-mode="idle">Idle</button>
+    <button id="togglePlay">Pause</button>
+  </div>
   <div class="row" id="dirs">
     <button data-dir="front" class="active">Front</button>
     <button data-dir="right">Right</button>
     <button data-dir="back">Back</button>
     <button data-dir="left">Left</button>
-    <button id="togglePlay">Pause</button>
   </div>
-  <p class="meta">Arrow keys / WASD also change facing. Touch the canvas and drag. This page does <em>not</em> replace live <code>haigen.html</code>.</p>
+  <p class="meta">Arrow keys / WASD change facing. This page does <em>not</em> replace live <code>haigen.html</code>. Left axe is a mirror preview.</p>
+  <p class="meta warn" id="note"></p>
   <div class="previews" id="previews"></div>
 </div>
 <script>
 const dirs=['front','right','back','left'];
-const frames={};
-let atlas=null, dir='front', frame=0, playing=true, last=0;
+const bank={walk:{},axe:{},idle:{front:null}};
+let atlas=null, mode='walk', dir='front', frame=0, playing=true, last=0, frameMs=150;
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
 const status=document.getElementById('status');
+const note=document.getElementById('note');
+
+async function loadImg(src){
+  const im=new Image(); im.decoding='async'; im.src=src; await im.decode(); return im;
+}
 
 async function load(){
   atlas=await (await fetch('./production/atlas-hd.json')).json();
   await Promise.all(dirs.map(async d=>{
-    const imgs=[];
+    bank.walk[d]=[]; bank.axe[d]=[];
     for(let i=0;i<6;i++){
-      const im=new Image();
-      im.decoding='async';
-      im.src=`./production/walk/${d}/frame_${String(i).padStart(2,'0')}.png`;
-      await im.decode();
-      imgs.push(im);
+      const n=String(i).padStart(2,'0');
+      bank.walk[d].push(await loadImg(`./production/walk/${d}/frame_${n}.png`));
+      bank.axe[d].push(await loadImg(`./production/actions/axe/${d}/frame_${n}.png`));
     }
-    frames[d]=imgs;
   }));
+  bank.idle.front=[];
+  for(let i=0;i<6;i++){
+    bank.idle.front.push(await loadImg(`./production/idle/front/frame_${String(i).padStart(2,'0')}.png`));
+  }
   const qa=atlas.qa||{};
-  const parts=dirs.map(d=>{
-    const ok=qa[d]?.ok;
-    return `<span class="${ok?'ok':'bad'}">${d}:${ok?'PASS':'FAIL'}</span>`;
-  });
-  status.innerHTML=`Loaded ${atlas.cell.w}×${atlas.cell.h} · ${parts.join(' · ')} · ${atlas.frame_ms}ms/frame`;
+  const parts=[
+    ...dirs.map(d=>`<span class="${qa[d]?.ok?'ok':'bad'}">walk/${d}:${qa[d]?.ok?'PASS':'FAIL'}</span>`),
+    ...dirs.map(d=>{
+      const k='action_axe_'+d; const ok=qa[k]?.ok;
+      return `<span class="${ok?'ok':'bad'}">axe/${d}:${ok?'PASS':'FAIL'}</span>`;
+    }),
+    `<span class="${qa.idle_front?.ok?'ok':'bad'}">idle/front:${qa.idle_front?.ok?'PASS':'FAIL'}</span>`
+  ];
+  status.innerHTML=`Loaded ${atlas.cell.w}×${atlas.cell.h} · ${parts.join(' · ')}`;
+  refreshPreviews();
+  requestAnimationFrame(tick);
+}
+
+function refreshPreviews(){
   const previews=document.getElementById('previews');
-  dirs.forEach(d=>{
+  previews.innerHTML='';
+  const items = mode==='idle'
+    ? [['front','./production/idle/front/loop.gif']]
+    : dirs.map(d=>[d, mode==='walk'
+        ? `./production/walk/${d}/loop.gif`
+        : `./production/actions/axe/${d}/loop.gif`]);
+  items.forEach(([d,src])=>{
     const fig=document.createElement('figure');
-    fig.innerHTML=`<img src="./production/walk/${d}/loop.gif" alt="${d} loop"/><figcaption>${d} verified loop</figcaption>`;
+    fig.innerHTML=`<img src="${src}" alt="${mode} ${d}"/><figcaption>${mode}/${d}</figcaption>`;
     previews.appendChild(fig);
   });
-  requestAnimationFrame(tick);
+  note.textContent = mode==='axe' && dir==='left'
+    ? 'Left axe = mirror(right). Scar/sword laterality flipped — replace before production claim.'
+    : mode==='idle'
+      ? 'Front micro-idle derived from Captain lock frame 0 (master pixels preserved).'
+      : (atlas?.handoff_constraints?.godot || '');
+}
+
+function currentFrames(){
+  if(mode==='idle') return bank.idle.front;
+  return bank[mode][dir];
 }
 
 function draw(){
   ctx.fillStyle='#1a221c';
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  // soft ground
   ctx.fillStyle='#173d3466';
   ctx.beginPath();ctx.ellipse(360,400,90,18,0,0,Math.PI*2);ctx.fill();
-  const im=frames[dir]?.[frame];
+  const im=currentFrames()?.[frame];
   if(!im)return;
-  const scale=0.45; // fit stage while keeping nearest-neighbour
+  const scale=0.45;
   const w=im.naturalWidth*scale, h=im.naturalHeight*scale;
   const x=360-w/2, y=408-h;
   ctx.imageSmoothingEnabled=false;
   ctx.drawImage(im,x,y,w,h);
   ctx.fillStyle='#9bb09a';
   ctx.font='14px Georgia';
-  ctx.fillText(`${dir} · frame ${frame}`,16,24);
+  ctx.fillText(`${mode}/${mode==='idle'?'front':dir} · frame ${frame}`,16,24);
 }
 
 function tick(t){
-  if(playing && t-last>=(atlas?.frame_ms||150)){
-    frame=(frame+1)%6; last=t;
-  }
+  frameMs = mode==='idle' ? 220 : (atlas?.frame_ms||150);
+  if(playing && t-last>=frameMs){ frame=(frame+1)%6; last=t; }
   draw();
   requestAnimationFrame(tick);
 }
 
+document.getElementById('modes').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-mode]');
+  if(!b)return;
+  mode=b.dataset.mode; frame=0;
+  if(mode==='idle') dir='front';
+  document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('button[data-dir]').forEach(x=>{
+    x.disabled = mode==='idle' && x.dataset.dir!=='front';
+    x.classList.toggle('active', x.dataset.dir===dir);
+  });
+  refreshPreviews();
+});
 document.getElementById('dirs').addEventListener('click',e=>{
   const b=e.target.closest('button[data-dir]');
-  if(!b)return;
+  if(!b || b.disabled)return;
   dir=b.dataset.dir; frame=0;
   document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x===b));
+  refreshPreviews();
 });
 document.getElementById('togglePlay').addEventListener('click',e=>{
   playing=!playing; e.target.textContent=playing?'Pause':'Play';
 });
 addEventListener('keydown',e=>{
   const map={ArrowDown:'front',s:'front',ArrowRight:'right',d:'right',ArrowUp:'back',w:'back',ArrowLeft:'left',a:'left'};
-  if(map[e.key]){dir=map[e.key];frame=0;
+  if(map[e.key] && mode!=='idle'){dir=map[e.key];frame=0;
     document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x.dataset.dir===dir));
+    refreshPreviews();
   }
-});
-let drag=null;
-canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId)});
-canvas.addEventListener('pointerup',e=>{
-  if(!drag)return;
-  const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
-  if(Math.hypot(dx,dy)<12)return;
-  dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'front':'back');
-  frame=0;
-  document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x.dataset.dir===dir));
-  drag=null;
+  if(e.key==='1'){mode='walk';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='walk'));refreshPreviews()}
+  if(e.key==='2'){mode='axe';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='axe'));refreshPreviews()}
+  if(e.key==='3'){mode='idle';dir='front';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='idle'));refreshPreviews()}
 });
 load().catch(err=>{status.innerHTML=`<span class="bad">Load failed: ${err}</span>`});
 </script>
