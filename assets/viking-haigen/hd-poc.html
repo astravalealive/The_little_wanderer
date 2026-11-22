@@ -168,9 +168,10 @@ addEventListener('keydown',e=>{
     document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x.dataset.dir===dir));
     refreshPreviews();
   }
-  if(e.key==='1'){mode='walk';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='walk'));refreshPreviews()}
-  if(e.key==='2'){mode='axe';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='axe'));refreshPreviews()}
-  if(e.key==='3'){mode='idle';dir='front';frame=0;document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='idle'));refreshPreviews()}
+  const modeKeys={'1':'walk','2':'axe','3':'idle'};
+  if(modeKeys[e.key]){
+    document.querySelector('button[data-mode="'+modeKeys[e.key]+'"]').click();
+  }
 });
 load().catch(err=>{status.innerHTML=`<span class="bad">Load failed: ${err}</span>`});
 </script>
