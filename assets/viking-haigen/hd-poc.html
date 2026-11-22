@@ -36,6 +36,7 @@
   <div class="row" id="modes">
     <button data-mode="walk" class="active">Walk</button>
     <button data-mode="axe">Axe</button>
+    <button data-mode="pickaxe">Pickaxe</button>
     <button data-mode="idle">Idle</button>
     <button id="togglePlay">Pause</button>
   </div>
@@ -51,7 +52,7 @@
 </div>
 <script>
 const dirs=['front','right','back','left'];
-const bank={walk:{},axe:{},idle:{front:null}};
+const bank={walk:{},axe:{},pickaxe:{},idle:{front:null}};
 let atlas=null, mode='walk', dir='front', frame=0, playing=true, last=0, frameMs=150;
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
@@ -66,12 +67,19 @@ async function loadImg(src){
 async function load(){
   atlas=await (await fetch('./production/atlas-hd.json')).json();
   await Promise.all(dirs.map(async d=>{
-    bank.walk[d]=[]; bank.axe[d]=[];
+    bank.walk[d]=[]; bank.axe[d]=[]; bank.pickaxe[d]=[];
     const frames=Array.from({length:6},(_,i)=>String(i).padStart(2,'0'));
-    [bank.walk[d],bank.axe[d]]=await Promise.all([
+    const jobs=[
       Promise.all(frames.map(n=>loadImg(`./production/walk/${d}/frame_${n}.png`))),
       Promise.all(frames.map(n=>loadImg(`./production/actions/axe/${d}/frame_${n}.png`)))
-    ]);
+    ];
+    if(d!=='back'){
+      jobs.push(Promise.all(frames.map(n=>loadImg(`./production/actions/pickaxe/${d}/frame_${n}.png`))));
+    }
+    const loaded=await Promise.all(jobs);
+    bank.walk[d]=loaded[0];
+    bank.axe[d]=loaded[1];
+    if(d!=='back') bank.pickaxe[d]=loaded[2];
   }));
   bank.idle.front=[];
   bank.idle.front=await Promise.all(Array.from({length:6},(_,i)=>
@@ -82,6 +90,10 @@ async function load(){
     ...dirs.map(d=>{
       const k='action_axe_'+d; const ok=qa[k]?.ok;
       return `<span class="${ok?'ok':'bad'}">axe/${d}:${ok?'PASS':'FAIL'}</span>`;
+    }),
+    ...['front','right','left'].map(d=>{
+      const k='action_pickaxe_'+d; const ok=qa[k]?.ok;
+      return `<span class="${ok?'ok':'bad'}">pickaxe/${d}:${ok?'PASS':'FAIL'}</span>`;
     }),
     `<span class="${qa.idle_front?.ok?'ok':'bad'}">idle/front:${qa.idle_front?.ok?'PASS':'FAIL'}</span>`
   ];
@@ -95,6 +107,8 @@ function refreshPreviews(){
   previews.innerHTML='';
   const items = mode==='idle'
     ? [['front','./production/idle/front/loop.gif']]
+    : mode==='pickaxe'
+    ? ['front','right','left'].map(d=>[d, `./production/actions/pickaxe/${d}/loop.gif`])
     : dirs.map(d=>[d, mode==='walk'
         ? `./production/walk/${d}/loop.gif`
         : `./production/actions/axe/${d}/loop.gif`]);
@@ -103,11 +117,13 @@ function refreshPreviews(){
     fig.innerHTML=`<img src="${src}" alt="${mode} ${d}"/><figcaption>${mode}/${d}</figcaption>`;
     previews.appendChild(fig);
   });
-  note.textContent = mode==='axe' && dir==='left'
-    ? 'Left axe = mirror(right). Scar/sword laterality flipped — replace before production claim.'
+  note.textContent = (mode==='axe' || mode==='pickaxe') && dir==='left'
+    ? `Left ${mode} = mirror(right). Scar/sword laterality flipped — replace before production claim.`
     : mode==='idle'
       ? 'Front micro-idle derived from Captain lock frame 0 (master pixels preserved).'
-      : (atlas?.handoff_constraints?.godot || '');
+      : mode==='walk' && dir==='front'
+        ? 'Corrected front walk candidate — Captain visual foot sign-off required before deploy. Lock archived in front-from-lock-blocked.'
+        : (atlas?.deployment_gate?.blocked ? 'DEPLOYMENT BLOCKED until front foot alternation sign-off.' : (atlas?.handoff_constraints?.godot || ''));
 }
 
 function currentFrames(){
@@ -140,18 +156,20 @@ function tick(t){
 }
 
 function setMode(next){
-  if(!['walk','axe','idle'].includes(next))return;
+  if(!['walk','axe','pickaxe','idle'].includes(next))return;
   mode=next; frame=0; last=performance.now();
   if(mode==='idle')dir='front';
+  if(mode==='pickaxe' && dir==='back')dir='front';
   document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode===mode));
   document.querySelectorAll('button[data-dir]').forEach(x=>{
-    x.disabled=mode==='idle' && x.dataset.dir!=='front';
+    x.disabled=(mode==='idle' && x.dataset.dir!=='front') || (mode==='pickaxe' && x.dataset.dir==='back');
     x.classList.toggle('active',x.dataset.dir===dir);
   });
   refreshPreviews(); draw();
 }
 function setDirection(next){
   if(mode==='idle'||!dirs.includes(next))return;
+  if(mode==='pickaxe' && next==='back')return;
   dir=next;frame=0;last=performance.now();
   document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x.dataset.dir===dir));
   refreshPreviews();draw();
@@ -170,7 +188,8 @@ addEventListener('keydown',e=>{
   if(map[e.key]){e.preventDefault();setDirection(map[e.key]);}
   else if(e.key==='1')setMode('walk');
   else if(e.key==='2')setMode('axe');
-  else if(e.key==='3')setMode('idle');
+  else if(e.key==='3')setMode('pickaxe');
+  else if(e.key==='4')setMode('idle');
 });
 load().catch(err=>{status.innerHTML=`<span class="bad">Load failed: ${err}</span>`});
 </script>

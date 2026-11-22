@@ -1,102 +1,104 @@
 {
   "front": {
     "frame_count": 6,
-    "ok": false,
+    "ok": true,
     "issues": [
-      "VISUAL FAIL: frames 01, 02, 04 and 05 advance the same screen-right boot; opposing foot stride is missing. Do not deploy until original pixels are corrected and visually rechecked."
+      "CORRECTED CANDIDATE replaces lock-derived front. Original lock-derived frames archived at walk/front-from-lock-blocked (same-foot VISUAL FAIL). Captain visual foot review still required before deploy."
     ],
     "metrics": [
       {
         "opaque": true,
         "bbox": [
-          21,
-          21,
-          363,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 342,
-        "height": 691,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          22,
-          16,
-          362,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 340,
-        "height": 696,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          28,
-          16,
-          356,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 328,
-        "height": 696,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          22,
-          21,
-          362,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 340,
-        "height": 691,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          21,
-          16,
-          363,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 342,
-        "height": 696,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          21,
-          21,
-          362,
+          90,
+          32,
+          293,
           712
         ],
-        "width": 341,
-        "height": 691,
+        "width": 203,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       }
     ],
     "foot_y_span": 0,
-    "center_x_span": 0.5,
+    "center_x_span": 0.0,
     "adjacent_deltas": [
-      0.1458,
-      0.1023,
-      0.1454,
-      0.1472,
-      0.132,
-      0.12
+      0.0228,
+      0.0421,
+      0.0378,
+      0.0423,
+      0.0345,
+      0.058
     ],
     "anatomical_foot_alternation_verified": false,
-    "requires_visual_foot_review": true
+    "requires_visual_foot_review": true,
+    "status": "production-candidate-awaiting-visual-foot-signoff",
+    "source": "raw/hd-walk-front-corrected-raw.jpg"
   },
   "right": {
     "frame_count": 6,
@@ -166,7 +168,7 @@
         "width": 305,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -179,7 +181,7 @@
         "width": 305,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       }
     ],
     "foot_y_span": 0,
@@ -237,7 +239,7 @@
         "width": 333,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -250,7 +252,7 @@
         "width": 331,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -360,7 +362,7 @@
         "width": 305,
         "height": 680,
         "foot_y": 711,
-        "center_x": 192
+        "center_x": 192.0
       },
       {
         "opaque": true,
@@ -373,7 +375,7 @@
         "width": 305,
         "height": 680,
         "foot_y": 711,
-        "center_x": 192
+        "center_x": 192.0
       }
     ],
     "foot_y_span": 0,
@@ -388,6 +390,14 @@
     ],
     "anatomical_foot_alternation_verified": false,
     "requires_visual_foot_review": true
+  },
+  "front_from_lock_blocked": {
+    "ok": false,
+    "issues": [
+      "VISUAL FAIL: same screen-right boot advances in frames 01/02/04/05 \u2014 archived, not for deploy"
+    ],
+    "path": "walk/front-from-lock-blocked/",
+    "anatomical_foot_alternation_verified": false
   },
   "action_axe_front": {
     "frame_count": 6,
@@ -405,7 +415,7 @@
         "width": 201,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -418,7 +428,7 @@
         "width": 201,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -431,7 +441,7 @@
         "width": 201,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -444,7 +454,7 @@
         "width": 201,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -457,7 +467,7 @@
         "width": 201,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -470,11 +480,11 @@
         "width": 203,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       }
     ],
     "foot_y_span": 0,
-    "center_x_span": 0,
+    "center_x_span": 0.0,
     "adjacent_deltas": [
       0.037,
       0.0469,
@@ -541,7 +551,7 @@
         "width": 343,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -567,7 +577,7 @@
         "width": 355,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       }
     ],
     "foot_y_span": 0,
@@ -599,7 +609,7 @@
         "width": 357,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -625,7 +635,7 @@
         "width": 293,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -735,7 +745,7 @@
         "width": 343,
         "height": 680,
         "foot_y": 711,
-        "center_x": 192
+        "center_x": 192.0
       },
       {
         "opaque": true,
@@ -761,7 +771,7 @@
         "width": 355,
         "height": 680,
         "foot_y": 711,
-        "center_x": 192
+        "center_x": 192.0
       }
     ],
     "foot_y_span": 0,
@@ -775,7 +785,300 @@
       0.1632
     ],
     "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true,
+    "status": "preview-mirror-only"
+  },
+  "action_pickaxe_front": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          90,
+          32,
+          293,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.0362,
+      0.0419,
+      0.0408,
+      0.046,
+      0.0479,
+      0.0317
+    ],
+    "anatomical_foot_alternation_verified": false,
     "requires_visual_foot_review": true
+  },
+  "action_pickaxe_right": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          90,
+          32,
+          293,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.0321,
+      0.0394,
+      0.0452,
+      0.0428,
+      0.0519,
+      0.0453
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "action_pickaxe_left": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          294,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.0321,
+      0.0394,
+      0.0452,
+      0.0428,
+      0.0519,
+      0.0453
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true,
+    "status": "preview-mirror-only"
   },
   "action_axe": {
     "frame_count": 6,
@@ -832,7 +1135,7 @@
         "width": 343,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -858,7 +1161,7 @@
         "width": 355,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       }
     ],
     "foot_y_span": 0,
@@ -870,6 +1173,103 @@
       0.1926,
       0.1833,
       0.1632
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "action_pickaxe": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          90,
+          32,
+          293,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.0321,
+      0.0394,
+      0.0452,
+      0.0428,
+      0.0519,
+      0.0453
     ],
     "anatomical_foot_alternation_verified": false,
     "requires_visual_foot_review": true
@@ -890,7 +1290,7 @@
         "width": 363,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -916,7 +1316,7 @@
         "width": 325,
         "height": 680,
         "foot_y": 711,
-        "center_x": 191
+        "center_x": 191.0
       },
       {
         "opaque": true,
@@ -1056,7 +1456,7 @@
       }
     ],
     "foot_y_span": 0,
-    "center_x_span": 2,
+    "center_x_span": 2.0,
     "adjacent_deltas": [
       0.0744,
       0.045,

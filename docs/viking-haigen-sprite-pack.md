@@ -69,8 +69,12 @@ From `Haigens_World_MASTER_DAILY_REFERENCE_2026-11-21` + `COMPLETE_Cursor_Handof
 ## Current verified HD extras (this continuation)
 
 - `production/actions/axe/{front,right,back,left}/` — 6-frame, 384×720, grip anchors in `atlas-hd.json`
+- `production/actions/pickaxe/{front,right,left}/` — pickaxe action sheets
 - `production/idle/front/` — lock-derived micro-idle
-- `hd-poc.html` modes: Walk / Axe / Idle
+- `production/walk/front/` — **corrected front walk candidate** after lock-derived same-foot FAIL
+- `production/walk/front-from-lock-blocked/` — archived failing lock-derived front
+- `hd-poc.html` modes: Walk / Axe / Pickaxe / Idle
+- **Deploy blocked** until Captain visual foot-alternation sign-off on corrected front
 
 ## Captain gate
 No permanent atlas swap, merge, or deploy without explicit approval.

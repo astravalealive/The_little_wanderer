@@ -22,12 +22,17 @@ Optional mini preview in the live game: `haigen.html?vikingHaigen=1` (packed she
 
 | Sheet | Source | QA |
 |---|---|---|
-| walk/front | Captain lock frames (unmodified density) | PASS |
+| walk/front | **corrected candidate** (lock-derived strip blocked: same-foot stride) | pixel QA PASS · **visual foot sign-off required** |
+| walk/front-from-lock-blocked | archived lock-derived front | FAIL — do not deploy |
 | walk/right · back | generated strip → HD fit | PASS |
 | walk/left | mirror(right) | PASS (laterality preview) |
 | axe/{front,right,back} | isolated action sheets + hand grip | PASS |
 | axe/left | mirror(right) | PASS — **preview-mirror-only** |
+| pickaxe/{front,right} | isolated sheets + grip | PASS |
+| pickaxe/left | mirror(right) | preview-mirror-only |
 | idle/front | micro-idle from lock frame 0 | PASS |
+
+**Deployment gate:** blocked until Captain visually confirms front walk foot alternation. Master lock file in `refs/` is unmodified.
 
 Handoff constraints (Master Daily 2026-11-21 / Complete Handoff 2026-11-19): Godot shelved → HTML only; no merge/deploy without Captain approval; tools must connect to hand anchors.
 
