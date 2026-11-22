@@ -1,4 +1,4 @@
 {
-  "build": 434,
-  "notes": "PR: Viking Haigen sprite pack (opt-in ?vikingHaigen=1). Walk, 7 region kits, expressions, items, actions, interactions. Approved atlases unchanged until Captain swap."
+  "build": 435,
+  "notes": "PR #291 / issue #292: HD Viking Haigen production (384x720, 6-frame verified walks + axe/sword). Opt-in only; approved atlases untouched."
 }

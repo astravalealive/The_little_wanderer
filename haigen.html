@@ -6972,7 +6972,7 @@ haigenMovementAtlas.onerror=()=>{
  }
 };
 haigenMovementAtlas.src=vikingHaigenPreview
- ? './assets/viking-haigen/packed/haigen-viking-walk-atlas.webp?v=434'
+ ? './assets/viking-haigen/packed/haigen-viking-walk-atlas.webp?v=435'
  : './assets/haigen-reference-walk-atlas.webp?v=122-direction';
 let haigenPreviousFacing='down',haigenTurnFrom='down',haigenTurnAt=-10000;
 function startHaigenAction(kind,duration=650){
@@ -7000,7 +7000,7 @@ travelSheet.onload=()=>{
  window.__haigenTravelAtlasesReady=travelAtlases.size;
 };
 travelSheet.src=vikingHaigenPreview
- ? './assets/viking-haigen/packed/haigen-viking-region-outfits.webp?v=434'
+ ? './assets/viking-haigen/packed/haigen-viking-region-outfits.webp?v=435'
  : './assets/haigen-region-outfits.png?v=129';
 function haigenOutfit(){
  const region=expandedRegion(state.x,state.y)?.id;
@@ -13185,7 +13185,7 @@ window.__haigenArtAudit=()=>({
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
  // M1 foundations: every on-screen version/identity surface reads GAME_BUILD.
- const GAME_BUILD=434;
+ const GAME_BUILD=435;
  const buildLabel='V'+GAME_BUILD;
  const buildBadge=document.getElementById('devVersion');
  buildBadge.textContent=buildLabel;

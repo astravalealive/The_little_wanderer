@@ -1,57 +1,49 @@
-# Viking Haigen sprite pack (V434)
+# Viking Haigen sprite pack (issue #292 / PR #291)
 
-Production pack locked to the Captain’s front-walk reference (spiky blonde hair, red **X** cheek scar, royal blue + gold + white fur).  
-**Does not replace** approved live atlases until Captain approval.
+**Art lock:** Captain six-frame front walk (`refs/viking-haigen-front-walk-lock.png`).  
+**Do not merge, deploy, or replace approved atlases without Captain approval.**
 
-## Preview in-game
+## Two layers (intentional)
 
-Open `haigen.html?vikingHaigen=1` — walk + region outfits swap to this pack. Default play stays on approved hoodie Haigen.
-
-## Engine drop-ins (packed/)
-
-| File | Size | Use |
+| Layer | Path | Purpose |
 |---|---|---|
-| `haigen-viking-walk-atlas.png/.webp` | 192×288 | Base woodland walk (4×4 · 48×72) |
-| `haigen-viking-region-outfits.png/.webp` | 192×2016 | Stack: snow, beach, desert, swim, downs, fen, wasteland |
-| `haigen-viking-walk-{kit}.png` | 192×288 | Per-region kits (+ bonus `knight`, `ceremonial`) |
-| `haigen-viking-expressions.png` | 288×288 | 3×3 dialogue busts (96×96) |
-| `haigen-viking-items.png` | 240×120 | 18 item icons (40×40) |
-| `haigen-viking-tools-row.png` | 240×60 | First 6 tools as 40×60 wrist props |
-| `haigen-viking-actions.png` | 192×432 | Sword / axe / pick / shovel / net / rod |
-| `haigen-viking-interactions.png` | 192×576 | Swim, boat, climb, pickup, chest, sit, sleep |
-| `haigen-viking-outfit-heroes.png` | 896×192 | Front hero poses for the 7 travel kits |
-| `haigen-viking-front-lock-hero.png` | 768×192 | Captain lock strip, 6 frames @ 128×192 |
+| **HD production** (claim) | `production/` | 384×720 cells, 6-frame strips, verified `loop.gif`, `atlas-hd.json` |
+| Engine-compat preview | `packed/` | Optional 48×72 / 192×288 sketches for `?vikingHaigen=1` only |
 
-Grid contract matches `drawApprovedHaigen`: rows down / up / right / left; cols idle + 3 walk; ~150 ms/frame; draw scale 1.67.
+#292 forbids treating poster catalogues or crushed mini-sprites as production-ready. HD is the standard.
 
-## Why ChatGPT-style one-shots fail
+## Playable proof
 
-1. **No lock file** — always attach `refs/viking-haigen-front-walk-lock.png` (and the packed base walk).
-2. **Wrong sheet size** — generate raw grids, then run the packer; never freehand “about 48×72”.
-3. **Whole bible in one image** — one job per sheet (walk / expressions / items / one outfit).
-4. **Perspective mix** — engine needs three-quarter top-down; the lock strip is upright hero art for faces/costume DNA only.
+Open `hd-poc.html` — 4-direction HD walk with verified loops. Does **not** replace live `haigen.html`.
+
+Optional mini preview in the live game: `haigen.html?vikingHaigen=1` (packed sheets).
+
+## HD walk status
+
+| Direction | Source | QA |
+|---|---|---|
+| front | Captain lock frames (unmodified density) | PASS |
+| right | generated strip → HD fit | PASS |
+| back | generated strip → HD fit | PASS |
+| left | mirror(right) | PASS |
+| axe (action) | isolated sheet | PASS |
 
 ## Rebuild
 
 ```bash
-python3 .github/scripts/pack_viking_haigen_atlases.py
+python3 .github/scripts/build_viking_haigen_hd.py \
+  --import-right assets/viking-haigen/raw/hd-walk-right-raw.png \
+  --import-back  assets/viking-haigen/raw/hd-walk-back-raw.png \
+  --import-action axe assets/viking-haigen/raw/hd-action-axe-raw.png
 ```
 
-Raw generators live in `raw/`. Refs in `refs/`. Manifest: `packed/manifest.json`.
+Metadata: `production/atlas-hd.json` (frame rects, pivots, 150 ms, grip anchor stub).  
+QA: `production/qa-report.json`.
 
-## Style lock (non-negotiable)
+## Live engine constants (audit)
 
-- Spiky bright blonde hair silhouette (not hoodie-era dangly noodles for this pack)
-- Blue eyes + red **X** scar on Haigen’s right cheek
-- Royal blue cloth, gold embroidery/brooch, white fur collar + boot cuffs (base kit)
-- Brown leather strap, belt, pouch; sword hilt over right shoulder on base kit
-- Region kits keep the face/hair/scar; change cloth only
+Cell **48×72**, sheet **192×288**, scale **1.67**, foot `y-h+7`, 4 frames @ ~150 ms — see `docs/viking-haigen-sprite-pack.md`.
 
-## Captain merge gate
+## Style lock
 
-To promote permanently (after approval only):
-
-1. Copy `packed/haigen-viking-walk-atlas.webp` → `assets/haigen-reference-walk-atlas.webp`
-2. Copy `packed/haigen-viking-region-outfits.png` → `assets/haigen-region-outfits.png`
-3. Remove `?vikingHaigen=1` branch in `haigen.html` (or default it on)
-4. Bump `GAME_BUILD` + `haigen-version.json` and ship evidence at iPhone 390×844 + iPad landscape
+Spiky blond, blue eyes, red **X** scar, cobalt + gold + white fur, brown leather, sword hilt on base kit. One action / one direction per sheet.
