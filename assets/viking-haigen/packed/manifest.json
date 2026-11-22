@@ -1,0 +1,713 @@
+{
+  "cell": [
+    48,
+    72
+  ],
+  "sheet": [
+    192,
+    288
+  ],
+  "kits": [
+    "snow",
+    "beach",
+    "desert",
+    "swim",
+    "downs",
+    "fen",
+    "wasteland"
+  ],
+  "files": {
+    "walk": {
+      "source": "viking-haigen-walk-atlas-raw.jpg",
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "opaque_w": 37
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "opaque_w": 34
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "opaque_w": 33
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "opaque_w": 33
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "opaque_w": 36
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "opaque_w": 36
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "opaque_w": 32
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "opaque_w": 30
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "opaque_w": 36
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "opaque_w": 34
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "opaque_w": 38
+        }
+      ]
+    },
+    "walk_snow": {
+      "source": "viking-haigen-walk-snow-raw.jpg",
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "opaque_w": 37
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "opaque_w": 34
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "opaque_w": 34
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "opaque_w": 34
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "opaque_w": 34
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "opaque_w": 32
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "opaque_w": 32
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "opaque_w": 30
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "opaque_w": 34
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "opaque_w": 37
+        }
+      ]
+    },
+    "walk_beach": {
+      "source": "viking-haigen-walk-beach-raw.jpg",
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "opaque_w": 36
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "opaque_w": 37
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "opaque_w": 32
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "opaque_w": 32
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "opaque_w": 36
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "opaque_w": 32
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "opaque_w": 37
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "opaque_w": 34
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "opaque_w": 33
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "opaque_w": 36
+        }
+      ]
+    },
+    "walk_desert": {
+      "source": "viking-haigen-walk-desert-raw.jpg",
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "opaque_w": 37
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "opaque_w": 34
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "opaque_w": 33
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "opaque_w": 34
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "opaque_w": 34
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "opaque_w": 35
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "opaque_w": 36
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "opaque_w": 36
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "opaque_w": 36
+        }
+      ]
+    },
+    "walk_swim": {
+      "source": "viking-haigen-walk-swim-raw.jpg",
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "opaque_w": 31
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "opaque_w": 31
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "opaque_w": 31
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "opaque_w": 30
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "opaque_w": 31
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "opaque_w": 31
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "opaque_w": 31
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "opaque_w": 31
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "opaque_w": 31
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "opaque_w": 31
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "opaque_w": 30
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "opaque_w": 30
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "opaque_w": 30
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "opaque_w": 30
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "opaque_w": 30
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "opaque_w": 31
+        }
+      ]
+    },
+    "walk_downs": {
+      "source": "viking-haigen-walk-downs-raw.jpg",
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "opaque_w": 35
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "opaque_w": 35
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "opaque_w": 36
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "opaque_w": 36
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "opaque_w": 36
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "opaque_w": 31
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "opaque_w": 32
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "opaque_w": 31
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "opaque_w": 35
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "opaque_w": 35
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "opaque_w": 35
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "opaque_w": 34
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "opaque_w": 36
+        }
+      ]
+    },
+    "walk_fen": {
+      "source": "viking-haigen-walk-fen-raw.jpg",
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "opaque_w": 38
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "opaque_w": 38
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "opaque_w": 39
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "opaque_w": 39
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "opaque_w": 36
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "opaque_w": 36
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "opaque_w": 35
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "opaque_w": 35
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "opaque_w": 34
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "opaque_w": 34
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "opaque_w": 33
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "opaque_w": 34
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "opaque_w": 36
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "opaque_w": 37
+        }
+      ]
+    },
+    "walk_wasteland": {
+      "source": "viking-haigen-walk-wasteland-raw.jpg",
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "opaque_w": 38
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "opaque_w": 37
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "opaque_w": 37
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "opaque_w": 35
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "opaque_w": 34
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "opaque_w": 34
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "opaque_w": 33
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "opaque_w": 34
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "opaque_w": 33
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "opaque_w": 30
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "opaque_w": 36
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "opaque_w": 35
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "opaque_w": 37
+        }
+      ]
+    },
+    "region_stack": "haigen-viking-region-outfits.png",
+    "expressions": "haigen-viking-expressions.png",
+    "items": "haigen-viking-items.png",
+    "actions": "haigen-viking-actions.png",
+    "interactions": "haigen-viking-interactions.png",
+    "outfit_heroes": "haigen-viking-outfit-heroes.png",
+    "front_lock_hero": "haigen-viking-front-lock-hero.png",
+    "front_lock_row": "haigen-viking-front-lock-row.png"
+  },
+  "bonus_kits": [
+    "knight",
+    "ceremonial"
+  ]
+}

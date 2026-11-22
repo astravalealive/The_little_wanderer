@@ -6953,6 +6953,9 @@ const haigenCostumeAtlases=new Map();
 // Full 16-frame replacement atlas taken from the approved V119 turnaround.
 // Down, up, right and left have distinct artwork including both shoes.
 // The earlier atlas stays loaded for the trusted sleeping pose and safe fallback.
+// Opt-in Viking Haigen preview (Captain review): ?vikingHaigen=1 swaps walk + region
+ // kits from assets/viking-haigen/packed/ without touching approved atlases.
+const vikingHaigenPreview=(()=>{try{return new URLSearchParams(location.search).get('vikingHaigen')==='1'}catch(e){return false}})();
 const haigenMovementAtlas=new Image();
 let haigenMovementReady=false;
 haigenMovementAtlas.decoding='async';
@@ -6968,7 +6971,9 @@ haigenMovementAtlas.onerror=()=>{
   haigenMovementAtlas.src='./assets/haigen-v119-movement-atlas.png?v=119';
  }
 };
-haigenMovementAtlas.src='./assets/haigen-reference-walk-atlas.webp?v=122-direction';
+haigenMovementAtlas.src=vikingHaigenPreview
+ ? './assets/viking-haigen/packed/haigen-viking-walk-atlas.webp?v=434'
+ : './assets/haigen-reference-walk-atlas.webp?v=122-direction';
 let haigenPreviousFacing='down',haigenTurnFrom='down',haigenTurnAt=-10000;
 function startHaigenAction(kind,duration=650){
  haigenVisualAction={kind,start:performance.now(),duration};
@@ -6994,7 +6999,9 @@ travelSheet.onload=()=>{
  }
  window.__haigenTravelAtlasesReady=travelAtlases.size;
 };
-travelSheet.src='./assets/haigen-region-outfits.png?v=129';
+travelSheet.src=vikingHaigenPreview
+ ? './assets/viking-haigen/packed/haigen-viking-region-outfits.webp?v=434'
+ : './assets/haigen-region-outfits.png?v=129';
 function haigenOutfit(){
  const region=expandedRegion(state.x,state.y)?.id;
  if(region==='snow')return 'snow';
@@ -13178,11 +13185,11 @@ window.__haigenArtAudit=()=>({
 });
 window.__haigenAssetReport=()=>{const x=window.__haigenArtAudit();x.missing=Object.entries(x.approved).filter(([,ok])=>!ok).map(([name])=>name);return x};
  // M1 foundations: every on-screen version/identity surface reads GAME_BUILD.
- const GAME_BUILD=433;
+ const GAME_BUILD=434;
  const buildLabel='V'+GAME_BUILD;
  const buildBadge=document.getElementById('devVersion');
  buildBadge.textContent=buildLabel;
- buildBadge.title=buildLabel+' · Krakkle sprite atlas';
+ buildBadge.title=buildLabel+(vikingHaigenPreview?' · Viking Haigen preview':' · Krakkle sprite atlas');
  const hudBuildBadge=document.getElementById('hudBuildBadge');
  if(hudBuildBadge)hudBuildBadge.textContent=buildLabel;
  document.title="Haigen's World "+buildLabel+" · Woodland Paths";

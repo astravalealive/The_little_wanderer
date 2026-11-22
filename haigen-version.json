@@ -1,1 +1,4 @@
-{"build":433,"notes":"PR #274: cohesive regional scenery overhaul, sparse beach palms, shells, starfish and walkable coast."}
+{
+  "build": 434,
+  "notes": "PR: Viking Haigen sprite pack (opt-in ?vikingHaigen=1). Walk, 7 region kits, expressions, items, actions, interactions. Approved atlases unchanged until Captain swap."
+}
