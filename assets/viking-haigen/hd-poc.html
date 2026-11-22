@@ -67,16 +67,15 @@ async function load(){
   atlas=await (await fetch('./production/atlas-hd.json')).json();
   await Promise.all(dirs.map(async d=>{
     bank.walk[d]=[]; bank.axe[d]=[];
-    for(let i=0;i<6;i++){
-      const n=String(i).padStart(2,'0');
-      bank.walk[d].push(await loadImg(`./production/walk/${d}/frame_${n}.png`));
-      bank.axe[d].push(await loadImg(`./production/actions/axe/${d}/frame_${n}.png`));
-    }
+    const frames=Array.from({length:6},(_,i)=>String(i).padStart(2,'0'));
+    [bank.walk[d],bank.axe[d]]=await Promise.all([
+      Promise.all(frames.map(n=>loadImg(`./production/walk/${d}/frame_${n}.png`))),
+      Promise.all(frames.map(n=>loadImg(`./production/actions/axe/${d}/frame_${n}.png`)))
+    ]);
   }));
   bank.idle.front=[];
-  for(let i=0;i<6;i++){
-    bank.idle.front.push(await loadImg(`./production/idle/front/frame_${String(i).padStart(2,'0')}.png`));
-  }
+  bank.idle.front=await Promise.all(Array.from({length:6},(_,i)=>
+    loadImg(`./production/idle/front/frame_${String(i).padStart(2,'0')}.png`)));
   const qa=atlas.qa||{};
   const parts=[
     ...dirs.map(d=>`<span class="${qa[d]?.ok?'ok':'bad'}">walk/${d}:${qa[d]?.ok?'PASS':'FAIL'}</span>`),
