@@ -211,8 +211,12 @@ def qa_walk_cycle(frames: list[Image.Image]) -> dict:
     for i in range(3):
         d = frame_delta(frames[i], frames[i + 3])
         if d < 0.006:
+            report["ok"] = False
             report["issues"].append(f"stride pair {i}/{i+3} too similar (delta={d:.4f})")
-    report["ok"] = report["ok"] and not any("nearly identical" in i for i in report["issues"])
+    # Pixel difference is not proof that the LEFT and RIGHT feet alternate.
+    # Keep this distinction explicit so visual QA cannot be mistaken for anatomy QA.
+    report["anatomical_foot_alternation_verified"] = False
+    report["requires_visual_foot_review"] = True
     return report
 
 
