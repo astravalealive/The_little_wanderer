@@ -135,7 +135,16 @@ function draw(){
 
 function tick(t){
   frameMs = mode==='idle' ? 220 : (atlas?.frame_ms||150);
-  if(playing && t-last>=frameMs){ frame=(frame+1)%6; last=t; }
+  if(playing){
+    if(!last) last=t;
+    const elapsed=Math.min(t-last,frameMs*6);
+    if(elapsed>=frameMs){
+      frame=(frame+Math.floor(elapsed/frameMs))%6;
+      last=t-(elapsed%frameMs);
+    }
+  } else {
+    last=t;
+  }
   draw();
   requestAnimationFrame(tick);
 }
@@ -143,7 +152,7 @@ function tick(t){
 document.getElementById('modes').addEventListener('click',e=>{
   const b=e.target.closest('button[data-mode]');
   if(!b)return;
-  mode=b.dataset.mode; frame=0;
+  mode=b.dataset.mode; frame=0; last=0;
   if(mode==='idle') dir='front';
   document.querySelectorAll('button[data-mode]').forEach(x=>x.classList.toggle('active',x===b));
   document.querySelectorAll('button[data-dir]').forEach(x=>{
@@ -155,16 +164,16 @@ document.getElementById('modes').addEventListener('click',e=>{
 document.getElementById('dirs').addEventListener('click',e=>{
   const b=e.target.closest('button[data-dir]');
   if(!b || b.disabled)return;
-  dir=b.dataset.dir; frame=0;
+  dir=b.dataset.dir; frame=0; last=0;
   document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x===b));
   refreshPreviews();
 });
 document.getElementById('togglePlay').addEventListener('click',e=>{
-  playing=!playing; e.target.textContent=playing?'Pause':'Play';
+  playing=!playing; last=0; e.target.textContent=playing?'Pause':'Play';
 });
 addEventListener('keydown',e=>{
   const map={ArrowDown:'front',s:'front',ArrowRight:'right',d:'right',ArrowUp:'back',w:'back',ArrowLeft:'left',a:'left'};
-  if(map[e.key] && mode!=='idle'){dir=map[e.key];frame=0;
+  if(map[e.key] && mode!=='idle'){dir=map[e.key];frame=0;last=0;
     document.querySelectorAll('button[data-dir]').forEach(x=>x.classList.toggle('active',x.dataset.dir===dir));
     refreshPreviews();
   }
