@@ -1283,7 +1283,9 @@
         0.1472,
         0.132,
         0.12
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "right": {
       "frame_count": 6,
@@ -1378,7 +1380,9 @@
         0.0662,
         0.0531,
         0.1102
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "back": {
       "frame_count": 6,
@@ -1473,7 +1477,9 @@
         0.0995,
         0.1123,
         0.0937
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "left": {
       "frame_count": 6,
@@ -1568,102 +1574,9 @@
         0.0662,
         0.0531,
         0.1102
-      ]
-    },
-    "action_sword": {
-      "frame_count": 6,
-      "ok": true,
-      "issues": [],
-      "metrics": [
-        {
-          "opaque": true,
-          "bbox": [
-            10,
-            32,
-            373,
-            712
-          ],
-          "width": 363,
-          "height": 680,
-          "foot_y": 711,
-          "center_x": 191.0
-        },
-        {
-          "opaque": true,
-          "bbox": [
-            8,
-            90,
-            376,
-            712
-          ],
-          "width": 368,
-          "height": 622,
-          "foot_y": 711,
-          "center_x": 191.5
-        },
-        {
-          "opaque": true,
-          "bbox": [
-            29,
-            32,
-            354,
-            712
-          ],
-          "width": 325,
-          "height": 680,
-          "foot_y": 711,
-          "center_x": 191.0
-        },
-        {
-          "opaque": true,
-          "bbox": [
-            8,
-            97,
-            376,
-            712
-          ],
-          "width": 368,
-          "height": 615,
-          "foot_y": 711,
-          "center_x": 191.5
-        },
-        {
-          "opaque": true,
-          "bbox": [
-            8,
-            100,
-            376,
-            712
-          ],
-          "width": 368,
-          "height": 612,
-          "foot_y": 711,
-          "center_x": 191.5
-        },
-        {
-          "opaque": true,
-          "bbox": [
-            15,
-            32,
-            369,
-            712
-          ],
-          "width": 354,
-          "height": 680,
-          "foot_y": 711,
-          "center_x": 191.5
-        }
       ],
-      "foot_y_span": 0,
-      "center_x_span": 0.5,
-      "adjacent_deltas": [
-        0.1908,
-        0.1594,
-        0.158,
-        0.1326,
-        0.1655,
-        0.1925
-      ]
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "action_axe_front": {
       "frame_count": 6,
@@ -1758,7 +1671,9 @@
         0.05,
         0.0431,
         0.0431
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "action_axe_right": {
       "frame_count": 6,
@@ -1853,7 +1768,9 @@
         0.1926,
         0.1833,
         0.1632
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "action_axe_back": {
       "frame_count": 6,
@@ -1948,7 +1865,9 @@
         0.2454,
         0.2292,
         0.1799
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "action_axe_left": {
       "frame_count": 6,
@@ -2043,7 +1962,9 @@
         0.1926,
         0.1833,
         0.1632
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "action_axe": {
       "frame_count": 6,
@@ -2138,7 +2059,106 @@
         0.1926,
         0.1833,
         0.1632
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
+    },
+    "action_sword": {
+      "frame_count": 6,
+      "ok": true,
+      "issues": [],
+      "metrics": [
+        {
+          "opaque": true,
+          "bbox": [
+            10,
+            32,
+            373,
+            712
+          ],
+          "width": 363,
+          "height": 680,
+          "foot_y": 711,
+          "center_x": 191.0
+        },
+        {
+          "opaque": true,
+          "bbox": [
+            8,
+            90,
+            376,
+            712
+          ],
+          "width": 368,
+          "height": 622,
+          "foot_y": 711,
+          "center_x": 191.5
+        },
+        {
+          "opaque": true,
+          "bbox": [
+            29,
+            32,
+            354,
+            712
+          ],
+          "width": 325,
+          "height": 680,
+          "foot_y": 711,
+          "center_x": 191.0
+        },
+        {
+          "opaque": true,
+          "bbox": [
+            8,
+            97,
+            376,
+            712
+          ],
+          "width": 368,
+          "height": 615,
+          "foot_y": 711,
+          "center_x": 191.5
+        },
+        {
+          "opaque": true,
+          "bbox": [
+            8,
+            100,
+            376,
+            712
+          ],
+          "width": 368,
+          "height": 612,
+          "foot_y": 711,
+          "center_x": 191.5
+        },
+        {
+          "opaque": true,
+          "bbox": [
+            15,
+            32,
+            369,
+            712
+          ],
+          "width": 354,
+          "height": 680,
+          "foot_y": 711,
+          "center_x": 191.5
+        }
+      ],
+      "foot_y_span": 0,
+      "center_x_span": 0.5,
+      "adjacent_deltas": [
+        0.1908,
+        0.1594,
+        0.158,
+        0.1326,
+        0.1655,
+        0.1925
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     },
     "idle_front": {
       "frame_count": 6,
@@ -2233,7 +2253,9 @@
         0.0614,
         0.0554,
         0.0344
-      ]
+      ],
+      "anatomical_foot_alternation_verified": false,
+      "requires_visual_foot_review": true
     }
   },
   "handoff_constraints": {
