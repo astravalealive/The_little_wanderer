@@ -11079,7 +11079,8 @@ function chooseCanvas(){
  return {id:atelier.next++,seed,kind,title:artNames[kind][seed%2],price:3+seed%3,day:1+Math.floor(state.daytime/180)};
 }
 function artPicture(work){
- if(artCache.has(work.id))return artCache.get(work.id);
+ const cacheKey=[work.id,work.seed,work.kind].join(':');
+ if(artCache.has(cacheKey)){const cached=artCache.get(cacheKey);artCache.delete(cacheKey);artCache.set(cacheKey,cached);return cached}
  const c=document.createElement('canvas');c.width=144;c.height=100;
  const g=c.getContext('2d');let seed=work.seed;
  function roll(n){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296*n}
@@ -11106,7 +11107,9 @@ function artPicture(work){
  }
  for(let i=0;i<500;i++)rect(roll(144),roll(100),1+roll(3),1,roll(2)>1?'#ffedbf24':'#1715281c');
  g.fillStyle='#fff3d9';g.font='italic 8px Georgia';g.fillText('H.',130,95);
- artCache.set(work.id,c);return c;
+ artCache.set(cacheKey,c);
+ if(artCache.size>32)artCache.delete(artCache.keys().next().value);
+ return c;
 }
 function paintAI(dt){
  if(homeInside||dist(state,artSeat)>640||state.resting)return false;
