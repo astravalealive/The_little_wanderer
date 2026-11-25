@@ -11887,7 +11887,7 @@ function raftInteract(){
  if(state.skiffAtSea||homeInside||visitorRoom||worldEditorActive)return false;
  const r=raftEnds();if(!r.ready)return false;
  if(state.raftAfloat){
-  const berth=Math.abs(state.x-r.a.x)<62?'shore':Math.abs(state.x-r.b.x)<62?'island':null;
+  const berth=Math.hypot(state.x-r.a.x,state.y-r.a.y)<110?'shore':Math.hypot(state.x-r.b.x,state.y-r.b.y)<110?'island':null;
   if(!berth){notify('Paddle to a mooring before stepping ashore.');return true}
   const p=berth==='shore'?r.a:r.b;
   if(blockedBySolid(p.x,p.y)){notify('Landing blocked.');return true}
@@ -11924,14 +11924,14 @@ function raftMove(dt,dx,dy){
  const nx=state.x+vx*Math.min(speed,12),ny=state.y+vy*Math.min(speed,12);
  const atIsland=onLakeIsland(nx,ny),atMainland=lakeLevel(nx,ny)>1.02;
  // Shore exit is based on actual terrain, not a fixed left/right endpoint.
- if((atIsland||atMainland)&&lakeLevel(state.x,state.y)<1.01&&!onLakeIsland(state.x,state.y)&&!blockedBySolid(nx,ny)){
+ if((atIsland||atMainland)&&!blockedBySolid(nx,ny)&&((lakeLevel(state.x,state.y)<1.01&&!onLakeIsland(state.x,state.y))||(atMainland&&lakeLevel(nx,ny)>lakeLevel(state.x,state.y)&&lakeLevel(state.x,state.y)>1.02)||(atIsland&&onLakeIsland(state.x,state.y)&&Math.hypot(nx-lakeIsland.x,ny-lakeIsland.y)<Math.hypot(state.x-lakeIsland.x,state.y-lakeIsland.y)))){
   // A shallow bank is an exit, regardless of approach direction.
   const berth=atIsland?'island':'shore';
   state.x=nx;state.y=ny;state.raftAfloat=false;state.raftBerth=berth;raft.moving=false;raftRipple(nx,ny);
   notify('🪢 Stepped ashore.');save();return;
  }
  // Remain on lake water; don't sail through mountains, islands or unrelated terrain.
- if(lakeLevel(nx,ny)>1.06&&!onLakeIsland(nx,ny))return;
+ if(lakeLevel(nx,ny)>1.06&&!onLakeIsland(nx,ny)&&!(lakeLevel(state.x,state.y)>1.02&&lakeLevel(nx,ny)<lakeLevel(state.x,state.y)))return;
  // Reject solid objects even while afloat; never paddle through a shore structure.
  if(blockedBySolid(nx,ny))return;
  const oldX=state.x,oldY=state.y;
@@ -12017,7 +12017,7 @@ function drawRaft(){
  ctx.restore();ctx.restore();
 }
 
-function interact(){if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&((!state.raftBuilt&&raftInteract())||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
+function interact(){if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(((!state.raftBuilt||state.raftAfloat)&&raftInteract())||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
  ...objects.filter(o=>(o.type==='mushroom'||o.type==='bush')&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:o.type})),
  ...woodlandDetails.filter(o=>o.kind==='fungi'&&woodlandFungiReady(o)&&!campsiteProtected(o)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:'fungi'}))
  ].sort((a,b)=>a.d-b.d)[0];
