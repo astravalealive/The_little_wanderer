@@ -11278,7 +11278,7 @@ function drawNico(){
 const trollInteriorArt=new Image();trollInteriorArt.src='./7155B1DF-71E9-41F7-9480-9C74F47D1A9A.png';
 function drawAbandonedTrollStump(){const old=abandonedTrollStump;if(abandonedTrollStumpImage.complete&&abandonedTrollStumpImage.naturalWidth)ctx.drawImage(abandonedTrollStumpImage,old.x-old.width/2,old.y-old.height+24,old.width,old.height);}
 function drawTrollStump(){const t=trollStumpHome;if(!trollStumpImage.complete||!trollStumpImage.naturalWidth)return;ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(trollStumpImage,t.x-t.width/2,t.y-t.height+24,t.width,t.height);ctx.restore();}
-function trollStumpDoorNear(){return Math.hypot(state.x-trollStumpHome.x,state.y-(trollStumpHome.y-12))<92;}
+function trollStumpDoorNear(){return Math.hypot(state.x-abandonedTrollStump.x,state.y-(abandonedTrollStump.y-12))<92;}
 // Independent, controllable room coordinates; never overwrite Haigen's outdoor position.
 const trollRoomPlayer={x:.50,y:.79,dir:'up',moving:false,steps:0};
 const treasureCaveArt=new Image();
@@ -11339,7 +11339,7 @@ function changeTrollChamber(toVault){
  Object.assign(trollRoomPlayer,spawn,{moving:false,steps:0});
  notify(toVault?'The Trolls’ Hoard':'Back in the trolls’ home.');
 }
-function leaveTrollRoom(){supperElapsed=0;if(inTreasureCave){changeTrollChamber(false);return}trollStumpInside=false;trollDoorCooldown=1600;state.x=trollStumpHome.x;state.y=trollStumpHome.y+125;notify('Back outside the troll cave.')}
+function leaveTrollRoom(){supperElapsed=0;if(inTreasureCave){changeTrollChamber(false);return}trollStumpInside=false;trollDoorCooldown=1600;state.x=abandonedTrollStump.x;state.y=abandonedTrollStump.y+125;notify('Back outside the troll stump.')}
 // Foot positions use a 547 by 600 reference rendering of the complete cave PNG.
 const caveFloorOutline=[
  [241,462],[240,420],[230,401],[216,391],[195,390],[175,399],
