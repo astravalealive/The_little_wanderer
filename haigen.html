@@ -337,10 +337,20 @@ function woodlandDailyPhase(){
  if(phase>=173||phase<45)return 0;
  return phase<83?1:2;
 }
-function updateWoodlandDeer(dt){
- const daily=woodlandDailyPhase();
- const step=Math.min(dt,50)/1000,skolli=companions[1];
+const wildlifeUpdateDebt=new WeakMap();
+function wildlifeBudget(a,dt,fullRate){
+ const z=worldZoom();
+ const near=fullRate||(Math.abs(a.x-state.x)<1200&&Math.abs(a.y-state.y)<1200)||(Math.abs(a.x-cam.x)<W/(2*z)+400&&Math.abs(a.y-cam.y)<H/(2*z)+400)||companions.some(c=>Math.abs(a.x-c.x)<400&&Math.abs(a.y-c.y)<400);
+ const elapsed=Math.min(150,(wildlifeUpdateDebt.get(a)||0)+dt);
+ if(!near&&elapsed<100){wildlifeUpdateDebt.set(a,elapsed);return 0}
+ wildlifeUpdateDebt.set(a,0);return near?Math.min(elapsed,50):elapsed;
+}
+function updateWoodlandDeer(frameDt){
+ const daily=woodlandDailyPhase(),skolli=companions[1];
  for(const a of woodlandDeer){
+  const dt=wildlifeBudget(a,frameDt,!a.placed||time<a.scaredUntil||time<a.alertUntil);
+  if(!dt)continue;
+  const step=dt/1000;
   // Resolve a deterministic clear starting point against the game's existing collision map.
   if(!a.placed){
    a.placed=true;
@@ -468,11 +478,13 @@ function drawWoodlandDeer(){
    time<a.scaredUntil?'flee':time<a.alertUntil?'alert':a.walking?'walk':'forage');
  }
 }
-function updateRegionalWildlife(dt){
- updateWoodlandDeer(dt);
- const step=Math.min(50,dt)/1000;
+function updateRegionalWildlife(frameDt){
+ updateWoodlandDeer(frameDt);
  for(const a of regionalWildlife){
   if(!animalAlive(a)){a.walking=false;continue}
+  const dt=wildlifeBudget(a,frameDt,hostileTypes.has(a.type)||time<a.scaredUntil);
+  if(!dt)continue;
+  const step=dt/1000;
   const pd=dist(state,a);
   a.attackCooldown=Math.max(0,(a.attackCooldown||0)-dt);
   const hostile=hostileTypes.has(a.type);
