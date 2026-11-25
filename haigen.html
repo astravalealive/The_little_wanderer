@@ -861,6 +861,16 @@ function fenGroundColour(x,y,base){
  return dry.map((c,i)=>c*(1-w)+water[i]*w);
 }
 const islandChunkSize=512,islandResolution=128,islandCache=new Map();
+const coastDepthChunks=new Map(),coastDepthLimit=48;
+function coastDepthChunk(ix,iy){
+ const key=ix+','+iy;
+ if(coastDepthChunks.has(key)){const grid=coastDepthChunks.get(key);coastDepthChunks.delete(key);coastDepthChunks.set(key,grid);return grid}
+ const grid=new Float64Array(17*17);
+ for(let y=0;y<17;y++)for(let x=0;x<17;x++)grid[y*17+x]=islandDepth(ix*512+x*32,iy*512+y*32);
+ coastDepthChunks.set(key,grid);
+ if(coastDepthChunks.size>coastDepthLimit)coastDepthChunks.delete(coastDepthChunks.keys().next().value);
+ return grid;
+}
 function islandChunk(ix,iy){
  const key=ix+','+iy;
  if(islandCache.has(key)){const c=islandCache.get(key);islandCache.delete(key);islandCache.set(key,c);return c}
@@ -962,8 +972,13 @@ function drawExpandedTerrain(night){
  // V156: animated foam contours follow actual land depth instead of rectangular map edges.
  ctx.save();ctx.strokeStyle=night>.5?'rgba(184,223,225,.52)':'rgba(247,253,233,.72)';ctx.lineWidth=3;ctx.lineCap='round';
  const step=32,phase=Math.sin(time*.0018)*12;
+ let coastIX=NaN,coastIY=NaN,coastGrid=null;
  for(let y=Math.floor(top/step)*step;y<bottom;y+=step)for(let x=Math.floor(left/step)*step;x<right;x+=step){
-  const a=islandDepth(x,y),b=islandDepth(x+step,y),c=islandDepth(x+step,y+step),d=islandDepth(x,y+step);
+  const ix=Math.floor(x/512),iy=Math.floor(y/512);
+  if(ix!==coastIX||iy!==coastIY){coastGrid=coastDepthChunk(ix,iy);coastIX=ix;coastIY=iy}
+  const k=((y-iy*512)/32)*17+(x-ix*512)/32;
+  const a=coastGrid[k],b=coastGrid[k+1],c=coastGrid[k+18],d=coastGrid[k+17];
+  if(Math.min(a,b,c,d)>phase||Math.max(a,b,c,d)<phase)continue;
   const edge=(u,v,p,q)=>{const t=(phase-u)/(v-u);return t>=0&&t<=1?[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t]:null};
   const pts=[edge(a,b,[x,y],[x+step,y]),edge(b,c,[x+step,y],[x+step,y+step]),edge(c,d,[x+step,y+step],[x,y+step]),edge(d,a,[x,y+step],[x,y])].filter(Boolean);
   if(pts.length>=2){ctx.beginPath();ctx.moveTo(...pts[0]);ctx.lineTo(...pts[1]);ctx.stroke()}
