@@ -5811,22 +5811,12 @@ function drawCampDecor(){
  const x=cottage.x,y=cottage.y;
  ctx.save();
  // Well-trodden, soft-edged campsite clearing and stepping stones.
- ellipse(x+12,y+24,238,147,'#8aa76b66');
- ellipse(x+23,y+37,187,111,'#b6b48155');
  for(let i=0;i<15;i++){const a=i*2.399,rx=105+seeded(6100+i)*110,ry=55+seeded(6200+i)*83;
   const px=x+Math.cos(a)*rx,py=y+Math.sin(a)*ry;
   if(Math.hypot(px-firstFire.x,py-firstFire.y)<62||Math.hypot(px-chickenNest.x,py-chickenNest.y)<54)continue;
   ellipse(px,py,5+seeded(i+6400)*9,3+seeded(i+6500)*5,i%2?'#8d9d73aa':'#c6b18b99');
  }
  // The new physical shed plot displays all stored wood.
- // Water bucket, stump seat and useful supply baskets.
- const bx=x-112,by=y+83;
- ellipse(bx,by+6,22,8,'#335b4066');poly([[bx-13,by-16],[bx+13,by-16],[bx+10,by+5],[bx-10,by+5]],'#806149');
- ellipse(bx,by-16,13,5,'#bfa27b');ellipse(bx,by-16,10,3,'#75b4b8');
- ctx.strokeStyle='#d9c39a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(bx,by-15,16,Math.PI,Math.PI*2);ctx.stroke();
- const sx=x+70,sy=y+105;
- ellipse(sx,sy+9,29,10,'#355d4066');ctx.fillStyle='#79573c';ctx.fillRect(sx-17,sy-13,34,22);
- ellipse(sx,sy-13,18,7,'#c4a077');ellipse(sx,sy-13,11,4,'#a57e55');
  // Hanging lantern on a timber post. Glows gently when night falls.
  const lx=x-160,ly=y-49;
  ctx.strokeStyle='#795c42';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(lx,ly+37);ctx.lineTo(lx,ly-51);ctx.lineTo(lx+25,ly-51);ctx.stroke();
@@ -9185,7 +9175,7 @@ function draw(){if(frostholdRoom){drawFrostholdRoom();return}ensureWorldLocator(
  const nightMix=nightStrength();ctx.fillStyle=mixColour('#7f9f64','#283c65',nightMix);ctx.fillRect(cam.x-W/(2*zoom)-120,cam.y-H/(2*zoom)-120,W/zoom+240,H/zoom+240);drawExpandedTerrain(nightMix);drawFenDetail(nightMix);overhaulBiomeFloor(nightMix);ctx.save();/* V154: do not clip actors and shoreline to obsolete original-island outline; expanded coast lies beyond it. */if(rbEnabled)rbDrawGround();if(rbEnabled)drawWoodlandFloorV391(nightMix);drawHomesteadStyleLock(nightMix);if(!draw.groundPatchLayout){draw.groundPatchLayout=Array.from({length:410},(_,i)=>({x:WORLD_MIN+seeded(i+950)*WORLD_SPAN,y:WORLD_MIN+seeded(i+1200)*WORLD_SPAN,rx:30+seeded(i+800)*90,ry:18+seeded(i+700)*65,shade:i%2}))}for(const p of draw.groundPatchLayout){if(Math.abs(p.x-cam.x)>1100||Math.abs(p.y-cam.y)>850||expandedRegion(p.x,p.y)||(rbEnabled&&rbWoodland(p.x,p.y)))continue;ellipse(p.x,p.y,p.rx,p.ry,mixColour(p.shade?'#8bb06c':'#648c58',p.shade?'#2f4658':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
 const tint=ctx.createRadialGradient(0,0,.04,0,0,1),shade=l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564';
 tint.addColorStop(0,shade+'cc');tint.addColorStop(.67,shade+'77');tint.addColorStop(1,shade+'00');
-ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(const p of l.detailOffsets){const px=l.x+p.x,py=l.y+p.y;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],p.shape?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,p.shade?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,p.shade?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();drawWetGround();drawEasternIslandLandmarks();if(window.__gloamAddon)window.__gloamAddon.drawGround();if(window.__thrummaw)window.__thrummaw.ground();if(window.__krakkle)window.__krakkle.draw();if(window.__swampBosses)window.__swampBosses.draw();clearingGround(cottage.x,cottage.y);drawCampDecor();drawDigPatches();drawMountainRiver(nightMix);if(!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80)){ellipse(firstFire.x,firstFire.y,47,25,'#76674a');for(let j=0;j<8;j++)ellipse(firstFire.x+Math.cos(j*Math.PI/4)*33,firstFire.y+Math.sin(j*Math.PI/4)*17,8,6,'#a7a18c')}lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();// V266: the cabin's eastern approach is a broad shallow shelf; depths migrate west.
+ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(const p of l.detailOffsets){const px=l.x+p.x,py=l.y+p.y;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],p.shape?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,p.shade?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,p.shade?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();drawWetGround();drawEasternIslandLandmarks();if(window.__gloamAddon)window.__gloamAddon.drawGround();if(window.__thrummaw)window.__thrummaw.ground();if(window.__krakkle)window.__krakkle.draw();if(window.__swampBosses)window.__swampBosses.draw();drawCampDecor();drawDigPatches();drawMountainRiver(nightMix);lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();// V266: the cabin's eastern approach is a broad shallow shelf; depths migrate west.
 lakeShape();ctx.clip();
 ctx.save();ctx.translate(-360,-110);
 lakeShape(.73);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();
@@ -11117,7 +11107,6 @@ function artDrawables(list){
    ctx.save();ctx.fillStyle='#f5d9a1';ctx.fillRect(left+12,y+92,15,9);ctx.fillStyle='#442d1a';ctx.font='bold 8px Georgia';ctx.fillText(w.price+'g',left+13,y+99);ctx.restore();
   });
  }},{y:artSeat.y-1,draw(){
-  ctx.save();ctx.fillStyle='#523722';ctx.fillRect(artSeat.x-9,artSeat.y-12,3,12);ctx.fillRect(artSeat.x+7,artSeat.y-12,3,12);ellipse(artSeat.x,artSeat.y-13,15,6,'#ad8149');ctx.restore();
   if(prop)ctx.drawImage(artProps,530,24,255,392,artSeat.x+16,artSeat.y-78,53,81);
   if(atelier.draft&&atelier.progress>0){
    ctx.save();ctx.globalAlpha=Math.min(1,atelier.progress/11000);ctx.drawImage(artPicture(atelier.draft),artSeat.x+34,artSeat.y-55,21,16);ctx.restore();
