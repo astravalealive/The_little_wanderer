@@ -272,7 +272,7 @@ function updateTrolls(dt){
   if(d<95&&!state.discoveries.includes(t.name)){state.discoveries.push(t.name);think(t.thought,5200,true);save()}
  }
 }
-const trollSpriteSize=56;
+const trollSpriteSize=76;
 const ospreyArt=new Image();
 ospreyArt.src='./assets/great-lake-ospreys.webp';
 const ospreyFlightHistory=[];
@@ -301,7 +301,7 @@ function drawTroll(t,i){
  const p=t.pos,stride=t.walking?Math.sin(time*.009*(t.scuttleSpeed||1)):0,pixel=2.8;
  if(drawTrollSprite(i,p.x,p.y,trollSpriteSize,t.dir||(t.face<0?'left':'right'),t.walking,time*(t.scuttleSpeed||1)))return;
  ellipse(p.x,p.y+1,18,5,'#26362955');
- ctx.save();ctx.translate(Math.round(p.x),Math.round(p.y));ctx.scale(t.face||1,1);
+ ctx.save();ctx.translate(Math.round(p.x),Math.round(p.y));ctx.scale((t.face||1)*76/56,76/56);
  for(const side of [-1,1]){
   ctx.fillStyle='#53483f';ctx.fillRect(side*7-4,-7+side*stride*2,9,8);
  }
@@ -11129,7 +11129,7 @@ function artDrawables(list){
    ctx.save();ctx.globalAlpha=Math.min(1,atelier.progress/11000);ctx.drawImage(artPicture(atelier.draft),artSeat.x+34,artSeat.y-55,21,16);ctx.restore();
   }
  }});
- if(guest)list.push({y:guest.y,draw(){drawTrollSprite(guest.id+2,guest.x,guest.y,56,guest.dir,guest.phase!=='admire',guest.clock);
+ if(guest)list.push({y:guest.y,draw(){drawTrollSprite(guest.id+2,guest.x,guest.y,trollSpriteSize,guest.dir,guest.phase!=='admire',guest.clock);
  if(guest.phase==='admire'){ctx.save();ctx.fillStyle='#f8ead1';ctx.font='12px Georgia';ctx.textAlign='center';ctx.fillText('“Lovely…”',guest.x,guest.y-59);ctx.restore()}}});
 }
 function paintHaigen(){
