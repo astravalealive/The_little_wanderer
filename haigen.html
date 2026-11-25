@@ -10434,6 +10434,14 @@ function drawFrosthold(){
  rect(x-32,ky+145,64,45,'#283c49');rect(x-27,ky+150,54,40,'#65554b');
  for(const a of [x-46,x+38]){rect(a,ky+150,8,20,'#344655');rect(a-2,ky+145,12,9,'#f5b76b')}
  for(const a of [x-98,x+50])tower(a,b-48,48,48);
+ // Layered Nordic architectural detailing, aligned with the existing collision footprint.
+ function banner(bx,by){rect(bx-2,by-3,30,4,'#b8a27a');rect(bx,by,26,45,'#263e58');rect(bx+3,by+3,20,37,'#365a78');rect(bx+11,by+8,4,24,'#c7dbe5');rect(bx+6,by+13,14,4,'#c7dbe5');rect(bx+5,by+42,16,5,'#365a78');rect(bx+10,by+47,6,4,'#365a78')}
+ function roof(ax,ay,ww,hh){ctx.beginPath();ctx.moveTo(ax-8,ay+hh);ctx.lineTo(ax+ww/2,ay);ctx.lineTo(ax+ww+8,ay+hh);ctx.closePath();ctx.fillStyle='#243d50';ctx.fill();for(let j=8;j<hh;j+=9){const half=(ww/2+8)*j/hh;rect(ax+ww/2-half,ay+j,half*2,2,'#536e82')}ctx.strokeStyle='#e0edf2';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(ax-8,ay+hh);ctx.lineTo(ax+ww/2,ay);ctx.lineTo(ax+ww+8,ay+hh);ctx.stroke();rect(ax+ww/2-2,ay-12,4,15,'#9cabb4')}
+ for(const ax of [kx,kx+288]){roof(ax,ky-43,72,62);banner(ax+23,ky+88);for(let j=35;j<150;j+=43){rect(ax+31,ky+j,10,22,'#243744');rect(ax+33,ky+j+4,6,14,'#e1ad68')}}
+ roof(kx+76,ky-38,208,78);
+ for(const bx of [x-118,x+92])banner(bx,ky+112);
+ for(const [ax,ay,ww,hh] of frostholdWalls()){for(let i=12;i<ww-8;i+=29){const len=5+((i*7+hh)%13);rect(ax+i,ay+11,3,len,'#b8dce8');rect(ax+i+1,ay+11,1,len,'#e9f5f8')}if(ww>100){for(let i=18;i<ww-12;i+=36){rect(ax+i,ay-5,20,12,'#607b8a');rect(ax+i,ay-5,20,4,'#edf4f5')}}}
+ for(const ax of [l+75,l+w-75])for(const ay of [t+350,t+530]){rect(ax-6,ay,12,25,'#384c59');rect(ax-10,ay-6,20,9,'#8c7959');rect(ax-5,ay-4,10,5,'#ffca82')}
  for(const d of frostholdDoors){if(d.id==='keep')continue;rect(d.x-24,d.y-30,48,30,'#415968');rect(d.x-14,d.y-25,28,25,'#785b43');rect(d.x-24,d.y-30,48,5,'#e4eff2')}
  ctx.restore();
 }
