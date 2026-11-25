@@ -10385,7 +10385,8 @@ function frostholdWalls(){
 }
 function frostholdBlocked(x,y){return frostholdWalls().some(([a,b,w,h])=>x>a-10&&x<a+w+10&&y>b-10&&y<b+h+10)}
 // Shared doorway metadata for subsequent interior transitions.
-const frostholdDoors=Object.freeze([{id:'keep',x:frosthold.x,y:frosthold.y-frosthold.h/2+312,returnX:frosthold.x,returnY:frosthold.y-frosthold.h/2+330}]);
+const frostholdRooms={keep:{name:'Central Keep',furniture:[[180,60,120,48,'#705348'],[55,65,55,100,'#665345'],[370,65,55,100,'#665345']]},barracks:{name:'Barracks',furniture:[[45,55,65,95,'#8c6551'],[370,55,65,95,'#8c6551'],[45,190,65,95,'#8c6551'],[370,190,65,95,'#8c6551']]},gatehouse:{name:'Gatehouse',furniture:[[45,55,75,120,'#695749'],[360,55,75,120,'#695749'],[180,75,120,45,'#806c58']]},hall:{name:'Great Hall',furniture:[[80,85,75,180,'#78583e'],[325,85,75,180,'#78583e'],[190,55,100,45,'#59483e']]}};
+const frostholdDoors=Object.freeze([{id:'keep',x:0,y:-4868,returnX:0,returnY:-4850},{id:'barracks',x:-255,y:-4770,returnX:-255,returnY:-4745},{id:'hall',x:255,y:-4770,returnX:255,returnY:-4745},{id:'gatehouse',x:0,y:-4500,returnX:0,returnY:-4475}]);
 function frostholdDoorNear(x,y){return frostholdDoors.find(d=>Math.hypot(x-d.x,y-d.y)<35)||null}
 function frostholdFoundationChecks(){
  const {x,y,w,h}=frosthold,t=y-h/2,b=y+h/2;
@@ -10433,6 +10434,7 @@ function drawFrosthold(){
  rect(x-32,ky+145,64,45,'#283c49');rect(x-27,ky+150,54,40,'#65554b');
  for(const a of [x-46,x+38]){rect(a,ky+150,8,20,'#344655');rect(a-2,ky+145,12,9,'#f5b76b')}
  for(const a of [x-98,x+50])tower(a,b-48,48,48);
+ for(const d of frostholdDoors){if(d.id==='keep')continue;rect(d.x-24,d.y-30,48,30,'#415968');rect(d.x-14,d.y-25,28,25,'#785b43');rect(d.x-24,d.y-30,48,5,'#e4eff2')}
  ctx.restore();
 }
 function blockedBySolid(x,y){if(frostholdBlocked(x,y))return true;if(window.__gloamAddon?.arena(x,y))return false;
@@ -12084,22 +12086,25 @@ function frostholdInteract(){
  if(homeInside||visitorRoom||trollStumpInside||worldEditorActive||collapseRemaining>0)return false;
  const d=frostholdDoorNear(state.x,state.y);if(!d)return false;
  state.autonomy=false;state.x=d.returnX;state.y=d.returnY;
- frostholdRoom={id:d.id,x:240,y:340};notify('Frosthold: Central Keep');return true;
+ frostholdRoom={id:d.id,x:240,y:340};notify('Frosthold: '+frostholdRooms[d.id].name);return true;
 }
 function updateFrostholdRoom(dt){
  const pad=controllerMove();checkActions();if(!frostholdRoom)return;
  let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);
  const n=Math.max(1,Math.hypot(dx,dy)),step=Math.min(dt,50)*.12;
- frostholdRoom.x=clamp(frostholdRoom.x+dx/n*step,32,448);
- frostholdRoom.y=clamp(frostholdRoom.y+dy/n*step,44,368);
+ const clear=(x,y)=>!frostholdRooms[frostholdRoom.id].furniture.some(([a,b,w,h])=>x>a-8&&x<a+w+8&&y>b-8&&y<b+h+8);
+ const nx=clamp(frostholdRoom.x+dx/n*step,32,448),ny=clamp(frostholdRoom.y+dy/n*step,44,368);
+ if(clear(nx,frostholdRoom.y))frostholdRoom.x=nx;
+ if(clear(frostholdRoom.x,ny))frostholdRoom.y=ny;
 }
 function drawFrostholdRoom(){
  const scale=Math.min(W/480,H/400);ctx.save();ctx.clearRect(0,0,W,H);ctx.fillStyle='#18232e';ctx.fillRect(0,0,W,H);ctx.translate((W-480*scale)/2,(H-400*scale)/2);ctx.scale(scale,scale);
  ctx.fillStyle='#526674';ctx.fillRect(16,16,448,368);
  for(let y=32;y<368;y+=24)for(let x=32;x<448;x+=32){ctx.fillStyle=(x+y)%3?'#83949d':'#748995';ctx.fillRect(x,y,30,22)}
  ctx.fillStyle='#263b49';ctx.fillRect(16,16,448,24);ctx.fillRect(16,16,16,368);ctx.fillRect(448,16,16,368);ctx.fillRect(16,368,200,16);ctx.fillRect(264,368,200,16);
+ for(const [a,b,w,h,c] of frostholdRooms[frostholdRoom.id].furniture){ctx.fillStyle='#34444b';ctx.fillRect(a+4,b+5,w,h);ctx.fillStyle=c;ctx.fillRect(a,b,w,h);ctx.fillStyle='#ad9274';ctx.fillRect(a,b,w,5)}
  ctx.fillStyle='#b68a58';ctx.fillRect(216,368,48,16);
- ctx.fillStyle='#f3e5c8';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('Frosthold · Central Keep',240,28);ctx.fillText('X: Leave',240,395);
+ ctx.fillStyle='#f3e5c8';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('Frosthold · '+frostholdRooms[frostholdRoom.id].name,240,28);ctx.fillText('X: Leave',240,395);
  ctx.fillStyle='#273c4a';ctx.fillRect(frostholdRoom.x-7,frostholdRoom.y-17,14,19);ctx.fillStyle='#d5b08b';ctx.fillRect(frostholdRoom.x-5,frostholdRoom.y-23,10,9);
  ctx.restore();
 }
