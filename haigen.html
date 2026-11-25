@@ -10501,7 +10501,7 @@ function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEn
  if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=174/600){
  changeTrollChamber(true);
-}else if(dy>0&&trollRoomPlayer.y>=455/600)leaveTrollRoom();}time+=dt;return}if(trollDoorCooldown===0&&trollStumpDoorNear()&&!state.autonomy){enterTrollRoom();return}tickArtMarket(dt);updateNico(dt);updateSurvival(dt);updateWastelandGhosts(dt);if(ghostStunMs>0){time+=dt;return}if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateTrolls(dt);updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);// Old saves could retain an outdoor sleep pose directly on the house roof.
+}else if(dy>0&&trollRoomPlayer.y>=455/600)leaveTrollRoom();}time+=dt;return}if(trollDoorCooldown===0&&trollStumpDoorNear()&&!state.autonomy){enterTrollRoom();return}tickArtMarket(dt);updateNico(dt);updateWanderer(dt);updateSurvival(dt);updateWastelandGhosts(dt);if(ghostStunMs>0){time+=dt;return}if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateTrolls(dt);updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);// Old saves could retain an outdoor sleep pose directly on the house roof.
  // Wake Haigen there so he can approach the proper door and rest in bed.
  if(state.autonomy&&state.resting&&!homeInside&&state.campTier>0&&
     Math.hypot(state.x-(cottage.x+35),state.y-(cottage.y-10))<310){
@@ -11279,6 +11279,50 @@ function wanderNico(dt){
  if(dist(nico,artCart)<150)state.nicoVisitedCamp=true;
  state.nicoPosition={x,y};
  if(step>=d){nico.route.shift();if(!nico.route.length)nico.wait=3500+Math.random()*6500}
+}
+
+
+const wanderer={x:0,y:0,ready:false,dir:'down',action:'idle',wait:0,target:null,tradeWait:0};
+const wandererGoods=[['vegetables',3,2,6],['eggs',2,2,4],['berries',5,1,10],['mushrooms',3,2,6],['fish',1,2,2]];
+function wandererTrade(field,qty,price,buy){
+ const wallet=Number(atelier.purse)||0, count=Number(state[field])||0;
+ if(buy?wallet<price:count<qty)return false;
+ state[field]=count+(buy?qty:-qty);atelier.purse=wallet+(buy?-price:price);save();return true;
+}
+function updateWanderer(dt){
+ if(!wanderer.ready){
+  const p=state.wandererPosition;
+  if(p&&nicoGround(p.x,p.y))Object.assign(wanderer,p,{ready:true});
+  else for(let ring=1;ring<10&&!wanderer.ready;ring++)for(let i=0;i<12;i++){
+   const x=artCart.x+ring*45*Math.cos(i*Math.PI/6),y=artCart.y+ring*45*Math.sin(i*Math.PI/6);
+   if(nicoGround(x,y)){Object.assign(wanderer,{x,y,ready:true});break}
+  }
+  if(!wanderer.ready)return;
+ }
+ wanderer.tradeWait=Math.max(0,wanderer.tradeWait-dt);
+ if(!homeInside&&dist(wanderer,state)<85){
+  wanderer.action='idle';wanderer.dir=trollFacing(state.x-wanderer.x,state.y-wanderer.y);
+  if(state.autonomy&&!wanderer.tradeWait){
+   wanderer.tradeWait=30000;
+   const surplus=wandererGoods.find(([f,q,p,reserve])=>(Number(state[f])||0)>=q+reserve);
+   if(surplus&&wandererTrade(surplus[0],surplus[1],surplus[2],false))notify('Haigen sold '+surplus[0]+' to the Wanderer.');
+   else if(state.hunger<55&&(state.food||0)<1&&wandererTrade('food',1,3,true))notify('Haigen bought a meal from the Wanderer.');
+  }
+  return;
+ }
+ if(wanderer.wait>0){wanderer.wait-=dt;wanderer.action='idle';return}
+ if(!wanderer.target){
+  for(let i=0;i<12;i++){
+   const angle=Math.random()*Math.PI*2,d=80+Math.random()*220,x=wanderer.x+Math.cos(angle)*d,y=wanderer.y+Math.sin(angle)*d;
+   if([.25,.5,.75,1].every(f=>nicoGround(wanderer.x+(x-wanderer.x)*f,wanderer.y+(y-wanderer.y)*f))){wanderer.target={x,y};break}
+  }
+  if(!wanderer.target){wanderer.wait=1500;return}
+ }
+ const dx=wanderer.target.x-wanderer.x,dy=wanderer.target.y-wanderer.y,d=Math.hypot(dx,dy);
+ if(d<2){wanderer.target=null;wanderer.wait=2500;wanderer.action='idle';return}
+ const step=Math.min(d,dt*.045),x=wanderer.x+dx/d*step,y=wanderer.y+dy/d*step;
+ if(!nicoGround(x,y)){wanderer.target=null;wanderer.wait=1000;wanderer.action='idle';return}
+ Object.assign(wanderer,{x,y,dir:trollFacing(dx,dy),action:'walk'});state.wandererPosition={x,y};
 }
 
 function updateNico(dt){
