@@ -11362,6 +11362,8 @@ function updateWanderer(dt){
   }
   if(!wanderer.ready)return;
  }
+ dt=wildlifeBudget(wanderer,dt,false);
+ if(!dt)return;
  wanderer.tradeWait=Math.max(0,wanderer.tradeWait-dt);
  if(!homeInside&&dist(wanderer,state)<85){
   wanderer.action='idle';wanderer.dir=trollFacing(state.x-wanderer.x,state.y-wanderer.y);
@@ -11391,6 +11393,8 @@ function updateWanderer(dt){
 function updateNico(dt){
 
  if(!nico.ready&&!placeNico())return;
+ dt=wildlifeBudget(nico,dt,nico.action==='cast'||nico.action==='wave'||!!nico.hoodTime);
+ if(!dt)return;
  const distance=homeInside||trollStumpInside?Infinity:dist(nico,state);
  const dx=state.x-nico.x,dy=state.y-nico.y;
  const toward={up:dy,down:-dy,left:dx,right:-dx}[playerMotion.dir]||0;
@@ -11763,8 +11767,17 @@ function noticeHaigen(t,dt){
  }
  return false;
 }
-function updateCaveResidents(dt){
+const caveResidentDebt=new WeakMap();
+function caveResidentBudget(t,dt){
+ const elapsed=Math.min(150,(caveResidentDebt.get(t)||0)+dt);
+ if(!mountainInside&&elapsed<100){caveResidentDebt.set(t,elapsed);return 0}
+ caveResidentDebt.set(t,0);return mountainInside?Math.min(50,elapsed):elapsed;
+}
+function updateCaveResidents(frameDt){
  for(const t of caveTrolls){
+  // Cave coordinates are local, not world coordinates. Keep all residents responsive while visiting.
+  const dt=t.room==='woods'?wildlifeBudget(t,frameDt,false):t.room==='mountain'?caveResidentBudget(t,frameDt):frameDt;
+  if(!dt)continue;
   if(t.room==='woods'){
    if(t.wait>0){t.wait-=dt;t.walking=false;continue}
    stepWoodlandResident(t,dt);continue;
