@@ -12089,11 +12089,14 @@ const frostholdInteriorLinks={keep:[{id:'royal',x:145,y:48},{id:'tower',x:335,y:
 const frostholdResidents=[{room:'gatehouse',name:'Gatekeeper',route:[[145,140],[320,140],[320,300],[145,300]]},{room:'barracks',name:'Shield Guard',route:[[160,100],[320,100],[320,300],[160,300]]},{room:'hall',name:'Steward',route:[[180,130],[300,130],[300,300],[180,300]]},{room:'keep',name:'Huscarl',route:[[125,180],[350,180],[350,310],[125,310]]}];
 let frostholdClock=0;
 function frostholdResidentPosition(n){const t=(frostholdClock/4000)%n.route.length,i=Math.floor(t),f=t-i,a=n.route[i],b=n.route[(i+1)%n.route.length];return {x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f}}
+Object.assign(frostholdRooms,{cells:{name:'Frozen Cells',furniture:[[32,75,130,55,'#48535b'],[318,75,130,55,'#48535b'],[32,190,130,55,'#48535b'],[318,190,130,55,'#48535b']]},crypt:{name:'Ancient Crypt',furniture:[[70,80,90,120,'#59626b'],[320,80,90,120,'#59626b'],[195,120,90,65,'#647784']]}});
+frostholdInteriorLinks.dungeon=[{id:'cells',x:240,y:55}];
+frostholdInteriorLinks.cells=[{id:'crypt',x:240,y:55}];
 let frostholdRoom=null;
 function frostholdInteract(){
  if(frostholdRoom){
  const link=(frostholdInteriorLinks[frostholdRoom.id]||[]).find(d=>Math.hypot(d.x-frostholdRoom.x,d.y-frostholdRoom.y)<30);
- if(link){frostholdRoom={id:link.id,x:240,y:340,parent:{id:frostholdRoom.id,x:link.x,y:Math.min(330,link.y+32)}};notify(frostholdRooms[link.id].name);return true}
+ if(link){frostholdRoom={id:link.id,x:240,y:340,parent:{...frostholdRoom,x:link.x,y:Math.min(330,link.y+32)}};notify(frostholdRooms[link.id].name);return true}
  if(frostholdRoom.y<340||Math.abs(frostholdRoom.x-240)>38){notify('Approach a doorway.');return true}
  if(frostholdRoom.parent){frostholdRoom=frostholdRoom.parent;notify(frostholdRooms[frostholdRoom.id].name);return true}
  frostholdRoom=null;notify('Back outside Frosthold.');return true
@@ -12123,6 +12126,7 @@ function drawFrostholdRoom(){
  ctx.fillStyle='#f3e5c8';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('Frosthold · '+frostholdRooms[frostholdRoom.id].name,240,28);ctx.fillText('X: Leave',240,395);
  for(const n of frostholdResidents.filter(n=>n.room===frostholdRoom.id)){const p=frostholdResidentPosition(n);ctx.fillStyle='#455a70';ctx.fillRect(p.x-8,p.y-17,16,19);ctx.fillStyle='#b6c5cf';ctx.fillRect(p.x-7,p.y-25,14,9);ctx.fillStyle='#f3e5c8';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(n.name,p.x,p.y-30)}
  ctx.fillStyle='#273c4a';ctx.fillRect(frostholdRoom.x-7,frostholdRoom.y-17,14,19);ctx.fillStyle='#d5b08b';ctx.fillRect(frostholdRoom.x-5,frostholdRoom.y-23,10,9);
+ for(const x of [42,438])for(const y of [55,300]){const g=ctx.createRadialGradient(x,y,2,x,y,65);g.addColorStop(0,'rgba(255,195,110,.35)');g.addColorStop(1,'rgba(255,195,110,0)');ctx.fillStyle=g;ctx.fillRect(x-65,y-65,130,130);ctx.fillStyle='#ffc27a';ctx.fillRect(x-2,y-5,4,9)}
  ctx.restore();
 }
 
