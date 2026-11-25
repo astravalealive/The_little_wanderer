@@ -2,97 +2,103 @@
   "front": {
     "frame_count": 6,
     "ok": true,
-    "issues": [],
+    "issues": [
+      "CORRECTED CANDIDATE replaces lock-derived front. Original lock-derived frames archived at walk/front-from-lock-blocked (same-foot VISUAL FAIL). Captain visual foot review still required before deploy."
+    ],
     "metrics": [
       {
         "opaque": true,
         "bbox": [
-          21,
-          21,
-          363,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 342,
-        "height": 691,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          22,
-          16,
-          362,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 340,
-        "height": 696,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          28,
-          16,
-          356,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 328,
-        "height": 696,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          22,
-          21,
-          362,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 340,
-        "height": 691,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          21,
-          16,
-          363,
+          91,
+          32,
+          292,
           712
         ],
-        "width": 342,
-        "height": 696,
+        "width": 201,
+        "height": 680,
         "foot_y": 711,
-        "center_x": 191.5
+        "center_x": 191.0
       },
       {
         "opaque": true,
         "bbox": [
-          21,
-          21,
-          362,
+          90,
+          32,
+          293,
           712
         ],
-        "width": 341,
-        "height": 691,
+        "width": 203,
+        "height": 680,
         "foot_y": 711,
         "center_x": 191.0
       }
     ],
     "foot_y_span": 0,
-    "center_x_span": 0.5,
+    "center_x_span": 0.0,
     "adjacent_deltas": [
-      0.1458,
-      0.1023,
-      0.1454,
-      0.1472,
-      0.132,
-      0.12
-    ]
+      0.0228,
+      0.0421,
+      0.0378,
+      0.0423,
+      0.0345,
+      0.058
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true,
+    "status": "production-candidate-awaiting-visual-foot-signoff",
+    "source": "raw/hd-walk-front-corrected-raw.jpg"
   },
   "right": {
     "frame_count": 6,
@@ -187,7 +193,9 @@
       0.0662,
       0.0531,
       0.1102
-    ]
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
   },
   "back": {
     "frame_count": 6,
@@ -282,7 +290,9 @@
       0.0995,
       0.1123,
       0.0937
-    ]
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
   },
   "left": {
     "frame_count": 6,
@@ -377,7 +387,698 @@
       0.0662,
       0.0531,
       0.1102
-    ]
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "front_from_lock_blocked": {
+    "ok": false,
+    "issues": [
+      "VISUAL FAIL: same screen-right boot advances in frames 01/02/04/05 \u2014 archived, not for deploy"
+    ],
+    "path": "walk/front-from-lock-blocked/",
+    "anatomical_foot_alternation_verified": false
+  },
+  "action_axe_front": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          90,
+          32,
+          293,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.037,
+      0.0469,
+      0.0487,
+      0.05,
+      0.0431,
+      0.0431
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "action_axe_right": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          8,
+          87,
+          376,
+          712
+        ],
+        "width": 368,
+        "height": 625,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          26,
+          32,
+          358,
+          712
+        ],
+        "width": 332,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          44,
+          32,
+          340,
+          712
+        ],
+        "width": 296,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          20,
+          32,
+          363,
+          712
+        ],
+        "width": 343,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          8,
+          97,
+          376,
+          712
+        ],
+        "width": 368,
+        "height": 615,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          14,
+          32,
+          369,
+          712
+        ],
+        "width": 355,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.5,
+    "adjacent_deltas": [
+      0.174,
+      0.1566,
+      0.1199,
+      0.1926,
+      0.1833,
+      0.1632
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "action_axe_back": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          13,
+          32,
+          370,
+          712
+        ],
+        "width": 357,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          8,
+          50,
+          376,
+          712
+        ],
+        "width": 368,
+        "height": 662,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          45,
+          32,
+          338,
+          712
+        ],
+        "width": 293,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          32,
+          32,
+          352,
+          712
+        ],
+        "width": 320,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          8,
+          59,
+          376,
+          712
+        ],
+        "width": 368,
+        "height": 653,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          8,
+          32,
+          376,
+          712
+        ],
+        "width": 368,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.5
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.5,
+    "adjacent_deltas": [
+      0.1358,
+      0.1711,
+      0.1418,
+      0.2454,
+      0.2292,
+      0.1799
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "action_axe_left": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          8,
+          87,
+          376,
+          712
+        ],
+        "width": 368,
+        "height": 625,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          26,
+          32,
+          358,
+          712
+        ],
+        "width": 332,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          44,
+          32,
+          340,
+          712
+        ],
+        "width": 296,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          21,
+          32,
+          364,
+          712
+        ],
+        "width": 343,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          8,
+          97,
+          376,
+          712
+        ],
+        "width": 368,
+        "height": 615,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          15,
+          32,
+          370,
+          712
+        ],
+        "width": 355,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.5,
+    "adjacent_deltas": [
+      0.174,
+      0.1566,
+      0.1199,
+      0.1926,
+      0.1833,
+      0.1632
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true,
+    "status": "preview-mirror-only"
+  },
+  "action_pickaxe_front": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          90,
+          32,
+          293,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.0362,
+      0.0419,
+      0.0408,
+      0.046,
+      0.0479,
+      0.0317
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "action_pickaxe_right": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          90,
+          32,
+          293,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.0321,
+      0.0394,
+      0.0452,
+      0.0428,
+      0.0519,
+      0.0453
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "action_pickaxe_left": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          92,
+          32,
+          293,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          294,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 192.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.0321,
+      0.0394,
+      0.0452,
+      0.0428,
+      0.0519,
+      0.0453
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true,
+    "status": "preview-mirror-only"
   },
   "action_axe": {
     "frame_count": 6,
@@ -472,7 +1173,106 @@
       0.1926,
       0.1833,
       0.1632
-    ]
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "action_pickaxe": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          91,
+          32,
+          292,
+          712
+        ],
+        "width": 201,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          90,
+          32,
+          293,
+          712
+        ],
+        "width": 203,
+        "height": 680,
+        "foot_y": 711,
+        "center_x": 191.0
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 0.0,
+    "adjacent_deltas": [
+      0.0321,
+      0.0394,
+      0.0452,
+      0.0428,
+      0.0519,
+      0.0453
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
   },
   "action_sword": {
     "frame_count": 6,
@@ -567,6 +1367,105 @@
       0.1326,
       0.1655,
       0.1925
-    ]
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
+  },
+  "idle_front": {
+    "frame_count": 6,
+    "ok": true,
+    "issues": [],
+    "metrics": [
+      {
+        "opaque": true,
+        "bbox": [
+          21,
+          21,
+          363,
+          712
+        ],
+        "width": 342,
+        "height": 691,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          21,
+          15,
+          363,
+          712
+        ],
+        "width": 342,
+        "height": 697,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          21,
+          12,
+          363,
+          712
+        ],
+        "width": 342,
+        "height": 700,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          21,
+          18,
+          363,
+          712
+        ],
+        "width": 342,
+        "height": 694,
+        "foot_y": 711,
+        "center_x": 191.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          20,
+          21,
+          362,
+          712
+        ],
+        "width": 342,
+        "height": 691,
+        "foot_y": 711,
+        "center_x": 190.5
+      },
+      {
+        "opaque": true,
+        "bbox": [
+          22,
+          21,
+          364,
+          712
+        ],
+        "width": 342,
+        "height": 691,
+        "foot_y": 711,
+        "center_x": 192.5
+      }
+    ],
+    "foot_y_span": 0,
+    "center_x_span": 2.0,
+    "adjacent_deltas": [
+      0.0744,
+      0.045,
+      0.0746,
+      0.0614,
+      0.0554,
+      0.0344
+    ],
+    "anatomical_foot_alternation_verified": false,
+    "requires_visual_foot_review": true
   }
 }

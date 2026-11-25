@@ -211,8 +211,12 @@ def qa_walk_cycle(frames: list[Image.Image]) -> dict:
     for i in range(3):
         d = frame_delta(frames[i], frames[i + 3])
         if d < 0.006:
+            report["ok"] = False
             report["issues"].append(f"stride pair {i}/{i+3} too similar (delta={d:.4f})")
-    report["ok"] = report["ok"] and not any("nearly identical" in i for i in report["issues"])
+    # Pixel difference is not proof that the LEFT and RIGHT feet alternate.
+    # Keep this distinction explicit so visual QA cannot be mistaken for anatomy QA.
+    report["anatomical_foot_alternation_verified"] = False
+    report["requires_visual_foot_review"] = True
     return report
 
 
@@ -320,7 +324,10 @@ def main():
     ap.add_argument("--import-right", type=Path, help="6-frame right-facing raw strip")
     ap.add_argument("--import-back", type=Path, help="6-frame back-facing raw strip")
     ap.add_argument("--import-left", type=Path, help="6-frame left-facing raw strip (else mirror right)")
-    ap.add_argument("--import-action", nargs=2, action="append", metavar=("NAME", "PATH"), help="import action strip (repeatable)")
+    ap.add_argument("--import-action", nargs=2, action="append", metavar=("NAME", "PATH"),
+                    help="import flat action strip → actions/NAME/ (legacy right)")
+    ap.add_argument("--import-action-dir", nargs=3, action="append", metavar=("NAME", "DIR", "PATH"),
+                    help="import action strip into actions/NAME/DIR/ (repeatable)")
     args = ap.parse_args()
 
     prod = PROD
@@ -355,9 +362,25 @@ def main():
         for name, path in args.import_action:
             src = Path(path)
             if src.exists():
+                # Legacy flat action path kept for right-facing compatibility
                 action_dir = prod / "actions" / name
                 frames = import_direction_strip(src, action_dir)
                 qa_all[f"action_{name}"] = qa_walk_cycle(frames)
+                right_dir = prod / "actions" / name / "right"
+                frames_r = import_direction_strip(src, right_dir)
+                qa_all[f"action_{name}_right"] = qa_walk_cycle(frames_r)
+
+    if args.import_action_dir:
+        for name, direction, path in args.import_action_dir:
+            src = Path(path)
+            if not src.exists():
+                continue
+            mirror = False
+            if direction == "left" and str(path).endswith("RIGHT_MIRROR"):
+                continue
+            action_dir = prod / "actions" / name / direction
+            frames = import_direction_strip(src, action_dir, mirror=mirror)
+            qa_all[f"action_{name}_{direction}"] = qa_walk_cycle(frames)
 
     write_atlas_metadata(prod, qa_all)
     (prod / "qa-report.json").write_text(json.dumps(qa_all, indent=2) + "\n")

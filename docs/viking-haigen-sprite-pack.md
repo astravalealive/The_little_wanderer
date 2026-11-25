@@ -55,5 +55,26 @@ Outputs: `assets/viking-haigen/production/` + `atlas-hd.json` + `loop.gif` per d
 ## Playable PoC
 `assets/viking-haigen/hd-poc.html` — high-detail walk playback (does not alter default `haigen.html`).
 
+## Incorporated handoff constraints (uploaded 22 Nov 2026)
+
+From `Haigens_World_MASTER_DAILY_REFERENCE_2026-11-21` + `COMPLETE_Cursor_Handoff_2026-11-19`:
+
+- **Godot shelved; HTML only** for current sprite work.
+- No merge / deploy / spend / live atlas swap without explicit Captain approval.
+- Preserve live `haigen.html` and saves (`wandererV127PreviewSave`).
+- Sprite grammar: idle + walk four directions; tool actions with **hand anchors**; no floating equipment / noodle arms.
+- Judge by playable visible results — do not claim untested sheets production-ready.
+- Left-facing sheets mirrored from right remain **preview-only** until a true left master exists (scar/sword laterality).
+
+## Current verified HD extras (this continuation)
+
+- `production/actions/axe/{front,right,back,left}/` — 6-frame, 384×720, grip anchors in `atlas-hd.json`
+- `production/actions/pickaxe/{front,right,left}/` — pickaxe action sheets
+- `production/idle/front/` — lock-derived micro-idle
+- `production/walk/front/` — **corrected front walk candidate** after lock-derived same-foot FAIL
+- `production/walk/front-from-lock-blocked/` — archived failing lock-derived front
+- `hd-poc.html` modes: Walk / Axe / Pickaxe / Idle
+- **Deploy blocked** until Captain visual foot-alternation sign-off on corrected front
+
 ## Captain gate
 No permanent atlas swap, merge, or deploy without explicit approval.
