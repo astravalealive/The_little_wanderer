@@ -272,7 +272,7 @@ function updateTrolls(dt){
   if(d<95&&!state.discoveries.includes(t.name)){state.discoveries.push(t.name);think(t.thought,5200,true);save()}
  }
 }
-const trollSpriteSize=56;
+const trollSpriteSize=76;
 const ospreyArt=new Image();
 ospreyArt.src='./assets/great-lake-ospreys.webp';
 const ospreyFlightHistory=[];
@@ -11043,7 +11043,7 @@ function artDrawables(list){
    ctx.save();ctx.globalAlpha=Math.min(1,atelier.progress/11000);ctx.drawImage(artPicture(atelier.draft),artSeat.x+34,artSeat.y-55,21,16);ctx.restore();
   }
  }});
- if(guest)list.push({y:guest.y,draw(){drawTrollSprite(guest.id+2,guest.x,guest.y,56,guest.dir,guest.phase!=='admire',guest.clock);
+ if(guest)list.push({y:guest.y,draw(){drawTrollSprite(guest.id+2,guest.x,guest.y,trollSpriteSize,guest.dir,guest.phase!=='admire',guest.clock);
  if(guest.phase==='admire'){ctx.save();ctx.fillStyle='#f8ead1';ctx.font='12px Georgia';ctx.textAlign='center';ctx.fillText('“Lovely…”',guest.x,guest.y-59);ctx.restore()}}});
 }
 function paintHaigen(){
