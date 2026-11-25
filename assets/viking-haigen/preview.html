@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Viking Haigen sprite pack preview</title>
+<style>
+  :root{--bg:#1a221c;--ink:#f3ead2;--muted:#9bb09a;--accent:#c9a227;--panel:#243028}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.45 Georgia,serif;background:linear-gradient(160deg,#152018,#2a3830 55%,#1c2620);color:var(--ink);padding:24px}
+  h1{font-size:1.6rem;margin:0 0 .25rem;letter-spacing:.02em}
+  h2{font-size:1.05rem;margin:1.6rem 0 .5rem;color:var(--accent);font-weight:600}
+  p,li{color:var(--muted)}
+  a{color:#d7c27a}
+  .hero{max-width:980px;margin:0 auto 1.5rem}
+  .grid{display:grid;gap:16px;max-width:980px;margin:0 auto}
+  figure{margin:0;background:var(--panel);padding:12px;border:1px solid #3a4a40}
+  figcaption{margin-top:8px;font-size:.85rem;color:var(--muted)}
+  img{image-rendering:pixelated;image-rendering:crisp-edges;max-width:100%;height:auto;background:#fff;display:block}
+  img.dark{background:#0e1411}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .row img{background:#fff}
+  .cta{display:inline-block;margin-top:10px;padding:.55rem .9rem;background:#3f5a45;color:var(--ink);text-decoration:none;border:1px solid #6f925c}
+</style>
+</head>
+<body>
+  <div class="hero">
+    <h1>Viking Haigen · sprite pack</h1>
+    <p>Locked to the Captain front-walk reference. Engine sheets are 48×72 cells in 192×288 atlases. Live game stays on approved Haigen until you approve the swap.</p>
+    <a class="cta" href="../../haigen.html?vikingHaigen=1">Play with Viking Haigen preview</a>
+  </div>
+
+  <div class="grid">
+    <figure>
+      <img class="dark" src="packed/haigen-viking-walk-atlas.png" alt="Base viking walk atlas" width="384" height="576" style="width:384px"/>
+      <figcaption>Base walk · 192×288 (shown 2×) · down / up / right / left</figcaption>
+    </figure>
+
+    <h2>Region kits</h2>
+    <div class="row">
+      <img src="packed/haigen-viking-walk-snow.png" width="192" height="288" alt="snow"/>
+      <img src="packed/haigen-viking-walk-beach.png" width="192" height="288" alt="beach"/>
+      <img src="packed/haigen-viking-walk-desert.png" width="192" height="288" alt="desert"/>
+      <img src="packed/haigen-viking-walk-swim.png" width="192" height="288" alt="swim"/>
+      <img src="packed/haigen-viking-walk-downs.png" width="192" height="288" alt="downs"/>
+      <img src="packed/haigen-viking-walk-fen.png" width="192" height="288" alt="fen"/>
+      <img src="packed/haigen-viking-walk-wasteland.png" width="192" height="288" alt="wasteland"/>
+    </div>
+    <p>Bonus: <img src="packed/haigen-viking-walk-knight.png" width="96" height="144" alt="knight"/> knight · <img src="packed/haigen-viking-walk-ceremonial.png" width="96" height="144" alt="ceremonial"/> ceremonial</p>
+
+    <figure>
+      <img src="packed/haigen-viking-expressions.png" alt="Expressions" width="288" height="288"/>
+      <figcaption>Expressions · determined, happy, surprised, serious, stern, sad, excited, focused, shy</figcaption>
+    </figure>
+
+    <figure>
+      <img src="packed/haigen-viking-items.png" alt="Items" width="480" height="240" style="width:480px"/>
+      <figcaption>Weapons &amp; tools icons (also packed as 40×60 tool cells)</figcaption>
+    </figure>
+
+    <figure>
+      <img class="dark" src="packed/haigen-viking-actions.png" alt="Actions" width="384" height="864" style="width:256px"/>
+      <figcaption>Actions · sword, axe, pickaxe, shovel, net, fishing rod</figcaption>
+    </figure>
+
+    <figure>
+      <img class="dark" src="packed/haigen-viking-interactions.png" alt="Interactions" width="384" height="1152" style="width:256px"/>
+      <figcaption>Interactions · swim, dive, row, climb, pickup, chest, sit, sleep</figcaption>
+    </figure>
+
+    <figure>
+      <img src="packed/haigen-viking-front-lock-hero.png" alt="Front lock hero strip"/>
+      <figcaption>Captain lock strip (high-res masters sliced from the approved front walk)</figcaption>
+    </figure>
+  </div>
+</body>
+</html>
