@@ -10620,23 +10620,26 @@ trackMotion(c,oldX,oldY,c.x,c.y,dt);
 // Pan feels direct under the finger. Release holds the view briefly before a gentle recenter.
 // Direct pan: no following force while fingers are on the canvas.
 const draggingCamera=cameraTouches.size>0;
-// Manual movement never snaps a freely panned camera back onto Haigen.
-// Only resume following when idle autonomy takes over and the camera has been
-// untouched for the idle-return interval. Keep editor and interior views intact.
-if(playerInput){cameraLastPanAt=performance.now();}
+// Manual panning pauses follow. Walking resumes it after the release hold,
+// while autonomous exploration resumes it after the existing idle interval.
 if(draggingCamera)cameraLastPanAt=performance.now();
 const cameraHolding=!draggingCamera&&performance.now()-cameraReleaseAt<950;
-if(cameraDetached&&state.autonomy&&!playerInput&&!draggingCamera&&!cameraHolding&&
-   !worldEditorActive&&!visitorRoom&&!homeInside&&!trollStumpInside&&
-   performance.now()-cameraLastPanAt>=CAMERA_IDLE_RETURN_MS){
+const cameraViewBlocked=worldEditorActive||visitorRoom||homeInside||trollStumpInside||autonomousHomeVisit;
+if(cameraDetached&&!draggingCamera&&!cameraHolding&&!cameraViewBlocked&&
+   (playerInput||(state.autonomy&&performance.now()-cameraLastPanAt>=CAMERA_IDLE_RETURN_MS))){
  cameraDetached=false;
 }
-if(!draggingCamera&&!cameraHolding&&!cameraDetached&&!worldEditorActive&&!visitorRoom&&!homeInside&&!trollStumpInside&&!autonomousHomeVisit){
- const follow=1-Math.exp(-dt/1250);
- // V426: portrait presentation bias keeps Haigen slightly lower so cabin/garden stay readable above.
- const portraitLift=presentationPortraitFraming()?Math.min(110,H*.075)/Math.max(.01,worldZoom()):0;
- const targetX=clamp(state.x+look.x,WORLD_MIN,WORLD);
- const targetY=clamp(state.y+look.y-portraitLift,WORLD_MIN,WORLD);
+if(!draggingCamera&&!cameraHolding&&!cameraDetached&&!cameraViewBlocked){
+ const zoom=Math.max(.01,worldZoom());
+ const follow=1-Math.exp(-dt/240);
+ // A small screen-relative zone prevents camera motion on every footstep.
+ const zoneX=Math.min(64,W*.08)/zoom;
+ const zoneY=Math.min(48,H*.07)/zoom;
+ const portraitLift=presentationPortraitFraming()?Math.min(110,H*.075)/zoom:0;
+ const focusX=state.x+look.x;
+ const focusY=state.y+look.y-portraitLift;
+ const targetX=clamp(focusX-clamp(focusX-cam.x,-zoneX,zoneX),WORLD_MIN,WORLD);
+ const targetY=clamp(focusY-clamp(focusY-cam.y,-zoneY,zoneY),WORLD_MIN,WORLD);
  cam.x+=(targetX-cam.x)*follow;
  cam.y+=(targetY-cam.y)*follow;
  if(Math.abs(cam.x-targetX)<.25)cam.x=targetX;
