@@ -9180,7 +9180,7 @@ function overhaulBiomeFloor(nightMix){
  }
  ctx.restore();
 }
-function draw(){ensureWorldLocator();const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const questHud=$('campQuestHud');if(questHud)questHud.textContent=state.campClearingDone?'🏕️ Campsite secure ✓':'🏕️ Clear campsite '+state.campClearingPicked.length+'/'+campDebris.length+' · X Collect brush';const homeHud=$('homesteadHud');if(homeHud)homeHud.textContent='🪵 '+state.wood+'/'+woodCarryLimit+' · 📦 '+state.woodStored+'/'+woodStoreLimit()+' · 🪨 '+state.stone+' · 🥚 '+state.eggs+' · 🐟 '+state.fish+' · 🥩 '+state.rawMeat+' · 🥕 '+state.vegetables+' · 🩵 '+state.medicinalMushrooms+' · 🧪 '+state.antidotes;const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100'+(state.poisonMs>0?' · 🟢 POISONED':'')+(collapseRemaining>0?' · 💤 RESCUE':'');hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=worldZoom();ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);
+function draw(){if(frostholdRoom){drawFrostholdRoom();return}ensureWorldLocator();const energyHud=$('energyMeter');if(energyHud)energyHud.textContent='💤 Energy '+Math.ceil(state.energy)+'/100'+(state.resting?' · Resting':'');const questHud=$('campQuestHud');if(questHud)questHud.textContent=state.campClearingDone?'🏕️ Campsite secure ✓':'🏕️ Clear campsite '+state.campClearingPicked.length+'/'+campDebris.length+' · X Collect brush';const homeHud=$('homesteadHud');if(homeHud)homeHud.textContent='🪵 '+state.wood+'/'+woodCarryLimit+' · 📦 '+state.woodStored+'/'+woodStoreLimit()+' · 🪨 '+state.stone+' · 🥚 '+state.eggs+' · 🐟 '+state.fish+' · 🥩 '+state.rawMeat+' · 🥕 '+state.vegetables+' · 🩵 '+state.medicinalMushrooms+' · 🧪 '+state.antidotes;const restButton=$('restBtn');if(restButton)restButton.textContent=state.resting?'🌤️ Wake up':'💤 Rest';const dayHud=$('day');if(dayHud)dayHud.title=state.weather?.mode==='rain'?'Rain falling over Haigen’s world':'Clear weather';const hungerHud=$('hungerMeter');if(hungerHud){hungerHud.textContent='🍲 Hunger '+Math.ceil(state.hunger)+'/100';hungerHud.style.color=state.hunger<=20?'#ff9990':state.hunger<=45?'#ffd47b':'#f3d18b'}const hp=$('lifeMeter'),fill=$('lifeFill');if(hp&&fill){hp.firstChild.textContent='❤️ Health '+Math.ceil(state.health)+'/100'+(state.poisonMs>0?' · 🟢 POISONED':'')+(collapseRemaining>0?' · 💤 RESCUE':'');hp.setAttribute('aria-valuenow',String(Math.ceil(state.health)));fill.style.width=state.health+'%';fill.style.background=state.health>60?'#73c977':state.health>30?'#e9bd59':'#e35c55'}ctx.clearRect(0,0,W,H);const zoom=worldZoom();ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-cam.x,-cam.y);
  if(cameraZoom<.18){drawWideCamera(zoom);ctx.restore();$('haigenSpeech').style.visibility='hidden';return}
  const nightMix=nightStrength();ctx.fillStyle=mixColour('#7f9f64','#283c65',nightMix);ctx.fillRect(cam.x-W/(2*zoom)-120,cam.y-H/(2*zoom)-120,W/zoom+240,H/zoom+240);drawExpandedTerrain(nightMix);drawFenDetail(nightMix);overhaulBiomeFloor(nightMix);ctx.save();/* V154: do not clip actors and shoreline to obsolete original-island outline; expanded coast lies beyond it. */if(rbEnabled)rbDrawGround();if(rbEnabled)drawWoodlandFloorV391(nightMix);drawHomesteadStyleLock(nightMix);if(!draw.groundPatchLayout){draw.groundPatchLayout=Array.from({length:410},(_,i)=>({x:WORLD_MIN+seeded(i+950)*WORLD_SPAN,y:WORLD_MIN+seeded(i+1200)*WORLD_SPAN,rx:30+seeded(i+800)*90,ry:18+seeded(i+700)*65,shade:i%2}))}for(const p of draw.groundPatchLayout){if(Math.abs(p.x-cam.x)>1100||Math.abs(p.y-cam.y)>850||expandedRegion(p.x,p.y)||(rbEnabled&&rbWoodland(p.x,p.y)))continue;ellipse(p.x,p.y,p.rx,p.ry,mixColour(p.shade?'#8bb06c':'#648c58',p.shade?'#2f4658':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000)continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
 const tint=ctx.createRadialGradient(0,0,.04,0,0,1),shade=l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564';
@@ -9585,7 +9585,7 @@ const visible=objects.filter(o=>!trollDoorwayTree(o)&&!worldEditorHidden.has(o.i
 drawables.push(...woodlandDeer.filter(a=>Math.abs(a.x-cam.x)<=1050&&Math.abs(a.y-cam.y)<=800).map(a=>({y:a.y,draw:()=>worldFaunaDraw('stag',a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,2.1,time<a.scaredUntil?'flee':time<a.alertUntil?'alert':a.walking?'walk':'forage')})));
 drawables.push(...regionalWildlife.filter(a=>animalAlive(a)&&Math.abs(a.x-cam.x)<=1050&&Math.abs(a.y-cam.y)<=800).map(a=>({y:a.y,draw:()=>drawWildAnimal(a)})));
 drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));trollHabitats.forEach((t,i)=>{if(caveTrolls.find(r=>r.sprite===i).room==='habitat'&&t.pos&&Math.abs(t.pos.x-cam.x)<1050&&Math.abs(t.pos.y-cam.y)<800)drawables.push({y:t.pos.y,draw:()=>drawTroll(t,i)})});for(const t of caveTrolls){if(t.room==='woods'&&Math.abs(t.x-cam.x)<1050&&Math.abs(t.y-cam.y)<800)drawables.push({y:t.y,draw:()=>drawTrollSprite(t.sprite,t.x,t.y,trollSpriteSize,t.dir,t.walking,t.clock)});}artDrawables(drawables);if(nico.ready)drawables.push({y:nico.y,draw:drawNico});drawables.push({y:abandonedTrollStump.y+24,draw:drawAbandonedTrollStump},{y:trollStumpHome.y+24,draw:drawTrollStump});if(state.skiffBerth&&!state.skiffAtSea)drawSkiff();drawables.forEach((o,i)=>{o.depthOrder=i});
-drawables.sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder).forEach(o=>o.draw());worldEditorOutline();if(!state.skiffAtSea)drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+drawFrosthold();drawables.sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder).forEach(o=>o.draw());worldEditorOutline();if(!state.skiffAtSea)drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
@@ -10377,7 +10377,75 @@ function easternRiverWalkBlocked(x,y){
  // Cross only on the deck of a genuine fixed bridge.
  return !easternBridges.some(bridge=>Math.abs(y-bridge.y)<=27&&Math.abs(x-easternRiverX(bridge.y))<=111);
 }
-function blockedBySolid(x,y){if(window.__gloamAddon?.arena(x,y))return false;
+// Frosthold phase 1: fixed world-space footprint; no save schema changes.
+const frosthold={x:0,y:-4800,w:960,h:760,gate:100};
+function frostholdWalls(){
+ const {x,y,w,h,gate}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
+ return [[l,t,w,48],[l,t,48,h],[l+w-48,t,48,h],[l,b-48,w/2-gate/2,48],[x+gate/2,b-48,w/2-gate/2,48],[x-180,t+110,360,190]];
+}
+function frostholdBlocked(x,y){return frostholdWalls().some(([a,b,w,h])=>x>a-10&&x<a+w+10&&y>b-10&&y<b+h+10)}
+// Shared doorway metadata for subsequent interior transitions.
+const frostholdRooms={keep:{name:'Central Keep',furniture:[[180,60,120,48,'#705348'],[55,65,55,100,'#665345'],[370,65,55,100,'#665345']]},barracks:{name:'Barracks',furniture:[[45,55,65,95,'#8c6551'],[370,55,65,95,'#8c6551'],[45,190,65,95,'#8c6551'],[370,190,65,95,'#8c6551']]},gatehouse:{name:'Gatehouse',furniture:[[45,55,75,120,'#695749'],[360,55,75,120,'#695749'],[180,75,120,45,'#806c58']]},hall:{name:'Great Hall',furniture:[[80,85,75,180,'#78583e'],[325,85,75,180,'#78583e'],[190,55,100,45,'#59483e']]}};
+const frostholdDoors=Object.freeze([{id:'keep',x:0,y:-4868,returnX:0,returnY:-4850},{id:'barracks',x:-255,y:-4770,returnX:-255,returnY:-4745},{id:'hall',x:255,y:-4770,returnX:255,returnY:-4745},{id:'gatehouse',x:0,y:-4500,returnX:0,returnY:-4475}]);
+function frostholdDoorNear(x,y){return frostholdDoors.find(d=>Math.hypot(x-d.x,y-d.y)<35)||null}
+function frostholdFoundationChecks(){
+ const {x,y,w,h}=frosthold,t=y-h/2,b=y+h/2;
+ return {gateOpen:!frostholdBlocked(x,b-24),westWall:frostholdBlocked(x-w/2+24,y),eastWall:frostholdBlocked(x+w/2-24,y),keepSolid:frostholdBlocked(x,t+200),courtOpen:!frostholdBlocked(x,y),doorReturnClear:frostholdDoors.every(d=>!frostholdBlocked(d.returnX,d.returnY)),land: islandDepth(x,y)>0};
+}
+
+function drawFrosthold(){
+ const {x,y,w,h}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
+ if(Math.abs(cam.x-x)>w/2+W/worldZoom()||Math.abs(cam.y-y)>h/2+H/worldZoom())return;
+ ctx.save();
+ const rect=(a,b,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(a,b,w,h)};
+ rect(l,t,w,h,'#b8cbd1');
+ for(let j=0;j<h;j+=24)for(let i=0;i<w;i+=32){const n=(i*17+j*13)%97;rect(l+i,t+j,Math.min(31,w-i),Math.min(23,h-j),n<30?'#a8bdc6':n<65?'#c0d0d5':'#b3c5cc')}
+ rect(x-54,t+300,108,h-300,'#849da9');
+ for(let j=t+304;j<b;j+=18){rect(x-51,j,102,15,'#a4b8c1');rect(x-2,j,2,15,'#748e9b')}
+ function masonry(a,b,ww,hh){
+ rect(a+8,b+9,ww,hh,'#829ba9');rect(a,b,ww,hh,'#425968');
+ for(let j=12;j<hh-4;j+=16)for(let i=4;i<ww-4;i+=25){const k=(j*11+i*7)%53;rect(a+i,b+j,Math.min(23,ww-i-3),Math.min(14,hh-j-2),k<18?'#657d8c':k<35?'#526b7b':'#738a98')}
+ rect(a,b,ww,10,'#e2edf0');rect(a,b+10,ww,4,'#9bb7c5');
+ }
+ // Courtyard circulation: cross-axis paths, raised keep approach and side courts.
+ rect(l+64,t+390,w-128,72,'#829ba8');
+ for(let i=l+66;i<l+w-64;i+=26){rect(i,t+394,23,64,'#a7bbc4');rect(i,t+426,23,2,'#738d9a')}
+ for(const side of [-1,1]){
+ const cx=x+side*255;
+ rect(cx-95,t+475,190,165,'#8da6b1');
+ rect(cx-89,t+481,178,153,'#cbd9dd');
+ for(let j=0;j<153;j+=25)for(let i=0;i<178;i+=29)rect(cx-87+i,t+483+j,Math.min(26,176-i),Math.min(22,151-j),'#b5c8cf');
+ for(const dx of [-75,75]){rect(cx+dx-5,t+488,10,17,'#465c68');rect(cx+dx-7,t+482,14,8,'#eeb46e')}
+ }
+ for(let j=0;j<7;j++){rect(x-68,t+300+j*8,136,7,j%2?'#9bb0ba':'#b9ccd3');rect(x-68,t+307+j*8,136,1,'#536f7e')}
+ for(const [a,b,ww,hh] of frostholdWalls())masonry(a,b,ww,hh);
+ function tower(a,b,ww,hh){
+ masonry(a,b,ww,hh);rect(a+7,b+9,ww-14,hh-25,'#344b5b');
+ rect(a+13,b+15,ww-26,hh-37,'#607b8b');
+ for(let i=0;i<ww;i+=24){rect(a+i,b-7,Math.min(15,ww-i),18,'#6c8494');rect(a+i,b-7,Math.min(15,ww-i),5,'#edf4f5')}
+ rect(a+ww/2-5,b+hh-25,10,17,'#263c4c');
+ }
+ for(const a of [l,l+w-48])for(const z of [t,b-48])tower(a,z,48,48);
+ const kx=x-180,ky=t+110;
+ tower(kx,ky,72,190);tower(kx+288,ky,72,190);
+ rect(kx+76,ky+10,208,110,'#344f62');
+ for(let j=0;j<110;j+=12)rect(kx+80,ky+10+j,200,2,'#718b9b');
+ rect(x-4,ky+8,8,112,'#d7e6ed');
+ rect(x-32,ky+145,64,45,'#283c49');rect(x-27,ky+150,54,40,'#65554b');
+ for(const a of [x-46,x+38]){rect(a,ky+150,8,20,'#344655');rect(a-2,ky+145,12,9,'#f5b76b')}
+ for(const a of [x-98,x+50])tower(a,b-48,48,48);
+ // Layered Nordic architectural detailing, aligned with the existing collision footprint.
+ function banner(bx,by){rect(bx-2,by-3,30,4,'#b8a27a');rect(bx,by,26,45,'#263e58');rect(bx+3,by+3,20,37,'#365a78');rect(bx+11,by+8,4,24,'#c7dbe5');rect(bx+6,by+13,14,4,'#c7dbe5');rect(bx+5,by+42,16,5,'#365a78');rect(bx+10,by+47,6,4,'#365a78')}
+ function roof(ax,ay,ww,hh){ctx.beginPath();ctx.moveTo(ax-8,ay+hh);ctx.lineTo(ax+ww/2,ay);ctx.lineTo(ax+ww+8,ay+hh);ctx.closePath();ctx.fillStyle='#243d50';ctx.fill();for(let j=8;j<hh;j+=9){const half=(ww/2+8)*j/hh;rect(ax+ww/2-half,ay+j,half*2,2,'#536e82')}ctx.strokeStyle='#e0edf2';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(ax-8,ay+hh);ctx.lineTo(ax+ww/2,ay);ctx.lineTo(ax+ww+8,ay+hh);ctx.stroke();rect(ax+ww/2-2,ay-12,4,15,'#9cabb4')}
+ for(const ax of [kx,kx+288]){roof(ax,ky-43,72,62);banner(ax+23,ky+88);for(let j=35;j<150;j+=43){rect(ax+31,ky+j,10,22,'#243744');rect(ax+33,ky+j+4,6,14,'#e1ad68')}}
+ roof(kx+76,ky-38,208,78);
+ for(const bx of [x-118,x+92])banner(bx,ky+112);
+ for(const [ax,ay,ww,hh] of frostholdWalls()){for(let i=12;i<ww-8;i+=29){const len=5+((i*7+hh)%13);rect(ax+i,ay+11,3,len,'#b8dce8');rect(ax+i+1,ay+11,1,len,'#e9f5f8')}if(ww>100){for(let i=18;i<ww-12;i+=36){rect(ax+i,ay-5,20,12,'#607b8a');rect(ax+i,ay-5,20,4,'#edf4f5')}}}
+ for(const ax of [l+75,l+w-75])for(const ay of [t+350,t+530]){rect(ax-6,ay,12,25,'#384c59');rect(ax-10,ay-6,20,9,'#8c7959');rect(ax-5,ay-4,10,5,'#ffca82')}
+ for(const d of frostholdDoors){if(d.id==='keep')continue;rect(d.x-24,d.y-30,48,30,'#415968');rect(d.x-14,d.y-25,28,25,'#785b43');rect(d.x-24,d.y-30,48,5,'#e4eff2')}
+ ctx.restore();
+}
+function blockedBySolid(x,y){if(frostholdBlocked(x,y))return true;if(window.__gloamAddon?.arena(x,y))return false;
  if(easternRiverWalkBlocked(x,y))return true;
  if(worldEditorBuildingBlocks(x,y))return true;
  if(islandDepth(x,y)<-105)return true; // V157: generous walkable shallows, deep sea still gated by flippers
@@ -10430,7 +10498,7 @@ function recoverAutonomousHaigen(dt,oldX,oldY){
  }
  autoDestination=null;autoPause=1800;
 }
-function update(dt){updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
+function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
  if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=174/600){
  changeTrollChamber(true);
@@ -12043,7 +12111,60 @@ function drawRaft(){
  ctx.restore();ctx.restore();
 }
 
-function interact(){if(mountainInside){leaveMountain();return}if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(((!state.raftBuilt||state.raftAfloat)&&raftInteract())||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
+// Frosthold interiors use independent local coordinates; world save stays at the safe doorway.
+Object.assign(frostholdRooms,{
+ royal:{name:'Royal Chambers',furniture:[[55,65,105,115,'#78576c'],[325,65,100,65,'#80634b'],[185,65,100,40,'#9a8258']]},
+ tower:{name:'Watchtower',furniture:[[55,55,80,65,'#80634b'],[345,55,80,65,'#80634b']]},
+ dungeon:{name:'Dungeon Entrance',furniture:[[45,65,100,190,'#43505b'],[335,65,100,190,'#43505b']]}
+});
+const frostholdInteriorLinks={keep:[{id:'royal',x:145,y:48},{id:'tower',x:335,y:48},{id:'dungeon',x:240,y:290}]};
+const frostholdResidents=[{room:'gatehouse',name:'Gatekeeper',route:[[145,140],[320,140],[320,300],[145,300]]},{room:'barracks',name:'Shield Guard',route:[[160,100],[320,100],[320,300],[160,300]]},{room:'hall',name:'Steward',route:[[180,130],[300,130],[300,300],[180,300]]},{room:'keep',name:'Huscarl',route:[[125,180],[350,180],[350,310],[125,310]]}];
+let frostholdClock=0;
+function frostholdResidentPosition(n){const t=(frostholdClock/4000)%n.route.length,i=Math.floor(t),f=t-i,a=n.route[i],b=n.route[(i+1)%n.route.length];return {x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f}}
+Object.assign(frostholdRooms,{cells:{name:'Frozen Cells',furniture:[[32,75,130,55,'#48535b'],[318,75,130,55,'#48535b'],[32,190,130,55,'#48535b'],[318,190,130,55,'#48535b']]},crypt:{name:'Ancient Crypt',furniture:[[70,80,90,120,'#59626b'],[320,80,90,120,'#59626b'],[195,120,90,65,'#647784']]}});
+frostholdInteriorLinks.dungeon=[{id:'cells',x:240,y:55}];
+frostholdInteriorLinks.cells=[{id:'crypt',x:240,y:55}];
+let frostholdRoom=null;
+function frostholdInteract(){
+ if(frostholdRoom){
+ const link=(frostholdInteriorLinks[frostholdRoom.id]||[]).find(d=>Math.hypot(d.x-frostholdRoom.x,d.y-frostholdRoom.y)<30);
+ if(link){frostholdRoom={id:link.id,x:240,y:340,parent:{...frostholdRoom,x:link.x,y:Math.min(330,link.y+32)}};notify(frostholdRooms[link.id].name);return true}
+ if(frostholdRoom.y<340||Math.abs(frostholdRoom.x-240)>38){notify('Approach a doorway.');return true}
+ if(frostholdRoom.parent){frostholdRoom=frostholdRoom.parent;notify(frostholdRooms[frostholdRoom.id].name);return true}
+ frostholdRoom=null;notify('Back outside Frosthold.');return true
+ }
+ if(homeInside||visitorRoom||trollStumpInside||mountainInside||worldEditorActive||collapseRemaining>0)return false;
+ const d=frostholdDoorNear(state.x,state.y);if(!d)return false;
+ state.autonomy=false;cameraDetached=false;state.x=d.returnX;state.y=d.returnY;cam.x=state.x;cam.y=state.y;
+ frostholdRoom={id:d.id,x:240,y:340};notify('Frosthold: '+frostholdRooms[d.id].name);return true;
+}
+function frostholdRoomClear(id,x,y){return x>=32&&x<=448&&y>=44&&y<=368&&!frostholdRooms[id].furniture.some(([a,b,w,h])=>x>a-8&&x<a+w+8&&y>b-8&&y<b+h+8)}
+function updateFrostholdRoom(dt){frostholdClock+=dt;
+ const pad=controllerMove();checkActions();if(!frostholdRoom)return;
+ let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);
+ const n=Math.max(1,Math.hypot(dx,dy)),step=Math.min(dt,50)*.12;
+ const clear=(x,y)=>frostholdRoomClear(frostholdRoom.id,x,y);
+ const nx=clamp(frostholdRoom.x+dx/n*step,32,448),ny=clamp(frostholdRoom.y+dy/n*step,44,368);
+ if(clear(nx,frostholdRoom.y))frostholdRoom.x=nx;
+ if(clear(frostholdRoom.x,ny))frostholdRoom.y=ny;
+ frostholdRoom.moving=Math.hypot(dx,dy)>.08;if(frostholdRoom.moving){frostholdRoom.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');frostholdRoom.steps=(frostholdRoom.steps||0)+dt;frostholdRoom.anim=frostholdRoom.steps;}
+}
+function drawFrostholdRoom(){
+ const scale=Math.min(W/480,H/400);ctx.save();ctx.clearRect(0,0,W,H);ctx.fillStyle='#18232e';ctx.fillRect(0,0,W,H);ctx.translate((W-480*scale)/2,(H-400*scale)/2);ctx.scale(scale,scale);
+ ctx.fillStyle='#526674';ctx.fillRect(16,16,448,368);
+ for(let y=32;y<368;y+=24)for(let x=32;x<448;x+=32){ctx.fillStyle=(x+y)%3?'#83949d':'#748995';ctx.fillRect(x,y,30,22)}
+ const chamber=frostholdRoom.id;const rug=['keep','royal','hall'].includes(chamber);if(rug){ctx.fillStyle='#344c62';ctx.fillRect(210,112,60,218);ctx.strokeStyle='#b5a27b';ctx.lineWidth=2;ctx.strokeRect(214,116,52,210);for(let y=130;y<320;y+=28){ctx.beginPath();ctx.moveTo(240,y-8);ctx.lineTo(251,y);ctx.lineTo(240,y+8);ctx.lineTo(229,y);ctx.closePath();ctx.stroke()}}ctx.fillStyle='#263b49';ctx.fillRect(16,16,448,24);ctx.fillRect(16,16,16,368);ctx.fillRect(448,16,16,368);ctx.fillRect(16,368,200,16);ctx.fillRect(264,368,200,16);
+ for(const [a,b,w,h,c] of frostholdRooms[frostholdRoom.id].furniture){ctx.fillStyle='#34444b';ctx.fillRect(a+4,b+5,w,h);ctx.fillStyle=c;ctx.fillRect(a,b,w,h);ctx.fillStyle='#ad9274';ctx.fillRect(a,b,w,5)}
+ for(const d of frostholdInteriorLinks[frostholdRoom.id]||[]){ctx.fillStyle='#27333d';ctx.fillRect(d.x-18,d.y-12,36,24);ctx.fillStyle='#c9b18a';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(frostholdRooms[d.id].name,d.x,d.y+23)}
+ for(let x=48;x<448;x+=48){ctx.fillStyle='#b5cbd4';ctx.fillRect(x,36,24,4);ctx.fillStyle='#334b5c';ctx.fillRect(x+10,40,4,8)}ctx.fillStyle='#b68a58';ctx.fillRect(216,368,48,16);
+ ctx.fillStyle='#f3e5c8';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('Frosthold · '+frostholdRooms[frostholdRoom.id].name,240,28);ctx.fillText('X: Enter doorway / leave at south exit',240,395);
+ for(const n of frostholdResidents.filter(n=>n.room===frostholdRoom.id)){const p=frostholdResidentPosition(n);ctx.fillStyle='#455a70';ctx.fillRect(p.x-8,p.y-17,16,19);ctx.fillStyle='#b6c5cf';ctx.fillRect(p.x-7,p.y-25,14,9);ctx.fillStyle='#f3e5c8';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(n.name,p.x,p.y-30)}
+ ctx.save();ctx.translate(frostholdRoom.x,frostholdRoom.y);ctx.scale(.65,.65);if(!drawApprovedHaigen(0,0,frostholdRoom,false))character(0,0,'boy',frostholdRoom,false);ctx.restore();
+ for(const x of [42,438])for(const y of [55,300]){const g=ctx.createRadialGradient(x,y,2,x,y,65);g.addColorStop(0,'rgba(255,195,110,.35)');g.addColorStop(1,'rgba(255,195,110,0)');ctx.fillStyle=g;ctx.fillRect(x-65,y-65,130,130);ctx.fillStyle='#ffc27a';ctx.fillRect(x-2,y-5,4,9)}
+ ctx.restore();
+}
+
+function interact(){if(frostholdInteract())return;if(mountainInside){leaveMountain();return}if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(((!state.raftBuilt||state.raftAfloat)&&raftInteract())||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
  ...objects.filter(o=>(o.type==='mushroom'||o.type==='bush')&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:o.type})),
  ...woodlandDetails.filter(o=>o.kind==='fungi'&&woodlandFungiReady(o)&&!campsiteProtected(o)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:'fungi'}))
  ].sort((a,b)=>a.d-b.d)[0];
