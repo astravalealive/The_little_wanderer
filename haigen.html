@@ -8605,9 +8605,18 @@ function chooseBirdLanding(flock,originX,originY){
  }
  return {x:originX,y:originY};
 }
+// Distant ambient birds use a bounded lower-frequency simulation.
+const birdUpdateDebt=new WeakMap();
 function updateBirds(dt){
- const step=Math.min(dt,50)/1000;
  for(const b of birds){
+  const nearPlayer=Math.abs(b.x-state.x)<1200&&Math.abs(b.y-state.y)<1200;
+  const z=worldZoom();
+  const nearCamera=Math.abs(b.x-cam.x)<W/(2*z)+400&&Math.abs(b.y-cam.y)<H/(2*z)+400;
+  const nearCompanion=companions.some(c=>Math.abs(b.x-c.x)<250&&Math.abs(b.y-c.y)<250);
+  const elapsed=Math.min(200,(birdUpdateDebt.get(b)||0)+dt);
+  if(b.birdReady&&!nearPlayer&&!nearCamera&&!nearCompanion&&elapsed<100){birdUpdateDebt.set(b,elapsed);continue}
+  birdUpdateDebt.set(b,0);
+  const step=Math.min(elapsed,nearPlayer||nearCamera||nearCompanion?50:150)/1000;
   if(!b.birdReady){
    b.birdReady=true;b.groundedUntil=time+400+seeded(b.phase)*1800;
    b.flightUntil=0;b.air=0;b.targetX=b.x;b.targetY=b.y;
