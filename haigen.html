@@ -10386,12 +10386,13 @@ function frostholdWalls(){
  const {x,y,w,h,gate}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
  return [[l,t,w,48],[l,t,48,h],[l+w-48,t,48,h],[l,b-48,w/2-gate/2,48],[x+gate/2,b-48,w/2-gate/2,48],[x-180,t+110,360,190]];
 }
-function drawFrostholdForeground(){if(!frostholdArtReady())return;const iw=frostholdArt.naturalWidth,ih=frostholdArt.naturalHeight;ctx.save();ctx.beginPath();ctx.rect(-540,-4670,465,290);ctx.rect(75,-4670,465,290);ctx.clip();ctx.drawImage(frostholdArt,0,0,iw,ih,-540,-5280,1080,900);ctx.restore()}
-function frostholdBlocked(x,y){return frostholdWalls().some(([a,b,w,h])=>x>a-10&&x<a+w+10&&y>b-10&&y<b+h+10)}
+function drawFrostholdForeground(){if(!frostholdArtReady())return;const iw=frostholdArt.naturalWidth,ih=frostholdArt.naturalHeight;ctx.save();ctx.beginPath();ctx.rect(-500,-4650,410,140);ctx.rect(90,-4650,410,140);ctx.clip();ctx.drawImage(frostholdArt,0,0,iw,ih,-540,-5280,1080,900);ctx.restore()}
+function frostholdBlocked(x,y){if(frostholdArtReady()){const u=(x+540)/1080*1536,v=(y+5280)/900*1024;const boxes=[[55,480,145,355],[1330,480,150,355],[195,720,400,155],[940,720,390,155],[600,655,95,195],[840,655,100,195],[450,0,640,285],[375,440,70,100],[1090,440,70,100],[685,540,165,85],[210,550,130,135],[1190,550,135,135],[470,485,100,70],[965,485,100,70]];return boxes.some(([a,b,w,h])=>u>a-8&&u<a+w+8&&v>b-8&&v<b+h+8)}return frostholdWalls().some(([a,b,w,h])=>x>a-10&&x<a+w+10&&y>b-10&&y<b+h+10)}
 // Shared doorway metadata for subsequent interior transitions.
 const frostholdRooms={keep:{name:'Central Keep',furniture:[[180,60,120,48,'#705348'],[55,65,55,100,'#665345'],[370,65,55,100,'#665345']]},barracks:{name:'Barracks',furniture:[[45,55,65,95,'#8c6551'],[370,55,65,95,'#8c6551'],[45,190,65,95,'#8c6551'],[370,190,65,95,'#8c6551']]},gatehouse:{name:'Gatehouse',furniture:[[45,55,75,120,'#695749'],[360,55,75,120,'#695749'],[180,75,120,45,'#806c58']]},hall:{name:'Great Hall',furniture:[[80,85,75,180,'#78583e'],[325,85,75,180,'#78583e'],[190,55,100,45,'#59483e']]}};
 const frostholdDoors=Object.freeze([{id:'keep',x:0,y:-4868,returnX:0,returnY:-4850},{id:'barracks',x:-255,y:-4770,returnX:-255,returnY:-4745},{id:'hall',x:255,y:-4770,returnX:255,returnY:-4745},{id:'gatehouse',x:0,y:-4500,returnX:0,returnY:-4475}]);
-function frostholdDoorNear(x,y){return frostholdDoors.find(d=>Math.hypot(x-d.x,y-d.y)<35)||null}
+const frostholdArtDoors=[{id:'keep',x:0,y:-5010,returnX:0,returnY:-5000},{id:'hall',x:-185,y:-4920,returnX:-185,returnY:-4900},{id:'barracks',x:185,y:-4920,returnX:185,returnY:-4900},{id:'gatehouse',x:0,y:-4560,returnX:0,returnY:-4540}];
+function frostholdDoorNear(x,y){return (frostholdArtReady()?frostholdArtDoors:frostholdDoors).find(d=>Math.hypot(x-d.x,y-d.y)<35)||null}
 function frostholdFoundationChecks(){
  const {x,y,w,h}=frosthold,t=y-h/2,b=y+h/2;
  return {gateOpen:!frostholdBlocked(x,b-24),westWall:frostholdBlocked(x-w/2+24,y),eastWall:frostholdBlocked(x+w/2-24,y),keepSolid:frostholdBlocked(x,t+200),courtOpen:!frostholdBlocked(x,y),doorReturnClear:frostholdDoors.every(d=>!frostholdBlocked(d.returnX,d.returnY)),land: islandDepth(x,y)>0};
