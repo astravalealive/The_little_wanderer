@@ -1022,7 +1022,7 @@ function shoreSceneryClearance(o){
  return type==='tree'||type==='fir'?190:type==='bareTree'||type==='palm'?150:type==='rock'?90:type==='bush'||type==='stump'||type==='log'?105:85;
 }
 function habitatClearance(o){return [[2500,2200,450,550],[3712,493,365,430]].some(([x,y,w,h])=>Math.abs(o.x-x)<w&&o.y>y-h&&o.y<y+150)}
-function canPlaceScenery(o){return !habitatClearance(o)&&islandDepth(o.x,o.y)>shoreSceneryClearance(o)}
+function canPlaceScenery(o){return !frostholdSceneryClear(o)&&!habitatClearance(o)&&islandDepth(o.x,o.y)>shoreSceneryClearance(o)}
 const objects=[];for(let i=0;i<1050;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;if(Math.hypot(x-1500,y-1500)<235)continue;const r=seeded(i*3+2);objects.push({id:i,x,y,type:r<.48?'tree':r<.69?'rock':r<.88?'bush':'flower',size:rand(0.85,1.25)})}for(let i=1050;i<1230;i++){let x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;objects.push({id:i,x,y,type:'mushroom',size:.65+seeded(i*3+2)*.5})}for(let i=1230;i<2030;i++){const x=80+seeded(i*3)*2840,y=80+seeded(i*3+1)*2840;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.42?'flower':v<.73?'bush':v<.92?'mushroom':'tree',size:.7+v*.5})}// New outer woodland ring preserves every original object and existing save coordinate.
 for(let i=2030;i<4400;i++){const x=100+seeded(i*3)*4000,y=100+seeded(i*3+1)*4000;if(x<2990&&y<2990)continue;const v=seeded(i*3+2);objects.push({id:i,x,y,type:v<.44?'tree':v<.62?'rock':v<.8?'bush':v<.93?'flower':'mushroom',size:.75+v*.55})}
 // Extra scenery uses fresh IDs; existing 0-4399 object IDs remain stable.
@@ -9585,7 +9585,7 @@ const visible=objects.filter(o=>!trollDoorwayTree(o)&&!worldEditorHidden.has(o.i
 drawables.push(...woodlandDeer.filter(a=>Math.abs(a.x-cam.x)<=1050&&Math.abs(a.y-cam.y)<=800).map(a=>({y:a.y,draw:()=>worldFaunaDraw('stag',a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,2.1,time<a.scaredUntil?'flee':time<a.alertUntil?'alert':a.walking?'walk':'forage')})));
 drawables.push(...regionalWildlife.filter(a=>animalAlive(a)&&Math.abs(a.x-cam.x)<=1050&&Math.abs(a.y-cam.y)<=800).map(a=>({y:a.y,draw:()=>drawWildAnimal(a)})));
 drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));trollHabitats.forEach((t,i)=>{if(caveTrolls.find(r=>r.sprite===i).room==='habitat'&&t.pos&&Math.abs(t.pos.x-cam.x)<1050&&Math.abs(t.pos.y-cam.y)<800)drawables.push({y:t.pos.y,draw:()=>drawTroll(t,i)})});for(const t of caveTrolls){if(t.room==='woods'&&Math.abs(t.x-cam.x)<1050&&Math.abs(t.y-cam.y)<800)drawables.push({y:t.y,draw:()=>drawTrollSprite(t.sprite,t.x,t.y,trollSpriteSize,t.dir,t.walking,t.clock)});}artDrawables(drawables);if(nico.ready)drawables.push({y:nico.y,draw:drawNico});drawables.push({y:abandonedTrollStump.y+24,draw:drawAbandonedTrollStump},{y:trollStumpHome.y+24,draw:drawTrollStump});if(state.skiffBerth&&!state.skiffAtSea)drawSkiff();drawables.forEach((o,i)=>{o.depthOrder=i});
-drawFrosthold();drawables.sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder).forEach(o=>o.draw());worldEditorOutline();if(!state.skiffAtSea)drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+drawFrosthold();drawables.sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder).forEach(o=>o.draw());drawFrostholdForeground();worldEditorOutline();if(!state.skiffAtSea)drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
@@ -10379,10 +10379,14 @@ function easternRiverWalkBlocked(x,y){
 }
 // Frosthold phase 1: fixed world-space footprint; no save schema changes.
 const frosthold={x:0,y:-4800,w:960,h:760,gate:100};
+const frostholdArt=new Image();frostholdArt.src='./frosthold-exterior.png';
+function frostholdSceneryClear(o){return Math.abs(o.x)<560&&o.y>-5290&&o.y<-4270||Math.abs(o.x)<115&&o.y>=-4270&&o.y<-3950}
+function frostholdArtReady(){return frostholdArt.complete&&frostholdArt.naturalWidth>0}
 function frostholdWalls(){
  const {x,y,w,h,gate}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
  return [[l,t,w,48],[l,t,48,h],[l+w-48,t,48,h],[l,b-48,w/2-gate/2,48],[x+gate/2,b-48,w/2-gate/2,48],[x-180,t+110,360,190]];
 }
+function drawFrostholdForeground(){if(!frostholdArtReady())return;const iw=frostholdArt.naturalWidth,ih=frostholdArt.naturalHeight;ctx.save();ctx.beginPath();ctx.rect(-540,-4670,465,290);ctx.rect(75,-4670,465,290);ctx.clip();ctx.drawImage(frostholdArt,0,0,iw,ih,-540,-5280,1080,900);ctx.restore()}
 function frostholdBlocked(x,y){return frostholdWalls().some(([a,b,w,h])=>x>a-10&&x<a+w+10&&y>b-10&&y<b+h+10)}
 // Shared doorway metadata for subsequent interior transitions.
 const frostholdRooms={keep:{name:'Central Keep',furniture:[[180,60,120,48,'#705348'],[55,65,55,100,'#665345'],[370,65,55,100,'#665345']]},barracks:{name:'Barracks',furniture:[[45,55,65,95,'#8c6551'],[370,55,65,95,'#8c6551'],[45,190,65,95,'#8c6551'],[370,190,65,95,'#8c6551']]},gatehouse:{name:'Gatehouse',furniture:[[45,55,75,120,'#695749'],[360,55,75,120,'#695749'],[180,75,120,45,'#806c58']]},hall:{name:'Great Hall',furniture:[[80,85,75,180,'#78583e'],[325,85,75,180,'#78583e'],[190,55,100,45,'#59483e']]}};
@@ -10393,7 +10397,7 @@ function frostholdFoundationChecks(){
  return {gateOpen:!frostholdBlocked(x,b-24),westWall:frostholdBlocked(x-w/2+24,y),eastWall:frostholdBlocked(x+w/2-24,y),keepSolid:frostholdBlocked(x,t+200),courtOpen:!frostholdBlocked(x,y),doorReturnClear:frostholdDoors.every(d=>!frostholdBlocked(d.returnX,d.returnY)),land: islandDepth(x,y)>0};
 }
 
-function drawFrosthold(){
+function drawFrosthold(){if(frostholdArtReady()){ctx.drawImage(frostholdArt,-540,-5280,1080,900);return}
  const {x,y,w,h}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
  if(Math.abs(cam.x-x)>w/2+W/worldZoom()||Math.abs(cam.y-y)>h/2+H/worldZoom())return;
  ctx.save();
@@ -10457,7 +10461,7 @@ function blockedBySolid(x,y){if(frostholdBlocked(x,y))return true;if(window.__gl
  for(let ix=cx-1;ix<=cx+1;ix++)for(let iy=cy-1;iy<=cy+1;iy++){
   const bucket=solidCells.get(ix+','+iy);if(!bucket)continue;
   for(const o of bucket){
-   if(state.removed.includes(o.id)||campsiteProtected(o))continue;
+   if(state.removed.includes(o.id)||campsiteProtected(o)||frostholdSceneryClear(o))continue;
    const dx=x-o.x,dy=(y-o.y)*.92,rad=solidRadius(o)+10;
    if(dx*dx+dy*dy<rad*rad)return true;
   }
