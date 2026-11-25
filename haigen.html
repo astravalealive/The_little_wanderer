@@ -10430,7 +10430,7 @@ function recoverAutonomousHaigen(dt,oldX,oldY){
  }
  autoDestination=null;autoPause=1800;
 }
-function update(dt){updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00024,ny=trollRoomPlayer.y+dy*dt*.00024;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
+function update(dt){updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00024,ny=trollRoomPlayer.y+dy*dt*.00024;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
  if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=174/600){
  changeTrollChamber(true);
@@ -11611,6 +11611,27 @@ function updateCaveResidents(dt){
   else stepIndoorResident(t,dt);
  }
 }
+
+// Independent mountain cavern, coordinates in approved 1536x1024 artwork.
+const mountainArt=new Image();mountainArt.src='./assets/troll-cave-interior.png';
+let mountainInside=false;
+const mountainPlayer={x:1390,y:825,dir:'left',moving:false,steps:0,anim:0};
+const mountainRoutes=[
+[[1390,825],[1320,865],[1230,902],[1110,925],[1040,900],[1010,845],[1040,785],[1120,750],[1210,750]],
+[[1040,785],[950,755],[900,700],[880,650],[860,595],[810,570],[750,570],[680,575],[610,575],[550,555],[490,510],[430,465],[400,410],[405,355],[410,300],[350,285],[240,285],[125,285]],
+[[430,465],[370,485],[315,530],[230,550],[125,550]],
+[[810,570],[890,530],[900,470],[925,420],[970,365],[1070,365],[1150,330],[1200,280],[1290,245],[1400,245]],
+[[970,365],[880,350],[790,350],[730,305],[680,245],[630,185],[700,145],[820,145],[950,145],[1050,150]],
+[[900,700],[835,755],[780,810],[740,870],[650,915],[550,925],[430,925],[350,895],[300,835],[230,805],[140,805]],
+[[1150,330],[1210,390],[1260,450],[1360,485],[1410,530]]
+];
+function mountainWalkable(x,y){return mountainRoutes.some(route=>route.some((p,i)=>{if(!i)return false;const a=route[i-1],dx=p[0]-a[0],dy=p[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<27}))}
+function enterMountain(){if(!mountainArt.complete||!mountainArt.naturalWidth){notify('Cave artwork loading.');return}visitorRoom=null;mountainInside=true;state.autonomy=false;cameraDetached=false;Object.assign(mountainPlayer,{x:1390,y:825,dir:'left',moving:false,steps:0});trollDoorCooldown=1300;}
+function leaveMountain(){mountainInside=false;state.x=trollStumpHome.x;state.y=trollStumpHome.y+125;cam.x=state.x;cam.y=state.y;trollDoorCooldown=1600;}
+function updateMountain(dt){const p=controllerMove();let dx=joy.x+p.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+p.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const m=Math.hypot(dx,dy);mountainPlayer.moving=m>.08;if(m>.08){dx/=Math.max(1,m);dy/=Math.max(1,m);const x=mountainPlayer.x+dx*dt*.23,y=mountainPlayer.y+dy*dt*.23;if(mountainWalkable(x,mountainPlayer.y))mountainPlayer.x=x;if(mountainWalkable(mountainPlayer.x,y))mountainPlayer.y=y;mountainPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');mountainPlayer.steps+=dt;if(dx>0&&mountainPlayer.x>1404&&mountainPlayer.y>790&&mountainPlayer.y<850&&trollDoorCooldown===0)leaveMountain()}checkActions();}
+function mountainView(){const w=ctx.canvas.width,h=ctx.canvas.height,sc=Math.min(w/1536,h/1024)*1.65;return {sc,x:Math.min(0,Math.max(w-1536*sc,w/2-mountainPlayer.x*sc)),y:Math.min(0,Math.max(h-1024*sc,h/2-mountainPlayer.y*sc))}}
+function drawMountain(){const v=mountainView();ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#100e12';ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.translate(v.x,v.y);ctx.scale(v.sc,v.sc);ctx.imageSmoothingEnabled=false;ctx.drawImage(mountainArt,0,0,1536,1024);ctx.translate(mountainPlayer.x,mountainPlayer.y);ctx.scale(.85,.85);mountainPlayer.anim=mountainPlayer.steps;if(!drawApprovedHaigen(0,0,mountainPlayer,false))character(0,0,'boy',mountainPlayer,false);ctx.restore();}
+ctx.canvas.addEventListener('click',e=>{if(mountainInside){const r=ctx.canvas.getBoundingClientRect(),v=mountainView(),x=((e.clientX-r.left)*ctx.canvas.width/r.width-v.x)/v.sc,y=((e.clientY-r.top)*ctx.canvas.height/r.height-v.y)/v.sc;if(x>1360&&y>730&&y<850)leaveMountain();return}if(visitorRoom||trollStumpInside||homeInside||worldEditorActive||trollDoorCooldown>0)return;const r=ctx.canvas.getBoundingClientRect(),x=cam.x+((e.clientX-r.left)*W/r.width-W/2)/worldZoom(),y=cam.y+((e.clientY-r.top)*H/r.height-H/2)/worldZoom();if(Math.abs(x-trollStumpHome.x)<100&&Math.abs(y-trollStumpHome.y+35)<100)enterMountain();else if(Math.abs(x-abandonedTrollStump.x)<90&&Math.abs(y-abandonedTrollStump.y+35)<90){cameraDetached=false;enterTrollRoom()}});
 function drawTrollStumpInterior(visiting=false){
  if(!visiting&&!trollStumpInside)return;
  const vault=visiting?visitorRoom==='vault':inTreasureCave;
@@ -12021,7 +12042,7 @@ function drawRaft(){
  ctx.restore();ctx.restore();
 }
 
-function interact(){if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(((!state.raftBuilt||state.raftAfloat)&&raftInteract())||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
+function interact(){if(mountainInside){leaveMountain();return}if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(((!state.raftBuilt||state.raftAfloat)&&raftInteract())||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
  ...objects.filter(o=>(o.type==='mushroom'||o.type==='bush')&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:o.type})),
  ...woodlandDetails.filter(o=>o.kind==='fungi'&&woodlandFungiReady(o)&&!campsiteProtected(o)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:'fungi'}))
  ].sort((a,b)=>a.d-b.d)[0];
@@ -13025,7 +13046,7 @@ function frame(now){
  if(visitorRoom==='home')drawHomeInteriorScene(true);
   else if(visitorRoom==='stump'||visitorRoom==='vault')drawTrollStumpInterior(true);
   else if(!state.autonomy&&!cameraDetached&&!autonomousHomeVisit){drawHomeInteriorScene();drawTrollStumpInterior()}
-  if(measure)diag.renderMs+=performance.now()-t;
+  if(mountainInside)drawMountain();if(measure)diag.renderMs+=performance.now()-t;
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
  }catch(error){reportWorldError(error);}
