@@ -10507,7 +10507,7 @@ function recoverAutonomousHaigen(dt,oldX,oldY){
  }
  autoDestination=null;autoPause=1800;
 }
-function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(Math.abs(p.u-768)<24&&Math.abs(p.v-292)<18&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
+function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(Math.abs(p.u-768)<24&&Math.abs(p.v-292)<18&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateCaveResidents(dt);updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
  if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=174/600){
  changeTrollChamber(true);
@@ -11373,7 +11373,7 @@ function chairNear(){
 function supperSet(){
  return trollStumpInside&&!inTreasureCave&&(supperElapsed>0||supperTime());
 }
-function chairAction(){
+function chairAction(){return false; /* abandoned stump: old supper event disabled */
  if(state.seventhChairHeard||!chairNear())return false;
  if(supperElapsed)return true;
  if(!supperTime()){
@@ -11464,7 +11464,7 @@ function trollRoomWalkable(x,y,vault=inTreasureCave){
 function enterTrollRoom(){
  Object.assign(trollRoomPlayer,{x:262/547,y:411/600,dir:'up',moving:false,steps:0});
  trollStumpInside=true;trollDoorCooldown=1300;state.autonomy=false;
- notify('Seven places at the table. Approach the stool at the left end for supper.');
+ notify('An abandoned home. A tunnel leads deeper.');
 }
 // Reference-art pixels. A few common aisle points let residents pass around the hearth and table.
 const indoorAisles=[
@@ -11584,7 +11584,7 @@ function stepIndoorResident(t,dt){
 function outdoorGoal(t){
  const home=trollStumpHome, native=trollHabitats[t.sprite];
  if(t.headingHome||((t.stops||0)>1&&Math.random()<.55)){
-  if(native&&!t.headingHome&&Math.random()<.25)return {x:native.x,y:native.y,to:'habitat'};
+  
   return {x:home.x,y:home.y+45,to:'home'};
  }
  const items=objects.filter(o=>trollInterests[t.sprite].includes(o.type)&&
@@ -11597,7 +11597,7 @@ function stepWoodlandResident(t,dt){
  if(!t.goal){t.goal=outdoorGoal(t);t.leg=null;}
  const goal=t.goal,dx=goal.x-t.x,dy=goal.y-t.y,range=Math.hypot(dx,dy);
  if(range<(goal.to?24:9)){
-  if(goal.to==='home'){t.headingHome=false;changeTrollLocation(t,'home');return;}
+  if(goal.to==='home'){t.headingHome=false;t.room='mountain-return';t.goal=null;return;}
   if(goal.to==='habitat'){
    t.room='habitat';const native=trollHabitats[t.sprite];native.pos={x:t.x,y:t.y};native.scuttle=null;
    t.wait=30000+Math.random()*60000;
@@ -11669,23 +11669,17 @@ function noticeHaigen(t,dt){
 }
 function updateCaveResidents(dt){
  for(const t of caveTrolls){
-  t.walking=false;
-  if(noticeHaigen(t,dt))continue;
-  if(t.wait>0){
-   t.wait-=dt;
-   if(trollStumpInside&&t.room===(inTreasureCave?'vault':'home')&&Math.random()<dt/3600){
-    const dx=trollRoomPlayer.x*(t.vault?600:547)-t.x,dy=trollRoomPlayer.y*(t.vault?400:600)-t.y;
-    if(Math.hypot(dx,dy)<65)t.dir=trollFacing(dx,dy);
-   }
-   continue;
+  if(t.room==='woods'){
+   if(t.wait>0){t.wait-=dt;t.walking=false;continue}
+   stepWoodlandResident(t,dt);continue;
   }
-  if(t.room==='habitat'){
-   const native=trollHabitats[t.sprite];
-   if(!native.pos||native.scuttle?.scaredUntil>Date.now()){t.wait=5000;continue;}
-   t.x=native.pos.x;t.y=native.pos.y;t.room='woods';t.headingHome=true;t.goal=null;t.leg=null;
-  }
-  if(t.room==='woods')stepWoodlandResident(t,dt);
-  else stepIndoorResident(t,dt);
+  if(t.room!=='mountain'){t.room='mountain';t.routeIndex=t.sprite%3===0?0:t.sprite%mountainRoutes.length;t.node=0;const p=mountainRoutes[t.routeIndex][0];t.x=p[0];t.y=p[1];t.wait=1000+t.sprite*700;t.direction=1;}
+  t.walking=false;if(t.wait>0){t.wait-=dt;continue}
+  const route=mountainRoutes[t.routeIndex],p=route[t.node],dx=p[0]-t.x,dy=p[1]-t.y,d=Math.hypot(dx,dy),step=Math.min(d,dt*.035);
+  if(d>1){t.x+=dx/d*step;t.y+=dy/d*step;t.dir=trollFacing(dx,dy);t.walking=true;t.clock+=dt;continue}
+  if(t.node===route.length-1)t.direction=-1;if(t.node===0)t.direction=1;
+  if(t.routeIndex===0&&t.node===0&&state.daytime%180<83&&Math.random()<.35){t.room='woods';t.x=trollStumpHome.x;t.y=trollStumpHome.y+125;t.goal=null;t.leg=null;t.stops=0;t.headingHome=false;continue}
+  t.node+=t.direction;t.wait=700+Math.random()*2500;
  }
 }
 
@@ -11707,7 +11701,7 @@ function enterMountain(){if(!mountainArt.complete||!mountainArt.naturalWidth){no
 function leaveMountain(){mountainInside=false;state.x=trollStumpHome.x;state.y=trollStumpHome.y+125;cam.x=state.x;cam.y=state.y;trollDoorCooldown=1600;}
 function updateMountain(dt){const p=controllerMove();let dx=joy.x+p.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+p.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const m=Math.hypot(dx,dy);mountainPlayer.moving=m>.08;if(m>.08){dx/=Math.max(1,m);dy/=Math.max(1,m);const x=mountainPlayer.x+dx*dt*.14,y=mountainPlayer.y+dy*dt*.14;if(mountainWalkable(x,mountainPlayer.y))mountainPlayer.x=x;if(mountainWalkable(mountainPlayer.x,y))mountainPlayer.y=y;mountainPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');mountainPlayer.steps+=dt;if(dx>0&&mountainPlayer.x>1404&&mountainPlayer.y>790&&mountainPlayer.y<850&&trollDoorCooldown===0)leaveMountain()}checkActions();}
 function mountainView(){const w=ctx.canvas.width,h=ctx.canvas.height,sc=Math.min(w/1536,h/1024)*3.2;return {sc,x:Math.min(0,Math.max(w-1536*sc,w/2-mountainPlayer.x*sc)),y:Math.min(0,Math.max(h-1024*sc,h/2-mountainPlayer.y*sc))}}
-function drawMountain(){const v=mountainView();ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#100e12';ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.translate(v.x,v.y);ctx.scale(v.sc,v.sc);ctx.imageSmoothingEnabled=false;ctx.drawImage(mountainArt,0,0,1536,1024);ctx.translate(mountainPlayer.x,mountainPlayer.y);ctx.scale(.52,.52);mountainPlayer.anim=mountainPlayer.steps;if(!drawApprovedHaigen(0,0,mountainPlayer,false))character(0,0,'boy',mountainPlayer,false);ctx.restore();}
+function drawMountain(){const v=mountainView();ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#100e12';ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.translate(v.x,v.y);ctx.scale(v.sc,v.sc);ctx.imageSmoothingEnabled=false;ctx.drawImage(mountainArt,0,0,1536,1024);const residents=caveTrolls.filter(t=>t.room==='mountain').sort((a,b)=>a.y-b.y);const paint=t=>drawTrollSprite(t.sprite,t.x,t.y,48,t.dir,t.walking,t.clock);for(const t of residents)if(t.y<=mountainPlayer.y)paint(t);ctx.save();ctx.translate(mountainPlayer.x,mountainPlayer.y);ctx.scale(.52,.52);mountainPlayer.anim=mountainPlayer.steps;if(!drawApprovedHaigen(0,0,mountainPlayer,false))character(0,0,'boy',mountainPlayer,false);ctx.restore();for(const t of residents)if(t.y>mountainPlayer.y)paint(t);ctx.restore();}
 ctx.canvas.addEventListener('click',e=>{if(mountainInside){const r=ctx.canvas.getBoundingClientRect(),v=mountainView(),x=((e.clientX-r.left)*ctx.canvas.width/r.width-v.x)/v.sc,y=((e.clientY-r.top)*ctx.canvas.height/r.height-v.y)/v.sc;if(x>1360&&y>730&&y<850)leaveMountain();return}if(visitorRoom||trollStumpInside||homeInside||worldEditorActive||trollDoorCooldown>0)return;const r=ctx.canvas.getBoundingClientRect(),x=cam.x+((e.clientX-r.left)*W/r.width-W/2)/worldZoom(),y=cam.y+((e.clientY-r.top)*H/r.height-H/2)/worldZoom();if(Math.abs(x-trollStumpHome.x)<100&&Math.abs(y-trollStumpHome.y+35)<100)enterMountain();else if(Math.abs(x-abandonedTrollStump.x)<90&&Math.abs(y-abandonedTrollStump.y+35)<90){cameraDetached=false;enterTrollRoom()}});
 function drawTrollStumpInterior(visiting=false){
  if(!visiting&&!trollStumpInside)return;
@@ -11732,7 +11726,7 @@ function drawTrollStumpInterior(visiting=false){
  const px=ox+iw*(supperElapsed?259/547:trollRoomPlayer.x),py=oy+ih*(supperElapsed?306/600:trollRoomPlayer.y);
  // Render the actual Haigen actor with the same game character renderer, not a static picture.
  if(!visiting)trollRoomPlayer.anim=trollRoomPlayer.steps;
- const dining=(!visiting||!inTreasureCave)&&supperSet();
+ const dining=false;
  if(dining){
   ctx.save();ctx.translate(ox,oy);ctx.scale(iw/547,ih/600);
   for(const [x,y] of [[291,278],[334,276],[378,280],[303,299],[338,301],[373,300],[275,290]]){
@@ -11742,11 +11736,7 @@ function drawTrollStumpInterior(visiting=false){
   }
   ctx.restore();
  }
- const guests=dining?caveTrolls.map(t=>{
-  const [x,y]=supperSeats[t.sprite];
-  const dir=supperElapsed>=850?trollFacing(210-x,175-y):t.sprite<3?'down':'up';
-  return {...t,x,y,vault:false,dir,walking:false};
- }):caveTrolls.filter(t=>t.room===(vault?'vault':'home'));
+ const guests=[];
  const residents=guests.map(t=>({...t,x:t.x/(t.vault?600:547),y:t.y/(t.vault?400:600)})).sort((a,b)=>a.y-b.y);
  // Room artwork uses backing pixels, while the outdoor camera draws in world units.
  const residentSize=trollSpriteSize*baseCameraScale()*(h/H)*(state.bigTrollMode?3:1);
@@ -11756,7 +11746,7 @@ function drawTrollStumpInterior(visiting=false){
  if(!drawApprovedHaigen(0,0,trollRoomPlayer,false))character(0,0,'boy',trollRoomPlayer,false);ctx.restore();}
  for(const t of residents)if(t.y>trollRoomPlayer.y)paintResident(t);
  ctx.fillStyle='#dfb978';ctx.textAlign='center';ctx.font='bold 24px system-ui';
- ctx.fillText(vault?'The Trolls’ Hoard':'Trolls’ Underground Home',w/2,Math.max(95,h*.12));
+ ctx.fillText(vault?'Abandoned Hoard':'Abandoned Tree Stump',w/2,Math.max(95,h*.12));
  if(visiting){
   // Invisible interactive hit areas, matching the visible cave doorways.
   const outerX=vault?.50:.48,outerY=vault?.93:.75;
@@ -11765,7 +11755,7 @@ function drawTrollStumpInterior(visiting=false){
   else visitorInnerDoor=null;
   ctx.restore();return}
  const action=!state.seventhChairHeard&&chairNear();
- const caption=supperElapsed>=1600?'Knock. Knock. From behind the pantry wall.':supperElapsed>=850?'Knock.':supperElapsed?'The spoon in the seventh bowl trembles.':action?'The seventh chair · X or tap below':inTreasureCave?'Walk with joystick or controller · X to return':state.seventhChairHeard?'The pantry is quiet.':'Supper at dusk · Left end of the table';
+ const caption=supperElapsed>=1600?'Knock. Knock. From behind the pantry wall.':supperElapsed>=850?'Knock.':supperElapsed?'The spoon in the seventh bowl trembles.':action?'The seventh chair · X or tap below':inTreasureCave?'Walk with joystick or controller · X to return':state.seventhChairHeard?'The pantry is quiet.':'Abandoned stump · Explore the tunnel';
  ctx.font='17px system-ui';ctx.fillText(caption,w/2,h-130,w*.86);
  ctx.fillStyle='#715332';ctx.fillRect(w/2-85,h-110,170,60);
  ctx.fillStyle='#fff0c9';ctx.font='bold 22px system-ui';ctx.fillText(supperElapsed?'LISTEN':action?(supperTime()?'SIT':'WAIT FOR SUPPER'):inTreasureCave?'RETURN':'EXIT',w/2,h-72);
