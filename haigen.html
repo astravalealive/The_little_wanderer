@@ -4790,7 +4790,8 @@ function rbDrawGround(){
    const fade=values[(j-iy*64)*64+i-ix*64];
    if(fade<=0)continue;
    ctx.globalAlpha=fade;
-   ctx.fillRect(i*cell,j*cell,cell,cell);
+   const x=i*cell,y=j*cell;
+   ctx.fillRect(x,y,cell,cell);
   }
  }
  if(night>.01){ctx.globalAlpha=night*.44;ctx.fillStyle='#192030';ctx.fillRect(l,t,r-l,b-t)}
