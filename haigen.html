@@ -1428,13 +1428,15 @@ state.campClearingDone=state.campClearingDone===true||state.campTier>0;
 state.campClearingPicked=Array.isArray(state.campClearingPicked)?state.campClearingPicked:[];
 function campDistance(x,y){return Math.hypot(x-cottage.x,y-cottage.y)}
 function campsiteProtected(o){return !!state.campClearingDone&&campDistance(o.x,o.y)<campProtectionRadius}
-const firstFire={x:1615,y:1540};const ruins={x:1540,y:480}; // V297: runestone at the northern woodland trail terminus, beneath Stoneback Highlands
+const firstFire={x:1415,y:1730};
+// Relocate the original home fire in existing saves without resetting its fuel.
+for(const f of state.structures)if(f.kind==='campfire'&&Math.hypot(f.x-1615,f.y-1540)<2){f.x=firstFire.x;f.y=firstFire.y;}const ruins={x:1540,y:480}; // V297: runestone at the northern woodland trail terminus, beneath Stoneback Highlands
 const runeGuardianId=9001;for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(o.type==='tree'&&Math.hypot(o.x-ruins.x,o.y-ruins.y)<155)objects.splice(i,1)}// V299: guardian tree permanently removed; keep the rune clearing open.
 // V100: opt-in coop. Hens do not exist until the physical plot is built.
 const coopPlot={kind:'coop',x:1215,y:1395,name:'Chicken Coop'},
  woodPlot={kind:'woodstore',x:1860,y:1500,name:'Wood Storage'},
  jettyPlot={kind:'jetty',x:1050,y:1490,name:'Fishing Jetty'},
- gardenPlot={kind:'garden',x:1625,y:1170,name:'Kitchen Garden'};
+ gardenPlot={kind:'garden',x:1660,y:1065,name:'Kitchen Garden'};
 const homesteadPlots=[coopPlot,woodPlot,jettyPlot,gardenPlot];
 function flowerHasHabitat(o){
  if(o.type!=='flower')return true;
