@@ -1400,7 +1400,8 @@ const campProtectionRadius=365;
 state.campClearingDone=state.campClearingDone===true||state.campTier>0;
 state.campClearingPicked=Array.isArray(state.campClearingPicked)?state.campClearingPicked:[];
 function campDistance(x,y){return Math.hypot(x-cottage.x,y-cottage.y)}
-function campsiteProtected(o){return !!state.campClearingDone&&campDistance(o.x,o.y)<campProtectionRadius}
+function frostholdSceneryExcluded(o){const dx=Math.abs(o.x),y=o.y;return (dx<570&&y>-5270&&y<-4330)||(dx<155&&y>=-4330&&y<-3970)}
+function campsiteProtected(o){return frostholdSceneryExcluded(o)||!!state.campClearingDone&&campDistance(o.x,o.y)<campProtectionRadius}
 const firstFire={x:1615,y:1540};const ruins={x:1540,y:480}; // V297: runestone at the northern woodland trail terminus, beneath Stoneback Highlands
 const runeGuardianId=9001;for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(o.type==='tree'&&Math.hypot(o.x-ruins.x,o.y-ruins.y)<155)objects.splice(i,1)}// V299: guardian tree permanently removed; keep the rune clearing open.
 // V100: opt-in coop. Hens do not exist until the physical plot is built.
