@@ -5836,7 +5836,18 @@ function ruin(x,y){
  ctx.shadowColor='#58c9ff';ctx.shadowBlur=11;
  ctx.drawImage(approvedRunestoneCanvas,470,315,185,760,left+w*470/1122,top+h*315/1402,w*185/1122,h*760/1402);
  ctx.restore();
-}function structure(s){if(s.kind==='trailLantern'||s.kind==='waymarker'){
+}const campfireArt=['stone','wood','burning'].map(k=>{const i=new Image();i.src='assets/campfire-'+k+'.png';return i});
+function drawLayeredCampfire(s){
+ const [stone,wood,burning]=campfireArt;
+ if(!campfireArt.every(i=>i.complete&&i.naturalWidth))return false;
+ const x=s.x,y=s.y,scale=.5;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(stone,x-45,y-74.5,90,74.5);
+ if(s.lit!==false){const frame=Math.floor(performance.now()/120)%8;ctx.drawImage(burning,frame*106,0,106,116,x-26.5,y-83,53,58);}
+ else ctx.drawImage(wood,x-25,y-61,50,36);
+ ctx.restore();return true;
+}
+function structure(s){if(s.kind==='campfire'&&drawLayeredCampfire(s))return;if(s.kind==='trailLantern'||s.kind==='waymarker'){
   if(rbEnabled){worldSprite(s.kind==='trailLantern'?'lantern':'sign',s.x,s.y,s.kind==='trailLantern'?54:68,s.kind==='trailLantern'?79:83)}
   else{ctx.fillStyle='#69513b';ctx.fillRect(s.x-4,s.y-55,8,55);ctx.fillStyle=s.kind==='trailLantern'?'#f1be68':'#be9965';ctx.fillRect(s.x-19,s.y-67,38,22)}
   if(s.kind==='trailLantern'&&s.lit!==false){ctx.save();ctx.globalAlpha=.15;ellipse(s.x,s.y-65,37,39,'#ffd681');ctx.restore()}
