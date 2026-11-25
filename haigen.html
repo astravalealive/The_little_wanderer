@@ -3686,7 +3686,7 @@ function drawTravelCamp(){
 }
 function fireLoaded(f){return f.loaded===true||f.lit===true}
 function loadCampfire(f){if(fireLoaded(f)||dist(state,f)>112||!state.woodStorageTier||state.woodStored<3)return false;state.woodStored-=3;f.loaded=true;f.lit=false;f.fuel=0;save();notify('🪵 Campfire loaded.');return true}
-function lightCampfire(f){if(!fireLoaded(f)||f.lit===true||dist(state,f)>112)return false;f.lit=true;f.fuel=3600;save();notify('🔥 Campfire lit!');return true}
+function lightCampfire(f){if(!fireLoaded(f)||f.lit===true||dist(state,f)>112)return false;f.lit=true;f.fuel=1200;save();notify('🔥 Campfire lit!');return true}
 function autoFireChore(dt){
  if(dist(state,cottage)>510)return false;
  const f=state.structures.find(f=>f.kind==='campfire'&&dist(f,cottage)<510&&f.lit!==true&&(fireLoaded(f)?(nightStrength()>.35||state.food<2):state.woodStorageTier&&state.woodStored>=3));
@@ -4136,6 +4136,8 @@ function independentChoiceTick(dt){
  independentAgenda.remaining-=dt;
  if(independentAgenda.remaining<=0){
   const inCamp=dist(state,cottage)<510;
+  const phase=(state.daytime%180+180)%180;
+  const morning=phase<45,evening=phase>=81&&phase<135;
   const chores=inCamp&&(
    state.woodStorageTier&&state.wood>=9&&state.woodStored<woodStoreLimit()||
    state.coopTier&&state.nestEggs>=2||
@@ -4144,8 +4146,8 @@ function independentChoiceTick(dt){
   const unbuilt=!state.coopTier||!state.gardenTier||!state.woodStorageTier;
   const weights=[
    ['build',unbuilt?1.5+haigenMind.patience/75:0],
-   ['chores',chores?1.7+(state.hunger<75?0.5:0):0],
-   ['adventure',2.3+haigenMind.curiosity/38+(state.energy>65?.8:0)]
+   ['chores',chores?1.7+(state.hunger<75?0.5:0)+(morning||evening?3:0):0],
+   ['adventure',(2.3+haigenMind.curiosity/38+(state.energy>65?.8:0))*(inCamp&&chores&&(morning||evening)?.45:1)]
   ].map(([kind,weight])=>({kind,weight:Math.max(0,weight)*(independentAgenda.recent.includes(kind)?0.45:1)}));
   // Needs-aware planner: don't choose another adventure when survival or camp work needs attention.
   const intent=mindChooseIntent();
@@ -4410,7 +4412,7 @@ function offlineProgress(){
   }
   // Lit campfires use fuel while away and safely extinguish.
   // Campfire fuel only advances during active gameplay.
-  state.daytime+=elapsed/1000*.3; // V219: 180 game-time units per 600 real seconds
+  state.daytime+=elapsed*.00015; // 180 units per 20 minutes
   const notes=[];
   if(gatheredWood)notes.push('🪵 Gathered '+gatheredWood+' wood');
   if(gatheredStone)notes.push('🪨 Gathered '+gatheredStone+' stone');
@@ -5624,7 +5626,7 @@ function wanderingSpecter(o){
  return {...o,x:g.x,y:g.y};
 }
 // Spectors emerge at dusk and retreat before daylight.
-function spectorsActive(){const p=((state.daytime%180)+180)%180;return p>=112.5||p<18}
+function spectorsActive(){const p=((state.daytime%180)+180)%180;return p>=90&&p<171}
 function updateWastelandGhosts(dt){
  if(!spectorsActive()){ghostStunMs=0;for(const g of ghostBehaviour.values())g.mode='roam';return;}
 
@@ -8229,7 +8231,7 @@ else if(o.kind==='stump'){ellipse(x,y+6,23,10,'#365e3d');ctx.fillStyle='#79563b'
 else{for(let j=-2;j<=2;j++){ctx.strokeStyle='#4f8c4b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+j*7,y-14,x+j*12,y-25+Math.sin(time*.001+o.seed)*3);ctx.stroke()}}}
 const smoothLight=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
 function nightStrength(){const p=(state.daytime%180+180)%180;
- return p<93?0:p<93.65?smoothLight((p-93)/.65):p<173?1:p<173.65?1-smoothLight((p-173)/.65):0;
+ return p<81?0:p<90?smoothLight((p-81)/9):p<171?1:1-smoothLight((p-171)/9);
 }
 function mixColour(day,night,amount){
  const a=Math.max(0,Math.min(1,amount)),da=day.replace('#',''),na=night.replace('#','');
@@ -9723,7 +9725,7 @@ drawFrosthold();drawables.sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder).forEac
  moon.addColorStop(0,'rgba(143,185,240,'+(darkness*.15)+')');
  moon.addColorStop(1,'rgba(143,185,240,0)');
  ctx.fillStyle=moon;ctx.fillRect(state.x-155,state.y-155,310,310);ctx.restore();
-} ctx.restore();ctx.restore();const regionLabel=$('regionName');if(regionLabel){const place=expandedRegion(state.x,state.y)?.name||'Haigen’s Woodlands';regionLabel.textContent=place+(state.autonomy&&autoJobLabel?' · 🤖 '+autoJobLabel:'');}const day=1+Math.floor(state.daytime/180),phase=['Morning','Afternoon','Evening','Night'][Math.floor(state.daytime%180/45)];$('day').textContent=`Day ${day} • ${phase} • ${state.weather.mode==='rain'?'🌧️ Showers':'🌤️ Clear'}`;$('resources').textContent=`🪵 ${state.wood}   🪨 ${state.stone}   🍓 ${state.berries}   🪓 ${state.tools.axe}   🔦 ${state.tools.torch}   🍲 ${state.food}   🌿 ${state.twigs}   🍃 ${state.leaves}   🥚 ${state.eggs}   🍄 ${state.mushrooms}   🌼 ${Object.values(state.herbs).reduce((a,b)=>a+b,0)}   🧪 ${state.potions}`;}function controllerMove(){if(!navigator.getGamepads)return {x:0,y:0};const pad=Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);if(!pad)return {x:0,y:0};const axis=i=>Math.abs(pad.axes[i]||0)>.18?pad.axes[i]:0;const down=i=>pad.buttons[i]&&pad.buttons[i].pressed?1:0;let x=axis(0),y=axis(1);if(pad.mapping==='standard'){x+=down(15)-down(14);y+=down(13)-down(12)}return {x,y}}const playerMotion={dir:'down',moving:false,anim:0};function trackMotion(m,x0,y0,x1,y1,dt){const dx=x1-x0,dy=y1-y0,amount=Math.hypot(dx,dy);m.moving=amount>.25;if(m.moving){m.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');m.anim=(m.anim||0)+dt}else m.anim=0}// Shared-layout safety mode: pause device-local world edits without deleting saved layouts.
+} ctx.restore();ctx.restore();const regionLabel=$('regionName');if(regionLabel){const place=expandedRegion(state.x,state.y)?.name||'Haigen’s Woodlands';regionLabel.textContent=place+(state.autonomy&&autoJobLabel?' · 🤖 '+autoJobLabel:'');}const day=1+Math.floor(state.daytime/180),phase=(()=>{const p=(state.daytime%180+180)%180;return p<45?'Morning':p<81?'Afternoon':p<90?'Sunset':p<171?'Night':'Sunrise'})();$('day').textContent=`Day ${day} • ${phase} • ${state.weather.mode==='rain'?'🌧️ Showers':'🌤️ Clear'}`;$('resources').textContent=`🪵 ${state.wood}   🪨 ${state.stone}   🍓 ${state.berries}   🪓 ${state.tools.axe}   🔦 ${state.tools.torch}   🍲 ${state.food}   🌿 ${state.twigs}   🍃 ${state.leaves}   🥚 ${state.eggs}   🍄 ${state.mushrooms}   🌼 ${Object.values(state.herbs).reduce((a,b)=>a+b,0)}   🧪 ${state.potions}`;}function controllerMove(){if(!navigator.getGamepads)return {x:0,y:0};const pad=Array.from(navigator.getGamepads()||[]).find(p=>p&&p.connected);if(!pad)return {x:0,y:0};const axis=i=>Math.abs(pad.axes[i]||0)>.18?pad.axes[i]:0;const down=i=>pad.buttons[i]&&pad.buttons[i].pressed?1:0;let x=axis(0),y=axis(1);if(pad.mapping==='standard'){x+=down(15)-down(14);y+=down(13)-down(12)}return {x,y}}const playerMotion={dir:'down',moving:false,anim:0};function trackMotion(m,x0,y0,x1,y1,dt){const dx=x1-x0,dy=y1-y0,amount=Math.hypot(dx,dy);m.moving=amount>.25;if(m.moving){m.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');m.anim=(m.anim||0)+dt}else m.anim=0}// Shared-layout safety mode: pause device-local world edits without deleting saved layouts.
 const worldLayoutEditingPaused=true;
 // V192: on-device visual world editor. Layout is separate from story saves.
 const worldEditorKindGroups=[
@@ -10587,7 +10589,7 @@ function recoverAutonomousHaigen(dt,oldX,oldY){
  }
  autoDestination=null;autoPause=1800;
 }
-function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(Math.abs(p.u-768)<24&&Math.abs(p.v-292)<18&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateCaveResidents(dt);updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
+function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(Math.abs(p.u-768)<24&&Math.abs(p.v-292)<18&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateCaveResidents(dt);updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.00015;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
  if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=174/600){
  changeTrollChamber(true);
@@ -10597,7 +10599,7 @@ function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEn
     Math.hypot(state.x-(cottage.x+35),state.y-(cottage.y-10))<310){
   state.resting=false;travelCamp=null;
  }
- const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.0001;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.skiffAtSea&&!state.raftAfloat&&!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>15000){idleTime=0;setAutonomy(true);notify('🌲 Haigen has resumed his own adventures.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput){setAutonomy(false);idleTime=0;}if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(state.raftAfloat){raftMove(dt,dx,dy)}else if(raftWalkBoard(dx,dy)){}else if(state.skiffAtSea){skiffMove(dt,dx,dy)}else if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=walkingLakeLevel(state.x,state.y)<.82,sea=islandDepth(state.x,state.y)<0;state.x=clamp(state.x+dx*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.steps+=dt*.19}if(!homeInside&&!state.skiffAtSea&&!state.raftAfloat){const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;}
+ const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.00015;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.skiffAtSea&&!state.raftAfloat&&!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>15000){idleTime=0;setAutonomy(true);notify('🌲 Haigen has resumed his own adventures.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput){setAutonomy(false);idleTime=0;}if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(state.raftAfloat){raftMove(dt,dx,dy)}else if(raftWalkBoard(dx,dy)){}else if(state.skiffAtSea){skiffMove(dt,dx,dy)}else if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=walkingLakeLevel(state.x,state.y)<.82,sea=islandDepth(state.x,state.y)<0;state.x=clamp(state.x+dx*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.steps+=dt*.19}if(!homeInside&&!state.skiffAtSea&&!state.raftAfloat){const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;}
 // Homestead collision and persistent entry/exit. Door is the only passage.
 if(state.campTier>0){
  const hx=cottage.x+35,hy=cottage.y-10,tier=displayedHouseTier();
