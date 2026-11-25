@@ -12080,9 +12080,21 @@ function drawRaft(){
 
 
 // Frosthold interiors use independent local coordinates; world save stays at the safe doorway.
+Object.assign(frostholdRooms,{
+ royal:{name:'Royal Chambers',furniture:[[55,65,105,115,'#78576c'],[325,65,100,65,'#80634b'],[185,65,100,40,'#9a8258']]},
+ tower:{name:'Watchtower',furniture:[[55,55,80,65,'#80634b'],[345,55,80,65,'#80634b']]},
+ dungeon:{name:'Dungeon Entrance',furniture:[[45,65,100,190,'#43505b'],[335,65,100,190,'#43505b']]}
+});
+const frostholdInteriorLinks={keep:[{id:'royal',x:145,y:48},{id:'tower',x:335,y:48},{id:'dungeon',x:240,y:290}]};
 let frostholdRoom=null;
 function frostholdInteract(){
- if(frostholdRoom){if(frostholdRoom.y<340){notify('Approach the southern doorway to leave.');return true}frostholdRoom=null;notify('Back outside Frosthold.');return true}
+ if(frostholdRoom){
+ const link=(frostholdInteriorLinks[frostholdRoom.id]||[]).find(d=>Math.hypot(d.x-frostholdRoom.x,d.y-frostholdRoom.y)<30);
+ if(link){frostholdRoom={id:link.id,x:240,y:340,parent:{id:frostholdRoom.id,x:link.x,y:Math.min(330,link.y+32)}};notify(frostholdRooms[link.id].name);return true}
+ if(frostholdRoom.y<340||Math.abs(frostholdRoom.x-240)>38){notify('Approach a doorway.');return true}
+ if(frostholdRoom.parent){frostholdRoom=frostholdRoom.parent;notify(frostholdRooms[frostholdRoom.id].name);return true}
+ frostholdRoom=null;notify('Back outside Frosthold.');return true
+ }
  if(homeInside||visitorRoom||trollStumpInside||worldEditorActive||collapseRemaining>0)return false;
  const d=frostholdDoorNear(state.x,state.y);if(!d)return false;
  state.autonomy=false;state.x=d.returnX;state.y=d.returnY;
@@ -12103,6 +12115,7 @@ function drawFrostholdRoom(){
  for(let y=32;y<368;y+=24)for(let x=32;x<448;x+=32){ctx.fillStyle=(x+y)%3?'#83949d':'#748995';ctx.fillRect(x,y,30,22)}
  ctx.fillStyle='#263b49';ctx.fillRect(16,16,448,24);ctx.fillRect(16,16,16,368);ctx.fillRect(448,16,16,368);ctx.fillRect(16,368,200,16);ctx.fillRect(264,368,200,16);
  for(const [a,b,w,h,c] of frostholdRooms[frostholdRoom.id].furniture){ctx.fillStyle='#34444b';ctx.fillRect(a+4,b+5,w,h);ctx.fillStyle=c;ctx.fillRect(a,b,w,h);ctx.fillStyle='#ad9274';ctx.fillRect(a,b,w,5)}
+ for(const d of frostholdInteriorLinks[frostholdRoom.id]||[]){ctx.fillStyle='#27333d';ctx.fillRect(d.x-18,d.y-12,36,24);ctx.fillStyle='#c9b18a';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(frostholdRooms[d.id].name,d.x,d.y+23)}
  ctx.fillStyle='#b68a58';ctx.fillRect(216,368,48,16);
  ctx.fillStyle='#f3e5c8';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('Frosthold · '+frostholdRooms[frostholdRoom.id].name,240,28);ctx.fillText('X: Leave',240,395);
  ctx.fillStyle='#273c4a';ctx.fillRect(frostholdRoom.x-7,frostholdRoom.y-17,14,19);ctx.fillStyle='#d5b08b';ctx.fillRect(frostholdRoom.x-5,frostholdRoom.y-23,10,9);
