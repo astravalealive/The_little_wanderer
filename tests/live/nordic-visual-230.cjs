@@ -12,15 +12,14 @@ const {chromium}=require('playwright-core');
  assert.ok(Number(ver.build)>=429,'Job 230 requires GAME_BUILD >= 429');
  assert.match(html,new RegExp('const GAME_BUILD\\s*=\\s*'+Number(ver.build)+'\\b'));
  assert.match(html,/Job 230: keep upright painting silhouette/);
- assert.match(html,/artDrawables already owns the easel stool/);
- // paintHaigen must not redraw the grounded stool legs/top (owned by artDrawables).
+ // The legacy stool is intentionally removed; painting must not redraw it.
  const paint=html.match(/function paintHaigen\(\)\{[\s\S]*?\n\}/);
  assert.ok(paint,'paintHaigen missing');
  assert.doesNotMatch(paint[0],/fillRect\(x-12,y-19/);
  assert.doesNotMatch(paint[0],/fillRect\(x-15,y-23/);
  assert.match(paint[0],/character\(x,y,'boy'/);
  assert.match(html,/function artDrawables/);
- assert.match(html,/artSeat\.x-9,artSeat\.y-12/);
+ assert.doesNotMatch(html,/artSeat\.x-9,artSeat\.y-12/);
  assert.doesNotMatch(html,/__qaForcePainting/);
  assert.match(html,/wandererV127PreviewSave/);
  assert.ok(fs.existsSync(path.join(root,'docs/nordic-visual-bible-230/README.md')));
@@ -53,5 +52,5 @@ const {chromium}=require('playwright-core');
  assert.ok(!errors.length,'page errors '+JSON.stringify(errors));
  await browser.close();
  server.close();
- console.log('PASS Job 230 Nordic visual: single-stool paintHaigen, bible evidence, V'+info.build);
+ console.log('PASS Job 230 Nordic visual: stool-free paintHaigen, bible evidence, V'+info.build);
 })().catch(e=>{console.error(e);process.exit(1)});
