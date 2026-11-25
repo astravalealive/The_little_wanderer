@@ -4753,23 +4753,6 @@ function rbGrass(){
  rbTileCache.grass=ctx.createPattern(tile,'repeat');
  return rbTileCache.grass;
 }
-const woodlandFadeChunks=new Map(),woodlandFadeLimit=64,woodlandFadeCells=64;
-function woodlandFadeChunk(ix,iy){
- const key=ix+','+iy;
- if(woodlandFadeChunks.has(key)){const v=woodlandFadeChunks.get(key);woodlandFadeChunks.delete(key);woodlandFadeChunks.set(key,v);return v}
- const values=new Float64Array(4096);
- for(let j=0;j<64;j++)for(let i=0;i<64;i++){
-  const cx=(ix*64+i)*6+3,cy=(iy*64+j)*6+3;
-  const wobble=90*Math.sin(cy/245)+40*Math.sin(cy/91+cx/310)+24*Math.sin(cx/133+cy/170);
-  const wobbleY=80*Math.sin(cx/280)+32*Math.sin(cx/107+cy/270);
-  const edge=Math.min(cx+wobble,3500+wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-20);
-  const transition=Math.max(0,Math.min(1,(edge+230)/460));
-  values[j*64+i]=transition*transition*(3-2*transition);
- }
- woodlandFadeChunks.set(key,values);
- if(woodlandFadeChunks.size>woodlandFadeLimit)woodlandFadeChunks.delete(woodlandFadeChunks.keys().next().value);
- return values;
-}
 function rbDrawGround(){
  // V403: one continuous woodland surface, with smooth world-space feathering.
  // Do not use 16px binary mask cells: they created the checkerboard seams.
@@ -4796,6 +4779,23 @@ function rbDrawGround(){
  }
  if(night>.01){ctx.globalAlpha=night*.44;ctx.fillStyle='#192030';ctx.fillRect(l,t,r-l,b-t)}
  ctx.restore();
+}
+const woodlandFadeChunks=new Map(),woodlandFadeLimit=64,woodlandFadeCells=64;
+function woodlandFadeChunk(ix,iy){
+ const key=ix+','+iy;
+ if(woodlandFadeChunks.has(key)){const v=woodlandFadeChunks.get(key);woodlandFadeChunks.delete(key);woodlandFadeChunks.set(key,v);return v}
+ const values=new Float64Array(4096);
+ for(let j=0;j<64;j++)for(let i=0;i<64;i++){
+  const cx=(ix*64+i)*6+3,cy=(iy*64+j)*6+3;
+  const wobble=90*Math.sin(cy/245)+40*Math.sin(cy/91+cx/310)+24*Math.sin(cx/133+cy/170);
+  const wobbleY=80*Math.sin(cx/280)+32*Math.sin(cx/107+cy/270);
+  const edge=Math.min(cx+wobble,3500+wobble-cx,cy+wobbleY,3100+wobbleY-cy,islandDepth(cx,cy)-20);
+  const transition=Math.max(0,Math.min(1,(edge+230)/460));
+  values[j*64+i]=transition*transition*(3-2*transition);
+ }
+ woodlandFadeChunks.set(key,values);
+ if(woodlandFadeChunks.size>woodlandFadeLimit)woodlandFadeChunks.delete(woodlandFadeChunks.keys().next().value);
+ return values;
 }
 function rbTreeImage(id){
  const variation=Math.abs(id)%12;if(rbTileCache.tree.has(variation))return rbTileCache.tree.get(variation);
