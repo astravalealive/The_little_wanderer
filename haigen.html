@@ -10380,16 +10380,16 @@ function easternRiverWalkBlocked(x,y){
 // Frosthold phase 1: fixed world-space footprint; no save schema changes.
 const frosthold={x:0,y:-4800,w:960,h:760,gate:100};
 const frostholdArt=new Image();frostholdArt.src='./frosthold-exterior.png';
-const frostholdBounds={x:-2160,y:-6500,w:4320,h:2880};
-function frostholdPixel(x,y){const b=frostholdBounds;return {u:(x-b.x)*1536/b.w,v:(y-b.y)*1024/b.h}}
-function frostholdWorld(u,v){const b=frostholdBounds;return {x:b.x+u*b.w/1536,y:b.y+v*b.h/1024}}
+function frostholdBounds(){return {x:-2160,y:-6500,w:4320,h:2880}}
+function frostholdPixel(x,y){const b=frostholdBounds();return {u:(x-b.x)*1536/b.w,v:(y-b.y)*1024/b.h}}
+function frostholdWorld(u,v){const b=frostholdBounds();return {x:b.x+u*b.w/1536,y:b.y+v*b.h/1024}}
 function frostholdSceneryClear(o){const {u,v}=frostholdPixel(o.x,o.y);return u>-35&&u<1571&&v>-35&&v<1059||Math.abs(u-768)<90&&v>=1024&&v<1190}
 function frostholdArtReady(){return frostholdArt.complete&&frostholdArt.naturalWidth>0}
 function frostholdWalls(){
  const {x,y,w,h,gate}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
  return [[l,t,w,48],[l,t,48,h],[l+w-48,t,48,h],[l,b-48,w/2-gate/2,48],[x+gate/2,b-48,w/2-gate/2,48],[x-180,t+110,360,190]];
 }
-function drawFrostholdForeground(){if(!frostholdArtReady())return;const b=frostholdBounds;const p=frostholdPixel(state.x,state.y);if(p.v<610||p.v>870)return;ctx.save();ctx.beginPath();for(const [u,v,w,h] of [[55,500,145,350],[1330,500,150,350],[195,710,405,160],[940,710,390,160],[600,655,95,195],[840,655,100,195]]){const q=frostholdWorld(u,v);ctx.rect(q.x,q.y,w*b.w/1536,h*b.h/1024)}ctx.clip();ctx.drawImage(frostholdArt,b.x,b.y,b.w,b.h);ctx.restore()}
+function drawFrostholdForeground(){if(!frostholdArtReady())return;const b=frostholdBounds();const p=frostholdPixel(state.x,state.y);if(p.v<610||p.v>870)return;ctx.save();ctx.beginPath();for(const [u,v,w,h] of [[55,500,145,350],[1330,500,150,350],[195,710,405,160],[940,710,390,160],[600,655,95,195],[840,655,100,195]]){const q=frostholdWorld(u,v);ctx.rect(q.x,q.y,w*b.w/1536,h*b.h/1024)}ctx.clip();ctx.drawImage(frostholdArt,b.x,b.y,b.w,b.h);ctx.restore()}
 const frostholdArtSolids=[[0,0,1536,210],[0,210,200,660],[1330,210,206,660],[0,870,670,154],[866,870,670,154],[195,720,400,155],[940,720,390,155],[600,655,95,195],[840,655,100,195],[450,210,250,75],[835,210,255,75],[375,440,70,100],[1090,440,70,100],[685,540,165,85],[210,550,130,135],[1190,550,135,135],[470,485,100,70],[965,485,100,70]];
 function frostholdBlocked(x,y){if(frostholdArtReady()){const {u,v}=frostholdPixel(x,y);return frostholdArtSolids.some(([a,b,w,h])=>u>a-4&&u<a+w+4&&v>b-4&&v<b+h+4)}return frostholdWalls().some(([a,b,w,h])=>x>a-10&&x<a+w+10&&y>b-10&&y<b+h+10)}
 // Shared doorway metadata for subsequent interior transitions.
@@ -10402,7 +10402,7 @@ function frostholdFoundationChecks(){
  return {gateOpen:!frostholdBlocked(x,b-24),westWall:frostholdBlocked(x-w/2+24,y),eastWall:frostholdBlocked(x+w/2-24,y),keepSolid:frostholdBlocked(x,t+200),courtOpen:!frostholdBlocked(x,y),doorReturnClear:frostholdDoors.every(d=>!frostholdBlocked(d.returnX,d.returnY)),land: islandDepth(x,y)>0};
 }
 
-function drawFrosthold(){if(frostholdArtReady()){const b=frostholdBounds;ctx.drawImage(frostholdArt,b.x,b.y,b.w,b.h);return}
+function drawFrosthold(){if(frostholdArtReady()){const b=frostholdBounds();ctx.drawImage(frostholdArt,b.x,b.y,b.w,b.h);return}
  const {x,y,w,h}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
  if(Math.abs(cam.x-x)>w/2+W/worldZoom()||Math.abs(cam.y-y)>h/2+H/worldZoom())return;
  ctx.save();
