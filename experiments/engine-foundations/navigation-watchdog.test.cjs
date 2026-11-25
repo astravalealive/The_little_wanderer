@@ -16,3 +16,4 @@ assert.equal(step(3300,3).action,'none');
 assert.equal(step(3400,3,true,200).reason,'new-target');
 assert.throws(()=>w.update({position:{x:NaN,y:0},target:{x:1,y:1},now:0}),TypeError);
 console.log('Navigation watchdog regression tests passed');
+require('./long-route.test.cjs');

@@ -3490,6 +3490,7 @@ function awakeningRoute(target,reach){
   return true;
  }
  let found=null,finish=null,iterations=0;
+ const initialDistance=Math.hypot(target.x-state.x,target.y-state.y);
  while(open.length&&iterations++<380){
   open.sort((a,b)=>(a.g+a.h)-(b.g+b.h));
   const cur=open.shift(),k=id(cur.x,cur.y);
@@ -3498,6 +3499,12 @@ function awakeningRoute(target,reach){
   const px=cur.parent?cur.x*cell:state.x,py=cur.parent?cur.y*cell:state.y;
   const distance=Math.hypot(target.x-px,target.y-py);
   if(distance<=reach){found=cur;break}
+  // Continue long journeys in bounded legs, using only a collision-checked path.
+  if(Math.max(Math.abs(cur.x-origin.x),Math.abs(cur.y-origin.y))===22 &&
+     initialDistance>22*cell+reach && distance<initialDistance-cell){
+   found=cur;
+   break;
+  }
   if(distance<=reach+cell){
    const fraction=(distance-Math.max(0,reach-1))/distance;
    const x=px+(target.x-px)*fraction,y=py+(target.y-py)*fraction;
@@ -3541,8 +3548,9 @@ function autoTravel(target,dt,reach=80,speed=.14){
  if(waypoint&&Math.hypot(state.x-waypoint.x,state.y-waypoint.y)<0.5){
   if(awakeningPath.length>1)awakeningPath.shift();
   else if(dist(state,target)<=reach+1){autoResetNav();return true}
+  else awakeningPath.shift(); // Finished an intermediate leg.
  }
- if(!awakeningPath.length)awakeningPath=awakeningRoute(target,reach);
+
  const activeWaypoint=awakeningPath[0];
  if(!activeWaypoint){
   // No safe route: never fall back to direct steering into an obstacle.
@@ -8891,6 +8899,8 @@ function ensureWorldLocator(){let el=document.getElementById('worldLocator');if(
 
 // V391 woodland floor pass: restrained painterly texture, denser only in wild woodland.
 // Stable world-coordinate marks; no tile outlines, image filters or gameplay changes.
+// One exact road distance per fixed woodland sample, shared across frames.
+const woodlandFloorDistances=new Float64Array(38*33).fill(NaN);
 function drawWoodlandFloorV391(nightMix){
  const zoom=worldZoom(),halfW=W/(2*zoom)+110,halfH=H/(2*zoom)+110,step=94;
  const x0=Math.floor((cam.x-halfW)/step),x1=Math.ceil((cam.x+halfW)/step);
@@ -8914,7 +8924,12 @@ function drawWoodlandFloorV391(nightMix){
   if(hash(gx,gy,3)>density)continue;
   // Road distance is pure and only used by surviving decorative samples.
   // Avoid scanning every road segment for rejected woodland cells.
-  const routeDistance=roadDistance(x,y);
+  const sampleIndex=gx*33+gy;
+  if(Number.isNaN(woodlandFloorDistances[sampleIndex])){
+   const routeDistance=roadDistance(x,y);
+   woodlandFloorDistances[sampleIndex]=routeDistance;
+  }
+  const routeDistance=woodlandFloorDistances[sampleIndex];
   const dark=nightMix*.48;
   // Fade floor strokes at road edges rather than drawing grass over the paths.
   const routeFade=coastSmooth(45,125,routeDistance);
