@@ -12086,6 +12086,9 @@ Object.assign(frostholdRooms,{
  dungeon:{name:'Dungeon Entrance',furniture:[[45,65,100,190,'#43505b'],[335,65,100,190,'#43505b']]}
 });
 const frostholdInteriorLinks={keep:[{id:'royal',x:145,y:48},{id:'tower',x:335,y:48},{id:'dungeon',x:240,y:290}]};
+const frostholdResidents=[{room:'gatehouse',name:'Gatekeeper',route:[[145,140],[320,140],[320,300],[145,300]]},{room:'barracks',name:'Shield Guard',route:[[160,100],[320,100],[320,300],[160,300]]},{room:'hall',name:'Steward',route:[[180,130],[300,130],[300,300],[180,300]]},{room:'keep',name:'Huscarl',route:[[125,180],[350,180],[350,310],[125,310]]}];
+let frostholdClock=0;
+function frostholdResidentPosition(n){const t=(frostholdClock/4000)%n.route.length,i=Math.floor(t),f=t-i,a=n.route[i],b=n.route[(i+1)%n.route.length];return {x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f}}
 let frostholdRoom=null;
 function frostholdInteract(){
  if(frostholdRoom){
@@ -12100,7 +12103,7 @@ function frostholdInteract(){
  state.autonomy=false;state.x=d.returnX;state.y=d.returnY;
  frostholdRoom={id:d.id,x:240,y:340};notify('Frosthold: '+frostholdRooms[d.id].name);return true;
 }
-function updateFrostholdRoom(dt){
+function updateFrostholdRoom(dt){frostholdClock+=dt;
  const pad=controllerMove();checkActions();if(!frostholdRoom)return;
  let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);
  const n=Math.max(1,Math.hypot(dx,dy)),step=Math.min(dt,50)*.12;
@@ -12118,6 +12121,7 @@ function drawFrostholdRoom(){
  for(const d of frostholdInteriorLinks[frostholdRoom.id]||[]){ctx.fillStyle='#27333d';ctx.fillRect(d.x-18,d.y-12,36,24);ctx.fillStyle='#c9b18a';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(frostholdRooms[d.id].name,d.x,d.y+23)}
  ctx.fillStyle='#b68a58';ctx.fillRect(216,368,48,16);
  ctx.fillStyle='#f3e5c8';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('Frosthold · '+frostholdRooms[frostholdRoom.id].name,240,28);ctx.fillText('X: Leave',240,395);
+ for(const n of frostholdResidents.filter(n=>n.room===frostholdRoom.id)){const p=frostholdResidentPosition(n);ctx.fillStyle='#455a70';ctx.fillRect(p.x-8,p.y-17,16,19);ctx.fillStyle='#b6c5cf';ctx.fillRect(p.x-7,p.y-25,14,9);ctx.fillStyle='#f3e5c8';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(n.name,p.x,p.y-30)}
  ctx.fillStyle='#273c4a';ctx.fillRect(frostholdRoom.x-7,frostholdRoom.y-17,14,19);ctx.fillStyle='#d5b08b';ctx.fillRect(frostholdRoom.x-5,frostholdRoom.y-23,10,9);
  ctx.restore();
 }
