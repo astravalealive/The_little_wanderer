@@ -10385,18 +10385,37 @@ function frostholdWalls(){
 }
 function frostholdBlocked(x,y){return frostholdWalls().some(([a,b,w,h])=>x>a-10&&x<a+w+10&&y>b-10&&y<b+h+10)}
 function drawFrosthold(){
- const {x,y,w,h}=frosthold;if(Math.abs(cam.x-x)>w/2+W/worldZoom()||Math.abs(cam.y-y)>h/2+H/worldZoom())return;
- ctx.save();ctx.fillStyle='#aabdc4';ctx.fillRect(x-w/2,y-h/2,w,h);
- ctx.fillStyle='#c9d6db';ctx.fillRect(x-55,y-80,110,h/2+80);
- for(const [a,b,ww,hh] of frostholdWalls()){
- ctx.fillStyle='#405664';ctx.fillRect(a,b,ww,hh);
- ctx.fillStyle='#8199a7';ctx.fillRect(a,b,ww,Math.min(24,hh));
- ctx.fillStyle='#e2edf0';ctx.fillRect(a,b,ww,7);
- ctx.fillStyle='#344957';for(let i=8;i<ww-8;i+=32)ctx.fillRect(a+i,b+25,2,Math.min(20,hh-25));
+ const {x,y,w,h}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
+ if(Math.abs(cam.x-x)>w/2+W/worldZoom()||Math.abs(cam.y-y)>h/2+H/worldZoom())return;
+ ctx.save();
+ const rect=(a,b,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(a,b,w,h)};
+ rect(l,t,w,h,'#b8cbd1');
+ for(let j=0;j<h;j+=24)for(let i=0;i<w;i+=32){const n=(i*17+j*13)%97;rect(l+i,t+j,Math.min(31,w-i),Math.min(23,h-j),n<30?'#a8bdc6':n<65?'#c0d0d5':'#b3c5cc')}
+ rect(x-54,t+300,108,h-300,'#849da9');
+ for(let j=t+304;j<b;j+=18){rect(x-51,j,102,15,'#a4b8c1');rect(x-2,j,2,15,'#748e9b')}
+ function masonry(a,b,ww,hh){
+ rect(a+8,b+9,ww,hh,'#829ba9');rect(a,b,ww,hh,'#425968');
+ for(let j=12;j<hh-4;j+=16)for(let i=4;i<ww-4;i+=25){const k=(j*11+i*7)%53;rect(a+i,b+j,Math.min(23,ww-i-3),Math.min(14,hh-j-2),k<18?'#657d8c':k<35?'#526b7b':'#738a98')}
+ rect(a,b,ww,10,'#e2edf0');rect(a,b+10,ww,4,'#9bb7c5');
  }
+ for(const [a,b,ww,hh] of frostholdWalls())masonry(a,b,ww,hh);
+ function tower(a,b,ww,hh){
+ masonry(a,b,ww,hh);rect(a+7,b+9,ww-14,hh-25,'#344b5b');
+ rect(a+13,b+15,ww-26,hh-37,'#607b8b');
+ for(let i=0;i<ww;i+=24){rect(a+i,b-7,Math.min(15,ww-i),18,'#6c8494');rect(a+i,b-7,Math.min(15,ww-i),5,'#edf4f5')}
+ rect(a+ww/2-5,b+hh-25,10,17,'#263c4c');
+ }
+ for(const a of [l,l+w-48])for(const z of [t,b-48])tower(a,z,48,48);
+ const kx=x-180,ky=t+110;
+ tower(kx,ky,72,190);tower(kx+288,ky,72,190);
+ rect(kx+76,ky+10,208,110,'#344f62');
+ for(let j=0;j<110;j+=12)rect(kx+80,ky+10+j,200,2,'#718b9b');
+ rect(x-4,ky+8,8,112,'#d7e6ed');
+ rect(x-32,ky+145,64,45,'#283c49');rect(x-27,ky+150,54,40,'#65554b');
+ for(const a of [x-46,x+38]){rect(a,ky+150,8,20,'#344655');rect(a-2,ky+145,12,9,'#f5b76b')}
+ for(const a of [x-98,x+50])tower(a,b-48,48,48);
  ctx.restore();
 }
-
 function blockedBySolid(x,y){if(frostholdBlocked(x,y))return true;if(window.__gloamAddon?.arena(x,y))return false;
  if(easternRiverWalkBlocked(x,y))return true;
  if(worldEditorBuildingBlocks(x,y))return true;
