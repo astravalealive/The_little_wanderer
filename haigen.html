@@ -10384,6 +10384,14 @@ function frostholdWalls(){
  return [[l,t,w,48],[l,t,48,h],[l+w-48,t,48,h],[l,b-48,w/2-gate/2,48],[x+gate/2,b-48,w/2-gate/2,48],[x-180,t+110,360,190]];
 }
 function frostholdBlocked(x,y){return frostholdWalls().some(([a,b,w,h])=>x>a-10&&x<a+w+10&&y>b-10&&y<b+h+10)}
+// Shared doorway metadata for subsequent interior transitions.
+const frostholdDoors=Object.freeze([{id:'keep',x:frosthold.x,y:frosthold.y-frosthold.h/2+312,returnX:frosthold.x,returnY:frosthold.y-frosthold.h/2+330}]);
+function frostholdDoorNear(x,y){return frostholdDoors.find(d=>Math.hypot(x-d.x,y-d.y)<35)||null}
+function frostholdFoundationChecks(){
+ const {x,y,w,h}=frosthold,t=y-h/2,b=y+h/2;
+ return {gateOpen:!frostholdBlocked(x,b-24),westWall:frostholdBlocked(x-w/2+24,y),eastWall:frostholdBlocked(x+w/2-24,y),keepSolid:frostholdBlocked(x,t+200),courtOpen:!frostholdBlocked(x,y),doorReturnClear:frostholdDoors.every(d=>!frostholdBlocked(d.returnX,d.returnY)),land: islandDepth(x,y)>0};
+}
+
 function drawFrosthold(){
  const {x,y,w,h}=frosthold,l=x-w/2,t=y-h/2,b=y+h/2;
  if(Math.abs(cam.x-x)>w/2+W/worldZoom()||Math.abs(cam.y-y)>h/2+H/worldZoom())return;
