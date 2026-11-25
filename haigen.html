@@ -1988,7 +1988,7 @@ function updateBeasts(dt){
 const rbCreatureCache=new Map();
 function rbCreatureSprite(kind,dir,frame){
  const key=kind+':'+dir+':'+frame;
- if(rbCreatureCache.has(key))return rbCreatureCache.get(key);
+ if(rbCreatureCache.has(key)){const cached=rbCreatureCache.get(key);rbCreatureCache.delete(key);rbCreatureCache.set(key,cached);return cached}
  const beast=kind==='wolf'||kind==='boar',bird=kind==='chicken'||kind==='duck';
  const w=beast?40:bird?28:18,h=beast?32:bird?24:16;
  const c=document.createElement('canvas');c.width=w;c.height=h;
@@ -2072,13 +2072,13 @@ function rbCreatureSprite(kind,dir,frame){
   if(!back){p(5,4,2,2,'#e2d9a6');p(11,4,2,2,'#e2d9a6');p(6,5,1,1,'#1e302b');p(12,5,1,1,'#1e302b')}
   p(1+step,12,5,3,'#466e49');p(12-step,12,5,3,'#466e49');
  }
- rbCreatureCache.set(key,c);return c;
+ rbCreatureCache.set(key,c);if(rbCreatureCache.size>192)rbCreatureCache.delete(rbCreatureCache.keys().next().value);return c;
 }
 // One visually coherent wildlife atlas for all biomes. Cached, transparent,
 // species-specific silhouettes, ground-anchored animation and original colours.
 const worldFaunaCache=new Map();
 function worldFauna(kind,frame=0){
- const key=kind+':'+frame;if(worldFaunaCache.has(key))return worldFaunaCache.get(key);
+ const key=kind+':'+frame;if(worldFaunaCache.has(key)){const cached=worldFaunaCache.get(key);worldFaunaCache.delete(key);worldFaunaCache.set(key,cached);return cached}
  const big=['wolf','boar','bison','stag','goat'].includes(kind),w=big?80:60,h=big?63:52;
  const c=document.createElement('canvas');c.width=w;c.height=h;
  const g=c.getContext('2d');g.imageSmoothingEnabled=false;
@@ -2201,7 +2201,7 @@ function worldFauna(kind,frame=0){
   shape([[16,28],[27,22],[43,26],[51,31],[42,37],[26,39]],'#91aeb0');
   p(47,29,3,3,dark);
  }
- worldFaunaCache.set(key,c);return c;
+ worldFaunaCache.set(key,c);if(worldFaunaCache.size>96)worldFaunaCache.delete(worldFaunaCache.keys().next().value);return c;
 }
 
 // V124 faithful illustrated fauna from the approved world concept sheet.
@@ -4983,7 +4983,7 @@ function rbDrawMushroom(o){
 // Draw at full device resolution; never pixelate the whole moving screen.
 const worldArtCache=new Map();
 function worldPaint(kind,variant=0){
- const key=kind+':'+variant;if(worldArtCache.has(key))return worldArtCache.get(key);
+ const key=kind+':'+variant;if(worldArtCache.has(key)){const cached=worldArtCache.get(key);worldArtCache.delete(key);worldArtCache.set(key,cached);return cached}
  const tall=['tree','fir','palm','bareTree','snowFir','cottage','tent','cactus','sign','lantern'];
  const w=['cottage','tent'].includes(kind)?180:['tree','fir','palm','snowFir','bareTree'].includes(kind)?112:kind==='rock'?92:kind==='sign'?64:80;
  const h=['cottage','tent'].includes(kind)?126:tall.includes(kind)?142:kind==='rock'?66:70;
@@ -5192,7 +5192,7 @@ function worldPaint(kind,variant=0){
    for(let i=0;i<3;i++){const x=Math.floor(rng()*w);p(x,yy+3,12,2,kind==='water'?'#85bcc4':'#bfd8cc')}}
   if(kind==='shore'){p(0,0,w,17,'#567b53');p(0,18,w,6,'#a2a17b');p(0,25,w,6,'#d0c9a2')}
  }
- worldArtCache.set(key,cv);return cv;
+ worldArtCache.set(key,cv);if(worldArtCache.size>192)worldArtCache.delete(worldArtCache.keys().next().value);return cv;
 }
 // Exact illustrated assets extracted from the approved environment reference,
 // rather than another approximated canvas-pixel remake. The old procedural
@@ -6868,7 +6868,7 @@ const rbSpriteCache=new Map();
 function rbPixel(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
 function rbSprite(kind,dir,frame,coat){
  const key=[kind,dir,frame,coat||''].join(':');
- if(rbSpriteCache.has(key))return rbSpriteCache.get(key);
+ if(rbSpriteCache.has(key)){const cached=rbSpriteCache.get(key);rbSpriteCache.delete(key);rbSpriteCache.set(key,cached);return cached}
  const canvas=document.createElement('canvas');canvas.width=30;canvas.height=40;
  const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;
  const p=(x,y,w,h,c)=>rbPixel(g,x,y,w,h,c);
@@ -6951,7 +6951,7 @@ function rbSprite(kind,dir,frame,coat){
    p(24,27,5,5,'#f4dcc1');
   }
  }
- rbSpriteCache.set(key,canvas);return canvas;
+ rbSpriteCache.set(key,canvas);if(rbSpriteCache.size>192)rbSpriteCache.delete(rbSpriteCache.keys().next().value);return canvas;
 }
 
 // V117 approved Haigen: source art from the family-approved character turnaround.
