@@ -12153,11 +12153,11 @@ function drawFrostholdRoom(){
  const scale=Math.min(W/480,H/400);ctx.save();ctx.clearRect(0,0,W,H);ctx.fillStyle='#18232e';ctx.fillRect(0,0,W,H);ctx.translate((W-480*scale)/2,(H-400*scale)/2);ctx.scale(scale,scale);
  ctx.fillStyle='#526674';ctx.fillRect(16,16,448,368);
  for(let y=32;y<368;y+=24)for(let x=32;x<448;x+=32){ctx.fillStyle=(x+y)%3?'#83949d':'#748995';ctx.fillRect(x,y,30,22)}
- ctx.fillStyle='#263b49';ctx.fillRect(16,16,448,24);ctx.fillRect(16,16,16,368);ctx.fillRect(448,16,16,368);ctx.fillRect(16,368,200,16);ctx.fillRect(264,368,200,16);
+ const chamber=frostholdRoom.id;const rug=['keep','royal','hall'].includes(chamber);if(rug){ctx.fillStyle='#344c62';ctx.fillRect(210,112,60,218);ctx.strokeStyle='#b5a27b';ctx.lineWidth=2;ctx.strokeRect(214,116,52,210);for(let y=130;y<320;y+=28){ctx.beginPath();ctx.moveTo(240,y-8);ctx.lineTo(251,y);ctx.lineTo(240,y+8);ctx.lineTo(229,y);ctx.closePath();ctx.stroke()}}ctx.fillStyle='#263b49';ctx.fillRect(16,16,448,24);ctx.fillRect(16,16,16,368);ctx.fillRect(448,16,16,368);ctx.fillRect(16,368,200,16);ctx.fillRect(264,368,200,16);
  for(const [a,b,w,h,c] of frostholdRooms[frostholdRoom.id].furniture){ctx.fillStyle='#34444b';ctx.fillRect(a+4,b+5,w,h);ctx.fillStyle=c;ctx.fillRect(a,b,w,h);ctx.fillStyle='#ad9274';ctx.fillRect(a,b,w,5)}
  for(const d of frostholdInteriorLinks[frostholdRoom.id]||[]){ctx.fillStyle='#27333d';ctx.fillRect(d.x-18,d.y-12,36,24);ctx.fillStyle='#c9b18a';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(frostholdRooms[d.id].name,d.x,d.y+23)}
- ctx.fillStyle='#b68a58';ctx.fillRect(216,368,48,16);
- ctx.fillStyle='#f3e5c8';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('Frosthold · '+frostholdRooms[frostholdRoom.id].name,240,28);ctx.fillText('X: Leave',240,395);
+ for(let x=48;x<448;x+=48){ctx.fillStyle='#b5cbd4';ctx.fillRect(x,36,24,4);ctx.fillStyle='#334b5c';ctx.fillRect(x+10,40,4,8)}ctx.fillStyle='#b68a58';ctx.fillRect(216,368,48,16);
+ ctx.fillStyle='#f3e5c8';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('Frosthold · '+frostholdRooms[frostholdRoom.id].name,240,28);ctx.fillText('X: Enter doorway / leave at south exit',240,395);
  for(const n of frostholdResidents.filter(n=>n.room===frostholdRoom.id)){const p=frostholdResidentPosition(n);ctx.fillStyle='#455a70';ctx.fillRect(p.x-8,p.y-17,16,19);ctx.fillStyle='#b6c5cf';ctx.fillRect(p.x-7,p.y-25,14,9);ctx.fillStyle='#f3e5c8';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(n.name,p.x,p.y-30)}
  ctx.save();ctx.translate(frostholdRoom.x,frostholdRoom.y);ctx.scale(.65,.65);if(!drawApprovedHaigen(0,0,frostholdRoom,false))character(0,0,'boy',frostholdRoom,false);ctx.restore();
  for(const x of [42,438])for(const y of [55,300]){const g=ctx.createRadialGradient(x,y,2,x,y,65);g.addColorStop(0,'rgba(255,195,110,.35)');g.addColorStop(1,'rgba(255,195,110,0)');ctx.fillStyle=g;ctx.fillRect(x-65,y-65,130,130);ctx.fillStyle='#ffc27a';ctx.fillRect(x-2,y-5,4,9)}
