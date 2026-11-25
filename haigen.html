@@ -10398,6 +10398,17 @@ function drawFrosthold(){
  for(let j=12;j<hh-4;j+=16)for(let i=4;i<ww-4;i+=25){const k=(j*11+i*7)%53;rect(a+i,b+j,Math.min(23,ww-i-3),Math.min(14,hh-j-2),k<18?'#657d8c':k<35?'#526b7b':'#738a98')}
  rect(a,b,ww,10,'#e2edf0');rect(a,b+10,ww,4,'#9bb7c5');
  }
+ // Courtyard circulation: cross-axis paths, raised keep approach and side courts.
+ rect(l+64,t+390,w-128,72,'#829ba8');
+ for(let i=l+66;i<l+w-64;i+=26){rect(i,t+394,23,64,'#a7bbc4');rect(i,t+426,23,2,'#738d9a')}
+ for(const side of [-1,1]){
+ const cx=x+side*255;
+ rect(cx-95,t+475,190,165,'#8da6b1');
+ rect(cx-89,t+481,178,153,'#cbd9dd');
+ for(let j=0;j<153;j+=25)for(let i=0;i<178;i+=29)rect(cx-87+i,t+483+j,Math.min(26,176-i),Math.min(22,151-j),'#b5c8cf');
+ for(const dx of [-75,75]){rect(cx+dx-5,t+488,10,17,'#465c68');rect(cx+dx-7,t+482,14,8,'#eeb46e')}
+ }
+ for(let j=0;j<7;j++){rect(x-68,t+300+j*8,136,7,j%2?'#9bb0ba':'#b9ccd3');rect(x-68,t+307+j*8,136,1,'#536f7e')}
  for(const [a,b,ww,hh] of frostholdWalls())masonry(a,b,ww,hh);
  function tower(a,b,ww,hh){
  masonry(a,b,ww,hh);rect(a+7,b+9,ww-14,hh-25,'#344b5b');
