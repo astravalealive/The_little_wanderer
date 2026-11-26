@@ -13308,6 +13308,20 @@ function visitTappedBuilding(x,y){
  visitorRoom=house?'home':'stump';visitorDoor=null;visitorInnerDoor=null;
  return true;
 }
+const stumpTapCapture=new Map();
+gameCanvas.addEventListener('pointerdown',e=>{
+ if(e.isPrimary===false||visitorRoom||worldEditorActive)return;
+ const r=gameCanvas.getBoundingClientRect(),z=worldZoom(),s=abandonedTrollStump;
+ const x=cam.x+((e.clientX-r.left)*W/r.width-W/2)/z,y=cam.y+((e.clientY-r.top)*H/r.height-H/2)/z;
+ if(Math.abs(x-s.x)<=s.width*.55&&y>=s.y-s.height&&y<=s.y+40)stumpTapCapture.set(e.pointerId,{x:e.clientX,y:e.clientY});
+},true);
+gameCanvas.addEventListener('pointerup',e=>{
+ const p=stumpTapCapture.get(e.pointerId);stumpTapCapture.delete(e.pointerId);
+ if(!p||Math.hypot(e.clientX-p.x,e.clientY-p.y)>16||visitorRoom||worldEditorActive)return;
+ visitorRoom='stump';visitorDoor=null;visitorInnerDoor=null;
+ e.preventDefault();e.stopImmediatePropagation();
+},true);
+gameCanvas.addEventListener('pointercancel',e=>stumpTapCapture.delete(e.pointerId),true);
 const homesteadTap=new Map();
 gameCanvas.addEventListener('pointerdown',e=>{
  const valid=e.isPrimary!==false&&e.button===0&&homesteadTap.size===0;
