@@ -7463,12 +7463,14 @@ function drawHaigenLevelOne(x,y,actor,status,deepWater){
  if(!img.complete||!img.naturalWidth)return false;
  const wide=img.naturalWidth/img.naturalHeight>1.4;
  const cell=img.naturalHeight/4,offset=(img.naturalWidth-cell*4)/2;
+ const sx=Math.round(offset+frame*cell),sy=Math.round(row*cell),sw=Math.round(offset+(frame+1)*cell)-sx,sh=Math.round((row+1)*cell)-sy;
  // Cache transparent cells; remove only near-black pixels connected to the cell boundary.
  const key=name+':'+row+':'+frame;
  if(!haigenApprovedSheets.has(key)){
-  const canvas=document.createElement('canvas');canvas.width=canvas.height=Math.round(cell);
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=Math.min(160,Math.round(cell));
   const g=canvas.getContext('2d',{willReadFrequently:true});if(!g)return false;
-  g.drawImage(img,offset+frame*cell,row*cell,cell,cell,0,0,canvas.width,canvas.height);
+  g.imageSmoothingEnabled=false;
+  g.drawImage(img,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
   if(wide&&(name==='haigen_basic_sprite_sheet'||name==='haigen_level_02_sprite_sheet')){
    const w=canvas.width,h=canvas.height,p=g.getImageData(0,0,w,h),d=p.data,seen=new Uint8Array(w*h),queue=[];
    const add=(i)=>{if(seen[i])return;seen[i]=1;const j=i*4;if(d[j]<25&&d[j+1]<25&&d[j+2]<25){d[j+3]=0;queue.push(i);}};
@@ -7477,9 +7479,11 @@ function drawHaigenLevelOne(x,y,actor,status,deepWater){
    g.putImageData(p,0,0);
   }
   const pixels=g.getImageData(0,0,canvas.width,canvas.height).data;
-  let bottom=-1;for(let yy=0;yy<canvas.height;yy++)for(let xx=0;xx<canvas.width;xx++)if(pixels[(yy*canvas.width+xx)*4+3]>128)bottom=yy;
+  let bottom=-1;outer:for(let yy=canvas.height-1;yy>=0;yy--)for(let xx=0;xx<canvas.width;xx++)if(pixels[(yy*canvas.width+xx)*4+3]>128){bottom=yy;break outer;}
   canvas.footOffset=bottom>=0?canvas.height-1-bottom:0;
   haigenApprovedSheets.set(key,canvas);
+  let count=0;for(const value of haigenApprovedSheets.values())if(value instanceof HTMLCanvasElement)count++;
+  if(count>96)for(const [oldKey,value] of haigenApprovedSheets){if(value instanceof HTMLCanvasElement&&oldKey!==key){haigenApprovedSheets.delete(oldKey);break;}}
  }
  const sprite=haigenApprovedSheets.get(key),w=120,h=120;
  ctx.save();ctx.imageSmoothingEnabled=false;nordicContactShadow(x+1,y+7,20,6);
