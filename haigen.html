@@ -1480,7 +1480,7 @@ state.lifeProject=state.lifeProject&&typeof state.lifeProject==='object'&&['coop
 if(state.lifeProject){state.lifeProject.stage=clamp(Math.floor(Number(state.lifeProject.stage)||0),0,2);state.lifeProject.work=clamp(Number(state.lifeProject.work)||0,0,2500)}
 state.lifeProjectsDone=Array.isArray(state.lifeProjectsDone)?state.lifeProjectsDone.filter(k=>['coop','woodstore'].includes(k)).slice(0,3):[];
 // V306: independent harvest cycles and four named crops, migrated from legacy garden timer.
-const gardenCrops=[];
+const gardenCrops=['cabbage','onions','turnips','leeks'];
 state.gardenCropReady=state.gardenCropReady&&typeof state.gardenCropReady==='object'?state.gardenCropReady:{};
 for(const crop of gardenCrops)if(!Number.isFinite(state.gardenCropReady[crop]))state.gardenCropReady[crop]=Number(state.gardenReadyAt)||Date.now()+105000;
 // An independent growth clock and last-harvest state for each crop, retained in saved games.
@@ -1488,7 +1488,7 @@ state.gardenCropPickedAt=state.gardenCropPickedAt&&typeof state.gardenCropPicked
 for(const crop of gardenCrops)if(!Number.isFinite(state.gardenCropPickedAt[crop]))state.gardenCropPickedAt[crop]=0;
 const gardenHarvestBursts=[];
 function gardenGrowthMs(){return [0,105000,70000,45000][state.gardenTier]||105000}
-function gardenCropGrowth(crop){return gardenGrowthMs()*({cabbage:1.25,tomatoes:1.1,carrots:.85,potatoes:1.15}[crop]||1)}
+function gardenCropGrowth(crop){return gardenGrowthMs()*({cabbage:1.25,onions:1.1,turnips:.85,leeks:1.15}[crop]||1)}
 function gardenCropProgress(crop){return Math.max(0,Math.min(1,1-(state.gardenCropReady[crop]-Date.now())/gardenCropGrowth(crop)))}
 function gardenCropRipe(crop){return !!state.gardenTier&&Date.now()>=state.gardenCropReady[crop]}
 function gardenRipe(){return gardenCrops.some(gardenCropRipe)}
@@ -6291,16 +6291,28 @@ function worldDrawDock(p){
 
 function drawVikingFarm(){
  const p=gardenPlot; if(Math.abs(p.x-cam.x)>950||Math.abs(p.y-cam.y)>750)return;
- const tier=Math.max(1,Math.min(5,Number(state.vikingFarmTier)||1));
+ const tier=Math.max(1,Math.min(5,Number(state.gardenTier)||1));
  const img=vikingFarmImages[tier-1]; if(!img.complete||!img.naturalWidth)return;
  const w=[180,220,260,300,340][tier-1],h=w*img.naturalHeight/img.naturalWidth;
- ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(img,p.x-w/2,p.y-h/2,w,h);ctx.restore();
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(img,p.x-w/2,p.y-h/2,w,h);
+ if(state.gardenTier)gardenCrops.forEach((crop,row)=>{
+ const growth=gardenCropProgress(crop),stage=gardenCropVisualStage(crop);
+ if(stage==='picked')return;
+ for(let k=0;k<4;k++){
+ const x=p.x+(k-1.5)*w*.12,y=p.y+(row-1.5)*h*.14;
+ const s=(stage==='planted'?.35:Math.max(.4,growth))*w/180;
+ if(crop==='cabbage'){for(let j=0;j<5;j++){const a=j*1.256;ellipse(x+Math.cos(a)*4*s,y+Math.sin(a)*3*s,5*s,3*s,j%2?'#54864a':'#83a95c');}}
+ else {for(let j=-1;j<=1;j++){ctx.strokeStyle=j===0?'#83ad58':'#527d42';ctx.lineWidth=Math.max(1,2*s);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+j*4*s,y-(8+Math.abs(j)*2)*s);ctx.stroke();}
+ if(stage==='ripe'&&crop!=='leeks')ellipse(x,y,4*s,3*s,crop==='onions'?'#c7a06a':'#d9c8a5');}
+ }
+ });
+ ctx.restore();
 }
 const vikingFarmImages=Array.from({length:5},(_,i)=>{const img=new Image();img.src='viking_farm_'+(i+1)+'.png';return img});
 function drawHomesteadPlotGround(p){
  if(Math.abs(p.x-cam.x)>950||Math.abs(p.y-cam.y)>750)return;
  const tier=homesteadTier(p),x=p.x,y=p.y;
- if(tier&&p.kind==='garden'){worldDrawGarden(p,tier);return}
+ if(p.kind==='garden')return;
  if(tier&&p.kind==='jetty'){
   worldDrawDock(p);
   if(state.castAt){
@@ -7451,7 +7463,7 @@ function drawHaigenLevelOne(x,y,actor,status,deepWater){
  const actions={axe:'axe_chop',pickaxe:'pickaxe_mine',shovel:'shovel_dig_v2',cast:'fishing_cast',reel:'fishing_cast',land:'fishing_cast',net:'net_swing',catch:'net_swing',spear:'spear_attack',slingshot:'slingshot_fire'};
  const outfits={snow:'snow',desert:'desert',beach:'beach',jungle:'jungle'};
  const clothingLevel=Math.max(1,Math.min(4,Math.floor(Number(state.clothingLevel)||1)));
- let name=({2:'haigen_level_02_sprite_sheet',3:'haigen_level_03_sprite_sheet',4:'haigen_level_05_sprite_sheet'})[clothingLevel]||'haigen_basic_sprite_sheet';
+ let name=({2:'haigen_level_02_sprite_sheet',3:'haigen_level_03_sprite_sheet',4:'haigen_level_05_sprite_sheet'})[clothingLevel]||'haigen_green_eyes';
  if(outfits[status.outfit])name='haigen_'+outfits[status.outfit]+'_gear_sprite_sheet';
  const baseName=name,baseFrame=frame;
  if(status.knock){name='haigen_level_01_damage_final';frame=Math.min(3,1+Math.floor((performance.now()-status.knock.started)/85));}
