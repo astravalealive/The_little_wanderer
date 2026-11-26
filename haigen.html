@@ -4312,6 +4312,12 @@ function autonomousTick(dt){
    const widths=[0,330,365,405,485,560],heights=[0,310,335,355,385,420];
    const hx=cottage.x+35,hy=cottage.y-10,front=hy+13,back=hy-(heights[tier]||310)*.78;
    const doorX=hx+([0,.41,.39,.51,.43,.43][tier]-.5)*(widths[tier]||330);
+   if(tier===1){
+    const shelter={x:doorX,y:front+24};
+    if(!autoTravel(shelter,dt,30,.13))return;
+    if(campDanger(state.x,state.y)){mindRetreat(dt);return;}
+    state.resting=true;travelCamp=null;autoDestination=null;autoWaypoint=null;autoResetNav();mindEvent('rest');autoPlan('sleep at my tent','rest');return;
+   }
    if(!homeInside){
     // Recover a Haigen stranded inside the old house footprint by a prior build.
     // The exterior collision otherwise prevents each tiny step back to the door.
@@ -6679,6 +6685,7 @@ async function loadApprovedHomes(){
   const archive=await window.JSZip.loadAsync(await zipResponse.arrayBuffer());
   const loading=[];
   for(let level=1;level<=5;level++)for(const kind of ['exterior','interior']){
+   if(level===1&&kind==='interior')continue;
    const filename='level_'+level+'_'+kind+'_reference.png';
    const entry=archive.file(filename)||Object.values(archive.files).find(f=>!f.dir&&f.name.split('/').pop()===filename);
    if(!entry)throw Error('Missing artwork: '+level+' '+kind);
@@ -10673,7 +10680,7 @@ function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEn
  changeTrollChamber(true);
 }else if(dy>0&&trollRoomPlayer.y>=455/600)leaveTrollRoom();}time+=dt;return}if(trollDoorCooldown===0&&trollStumpDoorNear()&&!state.autonomy){enterTrollRoom();return}tickArtMarket(dt);updateNico(dt);updateWanderer(dt);updateSurvival(dt);updateWastelandGhosts(dt);if(ghostStunMs>0){time+=dt;return}if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateTrolls(dt);updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);// Old saves could retain an outdoor sleep pose directly on the house roof.
  // Wake Haigen there so he can approach the proper door and rest in bed.
- if(state.autonomy&&state.resting&&!homeInside&&state.campTier>0&&
+ if(state.autonomy&&state.resting&&!homeInside&&state.campTier>1&&
     Math.hypot(state.x-(cottage.x+35),state.y-(cottage.y-10))<310){
   state.resting=false;travelCamp=null;
  }
@@ -10702,7 +10709,7 @@ if(state.campTier>0){
  const oldRoomX=(prevPlayerX-(hx-halfWidth))/(halfWidth*2);
  const oldRoomY=(prevPlayerY-back)/(front-back);
  homeStairCooldown=Math.max(0,homeStairCooldown-dt);
- if(crossedIn){
+ if(crossedIn&&tier>=2){
   stepIntoHome(interiorDoorX,front);
  }else if(crossedOut){
   homeInside=false;autonomousHomeVisit=false;homeFloor=0;homeDoorOpen=1;
@@ -13201,6 +13208,7 @@ function tappedBuildable(wx,wy){
 }
 let autonomousHomeVisit=false;
 function stepIntoHome(x,front){
+ if(displayedHouseTier()===1){homeInside=false;homeFloor=0;autonomousHomeVisit=false;return;}
  autonomousHomeVisit=!!state.autonomy||cameraDetached||!!visitorRoom;
  if(autonomousHomeVisit)cameraDetached=true;
  homeInside=true;homeFloor=0;homeDoorOpen=1;
@@ -13217,7 +13225,7 @@ function visitTappedBuilding(x,y){
  const tier=displayedHouseTier();
  const width=[0,330,365,405,485,560][tier],height=[0,310,335,355,385,420][tier];
  const hx=cottage.x+35,hy=cottage.y-10;
- const house=state.campTier>0&&(caveContains(homeSilhouette(tier),(x-hx)/width+.5,(y-hy-15)/height+1)||(Math.abs(x-hx)<width*.46&&y>hy-height*.84&&y<hy+height*.08));
+ const house=state.campTier>0&&tier>=2&&(caveContains(homeSilhouette(tier),(x-hx)/width+.5,(y-hy-15)/height+1)||(Math.abs(x-hx)<width*.46&&y>hy-height*.84&&y<hy+height*.08));
  const stump=trollStumpHome;
  const inStump=Math.abs(x-stump.x)<=stump.width*.56&&y>=stump.y-stump.height*.98&&y<=stump.y+32;
  const town=objects.find(o=>o.type.startsWith('hamlet-')&&Math.abs(x-o.x)<90&&y>=o.y-165&&y<=o.y+18);
@@ -13304,6 +13312,7 @@ function drawSaltwickInterior(){
 }
 // V233: separate indoor scene, independent of the exterior camera and house size.
 function drawHomeInteriorScene(visiting=false){
+ if(displayedHouseTier()===1)return;
  if(!visiting&&!homeInside)return;
  const floor=visiting?0:homeFloor;
  const tier=displayedHouseTier();
