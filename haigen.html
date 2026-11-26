@@ -2866,6 +2866,7 @@ function mindMood(){
 function mindTargetScore(o){
  const d=dist(o,state),region=expandedRegion(o.x,o.y)?.id||'woodland';
  let score=d+(Number(haigenMind.habits.dangers[region])||0)*(haigenMind.courage<55?220:90);
+ const remembered=livingBrain().places[Math.floor(o.x/250)+':'+Math.floor(o.y/250)];score+=(remembered?.danger||0)*180-(remembered?.reward||0)*10;
  if(state.health>80&&state.energy>55&&state.hunger>60&&haigenMind.curiosity>68&&d>180&&d<1100&&haigenMind.actions%4===0)score-=Math.min(210,d*.25);
  const threats=[...beasts,...regionalWildlife];
  for(const a of threats){
@@ -3211,6 +3212,7 @@ function mindThought(){
 }
 function mindEvent(event,details){
  mindExperience(event,details);
+ if(event==='hurt'){const p=livingPlace();p.danger=Math.min(20,p.danger+1);p.last=Date.now();}
  if(event==='gather'){
   haigenMind.actions++;haigenMind.curiosity=clamp(haigenMind.curiosity+.15,0,100);
   if(haigenMind.actions%5===0){
@@ -3299,7 +3301,7 @@ function vikingKnowledgeTick(){
 window.__haigenVikingKnowledge=()=>({learned:(haigenMind.vikingKnowledge?.learned||[]).slice(),total:vikingLessons.length});
 function mindTick(dt){
  if(document.hidden||collapseRemaining>0)return;
- mindObserveWorld(dt);
+ mindObserveWorld(dt);livingObserve(dt);
  mindChooseIntent();
  vikingKnowledgeTick();
  haigenMind.progressMs+=dt;if(state.autonomy)haigenMind.autonomyTime+=dt;
@@ -3762,7 +3764,8 @@ function autoExplore(){
   const cell=Math.floor(p.x/500)+':'+Math.floor(p.y/500);
   const newRegion=region&&!haigenMind.visited.includes(region.id);
   const unfamiliar=!haigenExplorationCells.has(cell);
-  const score=(newRegion?1250:0)+(unfamiliar?620:0)+Math.min(d,1700)*.27
+  const remembered=livingBrain().places[Math.floor(p.x/250)+':'+Math.floor(p.y/250)];
+  const score=(newRegion?1250:0)+(unfamiliar?620:0)+Math.min(d,1700)*.27+(remembered?.reward||0)*25-(remembered?.danger||0)*260
    +seeded(Math.floor(p.x/80)*31+Math.floor(p.y/80)*17+state.autoSteps)*140;
   candidates.push({p,score,cell});
  };
@@ -3958,6 +3961,57 @@ function autoBuildTrailProject(dt){
  save();return 'built';
 }
 
+
+// Persistent personal learning: outcomes, preferences and spatial experience.
+function livingBrain(){
+ const m=haigenMind;
+ if(!m.livingBrain||typeof m.livingBrain!=='object')m.livingBrain={};
+ const b=m.livingBrain;
+ for(const k of ['skills','places','preferences'])if(!b[k]||typeof b[k]!=='object')b[k]={};
+ if(!Array.isArray(b.history))b.history=[];
+ return b;
+}
+function livingPlace(x=state.x,y=state.y){
+ const b=livingBrain(),key=Math.floor(x/250)+':'+Math.floor(y/250);
+ if(!b.places[key]){
+  if(Object.keys(b.places).length>=180){const old=Object.keys(b.places).sort((a,c)=>(b.places[a].last||0)-(b.places[c].last||0))[0];delete b.places[old]}
+  b.places[key]={x,y,visits:0,reward:0,danger:0,last:0};
+ }
+ return b.places[key];
+}
+function livingOutcome(kind,success){
+ const b=livingBrain(),skill=b.skills[kind]||(b.skills[kind]={success:0,failure:0});
+ const key=success?'success':'failure';skill[key]=Math.min(999,skill[key]+1);
+ const p=livingPlace();p.last=Date.now();if(success)p.reward=Math.min(20,p.reward+1);
+ b.preferences[kind]=clamp((Number(b.preferences[kind])||0)+(success?.25:-.5),-4,4);
+ b.history.unshift({kind,success,day:1+Math.floor(state.daytime/180),region:expandedRegion(state.x,state.y)?.id||'woodland'});
+ b.history=b.history.slice(0,50);
+}
+function livingJobScore(choice){
+ const b=livingBrain(),k=choice.kind,skill=b.skills[k]||{},experience=(skill.success||0)+(skill.failure||0);
+ let weight=choice.weight*(1+(Number(b.preferences[k])||0)*.14);
+ weight*=experience?(.75+.65*((skill.success||0)+1)/(experience+2)):1.12;
+ const risky=['explore','story','observe','net','fish'].includes(k);
+ if(risky){
+  const readiness=Math.min(state.health,state.energy,state.hunger)/100;
+  weight*=Math.max(.15,readiness*(state.food>0?1.2:.7));
+  if(nightStrength()>.5)weight*=.45;
+ }
+ if(k==='cook'&&state.food<2)weight*=2;
+ if(k==='friends'&&state.fun<50)weight*=1.8;
+ if(k==='wood'&&state.wood<4)weight*=1.6;
+ return Math.max(0,weight);
+}
+let livingObserveClock=0,livingLastCell='';
+function livingObserve(dt){
+ if(!state.autonomy||homeInside)return;
+ livingObserveClock+=dt;if(livingObserveClock<5000)return;livingObserveClock=0;
+ const key=Math.floor(state.x/250)+':'+Math.floor(state.y/250);
+ if(key===livingLastCell)return;livingLastCell=key;
+ const p=livingPlace();p.visits++;p.last=Date.now();
+ if(p.visits===3&&p.reward>=2&&p.danger===0)mindWrite('I keep returning to this part of '+(expandedRegion(state.x,state.y)?.name||'the woodland')+'. It has been good to me.','reflection');
+}
+window.__livingHaigenMind=()=>JSON.parse(JSON.stringify(livingBrain()));
 function autoFreedomTick(dt){
  if(!state.autonomy||state.playerInstruction)return false;
  const now=Date.now();
@@ -3965,7 +4019,7 @@ function autoFreedomTick(dt){
  if(job&&(!['mine','dig','fish','cook','explore','forge','wood','garden','net','build','craft','observe','friends','story'].includes(job.kind)||now-(job.startedAt||now)>85000)){
   if(now-(job.startedAt||now)>85000){
    haigenMind.failedJobs=haigenMind.failedJobs||{};
-   haigenMind.failedJobs[job.kind]=now+90000;
+   haigenMind.failedJobs[job.kind]=now+90000;livingOutcome(job.kind,false);
    haigenMind.lastFailure={job:job.kind,reason:'task timed out',at:now};
    mindWrite('My '+job.kind+' plan took too long. I will try something different before returning to it.','memory');
   }
@@ -3993,12 +4047,12 @@ function autoFreedomTick(dt){
   const failed=haigenMind.failedJobs||{};
   const available=choices.filter(choice=>!(failed[choice.kind]>now));
   const pool=available.length?available:choices;
-  const weighted=pool.map(choice=>({...choice,weight:choice.weight*(history.includes(choice.kind)?.25:1)}));
+  const weighted=pool.map(choice=>({...choice,weight:livingJobScore(choice)*(history.includes(choice.kind)?.25:1)}));
   let pick=Math.random()*weighted.reduce((total,choice)=>total+choice.weight,0);
   let selected=weighted[weighted.length-1]?.kind||'explore';
   for(const choice of weighted){pick-=choice.weight;if(pick<=0){selected=choice.kind;break}}
   haigenMind.recentJobs=[selected,...history].slice(0,3);
-  job={kind:selected,startedAt:now,steps:0};
+  job={kind:selected,startedAt:now,steps:0,startX:state.x,startY:state.y};
   state.autoFreeJob=job;
   const labels={dig:'digging for hidden woodland treasures',mine:'mining stone for new projects',forge:'making a useful pickaxe',fish:'catching food with my rod',cook:'cooking a proper meal',explore:'finding somewhere new',wood:'chopping firewood',garden:'tending my vegetables',net:'studying frogs and releasing them',build:'building lanterns and signs along the trails',craft:'inventing useful equipment',observe:'learning about the wildlife',friends:'spending time with Dylan and Skölli',story:'investigating the Silent Pond mystery'};
   mindWrite('My next job is '+labels[job.kind]+'. I want to accomplish something useful.','plan');
@@ -4006,7 +4060,8 @@ function autoFreedomTick(dt){
  }
  job.steps++;
  const finish=(message)=>{
-  if(message)mindWrite(message,'achievement');
+  if(message)mindWrite(message,'reflection');
+  const success=!!message&&!/did not|need |more materials|could not|failed/i.test(message);livingOutcome(job.kind,success);
   if(haigenMind.failedJobs)delete haigenMind.failedJobs[job.kind];
   haigenMind.lastCompletedJob={kind:job.kind,at:Date.now()};
   state.autoFreeJob=null;autoDestination=null;autoWaypoint=null;autoPause=800;save();return true;
