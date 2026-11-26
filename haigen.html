@@ -6782,9 +6782,9 @@ function installRavenButtons(){
 loadRavenArt();installRavenButtons();
 
 const cleanHouseArt=[null];
-for(let tier=1;tier<=3;tier++){
+for(let tier=1;tier<=5;tier++){
  const sprite=new Image();sprite.decoding='async';
- sprite.src='assets/house-tier-'+tier+'-clean.png?v=370';
+ sprite.src='assets/house-tier-'+tier+'-clean.png?v=347';
  cleanHouseArt[tier]=sprite;
 }
 let homeInside=false,homeDoorOpen=0,homeFloor=0,homeStairCooldown=0;let housePreviewTier=0; // V227: visual preview only; never overwrites earned home progress.
@@ -6812,7 +6812,7 @@ function drawCampHome(){
  const h=tier===1?310:tier===2?335:tier===3?355:tier===4?385:420;
  ctx.save();ctx.imageSmoothingEnabled=false;
  if(tier!==1)ellipse(x,y+12,w*.42,24,'#20392d77');
- // Level 1–3 draw the alpha-cut sprite, not a rectangular presentation image.
+ // Levels 1–5 draw the alpha-cut sprite, not a rectangular presentation image.
  if(cleanSprite&&cleanSprite.complete&&cleanSprite.naturalWidth>0){
   const drawW=tier===3?430:w;
   const drawH=drawW*cleanSprite.naturalHeight/cleanSprite.naturalWidth;
