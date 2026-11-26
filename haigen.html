@@ -4311,7 +4311,7 @@ function autonomousTick(dt){
    const tier=displayedHouseTier();
    const widths=[0,330,365,405,485,700],heights=[0,310,335,355,385,525];
    const hx=cottage.x+35,hy=cottage.y-10,front=hy+13,back=hy-(heights[tier]||310)*.78;
-   const doorX=hx+([0,.41,.39,.51,.43,.43][tier]-.5)*(widths[tier]||330);
+   const doorX=hx+([0,.5,.5,.5,.5,.5][tier]-.5)*(widths[tier]||330);
    if(tier===1){
     const shelter={x:doorX,y:front+24};
     if(!autoTravel(shelter,dt,30,.13))return;
@@ -10631,14 +10631,17 @@ if(state.campTier>0||housePreviewTier>0){
  const halfWidth=width*.43,front=hy+13,back=hy-height*.78;
  // Tier 1 approved cottage artwork has its door at ~30% of the facade width (not 36%).
  // Keep interior staircase geometry independent so the working room collision remains intact.
- const doorFractions=[0,.41,.39,.51,.43,.43];
+ const doorFractions=[0,.5,.5,.5,.5,.5];
  const exteriorDoorX=hx+(doorFractions[tier]-.5)*width;
  // Interior stairs remain centred on their own artwork, independent of the exterior facade.
  const interiorDoorX=hx;
  const doorX=homeInside?interiorDoorX:exteriorDoorX;
  const doorHalf=26;
  const withinDoor=Math.abs(state.x-doorX)<=doorHalf;
- const crossedIn=!homeInside&&withinDoor&&state.y<prevPlayerY&&prevPlayerY>=front-12&&state.y<=front+24;
+ const exteriorSprite=cleanHouseArt[tier],exteriorWidth=tier===3?430:width;
+ const exteriorHeight=exteriorSprite?.naturalWidth?exteriorWidth*exteriorSprite.naturalHeight/exteriorSprite.naturalWidth:height;
+ const doorstep=hy+15-exteriorHeight*(1-[0,.70,.78,.78,.77,.76][tier]);
+ const crossedIn=!homeInside&&tier>=2&&homeStairCooldown===0&&Math.abs(state.x-exteriorDoorX)<Math.max(26,exteriorWidth*.075)&&state.y<prevPlayerY&&state.y<=doorstep+24&&state.y>=doorstep-35;
  const exitThreshold=back+(front-back)*.90;
  const crossedOut=homeInside&&homeFloor===0&&homeStairCooldown===0&&prevPlayerY<exitThreshold&&state.y>=exitThreshold&&withinDoor;
  const roomX=(state.x-(hx-halfWidth))/(halfWidth*2);
@@ -10650,7 +10653,7 @@ if(state.campTier>0||housePreviewTier>0){
   stepIntoHome(interiorDoorX,front);
  }else if(crossedOut){
   homeInside=false;autonomousHomeVisit=false;homeFloor=0;homeDoorOpen=1;
-  state.x=exteriorDoorX;state.y=front+20;homeStairCooldown=500;
+  state.x=exteriorDoorX;state.y=doorstep+38;homeStairCooldown=500;
   notify('🚪 Haigen steps outside.');
  }else if(!homeInside){
   // Do not let the player bypass the entrance through walls or roof.
