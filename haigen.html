@@ -7434,9 +7434,31 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  ctx.restore();
 }
 
+// Approved level-one artwork: four independently drawn directions, idle plus three walk poses.
+const haigenLevelOneArt=new Image();
+haigenLevelOneArt.src='./assets/haigen/level_01/walk_idle.png';
+function drawHaigenLevelOne(x,y,actor,status,deepWater){
+ if(deepWater||status.outfit!=='woodland'||status.equip||status.action||status.knock)return false;
+ if(!haigenLevelOneArt.complete||!haigenLevelOneArt.naturalWidth)return false;
+ const img=haigenLevelOneArt, motion=actor||playerMotion;
+ const dir=motion.dir||'down', row=({down:0,left:1,right:2,up:3})[dir]??0;
+ const frame=motion.moving?1+Math.floor((motion.anim||0)/150)%3:0;
+ // Original 1536x1024 sheet has one empty 256px column on either side.
+ // Scale source coordinates proportionally to the decoded PNG dimensions.
+ const sx=img.naturalWidth/1536,sy=img.naturalHeight/1024;
+ if(Math.abs(sx/sy-1)>.02)return false;
+ const w=120,h=120,left=Math.round(x-w/2),top=Math.round(y-h+7);
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ nordicContactShadow(x+1,y+7,20,6);
+ ctx.drawImage(img,(256+frame*256)*sx,row*256*sy,256*sx,256*sy,left,top,w,h);
+ ctx.restore();
+ window.__haigenSpriteProbe={dir,row,frame,mirrored:false,bakedLeft:false,source:'approved-level-one'};
+ return true;
+}
 function drawApprovedHaigen(x,y,actor,deepWater=false){
  if(!haigenApprovedAtlasReady&&!haigenMovementReady)return false;
  const status=haigenSpriteStatus();
+ if(drawHaigenLevelOne(x,y,actor,status,deepWater))return true;
  const newSheet=haigenMovementReady;
  const base=newSheet?haigenMovementAtlas:haigenApprovedWalkAtlas||haigenApprovedAtlas;
  const spriteAtlas=haigenCostumeAtlas(base,deepWater?'swim':status.outfit); // Use the approved swimming sprite; legacy drawn-on snorkel overlay stays removed.
