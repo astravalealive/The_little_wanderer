@@ -12898,6 +12898,13 @@ function vikingForge(){
  });
 }
 
+function haigenWardrobe(){
+ const level=Math.max(1,Math.min(4,Math.floor(Number(state.clothingLevel)||1)));
+ const names=['Woodland basics','Clothing level 2','Clothing level 3','Clothing level 4'];
+ open('<h2>Haigen’s wardrobe</h2><p class="small">Preview clothing levels freely while artwork is being tested. Regional gear and equipped tool animations may temporarily override the selected outfit.</p>'+names.map((name,i)=>'<div class="item"><span>'+name+'</span><button class="btn" data-wardrobe-level="'+(i+1)+'" '+(level===i+1?'disabled':'')+'>'+(level===i+1?'Selected':'Wear')+'</button></div>').join('')+'<button class="btn" id="wardrobeBack">Back to backpack</button>');
+ document.querySelectorAll('[data-wardrobe-level]').forEach(b=>b.onclick=()=>{state.clothingLevel=Number(b.dataset.wardrobeLevel);save();close();notify('Clothing level '+state.clothingLevel+' selected.');});
+ $('wardrobeBack').onclick=backpack;
+}
 function backpack(){
  const n=v=>Math.max(0,Math.floor(Number(v)||0));
  const groups=[
@@ -12934,6 +12941,7 @@ function backpack(){
   button.onclick=()=>{if(!(state.mana>=1)||state.mothlightMs>0)return;state.mana--;state.mothlightMs=60000;close();notify('Your mothlight charm shines for one minute.')};
   $('modalBody').append(button);
  }
+ const wardrobeButton=document.createElement('button');wardrobeButton.className='btn';wardrobeButton.textContent='👕 Wardrobe · clothing level '+(state.clothingLevel||1);wardrobeButton.onclick=haigenWardrobe;$('modalBody').append(wardrobeButton);
  const forgeButton=document.createElement('button');forgeButton.className='btn';forgeButton.textContent='⚒️ Visit Norse smith (near homestead)';forgeButton.disabled=Math.hypot(state.x-cottage.x,state.y-cottage.y)>450;forgeButton.onclick=vikingForge;$('modalBody').append(forgeButton);
 }
 
