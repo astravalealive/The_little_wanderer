@@ -11471,10 +11471,10 @@ function drawWanderer(){
  if(!wanderer.ready||homeInside||!wandererArt.naturalWidth)return;
  const row=({down:0,left:1,right:2,up:3})[wanderer.dir]??0;
  const col=wanderer.action==='walk'?1+Math.floor(time/250)%2:0;
- const size=144;
+ const size=96;
  ctx.save();ctx.imageSmoothingEnabled=false;
- ellipse(wanderer.x,wanderer.y,10,3,'#1a312b67');
- ctx.drawImage(wandererArt,col*256,row*256,256,256,wanderer.x-size/2,wanderer.y-size*246/256,size,size);
+ ellipse(wanderer.x,wanderer.y,8,3,'#1a312b67');
+ ctx.drawImage(wandererArt,col*256,row*256,256,256,wanderer.x-size/2,wanderer.y-size*228/256,size,size);
  ctx.restore();
 }
 const wanderer={x:0,y:0,ready:false,dir:'down',action:'idle',wait:0,target:null,tradeWait:0};
