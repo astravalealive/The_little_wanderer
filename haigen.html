@@ -7434,9 +7434,53 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
  ctx.restore();
 }
 
+// Approved level-one artwork: four independently drawn directions, idle plus three walk poses.
+const haigenApprovedSheets=new Map();
+function haigenSheet(name){
+ if(!haigenApprovedSheets.has(name)){const img=new Image();img.src='./'+name+'.png';haigenApprovedSheets.set(name,img);}
+ return haigenApprovedSheets.get(name);
+}
+function drawHaigenLevelOne(x,y,actor,status,deepWater){
+ if(deepWater)return false;
+ const motion=actor||playerMotion,dir=motion.dir||'down',row=({down:0,left:1,right:2,up:3})[dir]??0;
+ let frame=motion.moving?1+Math.floor((motion.anim||0)/150)%3:0;
+ const tool=({rod:'fishing_rod',axe:'axe',pickaxe:'pickaxe',shovel:'shovel',torch:'torch',net:'net',spear:'spear',slingshot:'slingshot'})[status.equip];
+ const actions={axe:'axe_chop',pickaxe:'pickaxe_mine',shovel:'shovel_dig_v2',cast:'fishing_cast',reel:'fishing_cast',land:'fishing_cast',net:'net_swing',catch:'net_swing',spear:'spear_attack',slingshot:'slingshot_fire'};
+ const outfits={snow:'snow',desert:'desert',beach:'beach',jungle:'jungle'};
+ let name='haigen_basic_sprite_sheet';
+ if(status.knock){name='haigen_level_01_damage_final';frame=Math.min(3,1+Math.floor((performance.now()-status.knock.started)/85));}
+ else if(status.action){const action=actions[status.action.kind];if(!action)return false;name='haigen_level_01_'+action;frame=Math.max(0,Math.min(3,Math.floor((status.action.progress||0)*4)));}
+ else if(status.equip){if(!tool)return false;name='haigen_level_01_'+tool+'_walk_idle';}
+ else if(outfits[status.outfit])name='haigen_'+outfits[status.outfit]+'_gear_sprite_sheet';
+ const img=haigenSheet(name);
+ if(!img.complete||!img.naturalWidth)return false;
+ const wide=img.naturalWidth/img.naturalHeight>1.4;
+ const cell=img.naturalHeight/4,offset=(img.naturalWidth-cell*4)/2;
+ // Cache transparent cells; remove only near-black pixels connected to the cell boundary.
+ const key=name+':'+row+':'+frame;
+ if(!haigenApprovedSheets.has(key)){
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=Math.round(cell);
+  const g=canvas.getContext('2d',{willReadFrequently:true});if(!g)return false;
+  g.drawImage(img,offset+frame*cell,row*cell,cell,cell,0,0,canvas.width,canvas.height);
+  if(wide&&(name==='haigen_basic_sprite_sheet'||name==='haigen_level_02_sprite_sheet')){
+   const w=canvas.width,h=canvas.height,p=g.getImageData(0,0,w,h),d=p.data,seen=new Uint8Array(w*h),queue=[];
+   const add=(i)=>{if(seen[i])return;seen[i]=1;const j=i*4;if(d[j]<25&&d[j+1]<25&&d[j+2]<25){d[j+3]=0;queue.push(i);}};
+   for(let i=0;i<w;i++){add(i);add((h-1)*w+i);}for(let i=0;i<h;i++){add(i*w);add(i*w+w-1);}
+   for(let k=0;k<queue.length;k++){const i=queue[k];if(i%w)add(i-1);if(i%w<w-1)add(i+1);if(i>=w)add(i-w);if(i<w*(h-1))add(i+w);}
+   g.putImageData(p,0,0);
+  }
+  haigenApprovedSheets.set(key,canvas);
+ }
+ const sprite=haigenApprovedSheets.get(key),w=120,h=120;
+ ctx.save();ctx.imageSmoothingEnabled=false;nordicContactShadow(x+1,y+7,20,6);
+ ctx.drawImage(sprite,Math.round(x-w/2),Math.round(y-h+7),w,h);ctx.restore();
+ window.__haigenSpriteProbe={dir,row,frame,mirrored:false,bakedLeft:false,source:name};
+ return true;
+}
 function drawApprovedHaigen(x,y,actor,deepWater=false){
  if(!haigenApprovedAtlasReady&&!haigenMovementReady)return false;
  const status=haigenSpriteStatus();
+ if(drawHaigenLevelOne(x,y,actor,status,deepWater))return true;
  const newSheet=haigenMovementReady;
  const base=newSheet?haigenMovementAtlas:haigenApprovedWalkAtlas||haigenApprovedAtlas;
  const spriteAtlas=haigenCostumeAtlas(base,deepWater?'swim':status.outfit); // Use the approved swimming sprite; legacy drawn-on snorkel overlay stays removed.
