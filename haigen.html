@@ -1471,7 +1471,7 @@ state.castAt=Number(state.castAt)||0;state.biteAt=Number(state.biteAt)||0;
 // Migrate original floating vegetable patch into the permanent homestead garden.
 // Previous garden investments are honoured and no other saved buildings are removed.
 const oldGardenBuilt=state.structures.some(q=>q.kind==='garden');
-state.gardenTier=0;
+state.gardenTier=Math.max(0,Math.min(5,Math.floor(Number(state.gardenTier)|| (oldGardenBuilt?1:0))));
 state.vegetables=Math.max(0,Number(state.vegetables)||0);
 state.gardenReadyAt=Math.max(0,Number(state.gardenReadyAt)||0);
 if(state.gardenTier&&!state.gardenReadyAt)state.gardenReadyAt=Date.now()+50000;
@@ -1486,23 +1486,26 @@ for(const crop of gardenCrops)if(!Number.isFinite(state.gardenCropReady[crop]))s
 // An independent growth clock and last-harvest state for each crop, retained in saved games.
 state.gardenCropPickedAt=state.gardenCropPickedAt&&typeof state.gardenCropPickedAt==='object'?state.gardenCropPickedAt:{};
 for(const crop of gardenCrops)if(!Number.isFinite(state.gardenCropPickedAt[crop]))state.gardenCropPickedAt[crop]=0;
+state.gardenSeeds=state.gardenSeeds||{};
+state.gardenPlanted=state.gardenPlanted||{};
+for(const crop of gardenCrops){state.gardenSeeds[crop]=Math.max(0,Math.floor(Number(state.gardenSeeds[crop])||0));state.gardenPlanted[crop]=!!state.gardenPlanted[crop];}
 const gardenHarvestBursts=[];
-function gardenGrowthMs(){return [0,105000,70000,45000][state.gardenTier]||105000}
+function gardenGrowthMs(){return [0,105000,70000,45000,35000,25000][state.gardenTier]||105000}
 function gardenCropGrowth(crop){return gardenGrowthMs()*({cabbage:1.25,onions:1.1,turnips:.85,leeks:1.15}[crop]||1)}
 function gardenCropProgress(crop){return Math.max(0,Math.min(1,1-(state.gardenCropReady[crop]-Date.now())/gardenCropGrowth(crop)))}
-function gardenCropRipe(crop){return !!state.gardenTier&&Date.now()>=state.gardenCropReady[crop]}
+function gardenCropRipe(crop){return !!state.gardenTier&&!!state.gardenPlanted[crop]&&Date.now()>=state.gardenCropReady[crop]}
 function gardenRipe(){return gardenCrops.some(gardenCropRipe)}
-function gardenHarvestAmount(){return [0,3,5,8][state.gardenTier]||0}
+function gardenHarvestAmount(){return [0,3,5,8,10,12][state.gardenTier]||0}
 function harvestGarden(crop){
  if(!state.gardenTier){notify('🥕 Build your kitchen garden first.');return false}
  crop=crop||gardenCrops.find(gardenCropRipe);
  if(!gardenCrops.includes(crop)||!gardenCropRipe(crop)){notify('🌱 That crop is still growing.');return false}
  const amount=gardenHarvestAmount();
- state.vegetables+=amount;state.gardenCropReady[crop]=Date.now()+gardenCropGrowth(crop);
+ state.vegetables+=amount;state.gardenPlanted[crop]=false;state.gardenCropReady[crop]=0;
  state.gardenCropPickedAt[crop]=Date.now();
  state.gardenReadyAt=Math.min(...gardenCrops.map(c=>state.gardenCropReady[c]));
  gardenHarvestBursts.push({x:gardenPlot.x,y:gardenPlot.y-20,at:time,crop,amount});
- notify('🌾 Harvested '+amount+' '+crop+'! The bed is growing again.');
+ notify('🌾 Harvested '+amount+' '+crop+'! Plant another seed to regrow.');
  if(typeof mindWrite==='function')mindWrite('I harvested '+crop+' from our garden. Watching things grow teaches me patience.','observation');
  save();return true;
 }
@@ -1510,12 +1513,22 @@ function gardenCropVisualStage(crop){
  if(gardenCropRipe(crop))return 'ripe';
  const picked=Number(state.gardenCropPickedAt[crop])||0;
  if(picked&&Date.now()-picked<Math.min(9000,gardenCropGrowth(crop)*.19))return 'picked';
+ if(!state.gardenPlanted[crop])return 'empty';
  return gardenCropProgress(crop)<.28?'planted':'growing';
 }
+function gardenPlant(crop){
+ if(!state.gardenTier||!gardenCrops.includes(crop)||state.gardenPlanted[crop]||!(state.gardenSeeds[crop]>0))return false;
+ state.gardenSeeds[crop]--;state.gardenPlanted[crop]=true;state.gardenCropPickedAt[crop]=0;state.gardenCropReady[crop]=Date.now()+gardenCropGrowth(crop);save();return true;
+}
 function gardenHarvestMenu(){
- open('<h2>🌱 Kitchen Garden</h2><p>Choose a ripe crop to pick. Each bed grows independently.</p>'+
- gardenCrops.map(c=>'<div class="item"><b>'+safeText(c[0].toUpperCase()+c.slice(1))+'</b><span>'+({picked:'🟫 Just picked · soil resting',planted:'🌱 Newly planted',growing:'🌿 Growing',ripe:'🥬 Fully grown · Ready to harvest'}[gardenCropVisualStage(c)])+(gardenCropRipe(c)?'':' · '+Math.ceil(Math.max(0,state.gardenCropReady[c]-Date.now())/1000)+'s')+'</span> <button class="btn" data-pick="'+c+'" '+(gardenCropRipe(c)?'':'disabled')+'>Pick</button></div>').join(''));
- document.querySelectorAll('[data-pick]').forEach(btn=>btn.onclick=()=>{harvestGarden(btn.dataset.pick);gardenHarvestMenu()});
+ open('<h2>Viking farm · Level '+state.gardenTier+'</h2><p>Plant each crop bed separately using seeds.</p>'+gardenCrops.map(c=>'<div class="item"><b>'+safeText(c)+'</b><span>'+gardenCropVisualStage(c)+' · '+state.gardenSeeds[c]+' seeds</span><button class="btn" data-plant="'+c+'" '+(state.gardenPlanted[c]||!state.gardenSeeds[c]?'disabled':'')+'>Plant</button><button class="btn" data-pick="'+c+'" '+(gardenCropRipe(c)?'':'disabled')+'>Pick</button></div>').join(''));
+ document.querySelectorAll('[data-plant]').forEach(b=>b.onclick=()=>{gardenPlant(b.dataset.plant);gardenHarvestMenu()});
+ document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{harvestGarden(b.dataset.pick);gardenHarvestMenu()});
+}
+function gardenSeedTrade(){
+ if(Math.hypot(state.x-cottage.x,state.y-cottage.y)>450)return;
+ open('<h2>Seed trader</h2><p>Gold: '+atelier.purse+' · 2 gold per seed</p>'+gardenCrops.map(c=>'<div class="item"><span>'+safeText(c)+' · '+state.gardenSeeds[c]+' owned</span><button class="btn" data-seed="'+c+'" '+(atelier.purse<2?'disabled':'')+'>Buy seed</button></div>').join(''));
+ document.querySelectorAll('[data-seed]').forEach(b=>b.onclick=()=>{const crop=b.dataset.seed;if(!gardenCrops.includes(crop)||!(atelier.purse>=2))return;atelier.purse-=2;state.gardenSeeds[crop]++;save();gardenSeedTrade()});
 }
 const woodCarryLimit=999999;
 function woodStoreLimit(){return [0,80,170,340][state.woodStorageTier]}
@@ -6298,7 +6311,7 @@ function drawVikingFarm(){
  if(state.gardenTier&&vikingCropAtlas.complete&&vikingCropAtlas.naturalWidth)gardenCrops.forEach((crop,row)=>{
  const growth=gardenCropProgress(crop),stage=gardenCropVisualStage(crop);
  const picked=Date.now()-(state.gardenCropPickedAt[crop]||0);
- if(stage==='picked'&&picked>900)return;
+ if(stage==='empty'||(stage==='picked'&&picked>900))return;
  const col=stage==='picked'?4:stage==='ripe'?3:Math.min(2,Math.floor(growth*3));
  const edges=[150,410,675,965,1250,1536],ys=[0,170,335,490,650,805,1024];
  const sx=edges[col],sy=ys[row],sw=edges[col+1]-sx,sh=ys[row+1]-sy;
@@ -6546,8 +6559,8 @@ function homesteadMenu(kind){
    info='Level '+state.gardenTier+' · '+(gardenRipe()?'Harvest ready!':'Next harvest in '+remaining+' seconds')+
     ' · '+gardenHarvestAmount()+' vegetables per harvest · '+state.vegetables+' in supplies.';
    items.push(['Pick ripe crops',()=>gardenHarvestMenu()]);
-   if(state.gardenTier<3){
-    const wood=state.gardenTier===1?10:16,stone=state.gardenTier===1?4:7,twigs=state.gardenTier===1?2:4;
+   if(state.gardenTier<5){
+    const wood=[0,10,16,24,32][state.gardenTier],stone=[0,4,7,10,14][state.gardenTier],twigs=[0,2,4,6,8][state.gardenTier];
     items.push(['Upgrade garden to Level '+(state.gardenTier+1)+' · '+wood+' wood, '+stone+' stone, '+twigs+' twigs',()=>{
      if(!homesteadCost(wood,stone,twigs))return;
      state.gardenTier++;state.gardenReadyAt=Math.min(state.gardenReadyAt,Date.now()+gardenGrowthMs());
@@ -12964,6 +12977,7 @@ function backpack(){
   button.onclick=()=>{if(!(state.mana>=1)||state.mothlightMs>0)return;state.mana--;state.mothlightMs=60000;close();notify('Your mothlight charm shines for one minute.')};
   $('modalBody').append(button);
  }
+ const seedButton=document.createElement('button');seedButton.className='btn';seedButton.textContent='Seed trader (near homestead)';seedButton.disabled=Math.hypot(state.x-cottage.x,state.y-cottage.y)>450;seedButton.onclick=gardenSeedTrade;$('modalBody').append(seedButton);
  const wardrobeButton=document.createElement('button');wardrobeButton.className='btn';wardrobeButton.textContent='👕 Wardrobe · clothing level '+(state.clothingLevel||1);wardrobeButton.onclick=haigenWardrobe;$('modalBody').append(wardrobeButton);
  const forgeButton=document.createElement('button');forgeButton.className='btn';forgeButton.textContent='⚒️ Visit Norse smith (near homestead)';forgeButton.disabled=Math.hypot(state.x-cottage.x,state.y-cottage.y)>450;forgeButton.onclick=vikingForge;$('modalBody').append(forgeButton);
 }
