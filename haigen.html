@@ -1480,7 +1480,7 @@ state.lifeProject=state.lifeProject&&typeof state.lifeProject==='object'&&['coop
 if(state.lifeProject){state.lifeProject.stage=clamp(Math.floor(Number(state.lifeProject.stage)||0),0,2);state.lifeProject.work=clamp(Number(state.lifeProject.work)||0,0,2500)}
 state.lifeProjectsDone=Array.isArray(state.lifeProjectsDone)?state.lifeProjectsDone.filter(k=>['coop','woodstore'].includes(k)).slice(0,3):[];
 // V306: independent harvest cycles and four named crops, migrated from legacy garden timer.
-const gardenCrops=['cabbage','onions','turnips','leeks'];
+const gardenCrops=['turnips','cabbage','onions','leeks','peas','parsnips'];
 state.gardenCropReady=state.gardenCropReady&&typeof state.gardenCropReady==='object'?state.gardenCropReady:{};
 for(const crop of gardenCrops)if(!Number.isFinite(state.gardenCropReady[crop]))state.gardenCropReady[crop]=Number(state.gardenReadyAt)||Date.now()+105000;
 // An independent growth clock and last-harvest state for each crop, retained in saved games.
@@ -6295,19 +6295,23 @@ function drawVikingFarm(){
  const img=vikingFarmImages[tier-1]; if(!img.complete||!img.naturalWidth)return;
  const w=[180,220,260,300,340][tier-1],h=w*img.naturalHeight/img.naturalWidth;
  ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(img,p.x-w/2,p.y-h/2,w,h);
- if(state.gardenTier)gardenCrops.forEach((crop,row)=>{
+ if(state.gardenTier&&vikingCropAtlas.complete&&vikingCropAtlas.naturalWidth)gardenCrops.forEach((crop,row)=>{
  const growth=gardenCropProgress(crop),stage=gardenCropVisualStage(crop);
- if(stage==='picked')return;
+ const picked=Date.now()-(state.gardenCropPickedAt[crop]||0);
+ if(stage==='picked'&&picked>900)return;
+ const col=stage==='picked'?4:stage==='ripe'?3:Math.min(2,Math.floor(growth*3));
+ const edges=[150,410,675,965,1250,1536],ys=[0,170,335,490,650,805,1024];
+ const sx=edges[col],sy=ys[row],sw=edges[col+1]-sx,sh=ys[row+1]-sy;
+ const scaleX=vikingCropAtlas.naturalWidth/1536,scaleY=vikingCropAtlas.naturalHeight/1024;
  for(let k=0;k<4;k++){
- const x=p.x+(k-1.5)*w*.12,y=p.y+(row-1.5)*h*.14;
- const s=(stage==='planted'?.35:Math.max(.4,growth))*w/180;
- if(crop==='cabbage'){for(let j=0;j<5;j++){const a=j*1.256;ellipse(x+Math.cos(a)*4*s,y+Math.sin(a)*3*s,5*s,3*s,j%2?'#54864a':'#83a95c');}}
- else {for(let j=-1;j<=1;j++){ctx.strokeStyle=j===0?'#83ad58':'#527d42';ctx.lineWidth=Math.max(1,2*s);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+j*4*s,y-(8+Math.abs(j)*2)*s);ctx.stroke();}
- if(stage==='ripe'&&crop!=='leeks')ellipse(x,y,4*s,3*s,crop==='onions'?'#c7a06a':'#d9c8a5');}
+ const x=p.x+(k-1.5)*w*.14,y=p.y+(row-2.5)*h*.105;
+ const dw=w*.13,dh=dw*sh/sw;
+ ctx.drawImage(vikingCropAtlas,sx*scaleX,sy*scaleY,sw*scaleX,sh*scaleY,x-dw/2,y-dh-(stage==='picked'?12*(1-picked/900):0),dw,dh);
  }
  });
  ctx.restore();
 }
+const vikingCropAtlas=new Image();vikingCropAtlas.src='a_clean_transparent_background_like_sprite_sheet.png';
 const vikingFarmImages=Array.from({length:5},(_,i)=>{const img=new Image();img.src='viking_farm_'+(i+1)+'.png';return img});
 function drawHomesteadPlotGround(p){
  if(Math.abs(p.x-cam.x)>950||Math.abs(p.y-cam.y)>750)return;
