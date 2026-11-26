@@ -10623,7 +10623,7 @@ function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEn
  }
  const prevPlayerX=state.x,prevPlayerY=state.y;time+=dt;stepHaigenKnock(dt);state.daytime+=dt*.00015;const pad=controllerMove();checkShoulders();checkActions();const pads=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[];const connected=pads.filter(p=>p&&p.connected);const debug=$('padDebug');if(debug){const active=connected[0];debug.textContent=active?'🎮 Connected · stick '+pad.x.toFixed(2)+', '+pad.y.toFixed(2)+' · AI '+(state.autonomy?'ON':'OFF'):'🎮 No controller detected · AI '+(state.autonomy?'ON':'OFF')}const playerInput=Math.hypot(pad.x,pad.y)>0.38||Math.hypot(joy.x,joy.y)>0.12||!!(keys.d||keys.a||keys.w||keys.s||keys.ArrowRight||keys.ArrowLeft||keys.ArrowUp||keys.ArrowDown);if(playerInput){idleTime=0}else if(!state.skiffAtSea&&!state.raftAfloat&&!state.autonomy&&!state.resting){idleTime+=dt;if(idleTime>15000){idleTime=0;setAutonomy(true);notify('🌲 Haigen has resumed his own adventures.')}}if(state.resting&&playerInput){state.resting=false;notify('🌤️ Haigen wakes up!')}if(state.autonomy&&playerInput){setAutonomy(false);idleTime=0;}if(state.autonomy&&!(haigenKnock&&haigenKnock.remaining>0)){autonomousTick(dt)}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);let mag=Math.hypot(dx,dy);if(state.raftAfloat){raftMove(dt,dx,dy)}else if(raftWalkBoard(dx,dy)){}else if(state.skiffAtSea){skiffMove(dt,dx,dy)}else if(!state.autonomy&&!state.resting&&!(haigenKnock&&haigenKnock.remaining>0)&&mag>.05){state.activity=Math.min(100,state.activity+dt*.002);state.fun=Math.min(100,state.fun+dt*.0005);dx/=Math.max(1,mag);dy/=Math.max(1,mag);const swim=walkingLakeLevel(state.x,state.y)<.82,sea=islandDepth(state.x,state.y)<0;state.x=clamp(state.x+dx*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.y=clamp(state.y+dy*dt*(swim?.115:sea?.135:.19),WORLD_MIN+50,WORLD-50);state.steps+=dt*.19}if(!homeInside&&!state.skiffAtSea&&!state.raftAfloat){const safePos=resolveSolidMovement(prevPlayerX,prevPlayerY,state.x,state.y);state.x=safePos.x;state.y=safePos.y;}
 // Homestead collision and persistent entry/exit. Door is the only passage.
-if(state.campTier>0){
+if(state.campTier>0||housePreviewTier>0){
  const hx=cottage.x+35,hy=cottage.y-10,tier=displayedHouseTier();
  // V238: one shared geometry for doorways, room coordinates and floor transitions.
  const widths=[0,330,365,405,485,560],heights=[0,310,335,355,385,420];
@@ -10654,8 +10654,19 @@ if(state.campTier>0){
   notify('🚪 Haigen steps outside.');
  }else if(!homeInside){
   // Do not let the player bypass the entrance through walls or roof.
-  const footprint=roomX>0&&roomX<1&&roomY>0&&roomY<1;
-  if(footprint && !(withinDoor&&state.y>=front-35)){state.x=prevPlayerX;state.y=prevPlayerY;}
+  // Ground footprint only: roof overhang and decorative doorstep are not solid.
+  const sprite=cleanHouseArt[tier],drawW=tier===3?430:width;
+  const drawH=sprite?.naturalWidth?drawW*sprite.naturalHeight/sprite.naturalWidth:height;
+  const footprints=[null,[.30,.70,.04,.18],[.43,.78,.05,.22],[.44,.78,.05,.23],[.44,.77,.05,.25],[.46,.76,.04,.26]];
+  const [half,base,inset,depth]=footprints[tier];
+  const bottom=hy+15-drawH*(1-base),top=bottom-drawH*depth;
+  const solid=(xx,yy)=>Math.abs(xx-hx)<drawW*(half-inset)&&yy>top&&yy<bottom&&!(tier>=2&&Math.abs(xx-exteriorDoorX)<doorHalf&&yy>bottom-30);
+  const nx=state.x,ny=state.y;
+  if(solid(nx,ny)&&!solid(prevPlayerX,prevPlayerY)){
+   state.x=prevPlayerX;state.y=prevPlayerY;
+   if(!solid(nx,prevPlayerY))state.x=nx;
+   if(!solid(state.x,ny))state.y=ny;
+  }
  }else if(tier===5){
   homeFloor=0;
   const blocked=(xx,yy)=>longhouseBlocked(.06+.88*(xx-hx+halfWidth)/(2*halfWidth),.07+.88*(yy-back)/(front-back));
