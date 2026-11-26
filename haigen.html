@@ -7112,6 +7112,7 @@ function haigenOutfit(){
  if(region==='snow')return 'snow';
  if(region==='desert'||region==='eastDunes')return 'desert';
  if(region==='coast')return 'beach';
+ if(region==='jungle'||region==='rainforest')return 'jungle';
  if(region==='fen')return 'fen';
  if(region==='wasteland')return 'wasteland';
  if(region==='downs')return 'downs';
@@ -7469,18 +7470,21 @@ function drawHaigenLevelOne(x,y,actor,status,deepWater){
    for(let k=0;k<queue.length;k++){const i=queue[k];if(i%w)add(i-1);if(i%w<w-1)add(i+1);if(i>=w)add(i-w);if(i<w*(h-1))add(i+w);}
    g.putImageData(p,0,0);
   }
+  const pixels=g.getImageData(0,0,canvas.width,canvas.height).data;
+  let bottom=-1;for(let yy=0;yy<canvas.height;yy++)for(let xx=0;xx<canvas.width;xx++)if(pixels[(yy*canvas.width+xx)*4+3]>128)bottom=yy;
+  canvas.footOffset=bottom>=0?canvas.height-1-bottom:0;
   haigenApprovedSheets.set(key,canvas);
  }
  const sprite=haigenApprovedSheets.get(key),w=120,h=120;
  ctx.save();ctx.imageSmoothingEnabled=false;nordicContactShadow(x+1,y+7,20,6);
- ctx.drawImage(sprite,Math.round(x-w/2),Math.round(y-h+7),w,h);ctx.restore();
+ ctx.drawImage(sprite,Math.round(x-w/2),Math.round(y-h+7+(sprite.footOffset||0)*h/sprite.height),w,h);ctx.restore();
  window.__haigenSpriteProbe={dir,row,frame,mirrored:false,bakedLeft:false,source:name};
  return true;
 }
 function drawApprovedHaigen(x,y,actor,deepWater=false){
- if(!haigenApprovedAtlasReady&&!haigenMovementReady)return false;
  const status=haigenSpriteStatus();
  if(drawHaigenLevelOne(x,y,actor,status,deepWater))return true;
+ if(!haigenApprovedAtlasReady&&!haigenMovementReady)return false;
  const newSheet=haigenMovementReady;
  const base=newSheet?haigenMovementAtlas:haigenApprovedWalkAtlas||haigenApprovedAtlas;
  const spriteAtlas=haigenCostumeAtlas(base,deepWater?'swim':status.outfit); // Use the approved swimming sprite; legacy drawn-on snorkel overlay stays removed.
