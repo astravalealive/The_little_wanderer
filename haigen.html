@@ -4295,7 +4295,7 @@ function autonomousTick(dt){
 
  // Once well-rested, walk back out via the front porch, not the roof artwork.
  if(homeInside&&state.campTier>0&&state.energy>=77&&state.health>=60){
-  const t=state.campTier,w=[0,330,365,405,485,560][t]||330;
+  const t=state.campTier,w=[0,330,365,405,485,700][t]||330;
   const hx=cottage.x+35,hy=cottage.y-10;
   const doorX=hx+([0,.41,.39,.51,.43,.43][t]-.5)*w;
   homeInside=false;autonomousHomeVisit=false;homeFloor=0;homeStairCooldown=850;
@@ -4309,7 +4309,7 @@ function autonomousTick(dt){
   if(state.campTier>0&&(dist(state,cottage)<460||homeInside)){
    travelCamp=null;
    const tier=displayedHouseTier();
-   const widths=[0,330,365,405,485,560],heights=[0,310,335,355,385,420];
+   const widths=[0,330,365,405,485,700],heights=[0,310,335,355,385,525];
    const hx=cottage.x+35,hy=cottage.y-10,front=hy+13,back=hy-(heights[tier]||310)*.78;
    const doorX=hx+([0,.41,.39,.51,.43,.43][tier]-.5)*(widths[tier]||330);
    if(tier===1){
@@ -6774,7 +6774,7 @@ function drawCampHome(){
  const tier=displayedHouseTier();if(state.campTier<1&&!housePreviewTier)return;
  const x=cottage.x+35,y=cottage.y-10;
  const cleanSprite=cleanHouseArt[tier];
- const w=[0,330,365,430,485,560][tier];
+ const w=[0,330,365,430,485,700][tier];
  if(!cleanSprite||!cleanSprite.complete||!cleanSprite.naturalWidth)return;
  const h=w*cleanSprite.naturalHeight/cleanSprite.naturalWidth;
  ctx.save();ctx.imageSmoothingEnabled=false;
@@ -10626,7 +10626,7 @@ function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEn
 if(state.campTier>0||housePreviewTier>0){
  const hx=cottage.x+35,hy=cottage.y-10,tier=displayedHouseTier();
  // V238: one shared geometry for doorways, room coordinates and floor transitions.
- const widths=[0,330,365,405,485,560],heights=[0,310,335,355,385,420];
+ const widths=[0,330,365,405,485,700],heights=[0,310,335,355,385,525];
  const width=widths[tier]||330,height=heights[tier]||310;
  const halfWidth=width*.43,front=hy+13,back=hy-height*.78;
  // Tier 1 approved cottage artwork has its door at ~30% of the facade width (not 36%).
@@ -13181,7 +13181,7 @@ function setVisitorDoorBounds(cx,cy,width,height){
 }
 function visitTappedBuilding(x,y){
  const tier=displayedHouseTier();
- const width=[0,330,365,405,485,560][tier],height=[0,310,335,355,385,420][tier];
+ const width=[0,330,365,405,485,700][tier],height=[0,310,335,355,385,525][tier];
  const hx=cottage.x+35,hy=cottage.y-10;
  const house=(state.campTier>0||housePreviewTier>0)&&(caveContains(homeSilhouette(tier),(x-hx)/width+.5,(y-hy-15)/height+1)||(Math.abs(x-hx)<width*.46&&y>hy-height*.84&&y<hy+height*.08));
  if(house){
@@ -13329,7 +13329,7 @@ function drawHomeInteriorScene(visiting=false){
   ctx.drawImage(art,left,top,size,roomHeight);
  }else{ctx.fillStyle='#6d5239';ctx.fillRect(left,top,size,size)}
  const hx=cottage.x+35,hy=cottage.y-10;
- const widths=[0,330,365,405,485,560],heights=[0,310,335,355,385,420];
+ const widths=[0,330,365,405,485,700],heights=[0,310,335,355,385,525];
  const halfWidth=(widths[tier]||330)*.43,back=hy-(heights[tier]||310)*.78,front=hy+13;
  const roomX=(state.x-(hx-halfWidth))/(halfWidth*2),roomY=(state.y-back)/(front-back);
  const px=left+size*(.06+roomX*.88),py=top+roomHeight*(.07+roomY*.88);
