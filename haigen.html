@@ -2861,6 +2861,8 @@ function mindMood(){
  if(state.hunger<32)return 'Hungry';
  if(state.energy<28)return 'Sleepy';
  if(haigenMind.habits.injury&&state.health<76)return 'Wary';
+ const e=livingInner().emotions;
+ if(e.fear>65)return 'Anxious';if(e.loneliness>65)return 'Lonely';if(e.frustration>65)return 'Frustrated';if(e.contentment>75&&e.confidence>60)return 'Content';
  return haigenMind.curiosity>66?'Inquisitive':'Thoughtful';
 }
 function mindTargetScore(o){
@@ -3212,7 +3214,9 @@ function mindThought(){
 }
 function mindEvent(event,details){
  mindExperience(event,details);
- if(event==='hurt'){const p=livingPlace();p.danger=Math.min(20,p.danger+1);p.last=Date.now();}
+ if(event==='hurt'){const p=livingPlace();p.danger=Math.min(20,p.danger+1);p.last=Date.now();const e=livingInner().emotions;e.fear=clamp(e.fear+15,0,100);}
+ if(event==='rescue')livingBond('Skölli','rescue');
+ if(event==='gift')livingBond(details,'gift');
  if(event==='gather'){
   haigenMind.actions++;haigenMind.curiosity=clamp(haigenMind.curiosity+.15,0,100);
   if(haigenMind.actions%5===0){
@@ -3301,7 +3305,7 @@ function vikingKnowledgeTick(){
 window.__haigenVikingKnowledge=()=>({learned:(haigenMind.vikingKnowledge?.learned||[]).slice(),total:vikingLessons.length});
 function mindTick(dt){
  if(document.hidden||collapseRemaining>0)return;
- mindObserveWorld(dt);livingObserve(dt);
+ mindObserveWorld(dt);livingObserve(dt);livingInnerTick(dt);
  mindChooseIntent();
  vikingKnowledgeTick();
  haigenMind.progressMs+=dt;if(state.autonomy)haigenMind.autonomyTime+=dt;
@@ -3963,6 +3967,70 @@ function autoBuildTrailProject(dt){
 
 
 // Persistent personal learning: outcomes, preferences and spatial experience.
+
+// Living mind: emotional regulation, social bonds and persistent personal ambitions.
+function livingAmbitionTable(){return {
+ provider:{label:'become a dependable provider',steps:['fish','cook','garden']},
+ artisan:{label:'become a skilled craftsman',steps:['forge','mine','craft','build']},
+ naturalist:{label:'understand the living woodland',steps:['observe','net','explore']},
+ explorer:{label:'become a knowledgeable explorer',steps:['explore','observe','story']},
+ companion:{label:'care for my friends and home',steps:['friends','cook','build']}
+}}
+function livingInner(){
+ const b=livingBrain();
+ if(!b.emotions)b.emotions={confidence:50,contentment:60,fear:15,loneliness:15,frustration:0};
+ if(!b.relationships)b.relationships={};
+ if(!Array.isArray(b.ambitionHistory))b.ambitionHistory=[];
+ return b;
+}
+function livingBond(name,event){
+ const b=livingInner(),k=String(name||'friend').slice(0,64);
+ const bond=b.relationships[k]||(b.relationships[k]={trust:50,affection:50,encounters:0});
+ bond.encounters++;bond.last=Date.now();bond.lastEvent=event;
+ bond.trust=clamp(bond.trust+(event==='rescue'?8:1),0,100);
+ bond.affection=clamp(bond.affection+2,0,100);
+ b.emotions.loneliness=Math.max(0,b.emotions.loneliness-20);
+}
+function livingChooseAmbition(){
+ const b=livingInner();
+ if(b.ambition&&livingAmbitionTable()[b.ambition.kind])return b.ambition;
+ const choices=Object.entries(livingAmbitionTable()).map(([kind,a])=>{
+  const interest=a.steps.reduce((n,k)=>n+(b.preferences[k]||0)+(b.skills[k]?.success||0)*.25,0)/a.steps.length;
+  return {kind,score:4+interest+(kind==='explorer'?haigenMind.curiosity/50:kind==='companion'?haigenMind.kindness/50:haigenMind.patience/65)-(b.ambitionHistory.slice(0,2).some(x=>x.kind===kind)?3:0)+Math.random()*2};
+ }).sort((a,c)=>c.score-a.score);
+ const kind=choices[0].kind;
+ b.ambition={kind,progress:{},started:Date.now(),lastProgress:Date.now()};
+ mindWrite('I have decided I want to '+livingAmbitionTable()[kind].label+'. I will work towards it a little at a time.','plan');
+ return b.ambition;
+}
+function livingAmbitionProgress(kind){
+ const b=livingInner(),a=b.ambition;if(!a||!livingAmbitionTable()[a.kind])return;
+ const plan=livingAmbitionTable()[a.kind];
+ if(!plan.steps.includes(kind))return;
+ a.progress[kind]=(a.progress[kind]||0)+1;a.lastProgress=Date.now();
+ if(plan.steps.filter(k=>a.progress[k]>=1).length>=2&&Object.values(a.progress).reduce((n,v)=>n+v,0)>=5){
+  b.ambitionHistory.unshift({kind:a.kind,completed:Date.now(),progress:{...a.progress}});
+  b.ambitionHistory=b.ambitionHistory.slice(0,15);b.ambition=null;
+  mindWrite('I have made real progress towards my ambition to '+plan.label+'. I am proud of what I learned.','achievement');
+  b.emotions.confidence=clamp(b.emotions.confidence+10,0,100);
+ }
+}
+let livingInnerClock=0;
+function livingInnerTick(dt){
+ if(!state.autonomy)return;
+ livingInnerClock+=dt;if(livingInnerClock<8000)return;livingInnerClock=0;
+ const b=livingInner(),e=b.emotions;
+ const safe=!campDanger(state.x,state.y),well=Math.min(state.health,state.energy,state.hunger);
+ e.fear=clamp(e.fear+(safe?-3:8),0,100);
+ e.contentment=clamp(e.contentment+(well>65?2:-3),0,100);
+ e.loneliness=clamp(e.loneliness+1,0,100);e.frustration=Math.max(0,e.frustration-1);
+ if(well>65&&!state.resting&&!state.playerInstruction){
+  if(b.ambition&&Date.now()-b.ambition.lastProgress>600000){
+   b.ambitionHistory.unshift({kind:b.ambition.kind,paused:Date.now()});b.ambitionHistory=b.ambitionHistory.slice(0,15);b.ambition=null;
+  }
+  livingChooseAmbition();
+ }
+}
 function livingBrain(){
  const m=haigenMind;
  if(!m.livingBrain||typeof m.livingBrain!=='object')m.livingBrain={};
@@ -3986,6 +4054,7 @@ function livingOutcome(kind,success){
  b.preferences[kind]=clamp((Number(b.preferences[kind])||0)+(success?.25:-.5),-4,4);
  b.history.unshift({kind,success,day:1+Math.floor(state.daytime/180),region:expandedRegion(state.x,state.y)?.id||'woodland'});
  b.history=b.history.slice(0,50);
+ const e=livingInner().emotions;e.confidence=clamp(e.confidence+(success?2:-2),0,100);e.frustration=clamp(e.frustration+(success?-3:7),0,100);if(success)livingAmbitionProgress(kind);
 }
 function livingJobScore(choice){
  const b=livingBrain(),k=choice.kind,skill=b.skills[k]||{},experience=(skill.success||0)+(skill.failure||0);
@@ -4000,6 +4069,11 @@ function livingJobScore(choice){
  if(k==='cook'&&state.food<2)weight*=2;
  if(k==='friends'&&state.fun<50)weight*=1.8;
  if(k==='wood'&&state.wood<4)weight*=1.6;
+ const inner=livingInner(),e=inner.emotions,a=inner.ambition;
+ if(a&&livingAmbitionTable()[a.kind]?.steps.includes(k))weight*=a.progress[k]?1.25:2.2;
+ if(k==='friends')weight*=1+e.loneliness/65;
+ if(risky)weight*=Math.max(.25,1-e.fear/120);
+ if(k==='observe'||k==='friends')weight*=1+e.frustration/100;
  return Math.max(0,weight);
 }
 let livingObserveClock=0,livingLastCell='';
@@ -4074,7 +4148,7 @@ function autoFreedomTick(dt){
   if(dist(state,friend)>100){autoTravel(friend,dt,96,.11);return true}
   if(!job.startedLooking)job.startedLooking=now;
   if(now-job.startedLooking<1800){autoPause=150;return true}
-  haigenMind.habits.companionship++;
+  haigenMind.habits.companionship++;livingBond(friend.name,'visit');
   const lines=friend.kind==='rabbit'?'Dylan is always curious. I think he likes discovering things with me.':'Skölli watches over us. I am glad he is here.';
   mindWrite(lines,'reflection');think('Good to spend some time with '+friend.name+'!',3400,true);
   state.autoSteps++;return finish('I checked on '+friend.name+' and spent time with my friend.');
