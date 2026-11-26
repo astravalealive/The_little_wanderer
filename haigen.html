@@ -2936,7 +2936,7 @@ function haigenRavenPost(){
  document.querySelectorAll('[data-raven-reply]').forEach(btn=>btn.onclick=()=>{
   const e=letters[Number(btn.dataset.ravenReply)],reply=document.getElementById('ravenReply'+btn.dataset.ravenReply)?.value.trim();
   if(!e||!reply)return;
-  e.reply=reply.slice(0,600);livingBond('Alfather','raven reply');
+  e.reply=reply.slice(0,600);livingBond('Alfather','raven reply');livingAdvice(e.reply);
   if(!Array.isArray(state.memories))state.memories=[];
   state.memories.push('The builders replied to my raven: '+e.reply);
   mindWrite('I received a reply to my raven. I want to remember what they told me.','memory');
@@ -2950,7 +2950,7 @@ function haigenOfflineLetters(){
   const interests=Object.entries(state.haigenInterests).sort((a,b)=>b[1]-a[1]);
   const interest=interests[0]?.[0]||'exploration';
   const reflections={lake:'I have been thinking about the creatures around the lake. I would like to understand their home better.',wildlife:'I keep wondering what the animals do when no one is watching.',botany:'There are still so many plants I cannot name. I want to learn about them.',building:'I have been imagining what we could build together next.',exploration:'I wonder what lies beyond the places I already know.',mysteries:'I cannot stop thinking about the mysteries of this world.'};
-  haigenLifeRecord('While you were away, I kept thinking: '+reflections[interest],'reflection');
+  haigenLifeRecord('Looking at my previous notes, I want to remember this: '+reflections[interest],'reflection');
  }
  state.haigenLastVisit=now;save();
 }
@@ -3080,7 +3080,8 @@ function haigenTalkPanel(){
   const message=input.value.trim();if(!message)return;
   state.haigenConversations.push({from:'you',text:message,at:Date.now()});livingBond('Alfather','conversation');
   if(/mycolog|mushroom|fung|mycel/i.test(message)&&!state.runeQuestions.some(q=>/mycolog/i.test(q.topic)))state.runeQuestions.unshift({topic:'Mycology',why:'Alfather asked me about fungi.',at:Date.now()});
-  const answer=haigenAnswer(message);
+  const learned=livingAdvice(message);
+  const answer=learned?'I will consider your advice when I make my own plans. I still need to make sure it is safe and possible.':haigenAnswer(message);
   state.haigenConversations.push({from:'haigen',text:answer,at:Date.now()});
   if(state.haigenConversations.length>400)state.haigenConversations=state.haigenConversations.slice(-400);
   mindWrite('Alfather spoke to me: '+message.slice(0,110)+' I replied: '+answer.slice(0,110),'conversation');
@@ -4029,7 +4030,7 @@ function livingInnerTick(dt){
   if(b.ambition&&Date.now()-b.ambition.lastProgress>600000){
    b.ambitionHistory.unshift({kind:b.ambition.kind,paused:Date.now()});b.ambitionHistory=b.ambitionHistory.slice(0,15);b.ambition=null;
   }
-  livingChooseAmbition();
+  livingChooseAmbition();livingReview();
  }
 }
 
@@ -4080,6 +4081,8 @@ function livingSocialTick(dt){
 }
 function livingAnswer(q){
  const b=livingInner(),a=b.ambition,e=b.emotions;
+ if(/unfinished|resume|interrupted/.test(q))return state.autoFreeJob?'I have an unfinished '+state.autoFreeJob.kind+' plan. I can continue it when my needs are met.':'I do not have an unfinished activity right now.';
+ if(/advice|suggestion/.test(q))return b.advice?.length?'I remember your advice: '+b.advice[0].text:'I have not saved any specific advice yet.';
  if(/ambition|dream|goal|future|want to become/.test(q))return a?'I want to '+livingAmbitionTable()[a.kind].label+'. So far I have completed '+Object.values(a.progress).reduce((n,v)=>n+v,0)+' related activities.':'I have not settled on a new ambition yet.';
  if(/how are you|how do you feel|are you okay|emotion/.test(q))return 'I feel '+mindMood().toLowerCase()+'. My health is '+Math.round(state.health)+'%, food '+Math.round(state.hunger)+'% and energy '+Math.round(state.energy)+'%. '+(e.loneliness>50?'I would enjoy some company.':e.fear>50?'I want to stay somewhere safe.':e.frustration>50?'I think I need a change of activity.':'My current plan is to '+(haigenMind.lastGoal||'look after myself')+'.');
  if(/friend|trust|nico|wanderer|merchant|skölli|skolli|dylan|relationship/.test(q)){
@@ -4101,6 +4104,47 @@ function livingAnswer(q){
   return skills.length?'I have had the most successful experiences with '+skills[0][0]+'. I have succeeded '+skills[0][1].success+' times.':'I am still learning what I am good at.';
  }
  return null;
+}
+
+function livingAdvice(message){
+ const q=String(message).toLowerCase();
+ if(!/\b(should|try|remember to|suggest|recommend|why not|be careful)\b/.test(q))return false;
+ const topics={fish:/fish/,cook:/cook|meal|food/,wood:/wood|timber/,mine:/mine|stone/,garden:/garden|crop/,friends:/friend|companion/,explore:/explore|adventure/,craft:/craft|tool/,observe:/watch|observe|wildlife/};
+ const kind=Object.keys(topics).find(k=>topics[k].test(q));
+ const b=livingInner();if(!Array.isArray(b.advice))b.advice=[];
+ const caution=/\b(avoid|careful|danger|don't|do not|never)\b/.test(q);
+ if(!kind&&!caution)return false;
+ b.advice.unshift({kind:kind||'explore',caution,text:String(message).slice(0,240),at:Date.now()});b.advice=b.advice.slice(0,30);
+ return true;
+}
+function livingReview(){
+ const b=livingInner(),h=b.history;
+ if(!h.length)return;
+ const last=h[0],previous=b.lastReviewCount||0,total=b.totalOutcomes||0;
+ if(total-previous<5)return;
+ b.lastReviewCount=total;
+ const recent=h.slice(0,5),failures=recent.filter(x=>!x.success);
+ const repeated=failures.find(x=>failures.filter(y=>y.kind===x.kind).length>=2);
+ if(repeated){
+  b.preferences[repeated.kind]=clamp((b.preferences[repeated.kind]||0)-.4,-4,4);
+  mindWrite('I have struggled with '+repeated.kind+' more than once. I should change my approach and practise other skills first.','reflection');
+ }else if(last.success){
+  mindWrite('Looking back at my recent work, '+recent.filter(x=>x.success).length+' of my last '+recent.length+' activities went well. I want to build on that.','reflection');
+ }
+ save();
+}
+function livingJobResume(job,now){
+ if(!job)return;
+ if(job.lastActive&&now-job.lastActive>2000){
+  job.startedAt=(job.startedAt||now)+(now-job.lastActive);
+  if(job.startedLooking)job.startedLooking+=now-job.lastActive;
+  if(job.lastActive&&now-job.lastActive>8000){
+   const b=livingInner();b.resumedPlans=(b.resumedPlans||0)+1;
+   autoResetNav();
+   if(now-(b.lastResumeNote||0)>60000){b.lastResumeNote=now;mindWrite('I can return to my unfinished '+job.kind+' plan now.','memory')}
+  }
+ }
+ job.lastActive=now;
 }
 function livingBrain(){
  const m=haigenMind;
@@ -4124,7 +4168,7 @@ function livingOutcome(kind,success){
  const p=livingPlace();p.last=Date.now();if(success)p.reward=Math.min(20,p.reward+1);
  b.preferences[kind]=clamp((Number(b.preferences[kind])||0)+(success?.25:-.5),-4,4);
  b.history.unshift({kind,success,day:1+Math.floor(state.daytime/180),region:expandedRegion(state.x,state.y)?.id||'woodland'});
- b.history=b.history.slice(0,50);
+ b.history=b.history.slice(0,50);b.totalOutcomes=(b.totalOutcomes||0)+1;
  const e=livingInner().emotions;e.confidence=clamp(e.confidence+(success?2:-2),0,100);e.frustration=clamp(e.frustration+(success?-3:7),0,100);if(success)livingAmbitionProgress(kind);
 }
 function livingJobScore(choice){
@@ -4143,6 +4187,7 @@ function livingJobScore(choice){
  const inner=livingInner(),e=inner.emotions,a=inner.ambition;
  if(a&&livingAmbitionTable()[a.kind]?.steps.includes(k))weight*=a.progress[k]?1.25:2.2;
  if(k==='friends')weight*=1+e.loneliness/65;
+ const advice=(inner.advice||[]).find(x=>x.kind===k&&Date.now()-x.at<86400000);if(advice)weight*=advice.caution?.55:1.45;
  if(risky)weight*=Math.max(.25,1-e.fear/120);
  if(k==='observe'||k==='friends')weight*=1+e.frustration/100;
  return Math.max(0,weight);
@@ -4161,6 +4206,7 @@ function autoFreedomTick(dt){
  if(!state.autonomy||state.playerInstruction)return false;
  const now=Date.now();
  let job=state.autoFreeJob;
+ livingJobResume(job,now);
  if(job&&(!['mine','dig','fish','cook','explore','forge','wood','garden','net','build','craft','observe','friends','story'].includes(job.kind)||now-(job.startedAt||now)>85000)){
   if(now-(job.startedAt||now)>85000){
    haigenMind.failedJobs=haigenMind.failedJobs||{};
@@ -4197,7 +4243,7 @@ function autoFreedomTick(dt){
   let selected=weighted[weighted.length-1]?.kind||'explore';
   for(const choice of weighted){pick-=choice.weight;if(pick<=0){selected=choice.kind;break}}
   haigenMind.recentJobs=[selected,...history].slice(0,3);
-  job={kind:selected,startedAt:now,steps:0,startX:state.x,startY:state.y};
+  job={kind:selected,startedAt:now,lastActive:now,steps:0,startX:state.x,startY:state.y};
   state.autoFreeJob=job;
   const labels={dig:'digging for hidden woodland treasures',mine:'mining stone for new projects',forge:'making a useful pickaxe',fish:'catching food with my rod',cook:'cooking a proper meal',explore:'finding somewhere new',wood:'chopping firewood',garden:'tending my vegetables',net:'studying frogs and releasing them',build:'building lanterns and signs along the trails',craft:'inventing useful equipment',observe:'learning about the wildlife',friends:'spending time with Dylan and Skölli',story:'investigating the Silent Pond mystery'};
   mindWrite('My next job is '+labels[job.kind]+'. I want to accomplish something useful.','plan');
@@ -4278,7 +4324,7 @@ function autoFreedomTick(dt){
   const choice=ingredients.find(([name,n])=>state[name]>=n);
   if(!choice)return finish();
   autoPlan('prepare a hot meal','freedom-cooking');
-  if(dist(state,cottage)>190){autoTravel(autoCampSpot(),dt,170,.12);return true}
+  if(dist(state,cottage)>190){autoTravel({x:cottage.x,y:cottage.y+85,id:'freedom-cook-home'},dt,100,.12);return true}
   state[choice[0]]-=choice[1];state.food++;startHaigenAction('cook',1100);state.autoSteps++;save();
   return finish('I cooked food instead of just gathering more ingredients.');
  }
@@ -4290,7 +4336,7 @@ function autoFreedomTick(dt){
    return finish('I need a safe stretch of shoreline to cast.');
   }
   if(!state.castAt){haigenUseRod();autoPause=1300;return true}
-  if(Date.now()>=state.biteAt){haigenUseRod();return finish('I landed a fish myself. Maybe I can cook it later.')}
+  if(Date.now()>=state.biteAt){const before=state.fish;haigenUseRod();return finish(state.fish>before?'I landed a fish myself. Maybe I can cook it later.':'I did not catch a fish this time.')}
   autoPause=850;return true;
  }
  if(job.kind==='wood'){
