@@ -10693,7 +10693,7 @@ if(state.campTier>0||housePreviewTier>0){
  const doorstep=hy+15-exteriorHeight*(1-[0,.70,.78,.78,.77,.76][tier]);
  const crossedIn=!homeInside&&tier>=2&&homeStairCooldown===0&&Math.abs(state.x-exteriorDoorX)<Math.max(26,exteriorWidth*.075)&&state.y<prevPlayerY&&state.y<=doorstep+24&&state.y>=doorstep-35;
  const exitThreshold=back+(front-back)*.90;
- const crossedOut=homeInside&&homeFloor===0&&homeStairCooldown===0&&prevPlayerY<exitThreshold&&state.y>=exitThreshold&&withinDoor;
+ const crossedOut=homeInside&&homeFloor===0&&homeStairCooldown===0&&withinDoor&&state.y>=back+(front-back)*.84&&(state.y>prevPlayerY||(!state.autonomy&&dy>.05));
  const roomX=(state.x-(hx-halfWidth))/(halfWidth*2);
  const roomY=(state.y-back)/(front-back);
  const oldRoomX=(prevPlayerX-(hx-halfWidth))/(halfWidth*2);
