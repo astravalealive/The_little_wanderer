@@ -10722,7 +10722,7 @@ if(state.campTier>0||housePreviewTier>0){
   }
  }else if(tier>=3){
   homeFloor=0;
-  const blocked=(xx,yy)=>(tier===3?tier3Blocked:tier===4?tier4Blocked:longhouseBlocked)(.06+.88*(xx-hx+halfWidth)/(2*halfWidth),.07+.88*(yy-back)/(front-back));
+  const blocked=(xx,yy)=>Math.abs(xx-hx)<=doorHalf&&yy>=back+(front-back)*.80&&yy<=front?false:(tier===3?tier3Blocked:tier===4?tier4Blocked:longhouseBlocked)(.06+.88*(xx-hx+halfWidth)/(2*halfWidth),.07+.88*(yy-back)/(front-back));
   const nx=state.x,ny=state.y;
   if(blocked(nx,ny)){
    state.x=prevPlayerX;state.y=prevPlayerY;
@@ -11963,7 +11963,7 @@ const mountainRoutes=[
 function mountainWalkable(x,y){return mountainRoutes.some(route=>route.some((p,i)=>{if(!i)return false;const a=route[i-1],dx=p[0]-a[0],dy=p[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)<27}))}
 function enterMountain(){if(!mountainArt.complete||!mountainArt.naturalWidth){notify('Cave artwork loading.');return}visitorRoom=null;mountainInside=true;state.autonomy=false;cameraDetached=false;Object.assign(mountainPlayer,{x:1390,y:825,dir:'left',moving:false,steps:0});trollDoorCooldown=1300;}
 function leaveMountain(){mountainInside=false;state.x=trollStumpHome.x;state.y=trollStumpHome.y+125;cam.x=state.x;cam.y=state.y;trollDoorCooldown=1600;}
-function updateMountain(dt){const p=controllerMove();let dx=joy.x+p.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+p.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const m=Math.hypot(dx,dy);mountainPlayer.moving=m>.08;if(m>.08){dx/=Math.max(1,m);dy/=Math.max(1,m);const x=mountainPlayer.x+dx*dt*.14,y=mountainPlayer.y+dy*dt*.14;if(mountainWalkable(x,mountainPlayer.y))mountainPlayer.x=x;if(mountainWalkable(mountainPlayer.x,y))mountainPlayer.y=y;mountainPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');mountainPlayer.steps+=dt;if(dx>0&&mountainPlayer.x>1404&&mountainPlayer.y>790&&mountainPlayer.y<850&&trollDoorCooldown===0)leaveMountain()}checkActions();}
+function updateMountain(dt){const p=controllerMove();let dx=joy.x+p.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+p.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const m=Math.hypot(dx,dy);mountainPlayer.moving=m>.08;if(m>.08){dx/=Math.max(1,m);dy/=Math.max(1,m);const x=mountainPlayer.x+dx*dt*.14,y=mountainPlayer.y+dy*dt*.14;if(mountainWalkable(x,mountainPlayer.y))mountainPlayer.x=x;if(mountainWalkable(mountainPlayer.x,y))mountainPlayer.y=y;mountainPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');mountainPlayer.steps+=dt;if(dx>0&&mountainPlayer.x>=1385&&mountainPlayer.y>790&&mountainPlayer.y<850&&trollDoorCooldown===0)leaveMountain()}checkActions();}
 function mountainView(){const w=ctx.canvas.width,h=ctx.canvas.height,sc=Math.min(w/1536,h/1024)*3.2;return {sc,x:Math.min(0,Math.max(w-1536*sc,w/2-mountainPlayer.x*sc)),y:Math.min(0,Math.max(h-1024*sc,h/2-mountainPlayer.y*sc))}}
 function drawMountain(){const v=mountainView();ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#100e12';ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.translate(v.x,v.y);ctx.scale(v.sc,v.sc);ctx.imageSmoothingEnabled=false;ctx.drawImage(mountainArt,0,0,1536,1024);const residents=caveTrolls.filter(t=>t.room==='mountain').sort((a,b)=>a.y-b.y);const paint=t=>drawTrollSprite(t.sprite,t.x,t.y,48,t.dir,t.walking,t.clock);for(const t of residents)if(t.y<=mountainPlayer.y)paint(t);ctx.save();ctx.translate(mountainPlayer.x,mountainPlayer.y);ctx.scale(.52,.52);mountainPlayer.anim=mountainPlayer.steps;if(!drawApprovedHaigen(0,0,mountainPlayer,false))character(0,0,'boy',mountainPlayer,false);ctx.restore();for(const t of residents)if(t.y>mountainPlayer.y)paint(t);ctx.restore();}
 ctx.canvas.addEventListener('click',e=>{if(mountainInside){const r=ctx.canvas.getBoundingClientRect(),v=mountainView(),x=((e.clientX-r.left)*ctx.canvas.width/r.width-v.x)/v.sc,y=((e.clientY-r.top)*ctx.canvas.height/r.height-v.y)/v.sc;if(x>1360&&y>730&&y<850)leaveMountain();return}if(visitorRoom||trollStumpInside||homeInside||worldEditorActive||trollDoorCooldown>0)return;const r=ctx.canvas.getBoundingClientRect(),x=cam.x+((e.clientX-r.left)*W/r.width-W/2)/worldZoom(),y=cam.y+((e.clientY-r.top)*H/r.height-H/2)/worldZoom();if(Math.abs(x-trollStumpHome.x)<100&&Math.abs(y-trollStumpHome.y+35)<100)enterMountain();else if(Math.abs(x-abandonedTrollStump.x)<90&&Math.abs(y-abandonedTrollStump.y+35)<90){cameraDetached=false;enterTrollRoom()}});
@@ -12401,7 +12401,7 @@ function frostholdInteract(){
  state.autonomy=false;cameraDetached=false;state.x=d.returnX;state.y=d.returnY;cam.x=state.x;cam.y=state.y;
  frostholdRoom={id:d.id,x:240,y:340};notify('Frosthold: '+frostholdRooms[d.id].name);return true;
 }
-function frostholdRoomClear(id,x,y){return x>=32&&x<=448&&y>=44&&y<=368&&!frostholdRooms[id].furniture.some(([a,b,w,h])=>x>a-8&&x<a+w+8&&y>b-8&&y<b+h+8)}
+function frostholdRoomClear(id,x,y){if(Math.abs(x-240)<=30&&y>=330&&y<=368)return true;return x>=32&&x<=448&&y>=44&&y<=368&&!frostholdRooms[id].furniture.some(([a,b,w,h])=>x>a-8&&x<a+w+8&&y>b-8&&y<b+h+8)}
 function updateFrostholdRoom(dt){frostholdClock+=dt;
  const pad=controllerMove();checkActions();if(!frostholdRoom)return;
  let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);
@@ -12410,6 +12410,7 @@ function updateFrostholdRoom(dt){frostholdClock+=dt;
  const nx=clamp(frostholdRoom.x+dx/n*step,32,448),ny=clamp(frostholdRoom.y+dy/n*step,44,368);
  if(clear(nx,frostholdRoom.y))frostholdRoom.x=nx;
  if(clear(frostholdRoom.x,ny))frostholdRoom.y=ny;
+ if(dy>.08&&frostholdRoom.y>=354&&Math.abs(frostholdRoom.x-240)<=30){frostholdInteract();return;}
  frostholdRoom.moving=Math.hypot(dx,dy)>.08;if(frostholdRoom.moving){frostholdRoom.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');frostholdRoom.steps=(frostholdRoom.steps||0)+dt;frostholdRoom.anim=frostholdRoom.steps;}
 }
 function drawFrostholdRoom(){
