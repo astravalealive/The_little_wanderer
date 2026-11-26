@@ -6686,6 +6686,10 @@ async function loadApprovedHomes(){
   const loading=[];
   for(let level=1;level<=5;level++)for(const kind of ['exterior','interior']){
    if(level===1&&kind==='interior')continue;
+   if(kind==='interior'){
+    loading.push((async()=>{const img=new Image();img.src='./assets/house-tier-'+level+'-interior.png?v=1';await img.decode();approvedHomes.interior[level]=img;})());
+    continue;
+   }
    const filename='level_'+level+'_'+kind+'_reference.png';
    const entry=archive.file(filename)||Object.values(archive.files).find(f=>!f.dir&&f.name.split('/').pop()===filename);
    if(!entry)throw Error('Missing artwork: '+level+' '+kind);
@@ -13321,7 +13325,8 @@ function drawHomeInteriorScene(visiting=false){
  // Canvas dimensions are physical pixels; draw directly in those coordinates.
  const cw=ctx.canvas.width,ch=ctx.canvas.height;
  ctx.fillStyle='#151d19';ctx.fillRect(0,0,cw,ch);
- const size=Math.min(cw*.91,ch*.73),left=(cw-size)/2,top=(ch-size)/2;
+ const ratio=floor===0&&art?.naturalWidth?art.naturalWidth/art.naturalHeight:1;
+ const size=Math.min(cw*.96,ch*.82*ratio),roomHeight=size/ratio,left=(cw-size)/2,top=(ch-roomHeight)/2;
  if(floor===1){
   // Distinct upstairs floor: timber loft, bed, storage and return staircase.
   ctx.fillStyle='#765436';ctx.fillRect(left,top,size,size);
@@ -13337,21 +13342,21 @@ function drawHomeInteriorScene(visiting=false){
   // V347: crop away the decorative rectangular frame baked into the interior artwork.
   const mx=art.naturalWidth*.075,my=art.naturalHeight*.075; // Restore original top/left room edges; border removal needs asymmetric masking.
   ctx.imageSmoothingEnabled=false;
-  ctx.drawImage(art,mx,my,art.naturalWidth-mx*2,art.naturalHeight-my*2,left,top,size,size);
+  ctx.drawImage(art,left,top,size,roomHeight);
  }else{ctx.fillStyle='#6d5239';ctx.fillRect(left,top,size,size)}
  const hx=cottage.x+35,hy=cottage.y-10;
  const widths=[0,330,365,405,485,560],heights=[0,310,335,355,385,420];
  const halfWidth=(widths[tier]||330)*.43,back=hy-(heights[tier]||310)*.78,front=hy+13;
  const roomX=(state.x-(hx-halfWidth))/(halfWidth*2),roomY=(state.y-back)/(front-back);
- const px=left+size*(.06+roomX*.88),py=top+size*(.07+roomY*.88);
+ const px=left+size*(.06+roomX*.88),py=top+roomHeight*(.07+roomY*.88);
  if(!visiting||(homeInside&&homeFloor===0)){ctx.save();ctx.translate(px,py);ctx.scale(Math.max(1.15,size/360),Math.max(1.15,size/360));
  if(state.resting&&homeInside)drawSleepingHaigen(0,0);else character(0,0,'boy');ctx.restore();}
  ctx.font='bold '+Math.max(15,Math.round(cw/36))+'px Georgia';
  ctx.fillStyle='#f3d9a1';ctx.textAlign='center';
  ctx.fillText('HAIGEN’S HOME · LEVEL '+tier+(floor?' · UPSTAIRS':''),cw/2,Math.max(22,top-18));
  ctx.font=Math.max(12,Math.round(cw/52))+'px Georgia';
- if(visiting){setVisitorDoorBounds(left+size*.5,top+size*.88,size*.21,size*.16);ctx.restore();return}
- ctx.fillText(homeFloor?'Use the left staircase to go downstairs':tier>=3?'Use the left stairs to reach upstairs · Door to leave':'Walk to the bottom doorway to leave',cw/2,top+size+28);
+ if(visiting){setVisitorDoorBounds(left+size*.5,top+roomHeight*.94,size*.21,roomHeight*.16);ctx.restore();return}
+ ctx.fillText(homeFloor?'Use the left staircase to go downstairs':tier>=3?'Use the left stairs to reach upstairs · Door to leave':'Walk to the bottom doorway to leave',cw/2,top+roomHeight+28);
  ctx.restore();
 }
 // Controller connection diagnostics: visible when a pad is connected or diagnostics mode is on.
