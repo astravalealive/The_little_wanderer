@@ -13172,7 +13172,13 @@ function visitTappedBuilding(x,y){
  const tier=displayedHouseTier();
  const width=[0,330,365,405,485,560][tier],height=[0,310,335,355,385,420][tier];
  const hx=cottage.x+35,hy=cottage.y-10;
- const house=state.campTier>0&&tier>=2&&(caveContains(homeSilhouette(tier),(x-hx)/width+.5,(y-hy-15)/height+1)||(Math.abs(x-hx)<width*.46&&y>hy-height*.84&&y<hy+height*.08));
+ const house=(state.campTier>0||housePreviewTier>0)&&(caveContains(homeSilhouette(tier),(x-hx)/width+.5,(y-hy-15)/height+1)||(Math.abs(x-hx)<width*.46&&y>hy-height*.84&&y<hy+height*.08));
+ if(house){
+  const doorX=hx+([0,.41,.39,.51,.43,.43][tier]-.5)*width;
+  const doorTap=tier>=2&&Math.abs(x-doorX)<=width*.075&&y>=hy-height*.29&&y<=hy+18;
+  if(!doorTap){campBuild();return true;}
+  visitorRoom='home';visitorDoor=null;visitorInnerDoor=null;return true;
+ }
  const stump=trollStumpHome;
  const inStump=Math.abs(x-stump.x)<=stump.width*.56&&y>=stump.y-stump.height*.98&&y<=stump.y+32;
  const town=objects.find(o=>o.type.startsWith('hamlet-')&&Math.abs(x-o.x)<90&&y>=o.y-165&&y<=o.y+18);
