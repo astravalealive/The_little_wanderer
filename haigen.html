@@ -12305,7 +12305,7 @@ function raftInteract(){
   open('<h2>ᛟ Timber Lake Raft</h2><p>Eight seasoned logs, lashed and cross-braced, with a carved paddle.</p><p>Wood: '+state.wood+'/8</p><button class="btn" id="raftBuild" '+(state.wood>=8?'':'disabled')+'>Build raft</button>');
   $('raftBuild').onclick=()=>{if(state.raftBuilt||state.wood<8)return;state.wood-=8;state.raftBuilt=true;state.raftBerth='shore';close();save();notify('🛶 Raft built. Collect to board.');};return true;
  }
- state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.stroke=0;raft.moving=false;raftRipple(p.x,p.y);notify('🛶 Paddle to the island. Collect to disembark.');return true;
+ state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.stroke=0;raft.moving=false;save();raftRipple(p.x,p.y);notify('🛶 Paddle to the island. Collect to disembark.');return true;
 }
 // Walking onto the built raft boards automatically. Stepping toward dry land docks automatically.
 function raftWalkBoard(dx,dy){
@@ -12318,7 +12318,7 @@ function raftWalkBoard(dx,dy){
  // Require the player to step toward the moored raft, not press Collect.
  const tx=p.x-state.x,ty=p.y-state.y,range=Math.hypot(tx,ty);
  if(range>12?(dx*tx+dy*ty)/Math.max(.001,Math.hypot(dx,dy)*range)<.35:dx*towardWater<.12)return false;
- state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.moving=false;raft.facing=towardWater;raft.heading=towardWater<0?Math.PI:0;raft.visualHeading=raft.heading;raft.stroke=0;raftRipple(p.x,p.y);
+ state.raftAfloat=true;state.autonomy=false;state.x=p.x;state.y=p.y;raft.moving=false;raft.facing=towardWater;raft.heading=towardWater<0?Math.PI:0;raft.visualHeading=raft.heading;raft.stroke=0;save();raftRipple(p.x,p.y);
  notify('🛶 Aboard. Steer freely; paddle into a bank to step ashore.');return true;
 }
 function raftMove(dt,dx,dy){
@@ -12338,7 +12338,7 @@ function raftMove(dt,dx,dy){
  // Remain on lake water; don't sail through mountains, islands or unrelated terrain.
  if(lakeLevel(nx,ny)>1.06&&!onLakeIsland(nx,ny)&&!(lakeLevel(state.x,state.y)>1.02&&lakeLevel(nx,ny)<lakeLevel(state.x,state.y)))return;
  // Reject solid objects even while afloat; never paddle through a shore structure.
- if(blockedBySolid(nx,ny))return;
+ if(blockedBySolid(nx,ny)&&!(lakeLevel(nx,ny)<.98&&!onLakeIsland(nx,ny)))return;
  const oldX=state.x,oldY=state.y;
  state.x=nx;state.y=ny;raft.moving=true;raft.pace=1;
  raft.heading=Math.atan2(vy,vx);
@@ -12476,7 +12476,7 @@ function drawFrostholdRoom(){
  ctx.restore();
 }
 
-function interact(){if(frostholdInteract())return;if(mountainInside){leaveMountain();return}if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(((!state.raftBuilt||state.raftAfloat)&&raftInteract())||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToWanderer()||speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
+function interact(){if(frostholdInteract())return;if(mountainInside){leaveMountain();return}if(trollStumpInside){if(!chairAction())leaveTrollRoom();return}if(trollDoorCooldown===0&&trollStumpDoorNear()){enterTrollRoom();return}if(collapseRemaining>0)return;if(!homeInside&&!visitorRoom&&!worldEditorActive&&(raftInteract()||skiffInteract()||skiffWorkshop()||gatherSkiffLashing()))return;if(!homeInside&&dist(state,artCart)<80){artGallery();return}if(speakToWanderer()||speakToNico())return;if(Math.hypot(state.x-ruins.x,state.y-ruins.y)<175){runeResearchPanel();return}if(collectMeat())return;const stone=state.stoneDrops.filter(o=>dist(state,o)<99).sort((a,b)=>dist(state,a)-dist(state,b))[0];if(stone){collectStonePiece(stone);return}const debris=remainingCampDebris().filter(d=>dist(d,state)<93).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(debris){collectCampDebris(debris);return}if(interactHomestead())return;const foraging=[
  ...objects.filter(o=>(o.type==='mushroom'||o.type==='bush')&&canPlaceScenery(o)&&!campsiteProtected(o)&&!state.removed.includes(o.id)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:o.type})),
  ...woodlandDetails.filter(o=>o.kind==='fungi'&&woodlandFungiReady(o)&&!campsiteProtected(o)&&dist(o,state)<94).map(o=>({o,d:dist(o,state),kind:'fungi'}))
  ].sort((a,b)=>a.d-b.d)[0];
