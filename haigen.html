@@ -6707,14 +6707,43 @@ async function loadRavenArt(){
   Object.assign(ravenArt,Object.fromEntries(entries),{atlas});
  }catch(e){console.warn('Raven artwork unavailable',e)}
 }
+function ravenData(){
+ if(!state.ravenMessages||!Array.isArray(state.ravenMessages.inbox)||!Array.isArray(state.ravenMessages.outbox))state.ravenMessages={inbox:[],outbox:[],lastThought:'',lastSent:0};
+ return state.ravenMessages;
+}
+let ravenFlight=null;
+function ravenTick(){
+ const d=ravenData(),now=Date.now();
+ if(ravenFlight&&now-ravenFlight.start>12000){
+  if(ravenFlight.kind==='outbound'){d.outbox.push({text:ravenFlight.text,at:now});d.lastThought=ravenFlight.text;d.lastSent=now}
+  else {const m=d.inbox.find(m=>m.id===ravenFlight.id);if(m)m.status='waiting'}
+  ravenFlight=null;save();
+ }
+ if(ravenFlight)return;
+ const queued=d.inbox.find(m=>m.status==='queued');
+ if(queued){ravenFlight={kind:'inbound',id:queued.id,start:now};return}
+ if(!state.autonomy||state.resting||dist(state,ravenPerch)>95)return;
+ const waiting=d.inbox.find(m=>m.status==='waiting');
+ if(waiting){waiting.status='read';waiting.readAt=now;save();return}
+ const thought=autoThought();
+ if(thought!==d.lastThought&&now-d.lastSent>120000)ravenFlight={kind:'outbound',text:thought,start:now};
+}
 function drawRavenPerch(){
  if(!ravenArt.atlas)return;
  const {x,y}=ravenPerch,p=ravenArt.raven_perch,w=145,h=w*p.height/p.width;
  ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(p,x-w/2,y-h,w,h);
  for(const [i,name] of ['huginn','muninn'].entries()){
   const a=ravenArt.atlas[name],cell=ravenArt.atlas.cell;
-  const time=performance.now()/1000+i*7,pose=time%23>20?'preen':'idle',f=a[pose],frame=Math.floor(time*f.fps)%f.frames;
-  ctx.save();ctx.translate(x+(i?36:-36),y-h+15);if(i)ctx.scale(-1,1);
+  const time=performance.now()/1000+i*7;let pose=time%23>20?'preen':'idle',dx=0,dy=0,flip=!!i,clock=time;
+  if(!i&&ravenFlight){
+   const t=Math.max(0,(Date.now()-ravenFlight.start)/1000),incoming=ravenFlight.kind==='inbound';
+   if(t>=3&&t<9)continue;
+   const u=incoming?Math.max(0,Math.min(1,(12-t)/3)):Math.min(1,t/3);
+   if(incoming&&t<9||!incoming&&t>=3)continue;
+   dx=-u*1100;dy=-u*350;flip=!incoming;pose=incoming?(t>11?'land':'fly'):(t<1?'takeoff':'fly');clock=incoming?t-9:t;
+  }
+  const f=a[pose],frame=Math.floor(Math.max(0,clock)*f.fps)%f.frames;
+  ctx.save();ctx.translate(x+(i?36:-36)+dx,y-h+15+dy);if(flip)ctx.scale(-1,1);
   ctx.drawImage(ravenArt[name],frame*cell.width,f.row*cell.height,cell.width,cell.height,-32,-42,64,48);ctx.restore();
  }
  ctx.restore();
@@ -6722,7 +6751,9 @@ function drawRavenPerch(){
 function ravenPanel(name){
  const safe=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  if(name==='muninn'){open('<h2>Muninn · Memory</h2>'+((state.memories||[]).map(m=>'<p>'+safe(m)+'</p>').join('')||'<p>No memories recorded yet.</p>'));return}
- open('<h2>Huginn · Thought</h2><p>Current needs and intentions:</p><p>'+safe(autoThought())+'</p><p>Two-way delivery is not enabled yet.</p>');
+ const d=ravenData();
+ open('<h2>Huginn · Thought</h2>'+d.outbox.slice(-20).reverse().map(m=>'<p>Haigen: '+safe(m.text)+'</p>').join('')+d.inbox.slice(-20).reverse().map(m=>'<p>Alfather: '+safe(m.text)+' · '+safe(m.status)+'</p>').join('')+'<textarea id="ravenLetter" maxlength="500" placeholder="Write to Haigen"></textarea><button class="btn" id="ravenSend">Send with Huginn</button>');
+ $('ravenSend').onclick=()=>{const msg=$('ravenLetter').value.trim();if(!msg)return;d.inbox.push({id:Date.now(),text:msg,status:'queued'});save();ravenPanel('huginn')};
 }
 function installRavenButtons(){
  const bar=document.createElement('div');bar.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 105px);left:8px;z-index:20;display:flex;gap:4px';
@@ -13363,6 +13394,7 @@ cv.addEventListener('pointerup',hwRealFinish,true);cv.addEventListener('pointerc
 
 
 function frame(now){
+ ravenTick();
  const diag=window.__haigenPerfDiag,measure=!!(diag&&diag.enabled),frameStart=measure?performance.now():0,frameGap=measure&&diag.lastFrame?now-diag.lastFrame:0;if(measure)diag.lastFrame=now;
  const dt=Math.min(Math.max(0,now-last),50);last=now;
  if(state.resting&&!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;if(state.autonomy){autoPause=0;autoPlan('danger woke me: escape','escape')}notify('⚠️ Danger nearby! Haigen wakes up.');}
