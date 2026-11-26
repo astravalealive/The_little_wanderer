@@ -10705,7 +10705,7 @@ function recoverAutonomousHaigen(dt,oldX,oldY){
  }
  autoDestination=null;autoPause=1800;
 }
-function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(Math.abs(p.u-768)<24&&Math.abs(p.v-292)<18&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateCaveResidents(dt);updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.00015;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
+function update(dt){if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(frostholdArtDoors.some(d=>Math.hypot(state.x-d.x,state.y-d.y)<24)&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateCaveResidents(dt);updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.00015;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
  if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=174/600){
  changeTrollChamber(true);
@@ -12445,11 +12445,11 @@ function frostholdInteract(){
  frostholdRoom=null;frostholdEntryCooldown=1500;notify('Back outside Frosthold.');return true
  }
  if(homeInside||visitorRoom||trollStumpInside||mountainInside||worldEditorActive||collapseRemaining>0)return false;
- const d=frostholdDoorNear(state.x,state.y);if(!d)return false;
+ const d=frostholdDoorNear(state.x,state.y);if(!d||frostholdEntryCooldown>0)return false;
  state.autonomy=false;cameraDetached=false;state.x=d.returnX;state.y=d.returnY;cam.x=state.x;cam.y=state.y;
  frostholdRoom={id:d.id,x:240,y:340};notify('Frosthold: '+frostholdRooms[d.id].name);return true;
 }
-function frostholdRoomClear(id,x,y){if(Math.abs(x-240)<=30&&y>=330&&y<=368)return true;return x>=32&&x<=448&&y>=44&&y<=368&&!frostholdRooms[id].furniture.some(([a,b,w,h])=>x>a-8&&x<a+w+8&&y>b-8&&y<b+h+8)}
+function frostholdRoomClear(id,x,y){if((frostholdInteriorLinks[id]||[]).some(d=>Math.hypot(x-d.x,y-d.y)<22))return true;if(Math.abs(x-240)<=30&&y>=330&&y<=368)return true;return x>=32&&x<=448&&y>=44&&y<=368&&!frostholdRooms[id].furniture.some(([a,b,w,h])=>x>a-8&&x<a+w+8&&y>b-8&&y<b+h+8)}
 function updateFrostholdRoom(dt){frostholdClock+=dt;
  const pad=controllerMove();checkActions();if(!frostholdRoom)return;
  let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);
@@ -12458,6 +12458,7 @@ function updateFrostholdRoom(dt){frostholdClock+=dt;
  const nx=clamp(frostholdRoom.x+dx/n*step,32,448),ny=clamp(frostholdRoom.y+dy/n*step,44,368);
  if(clear(nx,frostholdRoom.y))frostholdRoom.x=nx;
  if(clear(frostholdRoom.x,ny))frostholdRoom.y=ny;
+ const link=(frostholdInteriorLinks[frostholdRoom.id]||[]).find(d=>Math.hypot(d.x-frostholdRoom.x,d.y-frostholdRoom.y)<15&&dx*(d.x-frostholdRoom.x)+dy*(d.y-frostholdRoom.y)>0);if(link){frostholdInteract();return;}
  if(dy>.08&&frostholdRoom.y>=354&&Math.abs(frostholdRoom.x-240)<=30){frostholdInteract();return;}
  frostholdRoom.moving=Math.hypot(dx,dy)>.08;if(frostholdRoom.moving){frostholdRoom.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');frostholdRoom.steps=(frostholdRoom.steps||0)+dt;frostholdRoom.anim=frostholdRoom.steps;}
 }
