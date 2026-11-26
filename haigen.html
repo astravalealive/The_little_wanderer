@@ -13981,7 +13981,7 @@ offlineProgress();devInitialAccess();$('artBtn').textContent=rbEnabled?'🎨 Cla
    const t=Math.max(0,Number(state.daytime)||0);
    return {
     x:state.x,y:state.y,
-    health:state.health,energy:state.energy,hunger:state.hunger,
+    health:state.health,energy:state.energy,hunger:state.hunger,mana:Number(state.mana)||0,
     day:1+Math.floor(t/180),
     phase:['Morning','Afternoon','Evening','Night'][Math.floor((t%180)/45)]||'Morning',
     stage:Number(state.story?.stage)||0,
@@ -14029,4 +14029,4 @@ function refreshFrogHud(){
 }
 setInterval(refreshFrogHud,300);refreshFrogHud();
  placeArtCart();restoreTrollPosition();try{const moved=JSON.parse((worldLayoutEditingPaused?null:localStorage.getItem(hwRealKey))||'{}')['named:troll-cave'];if(moved&&Number.isFinite(moved.x)&&Number.isFinite(moved.y)&&moved.x>=0&&moved.y>=0&&moved.x<=5000&&moved.y<=5000){trollStumpHome.x=moved.x;trollStumpHome.y=moved.y}}catch(e){}stumpPositionReady=true;requestAnimationFrame(frame);if(state.returnReport.length)setTimeout(showReturnReport,350);setTimeout(()=>notify(!state.campClearingDone?'🏕️ First task: clear 7 brush piles at camp with X Collect.':state.story.oldStreamQuestRetired?'🌲 Welcome back! Explore the Great Lake and the woodland trails.':state.story.stage===0?'🌲 Welcome! Explore the forest and listen for something strange near the pond.':'🌲 Welcome back! 📜 The Silent Pond quest awaits.'),700)})();
-</script><script src="./swamp-bosses-v420.js?v=425"></script><script src="./v127-ornate-ui.js?v=418"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><!-- Tactical Gloamjaw adapter retired: original real-time boss remains active. --><script src="./thrummaw-v148.js?v=410"></script><script src="./krakkle-v407.js?v=417"></script></body></html>
+</script><script src="./swamp-bosses-v420.js?v=425"></script><script src="./v127-ornate-ui.js?v=419"></script><script src="./gloamjaw-v128.js?v=137"></script><script src="./gloamjaw-vfx-v136.js?v=136"></script><!-- Tactical Gloamjaw adapter retired: original real-time boss remains active. --><script src="./thrummaw-v148.js?v=410"></script><script src="./krakkle-v407.js?v=417"></script></body></html>
