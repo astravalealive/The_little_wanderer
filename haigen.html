@@ -13310,15 +13310,16 @@ function visitTappedBuilding(x,y){
 }
 const stumpTapCapture=new Map();
 gameCanvas.addEventListener('pointerdown',e=>{
- if(e.isPrimary===false||visitorRoom||worldEditorActive)return;
- const r=gameCanvas.getBoundingClientRect(),z=worldZoom(),s=abandonedTrollStump;
+ if(e.isPrimary===false||visitorRoom||mountainInside||trollStumpInside||homeInside||worldEditorActive)return;
+ const r=gameCanvas.getBoundingClientRect(),z=worldZoom();
  const x=cam.x+((e.clientX-r.left)*W/r.width-W/2)/z,y=cam.y+((e.clientY-r.top)*H/r.height-H/2)/z;
- if(Math.abs(x-s.x)<=s.width*.55&&y>=s.y-s.height&&y<=s.y+40)stumpTapCapture.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ for(const [kind,s] of [['stump',abandonedTrollStump],['cave',trollStumpHome]])if(Math.abs(x-s.x)<=s.width*.55&&y>=s.y-s.height&&y<=s.y+40){stumpTapCapture.set(e.pointerId,{x:e.clientX,y:e.clientY,kind});break}
 },true);
 gameCanvas.addEventListener('pointerup',e=>{
  const p=stumpTapCapture.get(e.pointerId);stumpTapCapture.delete(e.pointerId);
  if(!p||Math.hypot(e.clientX-p.x,e.clientY-p.y)>16||visitorRoom||worldEditorActive)return;
- visitorRoom='stump';visitorDoor=null;visitorInnerDoor=null;
+ if(p.kind==='cave')enterMountain();else{visitorRoom='stump';visitorDoor=null;visitorInnerDoor=null;}
+ homesteadTap.delete(e.pointerId);
  e.preventDefault();e.stopImmediatePropagation();
 },true);
 gameCanvas.addEventListener('pointercancel',e=>stumpTapCapture.delete(e.pointerId),true);
