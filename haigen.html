@@ -4298,7 +4298,7 @@ function hungerDrive(dt){
  if(campDanger(state.x,state.y)&&mindRetreat(dt))return true;
  const snack=state.eggs>=2||state.vegetables>=2||state.berries>=3;
  if(state.food>0||(state.hunger<=20&&snack)){
-  autoPlan('eat to restore my strength','hunger-eat');eatFood();autoPause=950;
+  autoPlan('eat to restore my strength','hunger-eat');eatFood();autoPause=950;livingMemory('I ate some food and restored my strength.');
   if(state.hunger>=80){state.hungerSeeking=false;hungerTarget=null;hungerRouteAge=0}
   return true;
  }
@@ -4314,7 +4314,7 @@ function hungerDrive(dt){
    if(!lightCampfire(fire))return true;
    autoPause=1000;return true;
   }
-  state[meal[0]]-=meal[1];state.food++;startHaigenAction('cook',1100);autoPause=1200;state.autoSteps++;save();notify('🍲 Haigen cooked '+meal[2]+'.');return true;
+  state[meal[0]]-=meal[1];state.food++;startHaigenAction('cook',1100);autoPause=1200;state.autoSteps++;livingMemory('I returned to camp and cooked '+meal[2]+'.');notify('🍲 Haigen cooked '+meal[2]+'.');return true;
  }
  if(hungerTarget&&(state.removed.includes(hungerTarget.id)||(hungerTarget.type==='bush'&&!berryReady(hungerTarget)))){hungerTarget=null;hungerRouteAge=0}
  if(hungerTarget){hungerRouteAge+=dt;if(hungerRouteAge>25000){autoIgnore.set(hungerTarget.id,Date.now()+30000);hungerTarget=null;hungerRouteAge=0;autoResetNav()}}
@@ -4332,6 +4332,50 @@ function hungerDrive(dt){
  if(autoWaypoint)autoTravel(autoWaypoint,dt,95);
  return true;
 }
+
+// Living Haigen: anticipation, preparation and actual outcome memories.
+let livingTarget=null,livingTargetAge=0,livingScanAt=0,livingHomeAge=0,livingHomeRetry=0;
+function livingMemory(text,type='memory'){
+ mindWrite(text,type);save();
+}
+function livingForage(kind,dt){
+ if(livingTarget&&(livingTarget.type!==kind||state.removed.includes(livingTarget.id)||(kind==='bush'&&!berryReady(livingTarget)))){livingTarget=null;livingTargetAge=0}
+ if(livingTarget){livingTargetAge+=dt;if(livingTargetAge>25000){autoIgnore.set(livingTarget.id,Date.now()+30000);livingTarget=null;livingTargetAge=0;autoResetNav()}}
+ if(!livingTarget&&time>=livingScanAt){livingScanAt=time+1200;livingTarget=autoTarget(kind);livingTargetAge=0}
+ if(!livingTarget)return false;
+ const target=livingTarget;
+ if(dist(state,target)>74){autoTravel(target,dt,74);return true}
+ livingTarget=null;livingTargetAge=0;autoResetNav();
+ if(harvest(target)){
+  if(kind==='flower')gatherFlower(target);else if(kind==='mushroom')gatherMushroom(target);
+  state.autoSteps++;autoPause=800;save();
+ }else autoIgnore.set(target.id,Date.now()+30000);
+ return true;
+}
+function livingPreparation(dt){
+ if(homeInside||state.resting||state.playerInstruction)return false;
+ if(autoPause>0)return false;
+ const herbs=Object.values(state.herbs).reduce((a,b)=>a+(Number(b)||0),0);
+ const homeDistance=dist(state,cottage);
+ if(state.health<85&&state.potions<1&&state.health>=58&&state.energy>=34&&state.hunger>60){
+  const need=herbs<2?'flower':state.mushrooms<1?'mushroom':null;
+  if(need){autoPlan('find ingredients for a healing salve','living-medicine-'+need);return livingForage(need,dt)}
+  if(homeDistance<270){
+   let remaining=2;for(const key of Object.keys(state.herbs)){const n=Math.min(remaining,state.herbs[key]);state.herbs[key]-=n;remaining-=n;if(!remaining)break}
+   state.mushrooms--;state.potions++;startHaigenAction('cook',1100);autoPause=1200;
+   livingMemory('I gathered herbs and mushrooms and made a healing salve.');return true;
+  }
+  autoPlan('return home to prepare medicine','living-medicine-home');
+  if(homeDistance<1500){autoTravel({x:cottage.x,y:cottage.y+85,id:'living-home'},dt,100);return true}
+ }
+ if(state.food<1&&state.hunger>60&&state.hunger<85&&homeDistance<510){
+  const ingredient=state.rawMeat>=1||state.fish>=1||state.eggs>=2||state.vegetables>=3||state.mushrooms>=3||state.berries>=6;
+  if(ingredient){autoPlan('prepare a spare meal before exploring','living-provisions');return autoCampChores(dt)}
+  autoPlan('collect provisions for my next journey','living-provisions-forage');
+  return livingForage('bush',dt);
+ }
+ return false;
+}
 function autonomousTick(dt){
  runeCuriosityTick(dt);
  if(autoDefendSelf())return;
@@ -4340,7 +4384,7 @@ function autonomousTick(dt){
  autoBubbleTimer-=dt;
  // Immediate needs supersede chores, without blindly returning to camp.
  if(state.poisonMs>0&&state.antidotes>0){autoPlan('cure the poison','antidote');curePoison();return}
- if(state.health<72&&state.potions>0){autoPlan('treat my wounds','salve');healSelf();return}
+ if(state.health<72&&state.potions>0){autoPlan('treat my wounds','salve');if(healSelf())livingMemory('I treated my wounds with a woodland salve.');return}
  if(state.resting){
   if(!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;autoPlan('danger near camp: move away','escape');return}
   if(state.energy>=90&&state.health>=77&&state.poisonMs<=0){state.resting=false;travelCamp=null;autoPause=350;autoPlan('wake up and explore again','wake');think('I feel better. Time to carry on!',3800,true)}
@@ -4359,7 +4403,14 @@ function autonomousTick(dt){
   autoPause=650;autoPlan('head outside after a good sleep','leave-home');
   return;
  }
- if(state.health<58||state.energy<34){
+ // Prefer home before exhaustion, but fall back to the original safe-rest routine if the route fails.
+ if(!homeInside&&state.campTier>0&&state.health>=58&&state.hunger>35&&state.energy>12&&state.energy<48&&dist(state,cottage)>=460&&dist(state,cottage)<1800&&time>=livingHomeRetry){
+  livingHomeAge+=dt;
+  if(livingHomeAge<35000){autoPlan('head home before I get exhausted','living-bed');autoTravel({x:cottage.x,y:cottage.y+85,id:'living-bed-home'},dt,350);return}
+  livingHomeAge=0;livingHomeRetry=time+90000;autoResetNav();
+ }
+ if(dist(state,cottage)<460||state.energy>=48)livingHomeAge=0;
+ if(state.health<58||state.energy<34||(state.energy<48&&state.campTier>0&&(homeInside||dist(state,cottage)<460))){
   // V344: a tired Haigen goes to his bed when near home; he never sleeps in the coop.
   if(state.campTier>0&&(dist(state,cottage)<460||homeInside)){
    travelCamp=null;
@@ -4416,6 +4467,7 @@ function autonomousTick(dt){
   think('A little fire will keep me warm tonight.',3900,true);save();return;
  }
  if(hungerDrive(dt))return;
+ if(livingPreparation(dt))return;
  if(mindRetreat(dt))return;
  if(instructionTick(dt))return;
  if(paintAI(dt))return;
