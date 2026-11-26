@@ -4288,6 +4288,50 @@ function autonomousRuneTick(dt){
  state.runeNextAttemptAt=Date.now()+4*60000;
  return true;
 }
+// Hunger takes precedence over optional exploration and chores.
+let hungerTarget=null,hungerSearchAt=0,hungerRouteAge=0;
+function hungerDrive(dt){
+ if(state.hunger>=80){state.hungerSeeking=false;hungerTarget=null;hungerRouteAge=0;return false}
+ if(state.hunger>60&&!hungerTarget&&!state.hungerSeeking)return false;
+ state.hungerSeeking=true;
+ if(autoPause>0){autoPause=Math.max(0,autoPause-dt);return true}
+ if(campDanger(state.x,state.y)&&mindRetreat(dt))return true;
+ const snack=state.eggs>=2||state.vegetables>=2||state.berries>=3;
+ if(state.food>0||(state.hunger<=20&&snack)){
+  autoPlan('eat to restore my strength','hunger-eat');eatFood();autoPause=950;
+  if(state.hunger>=80){state.hungerSeeking=false;hungerTarget=null;hungerRouteAge=0}
+  return true;
+ }
+ const recipes=[['rawMeat',1,'roast'],['fish',1,'grilled fish'],['vegetables',3,'garden stew'],['eggs',2,'eggs'],['mushrooms',3,'mushroom stew'],['berries',6,'berry meal']];
+ const meal=recipes.find(([k,n])=>(state[k]||0)>=n);
+ if(meal){
+  const fire=state.structures.find(f=>f.kind==='campfire'&&dist(f,cottage)<510);
+  const destination=fire||{x:cottage.x,y:cottage.y+85,id:'hunger-home'};
+  autoPlan('return to camp to cook','hunger-camp');
+  if(dist(state,destination)>105){autoTravel(destination,dt,100);return true}
+  if(fire&&!fire.lit){
+   if(!fireLoaded(fire)){if(!loadCampfire(fire)){if(state.wood>=3){state.wood-=3;fire.loaded=true;save()}else{autoGatherWood(dt);return true}}}
+   if(!lightCampfire(fire))return true;
+   autoPause=1000;return true;
+  }
+  state[meal[0]]-=meal[1];state.food++;startHaigenAction('cook',1100);autoPause=1200;state.autoSteps++;save();notify('🍲 Haigen cooked '+meal[2]+'.');return true;
+ }
+ if(hungerTarget&&(state.removed.includes(hungerTarget.id)||(hungerTarget.type==='bush'&&!berryReady(hungerTarget)))){hungerTarget=null;hungerRouteAge=0}
+ if(hungerTarget){hungerRouteAge+=dt;if(hungerRouteAge>25000){autoIgnore.set(hungerTarget.id,Date.now()+30000);hungerTarget=null;hungerRouteAge=0;autoResetNav()}}
+ if(!hungerTarget&&time>=hungerSearchAt){hungerSearchAt=time+1000;hungerTarget=autoTarget('bush')||autoTarget('mushroom');hungerRouteAge=0}
+ if(hungerTarget){
+  autoPlan('forage for food','hunger-forage:'+hungerTarget.id);
+  if(dist(state,hungerTarget)>74){autoTravel(hungerTarget,dt,74);return true}
+  const target=hungerTarget;hungerTarget=null;hungerRouteAge=0;autoResetNav();
+  if(harvest(target)){if(target.type==='mushroom')gatherMushroom(target);state.autoSteps++;save()}else autoIgnore.set(target.id,Date.now()+30000);
+  autoPause=800;return true;
+ }
+ if(snack){eatFood();autoPause=950;return true}
+ autoPlan('search for edible plants','hunger-search');
+ if(!autoWaypoint||dist(state,autoWaypoint)<95)autoWaypoint=autoExplore();
+ if(autoWaypoint)autoTravel(autoWaypoint,dt,95);
+ return true;
+}
 function autonomousTick(dt){
  runeCuriosityTick(dt);
  if(autoDefendSelf())return;
@@ -4371,9 +4415,7 @@ function autonomousTick(dt){
   mindEvent('rest');autoPlan('sleep beside my flickering campfire','rest');
   think('A little fire will keep me warm tonight.',3900,true);save();return;
  }
- if(state.hunger<57&&(state.food>0||state.eggs>=2||state.vegetables>=2||state.berries>=3)){
-  autoPlan('eat something from my bag','eat');eatFood();return;
- }
+ if(hungerDrive(dt))return;
  if(mindRetreat(dt))return;
  if(instructionTick(dt))return;
  if(paintAI(dt))return;
