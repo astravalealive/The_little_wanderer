@@ -10667,9 +10667,9 @@ if(state.campTier>0||housePreviewTier>0){
    if(!solid(nx,prevPlayerY))state.x=nx;
    if(!solid(state.x,ny))state.y=ny;
   }
- }else if(tier===5){
+ }else if(tier===5||tier===3){
   homeFloor=0;
-  const blocked=(xx,yy)=>longhouseBlocked(.06+.88*(xx-hx+halfWidth)/(2*halfWidth),.07+.88*(yy-back)/(front-back));
+  const blocked=(xx,yy)=>(tier===3?tier3Blocked:longhouseBlocked)(.06+.88*(xx-hx+halfWidth)/(2*halfWidth),.07+.88*(yy-back)/(front-back));
   const nx=state.x,ny=state.y;
   if(blocked(nx,ny)){
    state.x=prevPlayerX;state.y=prevPlayerY;
@@ -13283,6 +13283,16 @@ const longhouseObjects=[
  {box:[.105,.43,.27,.59],mask:[.10,.37,.27,.61]},
  {box:[.73,.43,.82,.52],mask:[.73,.20,.82,.53]}
 ];
+const tier3Objects=[
+ {box:[.43,.58,.59,.72],mask:[.42,.40,.60,.73]},
+ {box:[.13,.36,.30,.53],mask:[.12,.18,.31,.54]},
+ {box:[.72,.63,.89,.80],mask:[.70,.53,.90,.81]},
+ {box:[.06,.48,.14,.62],mask:[.05,.34,.15,.63]},
+ {box:[.77,.40,.92,.49],mask:[.76,.25,.93,.50]}
+];
+function tier3Blocked(u,v){
+ return u<.10||u>.90||v<.43||v>(Math.abs(u-.5)<.07?.92:.81)||tier3Objects.some(({box:[l,t,r,b]})=>u>l&&u<r&&v>t&&v<b);
+}
 function longhouseBlocked(u,v){
  if(u<.07||u>.93||v<.53||v>(Math.abs(u-.5)<.065?.91:.79))return true;
  return longhouseObjects.some(({box:[l,t,r,b]})=>u>l&&u<r&&v>t&&v<b);
@@ -13311,10 +13321,10 @@ function drawHomeInteriorScene(visiting=false){
  const roomX=(state.x-(hx-halfWidth))/(halfWidth*2),roomY=(state.y-back)/(front-back);
  const px=left+size*(.06+roomX*.88),py=top+roomHeight*(.07+roomY*.88);
  if(!visiting||(homeInside&&homeFloor===0)){ctx.save();ctx.translate(px,py);const actorScale=floor===0?roomHeight/520:size/520;ctx.scale(actorScale,actorScale);
- if(state.resting&&homeInside&&tier===5){ctx.restore();ctx.save();ctx.translate(left+size*.19,top+roomHeight*.49);ctx.scale(actorScale*.75,actorScale*.75);drawSleepingHaigen(0,0);}else if(state.resting&&homeInside)drawSleepingHaigen(0,0);else character(0,0,'boy');ctx.restore();
- if(tier===5&&art?.naturalWidth&&!state.resting){
+ if(state.resting&&homeInside&&(tier===5||tier===3)){ctx.restore();ctx.save();ctx.translate(left+size*(tier===3?.22:.19),top+roomHeight*(tier===3?.36:.49));ctx.scale(actorScale*.75,actorScale*.75);drawSleepingHaigen(0,0);}else if(state.resting&&homeInside)drawSleepingHaigen(0,0);else character(0,0,'boy');ctx.restore();
+ if((tier===5||tier===3)&&art?.naturalWidth&&!state.resting){
   const u=.06+roomX*.88,v=.07+roomY*.88;
-  for(const {box,mask:[l,t,r,b]} of longhouseObjects){
+  for(const {box,mask:[l,t,r,b]} of (tier===3?tier3Objects:longhouseObjects)){
    if(v>=box[3]||u<l-.06||u>r+.06)continue;
    ctx.drawImage(art,l*art.naturalWidth,t*art.naturalHeight,(r-l)*art.naturalWidth,(b-t)*art.naturalHeight,left+l*size,top+t*roomHeight,(r-l)*size,(b-t)*roomHeight);
   }
