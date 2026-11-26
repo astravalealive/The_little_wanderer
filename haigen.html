@@ -1492,38 +1492,35 @@ for(const crop of gardenCrops){state.gardenSeeds[crop]=Math.max(0,Math.floor(Num
 const gardenHarvestBursts=[];
 function gardenGrowthMs(){return [0,105000,70000,45000,35000,25000][state.gardenTier]||105000}
 function gardenCropGrowth(crop){return gardenGrowthMs()*({cabbage:1.25,onions:1.1,turnips:.85,leeks:1.15}[crop]||1)}
-function gardenCropProgress(crop){return Math.max(0,Math.min(1,1-(state.gardenCropReady[crop]-Date.now())/gardenCropGrowth(crop)))}
-function gardenCropRipe(crop){return !!state.gardenTier&&!!state.gardenPlanted[crop]&&Date.now()>=state.gardenCropReady[crop]}
-function gardenRipe(){return gardenCrops.some(gardenCropRipe)}
-function gardenHarvestAmount(){return [0,3,5,8,10,12][state.gardenTier]||0}
-function harvestGarden(crop){
- if(!state.gardenTier){notify('🥕 Build your kitchen garden first.');return false}
- crop=crop||gardenCrops.find(gardenCropRipe);
- if(!gardenCrops.includes(crop)||!gardenCropRipe(crop)){notify('🌱 That crop is still growing.');return false}
- const amount=gardenHarvestAmount();
- state.vegetables+=amount;state.gardenPlanted[crop]=false;state.gardenCropReady[crop]=0;
- state.gardenCropPickedAt[crop]=Date.now();
- state.gardenReadyAt=Math.min(...gardenCrops.map(c=>state.gardenCropReady[c]));
- gardenHarvestBursts.push({x:gardenPlot.x,y:gardenPlot.y-20,at:time,crop,amount});
- notify('🌾 Harvested '+amount+' '+crop+'! Plant another seed to regrow.');
- if(typeof mindWrite==='function')mindWrite('I harvested '+crop+' from our garden. Watching things grow teaches me patience.','observation');
- save();return true;
+function gardenCapacity(){return [0,1,2,3,4,5][state.gardenTier]||0}
+state.gardenSlots=state.gardenSlots||{};
+for(const crop of gardenCrops){
+ if(!Array.isArray(state.gardenSlots[crop]))state.gardenSlots[crop]=state.gardenPlanted[crop]?[{ready:state.gardenCropReady[crop],picked:0}]:[];
 }
-function gardenCropVisualStage(crop){
- if(gardenCropRipe(crop))return 'ripe';
- const picked=Number(state.gardenCropPickedAt[crop])||0;
- if(picked&&Date.now()-picked<Math.min(9000,gardenCropGrowth(crop)*.19))return 'picked';
- if(!state.gardenPlanted[crop])return 'empty';
- return gardenCropProgress(crop)<.28?'planted':'growing';
+function gardenSlot(crop,k){return state.gardenSlots[crop]?.[k]||null}
+function gardenCropProgress(crop,k=0){const s=gardenSlot(crop,k);return s?.ready?Math.max(0,Math.min(1,1-(s.ready-Date.now())/gardenCropGrowth(crop))):0}
+function gardenCropRipe(crop,k){if(!state.gardenTier)return false;if(k===undefined)return Array.from({length:gardenCapacity()},(_,i)=>i).some(i=>gardenCropRipe(crop,i));const s=gardenSlot(crop,k);return !!s?.ready&&Date.now()>=s.ready}
+function gardenRipe(){return gardenCrops.some(c=>gardenCropRipe(c))}
+function gardenHarvestAmount(){return 1}
+function gardenEmptySlot(crop){return Array.from({length:gardenCapacity()},(_,i)=>i).find(i=>!gardenSlot(crop,i)?.ready)}
+function gardenSowChoice(){return gardenCrops.find(c=>state.gardenSeeds[c]>0&&gardenEmptySlot(c)!==undefined)}
+function harvestGarden(crop,k){
+ crop=crop||gardenCrops.find(c=>gardenCropRipe(c));if(!gardenCrops.includes(crop))return false;
+ if(k===undefined)k=Array.from({length:gardenCapacity()},(_,i)=>i).find(i=>gardenCropRipe(crop,i));
+ if(!gardenCropRipe(crop,k))return false;
+ state.vegetables++;state.gardenSlots[crop][k]={ready:0,picked:Date.now()};save();return true;
 }
-function gardenPlant(crop){
- if(!state.gardenTier||!gardenCrops.includes(crop)||state.gardenPlanted[crop]||!(state.gardenSeeds[crop]>0))return false;
- state.gardenSeeds[crop]--;state.gardenPlanted[crop]=true;state.gardenCropPickedAt[crop]=0;state.gardenCropReady[crop]=Date.now()+gardenCropGrowth(crop);save();return true;
+function gardenCropVisualStage(crop,k=0){const s=gardenSlot(crop,k);if(gardenCropRipe(crop,k))return 'ripe';if(s?.ready)return gardenCropProgress(crop,k)<.28?'planted':'growing';return s?.picked&&Date.now()-s.picked<900?'picked':'empty'}
+function gardenPlant(crop,k){
+ if(!state.gardenTier||!gardenCrops.includes(crop)||!(state.gardenSeeds[crop]>0))return false;
+ if(k===undefined)k=gardenEmptySlot(crop);
+ if(!Number.isInteger(k)||k<0||k>=gardenCapacity()||gardenSlot(crop,k)?.ready)return false;
+ state.gardenSeeds[crop]--;state.gardenSlots[crop][k]={ready:Date.now()+gardenCropGrowth(crop),picked:0};save();return true;
 }
 function gardenHarvestMenu(){
- open('<h2>Viking farm · Level '+state.gardenTier+'</h2><p>Plant each crop bed separately using seeds.</p>'+gardenCrops.map(c=>'<div class="item"><b>'+safeText(c)+'</b><span>'+gardenCropVisualStage(c)+' · '+state.gardenSeeds[c]+' seeds</span><button class="btn" data-plant="'+c+'" '+(state.gardenPlanted[c]||!state.gardenSeeds[c]?'disabled':'')+'>Plant</button><button class="btn" data-pick="'+c+'" '+(gardenCropRipe(c)?'':'disabled')+'>Pick</button></div>').join(''));
- document.querySelectorAll('[data-plant]').forEach(b=>b.onclick=()=>{gardenPlant(b.dataset.plant);gardenHarvestMenu()});
- document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{harvestGarden(b.dataset.pick);gardenHarvestMenu()});
+ open('<h2>Viking farm · Level '+state.gardenTier+'</h2>'+gardenCrops.map(c=>'<h3>'+safeText(c)+' · '+state.gardenSeeds[c]+' seeds</h3>'+Array.from({length:gardenCapacity()},(_,k)=>'<div class="item"><span>Position '+(k+1)+' · '+gardenCropVisualStage(c,k)+'</span><button class="btn" data-plant="'+c+':'+k+'" '+(gardenSlot(c,k)?.ready||!state.gardenSeeds[c]?'disabled':'')+'>Plant</button><button class="btn" data-pick="'+c+':'+k+'" '+(gardenCropRipe(c,k)?'':'disabled')+'>Pick</button></div>').join('')).join(''));
+ document.querySelectorAll('[data-plant]').forEach(b=>b.onclick=()=>{const [c,k]=b.dataset.plant.split(':');gardenPlant(c,Number(k));gardenHarvestMenu()});
+ document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const [c,k]=b.dataset.pick.split(':');harvestGarden(c,Number(k));gardenHarvestMenu()});
 }
 function gardenSeedTrade(){
  if(Math.hypot(state.x-cottage.x,state.y-cottage.y)>450)return;
@@ -3724,6 +3721,9 @@ function autoCampChores(dt){
   autoPlan('collect eggs from the chicken coop','eggs');
   if(dist(state,chickenNest)>78){autoTravel(chickenNest,dt,78);return true}
   const n=state.nestEggs;state.nestEggs=0;state.eggs+=n;state.autoSteps++;save();notify('🥚 Haigen collected '+n+' eggs.');return true;
+ }
+ if(state.gardenTier&&gardenSowChoice()&&!gardenRipe()){
+ autoPlan('sow vegetable seeds','garden');if(dist(state,gardenPlot)>115){autoTravel(gardenPlot,dt,115);return true}if(gardenPlant(gardenSowChoice()))state.autoSteps++;return true;
  }
  if(state.gardenTier&&gardenRipe()&&state.vegetables<15){
   autoPlan('harvest the kitchen garden','garden');
@@ -6309,15 +6309,15 @@ function drawVikingFarm(){
  const w=[180,220,260,300,340][tier-1],h=w*img.naturalHeight/img.naturalWidth;
  ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(img,p.x-w/2,p.y-h/2,w,h);
  if(state.gardenTier&&vikingCropAtlas.complete&&vikingCropAtlas.naturalWidth)gardenCrops.forEach((crop,row)=>{
- const growth=gardenCropProgress(crop),stage=gardenCropVisualStage(crop);
- const picked=Date.now()-(state.gardenCropPickedAt[crop]||0);
- if(stage==='empty'||(stage==='picked'&&picked>900))return;
+ for(let k=0;k<gardenCapacity();k++){
+ const growth=gardenCropProgress(crop,k),stage=gardenCropVisualStage(crop,k);
+ const picked=Date.now()-(gardenSlot(crop,k)?.picked||0);
+ if(stage==='empty'||(stage==='picked'&&picked>900))continue;
  const col=stage==='picked'?4:stage==='ripe'?3:Math.min(2,Math.floor(growth*3));
  const edges=[150,410,675,965,1250,1536],ys=[0,170,335,490,650,805,1024];
  const sx=edges[col],sy=ys[row],sw=edges[col+1]-sx,sh=ys[row+1]-sy;
  const scaleX=vikingCropAtlas.naturalWidth/1536,scaleY=vikingCropAtlas.naturalHeight/1024;
- for(let k=0;k<4;k++){
- const x=p.x+(k-1.5)*w*.14,y=p.y+(row-2.5)*h*.105;
+ const x=p.x+(k-(gardenCapacity()-1)/2)*w*.14,y=p.y+(row-2.5)*h*.105;
  const dw=w*.13,dh=dw*sh/sw;
  ctx.drawImage(vikingCropAtlas,sx*scaleX,sy*scaleY,sw*scaleX,sh*scaleY,x-dw/2,y-dh-(stage==='picked'?12*(1-picked/900):0),dw,dh);
  }
@@ -11535,10 +11535,12 @@ function wandererTrade(field,qty,price,buy){
  state[field]=count+(buy?qty:-qty);atelier.purse=wallet+(buy?-price:price);save();return true;
 }
 
+function wandererBuySeed(crop){if(!gardenCrops.includes(crop)||!wanderer.ready||homeInside||dist(wanderer,state)>=100||!(atelier.purse>=2))return false;atelier.purse-=2;state.gardenSeeds[crop]++;save();return true;}
 function wandererShop(message=''){
  const goods=[['food',1,3],['wood',5,4],['stone',3,4],['berries',5,3]];
  const buttons=(rows,buy)=>rows.map(([f,q,p],i)=>'<button class="btn" data-wanderer="'+(buy?'b':'s')+i+'" '+((buy?(Number(atelier.purse)||0)<p:(Number(state[f])||0)<q)?'disabled':'')+'>'+ (buy?'Buy ':'Sell ')+q+' '+f+' · '+p+' gold</button>').join(' ');
- open('<h2>The Wanderer</h2><p>Coin purse: '+atelier.purse+' gold</p><h3>Buy supplies</h3>'+buttons(goods,true)+'<h3>Sell produce</h3>'+buttons(wandererGoods,false)+'<p>'+message+'</p>');
+ open('<h2>The Wanderer</h2><p>Coin purse: '+atelier.purse+' gold</p><h3>Buy supplies</h3>'+buttons(goods,true)+'<h3>Seeds · 2 gold each</h3>'+gardenCrops.map(c=>'<button class="btn" data-wseed="'+c+'" '+(atelier.purse<2?'disabled':'')+'>Buy '+c+' seed</button>').join(' ')+'<h3>Sell produce</h3>'+buttons(wandererGoods,false)+'<p>'+message+'</p>');
+ $('modalBody').querySelectorAll('[data-wseed]').forEach(b=>b.onclick=()=>{if(wandererBuySeed(b.dataset.wseed))wandererShop('Seed purchased.')});
  $('modalBody').querySelectorAll('[data-wanderer]').forEach(b=>b.onclick=()=>{
   if(!wanderer.ready||dist(wanderer,state)>=100||homeInside)return;
   const id=b.dataset.wanderer,buy=id[0]==='b',row=(buy?goods:wandererGoods)[Number(id.slice(1))];
@@ -11568,7 +11570,9 @@ function updateWanderer(dt){
   if(state.autonomy&&!wanderer.tradeWait){
    wanderer.tradeWait=30000;
    const surplus=wandererGoods.find(([f,q,p,reserve])=>(Number(state[f])||0)>=q+reserve);
-   if(surplus&&wandererTrade(surplus[0],surplus[1],surplus[2],false))notify('Haigen sold '+surplus[0]+' to the Wanderer.');
+   const seed=state.gardenTier&&gardenCrops.find(c=>!state.gardenSeeds[c]&&gardenEmptySlot(c)!==undefined);
+   if(seed&&wandererBuySeed(seed))notify('Haigen bought '+seed+' seed.');
+   else if(surplus&&wandererTrade(surplus[0],surplus[1],surplus[2],false))notify('Haigen sold '+surplus[0]+' to the Wanderer.');
    else if(state.hunger<55&&(state.food||0)<1&&wandererTrade('food',1,3,true))notify('Haigen bought a meal from the Wanderer.');
   }
   return;
