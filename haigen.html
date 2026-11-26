@@ -2936,7 +2936,7 @@ function haigenRavenPost(){
  document.querySelectorAll('[data-raven-reply]').forEach(btn=>btn.onclick=()=>{
   const e=letters[Number(btn.dataset.ravenReply)],reply=document.getElementById('ravenReply'+btn.dataset.ravenReply)?.value.trim();
   if(!e||!reply)return;
-  e.reply=reply.slice(0,600);
+  e.reply=reply.slice(0,600);livingBond('Alfather','raven reply');
   if(!Array.isArray(state.memories))state.memories=[];
   state.memories.push('The builders replied to my raven: '+e.reply);
   mindWrite('I received a reply to my raven. I want to remember what they told me.','memory');
@@ -3052,6 +3052,7 @@ state.haigenConversations=Array.isArray(state.haigenConversations)?state.haigenC
 
 function haigenAnswer(message){
  const q=message.toLowerCase();
+ const grounded=livingAnswer(q);if(grounded)return grounded;
  const recent=state.runeResearch?.[state.runeResearch.length-1];
  const question=state.runeQuestions?.[0];
  if(/what (did|have) you learn|what do you know|tell me about (your )?research|runestone/.test(q)){
@@ -3077,7 +3078,7 @@ function haigenTalkPanel(){
  const input=document.getElementById('haigenTalkInput'),send=document.getElementById('haigenTalkSend');
  send.onclick=()=>{
   const message=input.value.trim();if(!message)return;
-  state.haigenConversations.push({from:'you',text:message,at:Date.now()});
+  state.haigenConversations.push({from:'you',text:message,at:Date.now()});livingBond('Alfather','conversation');
   if(/mycolog|mushroom|fung|mycel/i.test(message)&&!state.runeQuestions.some(q=>/mycolog/i.test(q.topic)))state.runeQuestions.unshift({topic:'Mycology',why:'Alfather asked me about fungi.',at:Date.now()});
   const answer=haigenAnswer(message);
   state.haigenConversations.push({from:'haigen',text:answer,at:Date.now()});
@@ -4031,6 +4032,76 @@ function livingInnerTick(dt){
   livingChooseAmbition();
  }
 }
+
+function livingSocial(name,event,detail){
+ const b=livingInner(),prior=b.relationships[name];
+ livingBond(name,event);
+ const bond=b.relationships[name];bond.lastDetail=String(detail||'').slice(0,160);
+ if(!prior)mindWrite('I met '+name+'. '+(detail||''),'memory');
+ else if(event==='trade'||event==='seed')mindWrite('I traded with '+name+'. '+detail,'memory');
+ save();
+}
+let livingSocialTarget='',livingSocialAge=0,livingSocialRetry=0;
+function livingSocialTick(dt){
+ if(homeInside||state.resting||state.playerInstruction||state.health<70||state.energy<55||state.hunger<65||campDanger(state.x,state.y)||time<livingSocialRetry){livingSocialTarget='';livingSocialAge=0;return false}
+ if(autoPause>0)return false;
+ const b=livingInner();
+ if(!livingSocialTarget){
+  const candidates=[];
+  if(nico.ready&&dist(nico,state)<700&&Date.now()>=((b.nicoVisitTime||0)+90000))candidates.push({key:'nico',score:(!state.metNico?4:1)+b.emotions.loneliness/50-dist(nico,state)/700});
+  if(wanderer.ready&&dist(wanderer,state)<700&&Date.now()>=((b.traderVisitTime||0)+90000)){
+   const surplus=wandererGoods.some(([f,q,p,reserve])=>(Number(state[f])||0)>=q+reserve);
+   if(surplus||state.food<2&&atelier.purse>=3)candidates.push({key:'trader',score:2-dist(wanderer,state)/700});
+  }
+  candidates.sort((a,c)=>c.score-a.score);
+  if(!candidates.length)return false;
+  livingSocialTarget=candidates[0].key;livingSocialAge=0;
+ }
+ livingSocialAge+=dt;
+ if(livingSocialAge>18000){livingSocialTarget='';livingSocialAge=0;livingSocialRetry=time+45000;autoResetNav();return false}
+ const key=livingSocialTarget,person=key==='nico'?nico:wanderer;
+ if(!person.ready){livingSocialTarget='';return false}
+ autoPlan(key==='nico'?'visit Nico the Mothkeeper':'visit the travelling merchant','living-social-'+key);
+ if(dist(state,person)>78){autoTravel(person,dt,76,.12);return true}
+ if(key==='nico'){
+  b.nicoVisitTime=Date.now();state.metNico=true;nicoAction('wave');
+  livingSocial('Nico','visit','We met on the trail and greeted each other.');
+ }else{
+  b.traderVisitTime=Date.now();
+  livingSocial('The Wanderer','visit','I visited the travelling merchant.');
+  if(state.food<2&&atelier.purse>=3&&wandererTrade('food',1,3,true))notify('Haigen bought a meal for his travels.');
+  else{
+   const surplus=wandererGoods.find(([f,q,p,reserve])=>(Number(state[f])||0)>=q+reserve);
+   if(surplus)wandererTrade(surplus[0],surplus[1],surplus[2],false);
+  }
+  wanderer.tradeWait=30000;
+ }
+ livingSocialTarget='';livingSocialAge=0;livingSocialRetry=time+45000;autoResetNav();autoPause=1200;return true;
+}
+function livingAnswer(q){
+ const b=livingInner(),a=b.ambition,e=b.emotions;
+ if(/ambition|dream|goal|future|want to become/.test(q))return a?'I want to '+livingAmbitionTable()[a.kind].label+'. So far I have completed '+Object.values(a.progress).reduce((n,v)=>n+v,0)+' related activities.':'I have not settled on a new ambition yet.';
+ if(/how are you|how do you feel|are you okay|emotion/.test(q))return 'I feel '+mindMood().toLowerCase()+'. My health is '+Math.round(state.health)+'%, food '+Math.round(state.hunger)+'% and energy '+Math.round(state.energy)+'%. '+(e.loneliness>50?'I would enjoy some company.':e.fear>50?'I want to stay somewhere safe.':e.frustration>50?'I think I need a change of activity.':'My current plan is to '+(haigenMind.lastGoal||'look after myself')+'.');
+ if(/friend|trust|nico|wanderer|merchant|skölli|skolli|dylan|relationship/.test(q)){
+  const entries=Object.entries(b.relationships),match=entries.find(([name])=>q.includes(name.toLowerCase()));
+  if(match)return 'I have spent time with '+match[0]+' '+match[1].encounters+' times. '+(match[1].lastDetail||'I remember our time together.');
+  return entries.length?'I remember spending time with '+entries.map(([name])=>name).join(', ')+'.':'I am still getting to know my neighbours and companions.';
+ }
+ if(/favourite place|favorite place|safe place|dangerous place/.test(q)){
+  const dangerous=/danger/.test(q),places=Object.values(b.places).filter(p=>dangerous?p.danger>0:p.reward>0&&p.danger===0).sort((a,c)=>dangerous?c.danger-a.danger:c.reward-a.reward);
+  const p=places[0];return p?'I remember a place in '+(expandedRegion(p.x,p.y)?.name||'the woodland')+'. '+(dangerous?'I was hurt there '+p.danger+' times.':'I have had '+p.reward+' good experiences there.'):'I have not gathered enough experience to choose a place yet.';
+ }
+ if(/what.*(garden|vegetable|crop)/.test(q))return state.gardenTier?'My garden is established. I have '+(state.vegetables||0)+' vegetables in my supplies.':'I have not established a garden yet.';
+ if(/what.*(did you do|happened|accomplish)|recent adventure|last success|last failure/.test(q)){
+  const h=b.history.find(x=>/failure/.test(q)?!x.success:/success/.test(q)?x.success:true);
+  return h?'My recent '+h.kind+' activity in '+h.region+(h.success?' went well.':' did not go as planned. I will learn from it.'):'I have not recorded a completed activity yet.';
+ }
+ if(/skill|good at|best at/.test(q)){
+  const skills=Object.entries(b.skills).sort((a,c)=>c[1].success-a[1].success);
+  return skills.length?'I have had the most successful experiences with '+skills[0][0]+'. I have succeeded '+skills[0][1].success+' times.':'I am still learning what I am good at.';
+ }
+ return null;
+}
 function livingBrain(){
  const m=haigenMind;
  if(!m.livingBrain||typeof m.livingBrain!=='object')m.livingBrain={};
@@ -4597,6 +4668,7 @@ function autonomousTick(dt){
  }
  if(hungerDrive(dt))return;
  if(livingPreparation(dt))return;
+ if(livingSocialTick(dt))return;
  if(mindRetreat(dt))return;
  if(instructionTick(dt))return;
  if(paintAI(dt))return;
@@ -11756,10 +11828,10 @@ const wandererGoods=[['vegetables',3,2,6],['eggs',2,2,4],['berries',5,1,10],['mu
 function wandererTrade(field,qty,price,buy){
  const wallet=Number(atelier.purse)||0, count=Number(state[field])||0;
  if(buy?wallet<price:count<qty)return false;
- state[field]=count+(buy?qty:-qty);atelier.purse=wallet+(buy?-price:price);save();return true;
+ state[field]=count+(buy?qty:-qty);atelier.purse=wallet+(buy?-price:price);livingSocial('The Wanderer','trade',(buy?'Bought ':'Sold ')+qty+' '+field+' for '+price+' gold.');return true;
 }
 
-function wandererBuySeed(crop){if(!gardenCrops.includes(crop)||!wanderer.ready||homeInside||dist(wanderer,state)>=100||!(atelier.purse>=2))return false;atelier.purse-=2;state.gardenSeeds[crop]++;save();return true;}
+function wandererBuySeed(crop){if(!gardenCrops.includes(crop)||!wanderer.ready||homeInside||dist(wanderer,state)>=100||!(atelier.purse>=2))return false;atelier.purse-=2;state.gardenSeeds[crop]++;livingSocial('The Wanderer','seed','Bought '+crop+' seed for 2 gold.');return true;}
 function wandererShop(message=''){
  const goods=[['food',1,3],['wood',5,4],['stone',3,4],['berries',5,3]];
  const buttons=(rows,buy)=>rows.map(([f,q,p],i)=>'<button class="btn" data-wanderer="'+(buy?'b':'s')+i+'" '+((buy?(Number(atelier.purse)||0)<p:(Number(state[f])||0)<q)?'disabled':'')+'>'+ (buy?'Buy ':'Sell ')+q+' '+f+' · '+p+' gold</button>').join(' ');
