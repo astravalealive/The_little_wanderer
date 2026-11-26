@@ -6669,42 +6669,10 @@ function homesteadArt(tier){
 }
 // V225: Load the exact user-approved art directly from the ZIP committed to GitHub.
 // No duplicate PNG upload is necessary. The older art remains as an offline fallback.
-const approvedHomes={exterior:{},interior:{},ready:false,error:''};
-async function loadApprovedHomes(){
- try{
-  const zipResponse=await fetch('./haigen_approved_house_reference_crops.zip',{cache:'force-cache'});
-  if(!zipResponse.ok)throw Error('Artwork archive HTTP '+zipResponse.status);
-  if(!window.JSZip){
-   await new Promise((resolve,reject)=>{
-    const script=document.createElement('script');
-    script.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
-    script.onload=resolve;script.onerror=()=>reject(Error('ZIP decoder unavailable'));
-    document.head.appendChild(script);
-   });
-  }
-  const archive=await window.JSZip.loadAsync(await zipResponse.arrayBuffer());
-  const loading=[];
-  for(let level=1;level<=5;level++)for(const kind of ['exterior','interior']){
-   if(level===1&&kind==='interior')continue;
-   if(kind==='interior'){
-    loading.push((async()=>{const img=new Image();img.src='./assets/house-tier-'+level+'-interior.png?v=1';await img.decode();approvedHomes.interior[level]=img;})());
-    continue;
-   }
-   const filename='level_'+level+'_'+kind+'_reference.png';
-   const entry=archive.file(filename)||Object.values(archive.files).find(f=>!f.dir&&f.name.split('/').pop()===filename);
-   if(!entry)throw Error('Missing artwork: '+level+' '+kind);
-   loading.push((async()=>{
-    const blob=await entry.async('blob');
-    const url=URL.createObjectURL(new Blob([blob],{type:'image/png'}));
-    const img=new Image();img.src=url;await img.decode();
-    approvedHomes[kind][level]=img;
-   })());
-  }
-  await Promise.all(loading);approvedHomes.ready=true;
-  console.info('V225: all ten approved house images loaded from the repository ZIP');
- }catch(e){approvedHomes.error=String(e);console.warn('Approved artwork loading:',e);notify('House artwork could not load. Check connection and refresh.');}
+const approvedHomes={interior:{}};
+for(let level=2;level<=5;level++){
+ const img=new Image();img.decoding='async';img.src='./assets/house-tier-'+level+'-interior.png?v=351';approvedHomes.interior[level]=img;
 }
-loadApprovedHomes();
 
 const ravenPerch={x:cottage.x+245,y:cottage.y+90};
 const ravenArt={};
@@ -6806,46 +6774,11 @@ function drawCampHome(){
  const tier=displayedHouseTier();if(state.campTier<1&&!housePreviewTier)return;
  const x=cottage.x+35,y=cottage.y-10;
  const cleanSprite=cleanHouseArt[tier];
- const exterior=approvedHomes.exterior[tier];
- const interior=approvedHomes.interior[tier];
- const w=tier===1?330:tier===2?365:tier===3?405:tier===4?485:560;
- const h=tier===1?310:tier===2?335:tier===3?355:tier===4?385:420;
+ const w=[0,330,365,430,485,560][tier];
+ if(!cleanSprite||!cleanSprite.complete||!cleanSprite.naturalWidth)return;
+ const h=w*cleanSprite.naturalHeight/cleanSprite.naturalWidth;
  ctx.save();ctx.imageSmoothingEnabled=false;
- // Exterior artwork contains its own ground detail; no detached oval shadow.
- // Levels 1–5 draw the alpha-cut sprite, not a rectangular presentation image.
- if(cleanSprite&&cleanSprite.complete&&cleanSprite.naturalWidth>0){
-  const drawW=tier===3?430:w;
-  const drawH=drawW*cleanSprite.naturalHeight/cleanSprite.naturalWidth;
-  ctx.drawImage(cleanSprite,Math.round(x-drawW/2),Math.round(y+15-drawH),drawW,drawH);
-  ctx.restore();return;
- }
- if(exterior&&interior){
-  // Doorway state, not proximity: the interior stays visible while Haigen is inside.
-  const roofOpacity=1;
-  if(false){
-   ctx.globalAlpha=1;
-   // Crop the dark presentation frame from the supplied interior artwork.
-   const marginX=Math.round(interior.width*.075),marginY=Math.round(interior.height*.075);
-   ctx.drawImage(interior,marginX,marginY,interior.width-2*marginX,interior.height-2*marginY,Math.round(x-w/2),Math.round(y-h+15),w,h);
-  }
-  ctx.globalAlpha=roofOpacity;
-  // Trace a house-shaped silhouette to remove the surrounding presentation background.
-  const px=Math.round(x-w/2),py=Math.round(y-h+15);
-  ctx.save();ctx.beginPath();
-  // V344: tightly follow each approved building's roofline instead of retaining
-  // the dark rectangular presentation backing around the house sprites.
-  // Coordinates are fractions of the original art bounds; do not move the door.
-  const silhouette=homeSilhouette(tier);
-  // Clip the image to the building itself, never its illustrated background.
-  silhouette.forEach(([sx,sy],i)=>{
-   const tx=px+sx*w,ty=py+sy*h;
-   i?ctx.lineTo(tx,ty):ctx.moveTo(tx,ty);
-  });ctx.closePath();ctx.clip();
-  // Remove dark fringe pixels from the presentation artwork without trimming the roof.
- ctx.drawImage(exterior,px,py,w,h);ctx.restore();
-  if(!homeInside&&homeDoorOpen>0){ctx.save();ctx.fillStyle='#261b16';ctx.fillRect(x-18,y-72,36,73);ctx.fillStyle='#987247';ctx.fillRect(x-18+homeDoorOpen*30,y-72,Math.max(3,34-homeDoorOpen*30),73);ctx.restore()}
- }else if(tier===1){structure({kind:'shelter',x,y})}
- else ctx.drawImage(homesteadArt(tier),Math.round(x-w/2),Math.round(y-h+15),w,h);
+ ctx.drawImage(cleanSprite,Math.round(x-w/2),Math.round(y+15-h),w,h);
  ctx.restore();
 }
 let toolSwing=null;
@@ -10734,7 +10667,7 @@ if(state.campTier>0){
   const safeFront=back+(front-back)*frontLimit(state.x);
   state.x=Math.max(safeLeft,Math.min(safeRight,state.x));
   state.y=Math.max(safeBack,Math.min(safeFront,state.y));
-  const stairTier=tier>=3;
+  const stairTier=false;homeFloor=0;
   // Stairs are walkable, with a transition at the upper landing.
   const inStairLane=roomX>=.32&&roomX<=.41;
   const atTop=inStairLane&&roomY<=.34&&oldRoomY>.34;
@@ -13318,7 +13251,7 @@ function drawSaltwickInterior(){
 function drawHomeInteriorScene(visiting=false){
  if(displayedHouseTier()===1)return;
  if(!visiting&&!homeInside)return;
- const floor=visiting?0:homeFloor;
+ const floor=0;
  const tier=displayedHouseTier();
  const art=approvedHomes.interior[tier];
  ctx.save();ctx.setTransform(1,0,0,1,0,0);
@@ -13327,18 +13260,7 @@ function drawHomeInteriorScene(visiting=false){
  ctx.fillStyle='#151d19';ctx.fillRect(0,0,cw,ch);
  const ratio=floor===0&&art?.naturalWidth?art.naturalWidth/art.naturalHeight:1;
  const size=Math.min(cw*.99,ch*.94*ratio),roomHeight=size/ratio,left=(cw-size)/2,top=(ch-roomHeight)/2;
- if(floor===1){
-  // Distinct upstairs floor: timber loft, bed, storage and return staircase.
-  ctx.fillStyle='#765436';ctx.fillRect(left,top,size,size);
-  ctx.strokeStyle='#aa8051';ctx.lineWidth=Math.max(2,size*.012);
-  for(let i=0;i<14;i++){ctx.beginPath();ctx.moveTo(left,top+i*size/14);ctx.lineTo(left+size,top+i*size/14);ctx.stroke();}
-  ctx.fillStyle='#38271d';ctx.fillRect(left+size*.05,top+size*.12,size*.19,size*.42);
-  ctx.fillStyle='#b18a54';for(let i=0;i<7;i++)ctx.fillRect(left+size*.075,top+size*(.15+i*.053),size*.14,size*.018);
-  ctx.fillStyle='#543d2a';ctx.fillRect(left+size*.61,top+size*.20,size*.25,size*.31);
-  ctx.fillStyle='#d9bc86';ctx.fillRect(left+size*.64,top+size*.23,size*.19,size*.24);
-  ctx.fillStyle='#cda367';ctx.fillRect(left+size*.32,top+size*.15,size*.16,size*.12);
-  ctx.fillStyle='#e9c783';ctx.font='bold '+Math.round(size*.035)+'px Georgia';ctx.fillText('DOWN',left+size*.145,top+size*.60);
- }else if(art&&art.complete&&art.naturalWidth){
+ if(art&&art.complete&&art.naturalWidth){
   // V347: crop away the decorative rectangular frame baked into the interior artwork.
   const mx=art.naturalWidth*.075,my=art.naturalHeight*.075; // Restore original top/left room edges; border removal needs asymmetric masking.
   ctx.imageSmoothingEnabled=false;
@@ -13356,7 +13278,7 @@ function drawHomeInteriorScene(visiting=false){
  ctx.fillText('HAIGEN’S HOME · LEVEL '+tier+(floor?' · UPSTAIRS':''),cw/2,Math.max(22,top-18));
  ctx.font=Math.max(12,Math.round(cw/52))+'px Georgia';
  if(visiting){setVisitorDoorBounds(left+size*.5,top+roomHeight*.94,size*.21,roomHeight*.16);ctx.restore();return}
- ctx.fillText(homeFloor?'Use the left staircase to go downstairs':tier>=3?'Use the left stairs to reach upstairs · Door to leave':'Walk to the bottom doorway to leave',cw/2,top+roomHeight+28);
+ ctx.fillText('Walk to the bottom doorway to leave',cw/2,top+roomHeight+28);
  ctx.restore();
 }
 // Controller connection diagnostics: visible when a pad is connected or diagnostics mode is on.
