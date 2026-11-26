@@ -6790,7 +6790,7 @@ for(let tier=1;tier<=5;tier++){
 let homeInside=false,homeDoorOpen=0,homeFloor=0,homeStairCooldown=0;let housePreviewTier=0; // V227: visual preview only; never overwrites earned home progress.
 // V389: compact phone presentation uses the original starter cottage without changing saved upgrades.
 const mobileStarterHouse=()=>window.matchMedia('(max-width: 700px) and (pointer: coarse)').matches;
-const displayedHouseTier=()=>mobileStarterHouse()?1:(housePreviewTier||state.campTier||1);
+const displayedHouseTier=()=>Math.max(1,Math.min(5,Number(housePreviewTier||state.campTier)||1));
 function homeSilhouette(tier){
  return tier===1?
    [[.08,.97],[.08,.72],[.15,.70],[.23,.66],[.32,.60],[.42,.53],[.49,.49],[.55,.52],[.64,.59],[.75,.66],[.85,.71],[.91,.73],[.91,.97]]:
