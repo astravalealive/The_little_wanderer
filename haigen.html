@@ -3349,7 +3349,13 @@ function pickThought(topic){const pool=dialogue[topic]||dialogue.idle;const fres
 const oddThoughts=['Do frogs know they are damp?','Skölli looks like he knows my secrets.','If I were a mushroom, I would wear a tiny hat.','That stump looks suspiciously employed.','I wonder if squirrels have pockets.','Dylan has never paid rent. Not once.','My imaginary crown is extremely heavy.','I am not lost. The forest is misplaced.'];
 function currentThoughtTopic(){const nearDist=(p,r)=>dist(state,p)<r;if(state.food<2&&state.berries<3)return 'lowFood';if(state.coopTier&&state.nestEggs>=3&&nearDist(chickenNest,260))return 'eggs';if(state.coopTier&&nearDist(chickenNest,240))return 'chicken';if(nearDist(pond,400))return 'lake';if(nearDist(cottage,230))return 'camp';if(companions.some(c=>c.kind==='rabbit'&&nearDist(c,110)))return 'rabbit';if(companions.some(c=>c.kind==='fox'&&nearDist(c,110)))return 'fox';if(state.wood<3)return 'lowWood';if(state.stone<2)return 'lowStone';if(state.daytime%180>=112.5)return 'night';return Math.random()<.32?'silly':'woods'}
 let nextThoughtAt=0;
-function think(message,ms=3400,urgent=false){if(!urgent&&time<nextThoughtAt)return false;autoBubble=message;autoBubbleTimer=ms;nextThoughtAt=time+ms+rand(9000,16000);return true}
+// Give longer thoughts enough screen time to read without rushing.
+function haigenSpeechDuration(message,requestedMs=3400){
+ const words=String(message||'').trim().split(/\s+/).filter(Boolean).length;
+ const readingMs=1400+words*330;
+ return Math.min(18000,Math.max(requestedMs,readingMs));
+}
+function think(message,ms=3400,urgent=false){if(!urgent&&time<nextThoughtAt)return false;autoBubble=message;autoBubbleTimer=haigenSpeechDuration(message,ms);nextThoughtAt=time+autoBubbleTimer+rand(9000,16000);return true}
 // Little Viking Hero: concise, offline, historically qualified Norse lore.
 const norseLore=[
  {topic:'Odin',fact:'Odin is linked with wisdom, poetry, war and the dead in Norse myth. He gave up an eye in a quest for wisdom.'},
