@@ -3725,7 +3725,7 @@ function autoCampChores(dt){
  if(state.gardenTier&&gardenSowChoice()&&!gardenRipe()){
  autoPlan('sow vegetable seeds','garden');if(dist(state,gardenPlot)>115){autoTravel(gardenPlot,dt,115);return true}if(gardenPlant(gardenSowChoice()))state.autoSteps++;return true;
  }
- if(state.gardenTier&&gardenRipe()&&state.vegetables<15){
+ if(state.gardenTier&&gardenRipe()&&state.vegetables<30){
   autoPlan('harvest the kitchen garden','garden');
   if(dist(state,gardenPlot)>115){autoTravel(gardenPlot,dt,115);return true}
   if(harvestGarden())state.autoSteps++;
@@ -6555,10 +6555,11 @@ function homesteadMenu(kind){
     save();homesteadMenu(kind)
    }]);
   }else{
-   const remaining=Math.max(0,Math.ceil((state.gardenReadyAt-Date.now())/1000));
-   info='Level '+state.gardenTier+' · '+(gardenRipe()?'Harvest ready!':'Next harvest in '+remaining+' seconds')+
+   const pending=gardenCrops.flatMap(c=>state.gardenSlots[c]||[]).filter(s=>s?.ready>Date.now()).map(s=>s.ready);
+   const remaining=pending.length?Math.ceil((Math.min(...pending)-Date.now())/1000):0;
+   info='Level '+state.gardenTier+' · '+(gardenRipe()?'Harvest ready!':(remaining?'Next harvest in '+remaining+' seconds':'No crops growing'))+
     ' · '+gardenHarvestAmount()+' vegetables per harvest · '+state.vegetables+' in supplies.';
-   items.push(['Pick ripe crops',()=>gardenHarvestMenu()]);
+   items.push(['Plant or harvest crops',()=>gardenHarvestMenu()]);
    if(state.gardenTier<5){
     const wood=[0,10,16,24,32][state.gardenTier],stone=[0,4,7,10,14][state.gardenTier],twigs=[0,2,4,6,8][state.gardenTier];
     items.push(['Upgrade garden to Level '+(state.gardenTier+1)+' · '+wood+' wood, '+stone+' stone, '+twigs+' twigs',()=>{
@@ -12981,7 +12982,6 @@ function backpack(){
   button.onclick=()=>{if(!(state.mana>=1)||state.mothlightMs>0)return;state.mana--;state.mothlightMs=60000;close();notify('Your mothlight charm shines for one minute.')};
   $('modalBody').append(button);
  }
- const seedButton=document.createElement('button');seedButton.className='btn';seedButton.textContent='Seed trader (near homestead)';seedButton.disabled=Math.hypot(state.x-cottage.x,state.y-cottage.y)>450;seedButton.onclick=gardenSeedTrade;$('modalBody').append(seedButton);
  const wardrobeButton=document.createElement('button');wardrobeButton.className='btn';wardrobeButton.textContent='👕 Wardrobe · clothing level '+(state.clothingLevel||1);wardrobeButton.onclick=haigenWardrobe;$('modalBody').append(wardrobeButton);
  const forgeButton=document.createElement('button');forgeButton.className='btn';forgeButton.textContent='⚒️ Visit Norse smith (near homestead)';forgeButton.disabled=Math.hypot(state.x-cottage.x,state.y-cottage.y)>450;forgeButton.onclick=vikingForge;$('modalBody').append(forgeButton);
 }
