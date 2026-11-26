@@ -4332,8 +4332,8 @@ function autonomousTick(dt){
     stepIntoHome(hx,front);autoResetNav();return;
    }
    // Beds are solid furniture. Settle alongside the bed on the accessible floor.
-   const bedSide={x:hx+(widths[tier]||330)*.43*.02,y:back+(front-back)*(homeFloor===1?.38:.57)};
-   if(tier>=3&&homeFloor===0){
+   const bedSide=tier===5?{x:hx-(widths[tier]||330)*.43*.55,y:back+(front-back)*.61}:{x:hx+(widths[tier]||330)*.43*.02,y:back+(front-back)*(homeFloor===1?.38:.57)};
+   if(tier>=3&&tier<5&&homeFloor===0){
     // Existing stairs remain player controlled; use a downstairs rest position
     // rather than forcing a floor transition through furniture.
     bedSide.y=back+(front-back)*.37;
@@ -10656,6 +10656,16 @@ if(state.campTier>0){
   // Do not let the player bypass the entrance through walls or roof.
   const footprint=roomX>0&&roomX<1&&roomY>0&&roomY<1;
   if(footprint && !(withinDoor&&state.y>=front-35)){state.x=prevPlayerX;state.y=prevPlayerY;}
+ }else if(tier===5){
+  homeFloor=0;
+  const blocked=(xx,yy)=>longhouseBlocked(.06+.88*(xx-hx+halfWidth)/(2*halfWidth),.07+.88*(yy-back)/(front-back));
+  const nx=state.x,ny=state.y;
+  if(blocked(nx,ny)){
+   state.x=prevPlayerX;state.y=prevPlayerY;
+   if(!blocked(nx,prevPlayerY))state.x=nx;
+   if(!blocked(state.x,ny))state.y=ny;
+   if(blocked(state.x,state.y)){state.x=hx;state.y=back+(front-back)*.86;}
+  }
  }else{
   // V240: hard containment recovery. Previous collision only rejected NEW
   // invalid positions; once already outside a wall, sliding could never recover.
@@ -13248,6 +13258,18 @@ function drawSaltwickInterior(){
  ctx.restore();
 }
 // V233: separate indoor scene, independent of the exterior camera and house size.
+// Level 5 artwork-space furniture footprints and foreground masks.
+const longhouseObjects=[
+ {box:[.42,.56,.58,.70],mask:[.415,.40,.585,.705]},
+ {box:[.73,.60,.91,.73],mask:[.705,.51,.925,.74]},
+ {box:[.055,.68,.23,.76],mask:[.045,.60,.25,.77]},
+ {box:[.105,.43,.27,.59],mask:[.10,.37,.27,.61]},
+ {box:[.73,.43,.82,.52],mask:[.73,.20,.82,.53]}
+];
+function longhouseBlocked(u,v){
+ if(u<.07||u>.93||v<.53||v>(Math.abs(u-.5)<.065?.91:.79))return true;
+ return longhouseObjects.some(({box:[l,t,r,b]})=>u>l&&u<r&&v>t&&v<b);
+}
 function drawHomeInteriorScene(visiting=false){
  if(displayedHouseTier()===1)return;
  if(!visiting&&!homeInside)return;
@@ -13272,7 +13294,15 @@ function drawHomeInteriorScene(visiting=false){
  const roomX=(state.x-(hx-halfWidth))/(halfWidth*2),roomY=(state.y-back)/(front-back);
  const px=left+size*(.06+roomX*.88),py=top+roomHeight*(.07+roomY*.88);
  if(!visiting||(homeInside&&homeFloor===0)){ctx.save();ctx.translate(px,py);const actorScale=floor===0?roomHeight/520:size/520;ctx.scale(actorScale,actorScale);
- if(state.resting&&homeInside)drawSleepingHaigen(0,0);else character(0,0,'boy');ctx.restore();}
+ if(state.resting&&homeInside&&tier===5){ctx.restore();ctx.save();ctx.translate(left+size*.19,top+roomHeight*.49);ctx.scale(actorScale*.75,actorScale*.75);drawSleepingHaigen(0,0);}else if(state.resting&&homeInside)drawSleepingHaigen(0,0);else character(0,0,'boy');ctx.restore();
+ if(tier===5&&art?.naturalWidth&&!state.resting){
+  const u=.06+roomX*.88,v=.07+roomY*.88;
+  for(const {box,mask:[l,t,r,b]} of longhouseObjects){
+   if(v>=box[3]||u<l-.06||u>r+.06)continue;
+   ctx.drawImage(art,l*art.naturalWidth,t*art.naturalHeight,(r-l)*art.naturalWidth,(b-t)*art.naturalHeight,left+l*size,top+t*roomHeight,(r-l)*size,(b-t)*roomHeight);
+  }
+ }
+ }
  ctx.font='bold '+Math.max(15,Math.round(cw/36))+'px Georgia';
  ctx.fillStyle='#f3d9a1';ctx.textAlign='center';
  ctx.fillText('HAIGEN’S HOME · LEVEL '+tier+(floor?' · UPSTAIRS':''),cw/2,Math.max(22,top-18));
