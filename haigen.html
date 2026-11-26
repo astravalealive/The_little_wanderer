@@ -3071,22 +3071,63 @@ function haigenAnswer(message){
  if(/remember|my favourite|i like|i love/.test(q))return 'I will keep what you told me in our conversation history. I like learning about you as well as my world!';
  return 'That is an interesting question. I do not know enough to answer it properly yet. Could we investigate it at the runestone?';
 }
+
+const haigenAI={url:'',token:'',busy:false,lastPlan:0,proposal:null,status:'Local mind'};
+function haigenAIConfigure(){
+ const url=prompt('Private HTTPS brain endpoint (blank disables it)',haigenAI.url);
+ if(url===null)return;
+ if(!url.trim()){haigenAI.url='';haigenAI.token='';haigenAI.proposal=null;haigenAI.status='Local mind';return}
+ let parsed;try{parsed=new URL(url)}catch{return notify('Invalid brain endpoint.')}
+ if(parsed.protocol!=='https:'||parsed.username||parsed.password||parsed.search||parsed.hash)return notify('Use a private HTTPS endpoint without credentials in the URL.');
+ const token=prompt('Private gateway access token (held only until this page closes)','');
+ if(!token)return;
+ haigenAI.url=parsed.href;haigenAI.token=token;haigenAI.status='Connected settings; not yet tested';haigenAI.lastPlan=0;
+}
+function haigenAIContext(){
+ const b=livingInner();
+ return {health:Math.round(state.health),energy:Math.round(state.energy),food:Math.round(state.hunger),mana:state.mana||0,region:expandedRegion(state.x,state.y)?.name||'woodland',night:nightStrength()>.5,homeDistance:Math.round(dist(state,cottage)),inventory:Object.fromEntries(['food','berries','mushrooms','wood','stone','fish','eggs','vegetables','potions'].map(k=>[k,Number(state[k])||0])),tools:state.tools,goal:haigenMind.lastGoal,ambition:b.ambition,emotions:b.emotions,relationships:b.relationships,history:b.history.slice(0,12),notes:haigenMind.notes.slice(0,8).map(n=>({text:String(n.text).slice(0,200),type:n.type})),conversation:state.haigenConversations.slice(-6).map(m=>({from:m.from,text:String(m.text).slice(0,250)}))};
+}
+async function haigenAIRequest(mode,message='',allowed=[]){
+ if(!haigenAI.url||haigenAI.busy)return null;
+ haigenAI.busy=true;
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),40000);
+ try{
+  const response=await fetch(haigenAI.url,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+haigenAI.token},body:JSON.stringify({mode,message,allowed,world:haigenAIContext()}),signal:controller.signal,credentials:'omit',redirect:'error'});
+  if(!response.ok)throw Error('gateway '+response.status);
+  const data=await response.json();
+  if(typeof data.answer!=='string'||typeof data.reason!=='string')throw Error('invalid reply');
+  haigenAI.status='Language model responding';
+  return {answer:data.answer.slice(0,600),reason:data.reason.slice(0,200),job:allowed.includes(data.job)?data.job:null};
+ }catch(e){haigenAI.status='Gateway unavailable; local mind active';return null}
+ finally{clearTimeout(timer);haigenAI.busy=false}
+}
+function haigenAIPlan(choices){
+ if(!haigenAI.url||haigenAI.busy||Date.now()-haigenAI.lastPlan<90000||state.health<75||state.energy<65||state.hunger<70||state.playerInstruction)return;
+ haigenAI.lastPlan=Date.now();
+ const allowed=choices.map(c=>c.kind);
+ haigenAIRequest('plan','Choose a useful next activity and explain why.',allowed).then(result=>{
+  if(!result?.job||!state.autonomy||state.playerInstruction)return;
+  haigenAI.proposal={...result,expires:Date.now()+120000};
+ });
+}
 function haigenTalkPanel(){
  state.haigenConversations=state.haigenConversations.filter(m=>m&&typeof m.text==='string'&&runeSafeSummary(m.text));
  const history=state.haigenConversations.slice(-35);
- open('<h2>💬 Talk with Haigen</h2><p>Ask him about his feelings, plans, curiosity, mushrooms or what he has learned. His replies use his actual game state and saved discoveries, not an AI chat service.</p><div id="haigenTalkHistory" style="max-height:42vh;overflow-y:auto;padding:5px">'+history.map(m=>'<p style="margin:7px 0"><b>'+(m.from==='you'?'You':'Haigen')+':</b> '+safeText(m.text)+'</p>').join('')+'</div><textarea id="haigenTalkInput" rows="2" maxlength="500" style="box-sizing:border-box;width:100%;font-size:16px;padding:10px" placeholder="Ask Haigen anything..."></textarea><p><button class="btn" id="haigenTalkSend">Send to Haigen</button></p>');
+ open('<h2>💬 Talk with Haigen</h2><p>Ask him about his feelings, plans, curiosity, mushrooms or what he has learned. His replies use his actual game state and saved discoveries. Optional private language model: '+safeText(haigenAI.status)+'.</p><button class="btn" id="haigenAIConfig">Configure private AI brain</button><div id="haigenTalkHistory" style="max-height:42vh;overflow-y:auto;padding:5px">'+history.map(m=>'<p style="margin:7px 0"><b>'+(m.from==='you'?'You':'Haigen')+':</b> '+safeText(m.text)+'</p>').join('')+'</div><textarea id="haigenTalkInput" rows="2" maxlength="500" style="box-sizing:border-box;width:100%;font-size:16px;padding:10px" placeholder="Ask Haigen anything..."></textarea><p><button class="btn" id="haigenTalkSend">Send to Haigen</button></p>');
  const input=document.getElementById('haigenTalkInput'),send=document.getElementById('haigenTalkSend');
- send.onclick=()=>{
-  const message=input.value.trim();if(!message)return;
+ send.onclick=async()=>{
+  const message=input.value.trim();if(!message||send.disabled)return;send.disabled=true;
   state.haigenConversations.push({from:'you',text:message,at:Date.now()});livingBond('Alfather','conversation');
   if(/mycolog|mushroom|fung|mycel/i.test(message)&&!state.runeQuestions.some(q=>/mycolog/i.test(q.topic)))state.runeQuestions.unshift({topic:'Mycology',why:'Alfather asked me about fungi.',at:Date.now()});
   const learned=livingAdvice(message);
-  const answer=learned?'I will consider your advice when I make my own plans. I still need to make sure it is safe and possible.':haigenAnswer(message);
+  const reply=await haigenAIRequest('talk',message);
+  const answer=reply?.answer|| (learned?'I will consider your advice when I make my own plans. I still need to make sure it is safe and possible.':haigenAnswer(message));
   state.haigenConversations.push({from:'haigen',text:answer,at:Date.now()});
   if(state.haigenConversations.length>400)state.haigenConversations=state.haigenConversations.slice(-400);
   mindWrite('Alfather spoke to me: '+message.slice(0,110)+' I replied: '+answer.slice(0,110),'conversation');
   think(answer.slice(0,130),5500,true);save();haigenTalkPanel();
  };
+ document.getElementById('haigenAIConfig').onclick=()=>{haigenAIConfigure();haigenTalkPanel()};
  input.focus();
 }
 const haigenTalkBtn=document.createElement('button');
@@ -4238,10 +4279,13 @@ function autoFreedomTick(dt){
   const failed=haigenMind.failedJobs||{};
   const available=choices.filter(choice=>!(failed[choice.kind]>now));
   const pool=available.length?available:choices;
+  haigenAIPlan(pool);
   const weighted=pool.map(choice=>({...choice,weight:livingJobScore(choice)*(history.includes(choice.kind)?.25:1)}));
   let pick=Math.random()*weighted.reduce((total,choice)=>total+choice.weight,0);
   let selected=weighted[weighted.length-1]?.kind||'explore';
   for(const choice of weighted){pick-=choice.weight;if(pick<=0){selected=choice.kind;break}}
+  const proposal=haigenAI.proposal;
+  if(proposal&&proposal.expires>Date.now()&&state.health>=75&&state.energy>=65&&state.hunger>=70&&pool.some(c=>c.kind===proposal.job)){selected=proposal.job;haigenAI.proposal=null;haigenMind.lastModelReason=proposal.reason;}
   haigenMind.recentJobs=[selected,...history].slice(0,3);
   job={kind:selected,startedAt:now,lastActive:now,steps:0,startX:state.x,startY:state.y};
   state.autoFreeJob=job;
