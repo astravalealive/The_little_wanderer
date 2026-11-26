@@ -7437,6 +7437,8 @@ function haigenDrawPixelTool(kind,dir,frame,action,scale,left,top){
 
 // Approved level-one artwork: four independently drawn directions, idle plus three walk poses.
 const haigenApprovedSheets=new Map();
+// Clothing selection is independent of house tier; level one is the default for old saves.
+window.__setHaigenClothingLevel=function(level){state.clothingLevel=Math.max(1,Math.min(4,Math.floor(Number(level)||1)));save();return state.clothingLevel;};
 function haigenSheet(name){
  if(!haigenApprovedSheets.has(name)){const img=new Image();img.src='./'+name+'.png';haigenApprovedSheets.set(name,img);}
  return haigenApprovedSheets.get(name);
@@ -7448,7 +7450,8 @@ function drawHaigenLevelOne(x,y,actor,status,deepWater){
  const tool=({rod:'fishing_rod',axe:'axe',pickaxe:'pickaxe',shovel:'shovel',torch:'torch',net:'net',spear:'spear',slingshot:'slingshot'})[status.equip];
  const actions={axe:'axe_chop',pickaxe:'pickaxe_mine',shovel:'shovel_dig_v2',cast:'fishing_cast',reel:'fishing_cast',land:'fishing_cast',net:'net_swing',catch:'net_swing',spear:'spear_attack',slingshot:'slingshot_fire'};
  const outfits={snow:'snow',desert:'desert',beach:'beach',jungle:'jungle'};
- let name='haigen_basic_sprite_sheet';
+ const clothingLevel=Math.max(1,Math.min(4,Math.floor(Number(state.clothingLevel)||1)));
+ let name=({2:'haigen_level_02_sprite_sheet',3:'haigen_level_03_sprite_sheet',4:'haigen_level_05_sprite_sheet'})[clothingLevel]||'haigen_basic_sprite_sheet';
  if(status.knock){name='haigen_level_01_damage_final';frame=Math.min(3,1+Math.floor((performance.now()-status.knock.started)/85));}
  else if(status.action){const action=actions[status.action.kind];if(!action)return false;name='haigen_level_01_'+action;frame=Math.max(0,Math.min(3,Math.floor((status.action.progress||0)*4)));}
  else if(status.equip){if(!tool)return false;name='haigen_level_01_'+tool+'_walk_idle';}
