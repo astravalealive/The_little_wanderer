@@ -6811,7 +6811,7 @@ function drawCampHome(){
  const w=tier===1?330:tier===2?365:tier===3?405:tier===4?485:560;
  const h=tier===1?310:tier===2?335:tier===3?355:tier===4?385:420;
  ctx.save();ctx.imageSmoothingEnabled=false;
- if(tier!==1)ellipse(x,y+12,w*.42,24,'#20392d77');
+ // Exterior artwork contains its own ground detail; no detached oval shadow.
  // Levels 1–5 draw the alpha-cut sprite, not a rectangular presentation image.
  if(cleanSprite&&cleanSprite.complete&&cleanSprite.naturalWidth>0){
   const drawW=tier===3?430:w;
@@ -13326,7 +13326,7 @@ function drawHomeInteriorScene(visiting=false){
  const cw=ctx.canvas.width,ch=ctx.canvas.height;
  ctx.fillStyle='#151d19';ctx.fillRect(0,0,cw,ch);
  const ratio=floor===0&&art?.naturalWidth?art.naturalWidth/art.naturalHeight:1;
- const size=Math.min(cw*.96,ch*.82*ratio),roomHeight=size/ratio,left=(cw-size)/2,top=(ch-roomHeight)/2;
+ const size=Math.min(cw*.99,ch*.94*ratio),roomHeight=size/ratio,left=(cw-size)/2,top=(ch-roomHeight)/2;
  if(floor===1){
   // Distinct upstairs floor: timber loft, bed, storage and return staircase.
   ctx.fillStyle='#765436';ctx.fillRect(left,top,size,size);
@@ -13349,7 +13349,7 @@ function drawHomeInteriorScene(visiting=false){
  const halfWidth=(widths[tier]||330)*.43,back=hy-(heights[tier]||310)*.78,front=hy+13;
  const roomX=(state.x-(hx-halfWidth))/(halfWidth*2),roomY=(state.y-back)/(front-back);
  const px=left+size*(.06+roomX*.88),py=top+roomHeight*(.07+roomY*.88);
- if(!visiting||(homeInside&&homeFloor===0)){ctx.save();ctx.translate(px,py);ctx.scale(Math.max(1.15,size/360),Math.max(1.15,size/360));
+ if(!visiting||(homeInside&&homeFloor===0)){ctx.save();ctx.translate(px,py);const actorScale=floor===0?roomHeight/520:size/520;ctx.scale(actorScale,actorScale);
  if(state.resting&&homeInside)drawSleepingHaigen(0,0);else character(0,0,'boy');ctx.restore();}
  ctx.font='bold '+Math.max(15,Math.round(cw/36))+'px Georgia';
  ctx.fillStyle='#f3d9a1';ctx.textAlign='center';
