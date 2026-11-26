@@ -1437,7 +1437,7 @@ const coopPlot={kind:'coop',x:1010,y:1350,name:'Chicken Coop'},
  woodPlot={kind:'woodstore',x:2100,y:1450,name:'Wood Storage'},
  jettyPlot={kind:'jetty',x:1050,y:1490,name:'Fishing Jetty'},
  gardenPlot={kind:'garden',x:1550,y:2040,name:'Kitchen Garden'};
-const homesteadPlots=[coopPlot,woodPlot,jettyPlot,gardenPlot];
+const homesteadPlots=[coopPlot,woodPlot,jettyPlot];
 function flowerHasHabitat(o){
  if(o.type!=='flower')return true;
  if(expandedRegion(o.x,o.y)?.id==='coast'||islandDepth(o.x,o.y)<185)return false;
@@ -1471,16 +1471,16 @@ state.castAt=Number(state.castAt)||0;state.biteAt=Number(state.biteAt)||0;
 // Migrate original floating vegetable patch into the permanent homestead garden.
 // Previous garden investments are honoured and no other saved buildings are removed.
 const oldGardenBuilt=state.structures.some(q=>q.kind==='garden');
-state.gardenTier=Math.max(oldGardenBuilt?1:0,Math.min(3,Number(state.gardenTier)||0));
+state.gardenTier=0;
 state.vegetables=Math.max(0,Number(state.vegetables)||0);
 state.gardenReadyAt=Math.max(0,Number(state.gardenReadyAt)||0);
 if(state.gardenTier&&!state.gardenReadyAt)state.gardenReadyAt=Date.now()+50000;
 if(oldGardenBuilt)state.structures=state.structures.filter(q=>q.kind!=='garden');
-state.lifeProject=state.lifeProject&&typeof state.lifeProject==='object'&&['coop','garden','woodstore'].includes(state.lifeProject.kind)?state.lifeProject:null;
+state.lifeProject=state.lifeProject&&typeof state.lifeProject==='object'&&['coop','woodstore'].includes(state.lifeProject.kind)?state.lifeProject:null;
 if(state.lifeProject){state.lifeProject.stage=clamp(Math.floor(Number(state.lifeProject.stage)||0),0,2);state.lifeProject.work=clamp(Number(state.lifeProject.work)||0,0,2500)}
-state.lifeProjectsDone=Array.isArray(state.lifeProjectsDone)?state.lifeProjectsDone.filter(k=>['coop','garden','woodstore'].includes(k)).slice(0,3):[];
+state.lifeProjectsDone=Array.isArray(state.lifeProjectsDone)?state.lifeProjectsDone.filter(k=>['coop','woodstore'].includes(k)).slice(0,3):[];
 // V306: independent harvest cycles and four named crops, migrated from legacy garden timer.
-const gardenCrops=['cabbage','tomatoes','carrots','potatoes'];
+const gardenCrops=[];
 state.gardenCropReady=state.gardenCropReady&&typeof state.gardenCropReady==='object'?state.gardenCropReady:{};
 for(const crop of gardenCrops)if(!Number.isFinite(state.gardenCropReady[crop]))state.gardenCropReady[crop]=Number(state.gardenReadyAt)||Date.now()+105000;
 // An independent growth clock and last-harvest state for each crop, retained in saved games.
@@ -3052,7 +3052,7 @@ function haigenAnswer(message){
  if(/what.*(curious|question|interested)|what do you want to learn/.test(q))return 'Right now I want to understand '+(question?.topic||runeChosenTopic())+'. My curiosity is '+Math.round(state.runeCuriosity||0)+' out of 100!';
  if(/how are you|how do you feel|are you okay/.test(q))return 'I feel '+mood()+'. My energy is '+Math.round(state.energy)+' and my curiosity keeps tugging me toward the runestone.';
  if(/what.*(doing|working on)|what.*plan/.test(q))return 'My current plan is '+(haigenMind.lastGoal||'to explore and look after our woodland')+'. '+(state.runeCuriosity>65?'I cannot wait to study afterwards!':'I am keeping my eyes open for discoveries.');
- if(/what.*(garden|vegetable|crop)/.test(q))return gardenRipe()?'Some vegetables are ready to pick!':'The vegetables are growing. I will check the beds again soon.';
+ if(/what.*(garden|vegetable|crop)/.test(q))return 'There is no garden at camp yet.';
  if(/hello|^hi\\b|hey|good morning|good night/.test(q))return 'Hello, Alfather! I am glad you came to talk. I have been thinking about '+runeChosenTopic()+'.';
  if(/remember|my favourite|i like|i love/.test(q))return 'I will keep what you told me in our conversation history. I like learning about you as well as my world!';
  return 'That is an interesting question. I do not know enough to answer it properly yet. Could we investigate it at the runestone?';
@@ -3164,7 +3164,7 @@ function mindWish(){
  if(state.health<65)return ['safety','I think we need safer paths and lanterns near dangerous animal territory.'];
  if(state.hunger<48)return ['food','Could we store some emergency meals? Exploration is hungry business.'];
  if(!state.coopTier)return ['coop','I dream of keeping chickens and waking up to eggs at camp.'];
- if(!state.gardenTier)return ['garden','Could we build proper vegetable beds so I can grow food myself?'];
+
  if(!state.woodStorageTier)return ['wood','A log store would be wonderful. I am always carrying branches home.'];
  if(state.story?.stage<6)return ['pond','Something is wrong at the Silent Pond. I would like to investigate it.'];
  if(!state.tools.pickaxe)return ['tool:pickaxe','I want to make a pickaxe so I can start mining stone for new builds.'];
@@ -3771,7 +3771,6 @@ function autoExplore(){
 
 const lifeBlueprints={
  coop:{name:'Chicken Coop',plot:coopPlot,tier:'coopTier',stages:[{wood:2,stone:1,twigs:0,label:'Foundations'},{wood:3,stone:1,twigs:1,label:'Timber frame'},{wood:1,stone:1,twigs:1,label:'Roof and nesting boxes'}]},
- garden:{name:'Kitchen Garden',plot:gardenPlot,tier:'gardenTier',stages:[{wood:2,stone:1,twigs:1,label:'Levelling the ground'},{wood:2,stone:0,twigs:1,label:'Raised timber beds'},{wood:2,stone:1,twigs:1,label:'Planting and finishing'}]},
  woodstore:{name:'Wood Storage',plot:woodPlot,tier:'woodStorageTier',stages:[{wood:2,stone:1,twigs:0,label:'Stone foundations'},{wood:3,stone:1,twigs:0,label:'Structural supports'},{wood:2,stone:1,twigs:0,label:'Weatherproof roof'}]}
 };
 let lifeBuilderBusy=false;
@@ -3779,7 +3778,7 @@ function lifeBlueprint(){return state.lifeProject?lifeBlueprints[state.lifeProje
 function lifeProjectSummary(){const p=state.lifeProject,b=lifeBlueprint();return b?b.name+' · '+(p.stage+1)+'/3: '+b.stages[p.stage].label:'No current project'}
 function lifeChoose(){
  if(state.lifeProject)return state.lifeProject;
- const kind=!state.coopTier?'coop':!state.gardenTier?'garden':!state.woodStorageTier?'woodstore':null;
+ const kind=!state.coopTier?'coop':!state.woodStorageTier?'woodstore':null;
  if(!kind)return null;
  state.lifeProject={kind,stage:0,work:0};const b=lifeBlueprints[kind];
  mindWrite('I have decided to build a '+b.name.toLowerCase()+'. I will work out what I need and do it myself.','idea');save();
@@ -3788,7 +3787,6 @@ function lifeChoose(){
 function lifeFinish(){
  const p=state.lifeProject,b=lifeBlueprint();if(!p||!b)return;
  if(p.kind==='coop'&&!state.coopTier){state.coopTier=1;state.henCount=Math.max(2,state.henCount||0);state.lastEggAt=Date.now();syncChickens()}
- if(p.kind==='garden'&&!state.gardenTier){state.gardenTier=1;state.gardenReadyAt=Date.now()+gardenGrowthMs()}
  if(p.kind==='woodstore'&&!state.woodStorageTier)state.woodStorageTier=1;
  if(!state.lifeProjectsDone.includes(p.kind))state.lifeProjectsDone.push(p.kind);
  mindEvent('build',b.name);mindWrite('I completed my '+b.name.toLowerCase()+'. I gathered the supplies and made a place of my own.','growth');
@@ -4145,7 +4143,7 @@ function independentChoiceTick(dt){
    state.coopTier&&state.nestEggs>=2||
    state.gardenTier&&gardenRipe()||
    state.food<2&&(state.rawMeat||state.vegetables>=3||state.eggs>=2||state.fish||state.mushrooms>=3||state.berries>=6));
-  const unbuilt=!state.coopTier||!state.gardenTier||!state.woodStorageTier;
+  const unbuilt=!state.coopTier||!state.woodStorageTier;
   const weights=[
    ['build',unbuilt?1.5+haigenMind.patience/75:0],
    ['chores',chores?1.7+(state.hunger<75?0.5:0)+(morning||evening?3:0):0],
@@ -9762,7 +9760,7 @@ const worldEditorKindGroups=[
   ['flower','Wildflowers'],['mushroom','Mushrooms'],['cactus','Cactus'],['specter','Specter']
  ]],
  ['Ground & gardens',[
-  ['path','Dirt path'],['cobble','Cobblestones'],['grass','Meadow patch'],['garden','Vegetable bed']
+  ['path','Dirt path'],['cobble','Cobblestones'],['grass','Meadow patch'],
  ]]
 ];
 const worldEditorValidKinds=new Set(worldEditorKindGroups.flatMap(g=>g[1].map(k=>k[0])));
@@ -13382,8 +13380,8 @@ refreshControllerIndicator();
 /* Real-world placement editor: modifies original scenery and building positions, not substitute sprites. */
 const hwRealKey='haigen-real-object-layout-v1',hwRealOriginal=new Map(),hwRealUndo=[];
 let hwRealEnabled=false,hwRealSelected=null,hwRealDrag=null,hwRealMode='move',hwRealPointer=null;const hwRealDeleted=new Set();
-const hwRealNamed=[cottage,coopPlot,woodPlot,jettyPlot,gardenPlot,trollStumpHome];
-const hwRealNamedId=['homestead','coop','woodstore','jetty','garden','troll-stump'];
+const hwRealNamed=[cottage,coopPlot,woodPlot,jettyPlot,trollStumpHome];
+const hwRealNamedId=['homestead','coop','woodstore','jetty','troll-stump'];
 const hwRealItems=()=>[...objects.filter(o=>['tree','bareTree','fir','rock','bush','flower'].includes(o.type)&&Number.isFinite(o.id)&&!hwRealDeleted.has('object:'+o.id)),...hwRealNamed];
 function hwRealId(o){const k=hwRealNamed.indexOf(o);return k>=0?'named:'+hwRealNamedId[k]:'object:'+o.id}
 function hwRealStore(){try{const changes={};for(const o of hwRealItems()){const id=hwRealId(o),original=hwRealOriginal.get(id);if(original&&(o.x!==original.x||o.y!==original.y))changes[id]={x:o.x,y:o.y}}changes.__deleted=[...hwRealDeleted];localStorage.setItem(hwRealKey,JSON.stringify(changes))}catch(e){notify('Editor save failed')}}
