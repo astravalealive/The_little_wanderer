@@ -6715,7 +6715,7 @@ let ravenFlight=null;
 function ravenTick(){
  const d=ravenData(),now=Date.now();
  if(ravenFlight&&now-ravenFlight.start>12000){
-  if(ravenFlight.kind==='outbound'){d.outbox.push({text:ravenFlight.text,at:now});d.lastThought=ravenFlight.text;d.lastSent=now}
+  if(ravenFlight.kind==='outbound'){d.outbox.push({text:ravenFlight.text,at:now});d.lastThought=ravenFlight.text;d.lastSent=now;notify('Huginn delivered a message from Haigen')}
   else {const m=d.inbox.find(m=>m.id===ravenFlight.id);if(m)m.status='waiting'}
   ravenFlight=null;save();
  }
@@ -6752,12 +6752,20 @@ function ravenPanel(name){
  const safe=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  if(name==='muninn'){open('<h2>Muninn · Memory</h2>'+((state.memories||[]).map(m=>'<p>'+safe(m)+'</p>').join('')||'<p>No memories recorded yet.</p>'));return}
  const d=ravenData();
- open('<h2>Huginn · Thought</h2>'+d.outbox.slice(-20).reverse().map(m=>'<p>Haigen: '+safe(m.text)+'</p>').join('')+d.inbox.slice(-20).reverse().map(m=>'<p>Alfather: '+safe(m.text)+' · '+safe(m.status)+'</p>').join('')+'<textarea id="ravenLetter" maxlength="500" placeholder="Write to Haigen"></textarea><button class="btn" id="ravenSend">Send with Huginn</button>');
+ open('<h2>Huginn · Thought</h2>'+d.outbox.slice(-20).reverse().map(m=>'<p>Haigen: '+safe(m.text)+'</p>').join('')+d.inbox.slice(-20).reverse().map(m=>'<p>Alfather: '+safe(m.text)+' · '+safe(m.status)+'</p>').join('')+'<textarea id="ravenLetter" maxlength="500" style="width:100%;min-height:90px;touch-action:auto;user-select:text" placeholder="Write to Haigen"></textarea><button class="btn" id="ravenSend">Send with Huginn</button>');
  $('ravenSend').onclick=()=>{const msg=$('ravenLetter').value.trim();if(!msg)return;d.inbox.push({id:Date.now(),text:msg,status:'queued'});save();ravenPanel('huginn')};
 }
 function installRavenButtons(){
- const bar=document.createElement('div');bar.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 105px);left:8px;z-index:20;display:flex;gap:4px';
- for(const name of ['huginn','muninn']){const b=document.createElement('button');b.className='btn';b.style.cssText='padding:5px 7px;font-size:11px';b.textContent=name==='huginn'?'🐦‍⬛ Huginn':'🐦‍⬛ Muninn';b.onclick=()=>ravenPanel(name);bar.append(b)}
+ const bar=document.createElement('div');bar.id='ravenPortraits';bar.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 105px);left:8px;z-index:20;display:flex;gap:8px;pointer-events:auto;touch-action:manipulation';
+ for(const name of ['huginn','muninn']){
+  const b=document.createElement('button');b.type='button';b.setAttribute('aria-label',name==='huginn'?'Huginn messages':'Muninn memories');b.style.cssText='width:48px;height:48px;border-radius:50%;border:2px solid #d5b775;background:#183b32;color:#fff;position:relative;pointer-events:auto;touch-action:manipulation;padding:0;overflow:hidden';
+  const c=document.createElement('canvas');c.width=48;c.height=48;c.style.cssText='position:static;width:100%;height:100%;pointer-events:none';b.append(c);
+  const g=c.getContext('2d');g.font='24px sans-serif';g.fillText('🐦‍⬛',8,33);
+  const paint=()=>{if(!ravenArt.atlas)return false;const cell=ravenArt.atlas.cell,f=ravenArt.atlas[name].idle;g.clearRect(0,0,48,48);g.drawImage(ravenArt[name],0,f.row*cell.height,cell.width,cell.height,0,0,48,48);return true};
+  const timer=setInterval(()=>{if(paint())clearInterval(timer)},500);setTimeout(()=>clearInterval(timer),30000);
+  b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('pointerup',e=>{e.stopPropagation();e.preventDefault();ravenPanel(name)});b.addEventListener('click',e=>{e.stopPropagation();if(e.detail===0)ravenPanel(name)});
+  bar.append(b);
+ }
  document.body.append(bar);
 }
 loadRavenArt();installRavenButtons();
