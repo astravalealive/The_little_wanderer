@@ -38,9 +38,9 @@ window.__v127ToolIcon=function(id){
 const el=document.createElement('div');el.id='v127Root';
 el.innerHTML=[
  '<div class="v127-head"><div class="v127-portrait"><canvas width="68" height="68" id="v127Portrait"></canvas></div>',
- '<div class="v127-portrait-name">Haigen</div><div><div class="v127-heart-row" id="v127Hearts">',
- Array.from({length:7},(_,i)=>'<span class="v127-heart" data-heart="'+i+'">'+icons.heart+'</span>').join(''),
- '</div><div class="v127-life"><div class="v127-life-fill" id="v127HpFill"></div></div></div></div>',
+ '<div class="v127-portrait-name">Haigen</div><div class="v127-vitals">',
+ ['Health','Sleep','Food','Mana'].map(name=>'<div class="v127-life" role="meter" aria-label="'+name+'" aria-valuemin="0" aria-valuemax="100"><div class="v127-life-fill" id="vital'+name+'"></div><span>'+name+'</span></div>').join(''),
+ '</div></div>',
  '<div class="v127-period v127-framed">',icons.sun,'<span id="v127Day">Day 1 · Morning</span></div>',
  '<div class="v127-companions"><div class="v127-companion v127-framed"><i class="v127-companion-mark"></i><span>Skölli · <em>Fox</em></span></div><div class="v127-companion v127-framed"><i class="v127-companion-mark"></i><span>Dylan · <em>Rabbit</em></span></div></div>',
  '<section class="v127-quest v127-framed" id="v127Quest"><button type="button" class="v127-quest-toggle" aria-label="Toggle quest objectives" id="v127QuestToggle">−</button><h3>The Silent Pond</h3><ul id="v127QuestList"></ul></section>',
@@ -75,6 +75,20 @@ el.innerHTML=[
  '<button id="v127CloseSettings">Close menu</button></aside>'
 ].join('');
 document.body.appendChild(el);
+const vitalStyle=document.createElement('style');
+vitalStyle.textContent=`
+#v127Root .v127-vitals{display:grid;gap:3px}
+#v127Root .v127-vitals .v127-life{position:relative;margin:0;box-sizing:border-box;width:100%;height:19px}
+#v127Root .v127-vitals span{position:absolute;inset:0;display:grid;place-items:center;color:white;font:bold 10px Georgia;text-shadow:0 1px 2px black}
+#v127Root .v127-vitals .v127-life-fill{background:linear-gradient(var(--light),var(--dark))}
+#v127Root .v127-vitals .critical{background:linear-gradient(#ef7768,#941e20)}
+#v127Root .v127-life:has(.critical){border-color:#d94444}
+@media(max-width:1100px){#v127Root .v127-vitals{gap:2px}#v127Root .v127-vitals .v127-life{height:14px}#v127Root .v127-vitals span{font-size:9px}}
+`;
+document.head.appendChild(vitalStyle);
+const badge=new Image();badge.onload=()=>{window.__v127PortraitReady=false};badge.src='./haigen-badge.png';
+const vitals=[['Health','health','#adf073','#257f43',100],['Sleep','energy','#8ed4ff','#2456a4',100],['Food','hunger','#ffc56a','#b85b18',100],['Mana','mana','#d7a4ff','#7135a4',10]];
+
 const coordsToggle=$('v127ToggleCoords');
 function syncCoordsToggleLabel(){
  const on=!!window.__haigenCoordsVisible?.();
@@ -130,6 +144,7 @@ const questSteps=[['Investigate the pond',2],['Find the source of the blockage',
 function portrait(){
  const canvas=$('v127Portrait'),g=canvas.getContext('2d'),art=engine.portrait();
  g.clearRect(0,0,68,68);
+ if(badge.complete&&badge.naturalWidth){const side=Math.min(badge.naturalWidth,badge.naturalHeight);g.drawImage(badge,(badge.naturalWidth-side)/2,(badge.naturalHeight-side)/2,side,side,0,0,68,68);return true}
  if(art&&art.naturalWidth>=48&&art.naturalHeight>=72){
   g.imageSmoothingEnabled=false;g.drawImage(art,0,0,48,51,-1,-10,71,86);
   return true;
@@ -160,11 +175,11 @@ function tick(){
  if(now-lastDraw>180){lastDraw=now;
   try{
    const state=engine.snapshot(),hp=Math.min(100,Math.max(0,Number(state.health)||0));
-   if(Math.ceil(hp)!==lastHP){
-    lastHP=Math.ceil(hp);
-    const hearts=[...el.querySelectorAll('.v127-heart')];
-    hearts.forEach((h,i)=>{h.style.filter=i<Math.ceil(hp*hearts.length/100)?'drop-shadow(0 1px 1px #000a)':'grayscale(1) brightness(.35)'});
-    $('v127HpFill').style.width=hp+'%';
+   for(const [name,key,light,dark,max] of vitals){
+    const fill=$('vital'+name),raw=Math.max(0,Number(state[key])||0),pct=Math.min(100,raw/max*100);
+    fill.style.width=pct+'%';fill.style.setProperty('--light',light);fill.style.setProperty('--dark',dark);fill.classList.toggle('critical',pct<=20);
+    fill.parentElement.setAttribute('aria-valuenow',String(Math.round(pct)));
+    fill.parentElement.title=name+': '+Math.round(raw)+'/'+max;
    }
    const day='Day '+state.day+' · '+state.phase;
    if(day!==lastDay){$('v127Day').textContent=day;lastDay=day}
