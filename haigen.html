@@ -7452,11 +7452,14 @@ function drawHaigenLevelOne(x,y,actor,status,deepWater){
  const outfits={snow:'snow',desert:'desert',beach:'beach',jungle:'jungle'};
  const clothingLevel=Math.max(1,Math.min(4,Math.floor(Number(state.clothingLevel)||1)));
  let name=({2:'haigen_level_02_sprite_sheet',3:'haigen_level_03_sprite_sheet',4:'haigen_level_05_sprite_sheet'})[clothingLevel]||'haigen_basic_sprite_sheet';
+ if(outfits[status.outfit])name='haigen_'+outfits[status.outfit]+'_gear_sprite_sheet';
+ const baseName=name,baseFrame=frame;
  if(status.knock){name='haigen_level_01_damage_final';frame=Math.min(3,1+Math.floor((performance.now()-status.knock.started)/85));}
- else if(status.action){const action=actions[status.action.kind];if(!action)return false;name='haigen_level_01_'+action;frame=Math.max(0,Math.min(3,Math.floor((status.action.progress||0)*4)));}
- else if(status.equip){if(!tool)return false;name='haigen_level_01_'+tool+'_walk_idle';}
- else if(outfits[status.outfit])name='haigen_'+outfits[status.outfit]+'_gear_sprite_sheet';
- const img=haigenSheet(name);
+ else if(status.action){const action=actions[status.action.kind];if(action){name='haigen_level_01_'+action;frame=Math.max(0,Math.min(3,Math.floor((status.action.progress||0)*4)));}}
+ else if(status.equip){if(tool)name='haigen_level_01_'+tool+'_walk_idle';}
+ 
+ let img=haigenSheet(name);
+ if((!img.complete||!img.naturalWidth)&&name!==baseName){name=baseName;frame=baseFrame;img=haigenSheet(name);}
  if(!img.complete||!img.naturalWidth)return false;
  const wide=img.naturalWidth/img.naturalHeight>1.4;
  const cell=img.naturalHeight/4,offset=(img.naturalWidth-cell*4)/2;
