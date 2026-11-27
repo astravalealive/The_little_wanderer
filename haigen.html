@@ -14175,6 +14175,39 @@ function incaRemember(m,thought,kind){
  m.thought=thought;m.memories.push({day:state.daytime,kind,thought});if(m.memories.length>120)m.memories.shift();
 }
 let incaMindSaveClock=0,incaMindRestored=false;
+
+function incaChooseActivity(dt,a,m){
+ m.enjoyment??=65;m.curiosity??=70;m.discoveries??={};m.creations??=[];m.skills.exploration??=0;m.skills.animals??=0;
+ m.enjoyment=Math.max(0,m.enjoyment-dt*.000025);
+ m.curiosity=Math.min(100,m.curiosity+dt*.00002);
+ if(a.activityPause>0){a.activityPause-=dt;a.moving=false;return true;}
+ if(!a.activity){
+  const options=[['sketch',m.traits.art*(35+(100-m.enjoyment)*.6)],['music',m.traits.music*(30+(100-m.enjoyment)*.6)],['explore',m.traits.exploration*(20+m.curiosity*.65)],['animals',m.traits.animals*45]];
+  const choice=options.map(([kind,score])=>({kind,score:score*(.65+Math.random()*.7)})).sort((p,q)=>q.score-p.score)[0].kind;
+  let goal=null;
+  if(choice==='animals'){const animal=woodlandCritters.filter(c=>dist(a,c)<450).sort((p,q)=>dist(a,p)-dist(a,q))[0];if(animal)goal={x:animal.x,y:animal.y};}
+  if(!goal){for(let i=0;i<18;i++){const angle=Math.random()*Math.PI*2,r=choice==='explore'?220+Math.random()*350:50+Math.random()*180;const x=a.x+Math.cos(angle)*r,y=a.y+Math.sin(angle)*r;if(incaLand(x,y)&&Math.hypot(x-a.homeX,y-a.homeY)<750){goal={x,y};break;}}}
+  if(!goal){a.activityPause=2000;return false;}
+  a.activity={kind:choice,goal,elapsed:0,work:0};
+  m.thought={sketch:'I wonder what I could sketch today.',music:'I have a little melody in my head.',explore:'I want to see what lies beyond here.',animals:'I wonder what animals are nearby.'}[choice];
+ }
+ const task=a.activity;task.elapsed+=dt;
+ if(task.elapsed>35000){a.activity=null;a.activityPause=2500;return false;}
+ if(!incaWalkTo(task.goal,dt,35))return true;
+ a.moving=false;task.work+=dt;
+ if(task.work<4500)return true;
+ const skill={sketch:'art',music:'music',explore:'exploration',animals:'animals'}[task.kind];
+ m.skills[skill]=Math.min(100,(m.skills[skill]||0)+.5);
+ const trait={sketch:'art',music:'music',explore:'exploration',animals:'animals'}[task.kind];
+ m.traits[trait]=Math.min(1,m.traits[trait]+.002);
+ m.enjoyment=Math.min(100,m.enjoyment+18);m.curiosity=Math.max(0,m.curiosity-(task.kind==='explore'?35:8));
+ const key=Math.round(a.x/100)+','+Math.round(a.y/100);
+ m.discoveries[key]={x:a.x,y:a.y,kind:task.kind,day:state.daytime};
+ if(Object.keys(m.discoveries).length>160)delete m.discoveries[Object.keys(m.discoveries)[0]];
+ if(task.kind==='sketch'){m.creations.push({kind:'sketch',x:a.x,y:a.y,day:state.daytime,skill:m.skills.art});if(m.creations.length>80)m.creations.shift();}
+ incaRemember(m,{sketch:'I made a sketch of this place.',music:'I practised a melody.',explore:'I explored a new part of the woodland.',animals:'I spent some time looking for wildlife.'}[task.kind],task.kind);
+ a.activity=null;a.activityPause=3500+Math.random()*3500;save();return true;
+}
 function incaThink(dt,a){
  const m=incaMind(),n=m.needs;
  if(!incaMindRestored){incaMindRestored=true;const p=m.position;if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&incaLand(p.x,p.y))Object.assign(a,{x:p.x,y:p.y,ready:true,room:p.room||null});}
@@ -14182,20 +14215,22 @@ function incaThink(dt,a){
  n.energy=Math.max(0,Math.min(100,n.energy+(a.room?dt*.00022:-dt*.000025)));
  n.health=Math.max(0,Math.min(100,n.health+(n.hunger<5?-dt*.000015:a.room?dt*.00002:0)));
  incaMindSaveClock+=dt;if(incaMindSaveClock>=15000){incaMindSaveClock=0;if(a.ready)m.position={x:a.x,y:a.y,room:a.room||null};save();}
- if(a.room||!a.ready||nightStrength()>.60)return false;
- if(n.hunger<85&&m.inventory.berries>0){m.inventory.berries--;n.hunger=Math.min(100,n.hunger+15);incaRemember(m,'Sweet berries! Just what I needed.','food');a.wait=1200;a.moving=false;save();return true;}
+ if(a.room||!a.ready||nightStrength()>.60){a.activity=null;return false;}
+ if(a.foodPause>0){a.foodPause-=dt;a.moving=false;return true;}
+ if(n.energy<15){a.activity=null;a.moving=false;n.energy=Math.min(100,n.energy+dt*.00012);m.thought='I need a little rest.';return true;}
+ if(n.hunger<85&&m.inventory.berries>0){m.inventory.berries--;n.hunger=Math.min(100,n.hunger+15);incaRemember(m,'Sweet berries! Just what I needed.','food');a.foodPause=1200;a.moving=false;save();return true;}
  if(n.hunger<80||m.inventory.berries<2){
   if(!a.berryGoal||!berryReady(a.berryGoal)||state.removed.includes(a.berryGoal.id)){
    a.berryGoal=objects.filter(o=>o.type==='bush'&&berryReady(o)&&!state.removed.includes(o.id)&&dist(a,o)<700&&!(m.harvested[o.id]>state.daytime)).sort((p,q)=>dist(a,p)-dist(a,q))[0]||null;
   }
   if(a.berryGoal){
    const o=a.berryGoal;
-   if(incaWalkTo(o,dt,65)){m.inventory.berries+=2;m.harvested[o.id]=state.daytime+30;incaRemember(m,'Found a lovely patch of berries.','foraging');a.berryGoal=null;a.wait=1600;save();}
+   if(incaWalkTo(o,dt,65)){m.inventory.berries+=2;m.harvested[o.id]=state.daytime+30;incaRemember(m,'Found a lovely patch of berries.','foraging');a.berryGoal=null;a.berryTime=0;a.foodPause=1600;save();}
    else {a.berryTime=(a.berryTime||0)+dt;if(a.berryTime>18000){m.harvested[o.id]=state.daytime+10;a.berryGoal=null;a.berryTime=0;}}
    return true;
   }
  }
- return false;
+ return incaChooseActivity(dt,a,m);
 }
 
 function tickInca(dt){
