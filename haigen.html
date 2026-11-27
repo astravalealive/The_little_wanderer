@@ -3130,7 +3130,7 @@ function haigenTalkPanel(){
   if(message.from==='you'||!turns.length)turns.push([message]);
   else turns[turns.length-1].push(message);
  }
- const history=turns.slice(-18).reverse().flat();
+ const history=turns.slice(-18).flat().reverse();
  open('<h2>💬 Talk with Haigen</h2><p>Ask him about his feelings, plans, curiosity, mushrooms or what he has learned. His replies use his actual game state and saved discoveries. Optional private language model: '+safeText(haigenAI.status)+'.</p><button class="btn" id="haigenAIConfig">Configure private AI brain</button><div id="haigenTalkHistory" style="max-height:min(32vh,260px);overflow-y:auto;overscroll-behavior:contain;padding:5px">'+history.map(m=>'<p style="margin:7px 0"><b>'+(m.from==='you'?'You':'Haigen')+':</b> '+safeText(m.text)+'</p>').join('')+'</div><textarea id="haigenTalkInput" rows="2" maxlength="500" style="box-sizing:border-box;width:100%;font-size:16px;padding:10px" placeholder="Ask Haigen anything..."></textarea><p><button class="btn" id="haigenTalkSend">Send to Haigen</button></p>');
  const input=document.getElementById('haigenTalkInput'),send=document.getElementById('haigenTalkSend');
  send.onclick=async()=>{
