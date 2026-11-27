@@ -834,14 +834,18 @@ const woodlandFloorImage=new Image();
 let woodlandFloorTile=null;
 woodlandFloorImage.onload=()=>{
  const im=woodlandFloorImage,w=384,h=Math.round(w*im.naturalHeight/im.naturalWidth);
- const tile=document.createElement('canvas');tile.width=w*2;tile.height=h*2;
- const g=tile.getContext('2d');g.imageSmoothingEnabled=true;
- for(let y=0;y<2;y++)for(let x=0;x<2;x++){
- g.save();g.translate((x+(x?1:0))*w,(y+(y?1:0))*h);g.scale(x?-1:1,y?-1:1);g.drawImage(im,0,0,w,h);g.restore();
+ const tile=document.createElement('canvas');tile.width=w;tile.height=h;
+ const g=tile.getContext('2d');g.drawImage(im,0,0,w,h);
+ const p=g.getImageData(0,0,w,h),src=new Uint8ClampedArray(p.data);
+ // Crossfade opposite edges without mirroring the artwork.
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+ const ax=.5*Math.max(0,1-Math.min(x,w-1-x)/32),ay=.5*Math.max(0,1-Math.min(y,h-1-y)/32);
+ for(let k=0;k<3;k++){const at=(xx,yy)=>src[(yy*w+xx)*4+k];p.data[(y*w+x)*4+k]=(1-ay)*((1-ax)*at(x,y)+ax*at(w-1-x,y))+ay*((1-ax)*at(x,h-1-y)+ax*at(w-1-x,h-1-y));}
  }
+ g.putImageData(p,0,0);
  woodlandFloorTile=tile;islandCache.clear();
 };
-woodlandFloorImage.src='./woodland_floor_green.png?v=465';
+woodlandFloorImage.src='./woodland_primary.png?v=467';
 const woodlandArtCache=new Map();
 function drawWoodlandArtChunk(ix,iy){
  if(!woodlandFloorTile)return;
@@ -854,9 +858,9 @@ function drawWoodlandArtChunk(ix,iy){
  const m=mask.getContext('2d'),p=m.createImageData(65,65);
  for(let y=0;y<65;y++)for(let x=0;x<65;x++){
  const wx=x0+x*8,wy=y0+y*8;
- const edge=Math.min(wx,3500-wx,wy,3100-wy,islandDepth(wx,wy)-25);
+ const wobble=55*Math.sin(wx*.019+wy*.012)+35*Math.sin(wy*.031-wx*.009);let edge=Math.min(wx,3500-wx,wy,3100-wy,islandDepth(wx,wy)-25);for(let a=0;a<8;a++){const t=a*Math.PI/4;for(const d of [48,96,160])if(expandedRegion(wx+Math.cos(t)*d,wy+Math.sin(t)*d))edge=Math.min(edge,d-24);}
  const region=expandedRegion(wx,wy);
- p.data[(y*65+x)*4+3]=region?0:Math.round(255*coastSmooth(0,180,edge));
+ p.data[(y*65+x)*4+3]=region?0:Math.round(255*coastSmooth(0,200,edge+wobble));
  }
  m.putImageData(p,0,0);g.globalCompositeOperation='destination-in';g.drawImage(mask,-4,-4,520,520);
  woodlandArtCache.set(key,cv);if(woodlandArtCache.size>40)woodlandArtCache.delete(woodlandArtCache.keys().next().value);
