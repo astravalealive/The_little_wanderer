@@ -5024,6 +5024,16 @@ for(let i=0;i<1400;i++){
   if(treeTypes.has(o.type)&&!keepIds.has(o.id))objects.splice(i,1);
  }
 }
+// Stable harvestable mushroom clusters around woodland trunks.
+for(const t of objects.filter(o=>o.type==='tree'&&(!expandedRegion(o.x,o.y)||expandedRegion(o.x,o.y)?.id==='downs'))){
+ for(let j=0;j<2;j++){
+ const seed=t.id*17+j*131+92000;if(seeded(seed)<.32)continue;
+ const a=seeded(seed+1)*Math.PI*2,r=42+seeded(seed+2)*65;
+ const x=t.x+Math.cos(a)*r,y=t.y+Math.sin(a)*r;
+ const o={id:2000000+t.id*2+j,x,y,type:'mushroom',size:.65+seeded(seed+3)*.45};
+ if(roadDistance(x,y)>100&&canPlaceScenery(o)&&Math.hypot(x-cottage.x,y-cottage.y)>safeRadius+100)objects.push(o);
+ }
+}
 // V386: first regional polish pass. Deterministic habitat details and quiet scenic pockets
 // across every named region; use existing approved scenery renderers, no new asset dependencies.
 {
@@ -6305,7 +6315,24 @@ function drawEasternIslandLandmarks(){
  }
  ctx.restore();
 }
+const fungiSprites=[];
+const fungiSheet=new Image();
+fungiSheet.onload=()=>{
+ const rows=[[0,232,[0,236,398,598,828,1028,1228,1536]],[232,430,[0,225,415,613,835,1020,1345,1536]],[430,620,[0,270,480,696,820,1050,1297,1536]],[620,820,[0,245,477,715,919,1125,1322,1536]],[820,1024,[0,312,482,654,839,1024,1225,1536]]];
+ for(const [y,b,xs] of rows)for(let j=0;j<xs.length-1;j++){
+ const x=xs[j],w=xs[j+1]-x,h=b-y,cv=document.createElement('canvas');cv.width=w;cv.height=h;
+ const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(fungiSheet,x*fungiSheet.naturalWidth/1536,y*fungiSheet.naturalHeight/1024,w*fungiSheet.naturalWidth/1536,h*fungiSheet.naturalHeight/1024,0,0,w,h);
+ const p=g.getImageData(0,0,w,h);cleanForestMatte(p,w,h);g.putImageData(p,0,0);fungiSprites.push(cv);
+ }
+};
+fungiSheet.src='./mushroom_sprite_sheet.png?v=461';
+function drawNewFungi(o){
+ if(o.type!=='mushroom'||(!rbWoodland(o.x,o.y)&&o.id<2000000)||!fungiSprites.length)return false;
+ const im=fungiSprites[Math.floor(seeded(o.id*37+19)*fungiSprites.length)],w=42*(o.size||1),h=w*im.height/im.width;
+ ctx.drawImage(im,o.x-w/2,o.y-h+5,w,h);return true;
+}
 function drawSceneryNearHaigen(o){
+ if(drawNewFungi(o))return;
  if(overhaulBeachScenery(o))return;
  // Route woodland flowers before the cached atlas path, which otherwise returns early.
  if(rbEnabled&&o.type==='flower'&&rbWoodland(o.x,o.y)){
