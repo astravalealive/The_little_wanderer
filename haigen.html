@@ -10277,7 +10277,7 @@ const visible=sceneryInView(cam.x,cam.y,W/zoom/2+150,H/zoom/2+150).filter(o=>Mat
  const depth=walkingLakeLevel(state.x,state.y),seaDepth=islandDepth(state.x,state.y);if(state.raftAfloat){drawRaft();character(state.x,state.y-8,'boy')}else if(state.skiffAtSea){drawSkiff();character(state.x,state.y,'boy')}else if(depth>=1&&seaDepth<0){character(state.x,state.y,'boy');ctx.save();ctx.fillStyle='rgba(58,157,179,'+Math.min(.62,.16+(-seaDepth/62)*.38)+')';ctx.beginPath();ctx.ellipse(state.x,state.y+3,24,10,0,Math.PI,Math.PI*2);ctx.lineTo(state.x+24,state.y+4);ctx.ellipse(state.x,state.y+4,24,9,0,0,Math.PI);ctx.fill();ctx.strokeStyle='#d8f6edaa';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,27,7,0,0,Math.PI*2);ctx.stroke();ctx.restore()}else if(depth<1){ctx.save();ctx.beginPath();ctx.rect(state.x-50,state.y-100,100,100);ctx.clip();ctx.translate(0,depth<.55?30:depth<.82?18:7);((state.resting||collapseRemaining>0)?drawSleepingHaigen(state.x,state.y):character(state.x,state.y,'boy',null,depth<.82));ctx.restore();ellipse(state.x,state.y+3,depth<.55?29:23,depth<.55?7:5,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(state.x,state.y+3,depth<.55?35:26,depth<.55?12:8,0,0,Math.PI*2);ctx.stroke()}else if(state.resting||collapseRemaining>0)drawSleepingHaigen(state.x,state.y);else if(paintingNow)paintHaigen();else character(state.x,state.y,'boy');ctx.restore()}},...chickens.map(h=>({y:h.y,draw:()=>drawHen(h)})),...companions.map(c=>({y:c.y,draw:()=>{const depth=lakeLevel(c.x,c.y);if(depth<1){ctx.save();ctx.beginPath();ctx.rect(c.x-48,c.y-85,96,87);ctx.clip();ctx.translate(0,depth<.65?21:10);character(c.x,c.y,c.kind,c);ctx.restore();ellipse(c.x,c.y+3,23,6,'#b3e4dc99');ctx.strokeStyle='#e4f7e8a9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y+3,28,9,0,0,Math.PI*2);ctx.stroke()}else character(c.x,c.y,c.kind,c)}}))];drawables.push(...state.pondFamilies.filter(f=>f.stage!=='gather'||f.twigs>=2).map(f=>({y:f.nestY,draw:()=>drawDuckNest(f)})));drawables.push(...state.pondFamilies.flatMap(f=>f.chicks).filter(ch=>Math.abs(ch.x-cam.x)<1100&&Math.abs(ch.y-cam.y)<900).map(ch=>({y:ch.y,draw:()=>drawDuckling(ch)})));drawables.push(...ducks.filter(d=>Math.abs(d.x-cam.x)<1100&&Math.abs(d.y-cam.y)<900).map(d=>({y:d.y,draw:()=>drawDuck(d)})));drawables.push(...birds.filter(b=>islandDepth(b.x,b.y)>50&&Math.abs(b.x-cam.x)<1100&&Math.abs(b.y-cam.y)<900).map(b=>({y:b.y,draw:()=>drawBird(b)})));if(state.coopTier){drawables.push({y:chickenNest.y,draw:drawChickenNest});if(state.rooster)drawables.push({y:coopPlot.y+52,draw:drawRooster})}// Queue deer and regional wildlife by ground position alongside rocks and the troll stump.
 drawables.push(...woodlandDeer.filter(a=>Math.abs(a.x-cam.x)<=1050&&Math.abs(a.y-cam.y)<=800).map(a=>({y:a.y,draw:()=>worldFaunaDraw('stag',a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,2.1,time<a.scaredUntil?'flee':time<a.alertUntil?'alert':a.walking?'walk':'forage')})));
 drawables.push(...regionalWildlife.filter(a=>animalAlive(a)&&Math.abs(a.x-cam.x)<=1050&&Math.abs(a.y-cam.y)<=800).map(a=>({y:a.y,draw:()=>drawWildAnimal(a)})));
-drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));for(const t of caveTrolls){if(t.room==='woods'&&Math.abs(t.x-cam.x)<1050&&Math.abs(t.y-cam.y)<800)drawables.push({y:t.y,draw:()=>drawTrollSprite(t.sprite,t.x,t.y,trollSpriteSize,t.dir,t.walking,t.clock)});}artDrawables(drawables);if(nico.ready)drawables.push({y:nico.y,draw:drawNico});if(wanderer.ready)drawables.push({y:wanderer.y,draw:drawWanderer});drawables.push({y:abandonedTrollStump.y+24,draw:drawAbandonedTrollStump},{y:trollStumpHome.y+24,draw:drawTrollStump});if(state.skiffBerth&&!state.skiffAtSea)drawSkiff();if(incaActor.ready&&!incaActor.room)drawables.push({y:incaActor.y,draw:drawInca});drawables.forEach((o,i)=>{o.depthOrder=i});
+drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));for(const t of caveTrolls){if(t.room==='woods'&&Math.abs(t.x-cam.x)<1050&&Math.abs(t.y-cam.y)<800)drawables.push({y:t.y,draw:()=>drawTrollSprite(t.sprite,t.x,t.y,trollSpriteSize,t.dir,t.walking,t.clock)});}for(const e of elfResidents)if(e.room==='woods')drawables.push({y:e.y,draw:()=>drawElf(e,e.x,e.y,70)});artDrawables(drawables);if(nico.ready)drawables.push({y:nico.y,draw:drawNico});if(wanderer.ready)drawables.push({y:wanderer.y,draw:drawWanderer});drawables.push({y:abandonedTrollStump.y+24,draw:drawAbandonedTrollStump},{y:trollStumpHome.y+24,draw:drawTrollStump});if(state.skiffBerth&&!state.skiffAtSea)drawSkiff();if(incaActor.ready&&!incaActor.room)drawables.push({y:incaActor.y,draw:drawInca});drawables.forEach((o,i)=>{o.depthOrder=i});
 drawFrosthold();drawables.sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder).forEach(o=>o.draw());drawFrostholdForeground();worldEditorOutline();if(!state.skiffAtSea)drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
@@ -11212,7 +11212,7 @@ function recoverAutonomousHaigen(dt,oldX,oldY){
 function update(dt){
  for(const f of state.structures)if(f.kind==='campfire')tickFire(f,dt);
  tickFire(shipHearth(landingSite()),dt);
- fishRoastTick(dt);if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(frostholdArtDoors.some(d=>Math.hypot(state.x-d.x,state.y-d.y)<24)&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.00015;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
+ fishRoastTick(dt);if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(frostholdArtDoors.some(d=>Math.hypot(state.x-d.x,state.y-d.y)<24)&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);updateElves(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.00015;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
  if(dy>0&&trollRoomPlayer.y>=.94)leaveTrollRoom();
 }else if(dy<0&&trollRoomPlayer.y<=.23){
  changeTrollChamber(true);
@@ -11730,6 +11730,59 @@ const mushroom=objects.filter(o=>o.type==='mushroom'&&canPlaceScenery(o)&&!camps
 const frog=frogs.find(f=>dist(f,state)<55);if(frog)return {o:frog,d:dist(frog,state),type:'frog'};const critter=woodlandCritters.filter(o=>dist(o,state)<70).sort((a,b)=>dist(a,state)-dist(b,state))[0];if(critter)return {o:critter,d:dist(critter,state),type:'critter'};if(state.coopTier&&dist(state,chickenNest)<58&&state.nestEggs>0)return {o:chickenNest,d:dist(state,chickenNest),type:'eggs'};let candidates=state.fallen.filter(o=>near(o,100)).map(o=>({o,d:dist(o,state)-20,type:'fallen'}));candidates.push(...objects.filter(o=>!campsiteProtected(o)&&flowerHasHabitat(o)&&!state.removed.includes(o.id)&&near(o,90)).map(o=>({o,d:dist(o,state),type:'resource'})));for(let c of companions)if(near(c,110))candidates.push({o:c,d:dist(c,state),type:'friend'});for(let f of state.structures)if(f.kind==='campfire'&&near(f,100))candidates.push({o:f,d:dist(f,state),type:'fire'});if(near(cottage,125))candidates.push({o:cottage,d:dist(cottage,state),type:'home'});if(near(firstFire,90)&&!state.structures.some(q=>q.kind==='campfire'&&dist(q,firstFire)<80))candidates.push({o:firstFire,d:dist(firstFire,state),type:'fireSite'});if(near(ruins,100))candidates.push({o:ruins,d:dist(ruins,state),type:'ruins'});return candidates.sort((a,b)=>a.d-b.d)[0]}const abandonedTrollStump={x:2500,y:2200,width:700,height:476};
 const abandonedTrollStumpImage=new Image();abandonedTrollStumpImage.src='./assets/Stump.png';
 const trollStumpHome={x:3712,y:493,width:540,height:360};
+
+/* Great Stump elf residents: independent indoor/outdoor routines. */
+const elfResidents=['male','female','elder','blonde'].map((name,i)=>({name,i,x:.50,y:.90,room:'stump',dir:'up',clock:0,wait:2500+i*4000,walking:false,goal:null,frames:[]}));
+for(const e of elfResidents){
+ const img=new Image();
+ img.onload=()=>{
+  const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+  const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0);
+  const cols=e.i<2?3:4;
+  const xs=e.i===0?[.27,.42,.57,.73]:e.i===1?[.19,.36,.55,.73]:e.i===2?[.20,.34,.49,.64,.78]:[.19,.34,.49,.65,.80];
+  const ys=e.i<2?[0,.25,.474,.70,1]:[0,.26,.505,.747,1];
+  for(let row=0;row<4;row++){
+   const frames=[];
+   for(let col=0;col<cols;col++){
+    const x=Math.round(xs[col]*c.width),y=Math.round(ys[row]*c.height),w=Math.round(xs[col+1]*c.width)-x,h=Math.round(ys[row+1]*c.height)-y;
+    const p=g.getImageData(x,y,w,h),d=p.data;let l=w,t=h,b=-1,rr=-1;
+    for(let j=0;j<h;j++)for(let k=0;k<w;k++){const n=(j*w+k)*4;if(Math.min(d[n],d[n+1],d[n+2])>225)d[n+3]=0;if(d[n+3]>32){l=Math.min(l,k);rr=Math.max(rr,k);t=Math.min(t,j);b=Math.max(b,j);}}
+    if(b<t){frames.push(null);continue;}
+    const f=document.createElement('canvas');f.width=rr-l+1;f.height=b-t+1;f.getContext('2d').putImageData(p,-l,-t);frames.push(f);
+   }e.frames.push(frames);
+  }
+ };img.src='./elf_'+e.name+'.png';
+}
+function drawElf(e,x,y,h){
+ const row={down:0,right:1,left:2,up:3}[e.dir]??0,frames=e.frames[row];if(!frames)return;
+ const phase=e.walking?Math.floor(e.clock/160)%4:0;
+ const vertical=row===0||row===3;
+ const index=phase===0||phase===2?0:vertical?1:phase===1?1:frames.length-1;
+ const f=frames[index];if(!f)return;
+ const w=h*f.width/f.height;ctx.save();ctx.translate(x,y);if(vertical&&phase===3)ctx.scale(-1,1);ctx.imageSmoothingEnabled=false;ctx.drawImage(f,-w/2,-h,w,h);ctx.restore();
+}
+function updateElves(dt){
+ const a=abandonedTrollStump,door={x:a.x,y:a.y+125};
+ for(const e of elfResidents){
+  e.walking=false;if(e.wait>0){e.wait-=dt;continue;}
+  const night=nightStrength()>.55;
+  if(e.room==='stump'){
+   if(!e.goal)e.goal=night?{x:.50,y:.86}:{x:.50,y:.96,exit:true};
+   const dx=e.goal.x-e.x,dy=e.goal.y-e.y,d=Math.hypot(dx,dy);
+   if(d<.008){if(e.goal.exit){e.room='woods';e.x=door.x;e.y=door.y;e.outings=0;}e.goal=null;e.wait=night?12000:1200+e.i*900;continue;}
+   const step=Math.min(d,dt*.000055),nx=e.x+dx/d*step,ny=e.y+dy/d*step;
+   if(trollRoomWalkable(nx,ny,false)){e.x=nx;e.y=ny;e.dir=trollFacing(dx,dy);e.walking=true;e.clock+=dt;}else{e.goal=null;e.wait=2000;}continue;
+  }
+  if(!e.goal||night&&!e.goal.home){e.leg=null;if(night||e.outings>=4)e.goal={...door,home:true};else{const angle=Math.random()*Math.PI*2,r=180+Math.random()*650;e.goal={x:door.x+Math.cos(angle)*r,y:door.y+Math.sin(angle)*r};}}
+  const dx=e.goal.x-e.x,dy=e.goal.y-e.y,d=Math.hypot(dx,dy);
+  if(d<12){if(e.goal.home){e.room='stump';e.x=.50;e.y=.96;}else e.outings++;e.goal=null;e.leg=null;e.wait=2500+Math.random()*4500;continue;}
+  const angle=Math.atan2(dy,dx),step=Math.min(d,dt*.045);
+  let moved=false;
+  for(const off of [0,.55,-.55,1.1,-1.1,1.57,-1.57]){const nx=e.x+Math.cos(angle+off)*step,ny=e.y+Math.sin(angle+off)*step;if(!blockedBySolid(nx,ny)){e.dir=trollFacing(nx-e.x,ny-e.y);e.x=nx;e.y=ny;e.walking=true;e.clock+=dt;moved=true;break;}}
+  if(!moved){if(!e.goal.home){e.goal=null;e.outings++;}e.wait=900;}
+ }
+}
+
 const trollStumpImage=new Image();trollStumpImage.src='./assets/troll-cave.png';
 var stumpPositionReady=false;
 let trollStumpInside=false;
@@ -12548,6 +12601,8 @@ function drawTrollStumpInterior(visiting=false){
   ctx.restore();
  }
  const guests=[];
+ const elves=vault?[]:elfResidents.filter(e=>e.room==='stump').sort((a,b)=>a.y-b.y);
+ for(const e of elves)if(e.y<=trollRoomPlayer.y)drawElf(e,ox+e.x*iw,oy+e.y*ih,ih*.115);
  const residents=guests.map(t=>({...t,x:t.x/(t.vault?600:547),y:t.y/(t.vault?400:600)})).sort((a,b)=>a.y-b.y);
  // Room artwork uses backing pixels, while the outdoor camera draws in world units.
  const residentSize=trollSpriteSize*baseCameraScale()*(h/H)*(state.bigTrollMode?3:1);
@@ -12556,8 +12611,9 @@ function drawTrollStumpInterior(visiting=false){
  if(!visiting||(trollStumpInside&&!inTreasureCave)){ctx.save();ctx.translate(px,py);const scale=Math.max(1.15,Math.min(1.9,iw/650));ctx.scale(scale,scale);
  if(!drawApprovedHaigen(0,0,trollRoomPlayer,false))character(0,0,'boy',trollRoomPlayer,false);ctx.restore();}
  for(const t of residents)if(t.y>trollRoomPlayer.y)paintResident(t);
+ for(const e of elves)if(e.y>trollRoomPlayer.y)drawElf(e,ox+e.x*iw,oy+e.y*ih,ih*.115);
  ctx.fillStyle='#dfb978';ctx.textAlign='center';ctx.font='bold 24px system-ui';
- ctx.fillText(vault?'Abandoned Hoard':'Abandoned Tree Stump',w/2,Math.max(95,h*.12));
+ ctx.fillText(vault?'Great Stump Hoard':'Great Stump',w/2,Math.max(95,h*.12));
  if(visiting){
   // Invisible interactive hit areas, matching the visible cave doorways.
   const outerX=.50,outerY=.93;
