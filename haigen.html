@@ -844,9 +844,24 @@ const woodlandOverlayImage=new Image();
 woodlandOverlayImage.onload=()=>woodlandArtCache.clear();
 woodlandOverlayImage.src='./woodland_overlay.png?v=471';
 
-const woodlandLeavesImage=new Image();
-woodlandLeavesImage.onload=()=>woodlandArtCache.clear();
-woodlandLeavesImage.src='./woodland_leaves.png?v=472';
+const woodlandLeavesImage=new Image(),woodlandLeafSprites=[];
+woodlandLeavesImage.onload=()=>{
+ const cv=document.createElement('canvas');cv.width=woodlandLeavesImage.naturalWidth;cv.height=woodlandLeavesImage.naturalHeight;
+ const g=cv.getContext('2d');g.drawImage(woodlandLeavesImage,0,0);
+ const w=cv.width,h=cv.height,p=g.getImageData(0,0,w,h).data,seen=new Uint8Array(w*h);
+ for(let i=0;i<w*h;i++){
+ if(seen[i]||p[i*4+3]<100)continue;
+ const q=[i];seen[i]=1;let l=w,t=h,r=0,b=0;
+ for(let j=0;j<q.length;j++){const k=q[j],x=k%w,y=Math.floor(k/w);l=Math.min(l,x);r=Math.max(r,x);t=Math.min(t,y);b=Math.max(b,y);
+ for(const n of [x>0?k-1:-1,x<w-1?k+1:-1,y>0?k-w:-1,y<h-1?k+w:-1])if(n>=0&&!seen[n]&&p[n*4+3]>=100){seen[n]=1;q.push(n)}}
+ if(q.length<250||r-l<12||b-t<8)continue;
+ const s=document.createElement('canvas');s.width=r-l+1;s.height=b-t+1;const sg=s.getContext('2d'),im=sg.createImageData(s.width,s.height);
+ for(const k of q){const d=((Math.floor(k/w)-t)*s.width+k%w-l)*4;im.data.set(p.subarray(k*4,k*4+4),d)}
+ sg.putImageData(im,0,0);woodlandLeafSprites.push(s);
+ }
+ woodlandArtCache.clear();
+};
+woodlandLeavesImage.src='./woodland_leaves.png?v=473';
 function drawWoodlandArtChunk(ix,iy){
  if(!woodlandFloorTile)return;
  const key=ix+','+iy;let cv=woodlandArtCache.get(key);
@@ -865,16 +880,17 @@ function drawWoodlandArtChunk(ix,iy){
  }
  g.globalAlpha=1;
  }
- if(woodlandLeavesImage.complete&&woodlandLeavesImage.naturalWidth){
- const step=250;
- for(let yy=Math.floor((y0-250)/step);yy<=Math.ceil((y0+size+250)/step);yy++)
- for(let xx=Math.floor((x0-250)/step);xx<=Math.ceil((x0+size+250)/step);xx++){
- const s=xx*217.31+yy*431.73;
- if(seeded(s+11)<.32)continue;
- const px=xx*step+seeded(s+12)*step,py=yy*step+seeded(s+13)*step;
- const w=100+seeded(s+14)*65,h=w*woodlandLeavesImage.naturalHeight/woodlandLeavesImage.naturalWidth*.65;
- g.globalAlpha=.72+seeded(s+15)*.23;
- g.drawImage(woodlandLeavesImage,px-w/2,py-h/2,w,h);
+ if(woodlandLeafSprites.length){
+ const step=48;
+ for(let yy=Math.floor((y0-32)/step);yy<=Math.ceil((y0+size+32)/step);yy++)
+ for(let xx=Math.floor((x0-32)/step);xx<=Math.ceil((x0+size+32)/step);xx++){
+ const s=xx*217.31+yy*431.73,px=xx*step+seeded(s+12)*step,py=yy*step+seeded(s+13)*step;
+ const density=.32+.23*Math.sin(px*.009+py*.004)+.18*Math.sin(py*.013-px*.006);
+ if(seeded(s+11)>density)continue;
+ const leaf=woodlandLeafSprites[Math.floor(seeded(s+16)*woodlandLeafSprites.length)%woodlandLeafSprites.length];
+ const w=5+seeded(s+14)*10,h=w*leaf.height/leaf.width*.75;
+ g.globalAlpha=.65+seeded(s+15)*.3;
+ g.drawImage(leaf,px-w/2,py-h/2,w,h);
  }
  g.globalAlpha=1;
  }
