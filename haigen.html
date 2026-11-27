@@ -3112,8 +3112,13 @@ function haigenAIPlan(choices){
 }
 function haigenTalkPanel(){
  state.haigenConversations=state.haigenConversations.filter(m=>m&&typeof m.text==='string'&&runeSafeSummary(m.text));
- const history=state.haigenConversations.slice(-35);
- open('<h2>💬 Talk with Haigen</h2><p>Ask him about his feelings, plans, curiosity, mushrooms or what he has learned. His replies use his actual game state and saved discoveries. Optional private language model: '+safeText(haigenAI.status)+'.</p><button class="btn" id="haigenAIConfig">Configure private AI brain</button><div id="haigenTalkHistory" style="max-height:42vh;overflow-y:auto;padding:5px">'+history.map(m=>'<p style="margin:7px 0"><b>'+(m.from==='you'?'You':'Haigen')+':</b> '+safeText(m.text)+'</p>').join('')+'</div><textarea id="haigenTalkInput" rows="2" maxlength="500" style="box-sizing:border-box;width:100%;font-size:16px;padding:10px" placeholder="Ask Haigen anything..."></textarea><p><button class="btn" id="haigenTalkSend">Send to Haigen</button></p>');
+ const turns=[];
+ for(const message of state.haigenConversations){
+  if(message.from==='you'||!turns.length)turns.push([message]);
+  else turns[turns.length-1].push(message);
+ }
+ const history=turns.slice(-18).reverse().flat();
+ open('<h2>💬 Talk with Haigen</h2><p>Ask him about his feelings, plans, curiosity, mushrooms or what he has learned. His replies use his actual game state and saved discoveries. Optional private language model: '+safeText(haigenAI.status)+'.</p><button class="btn" id="haigenAIConfig">Configure private AI brain</button><div id="haigenTalkHistory" style="max-height:min(32vh,260px);overflow-y:auto;overscroll-behavior:contain;padding:5px">'+history.map(m=>'<p style="margin:7px 0"><b>'+(m.from==='you'?'You':'Haigen')+':</b> '+safeText(m.text)+'</p>').join('')+'</div><textarea id="haigenTalkInput" rows="2" maxlength="500" style="box-sizing:border-box;width:100%;font-size:16px;padding:10px" placeholder="Ask Haigen anything..."></textarea><p><button class="btn" id="haigenTalkSend">Send to Haigen</button></p>');
  const input=document.getElementById('haigenTalkInput'),send=document.getElementById('haigenTalkSend');
  send.onclick=async()=>{
   const message=input.value.trim();if(!message||send.disabled)return;send.disabled=true;
@@ -3128,7 +3133,7 @@ function haigenTalkPanel(){
   think(answer.slice(0,130),5500,true);save();haigenTalkPanel();
  };
  document.getElementById('haigenAIConfig').onclick=()=>{haigenAIConfigure();haigenTalkPanel()};
- input.focus();
+ document.getElementById('haigenTalkHistory').scrollTop=0;
 }
 const haigenTalkBtn=document.createElement('button');
 haigenTalkBtn.id='haigenTalkBtn';haigenTalkBtn.className='btn';haigenTalkBtn.textContent='💬 Talk to Haigen';
