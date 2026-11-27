@@ -3080,16 +3080,21 @@ function haigenAnswer(message){
  return 'That is an interesting question. I do not know enough to answer it properly yet. Could we investigate it at the runestone?';
 }
 
-const haigenAI={url:'',token:'',busy:false,lastPlan:0,proposal:null,status:'Local mind'};
+const haigenAIStorage='haigen.privateBrain.v1';
+const haigenAIDefault='https://haigen-brain.seanbrianwebb-ou.workers.dev/brain';
+function haigenAIRestore(){try{const c=JSON.parse(localStorage.getItem(haigenAIStorage)||'null');if(c&&c.url===haigenAIDefault&&typeof c.token==='string'&&c.token)return c}catch{}return {url:'',token:''}}
+const haigenAIRestored=haigenAIRestore();
+const haigenAI={...haigenAIRestored,busy:false,lastPlan:0,proposal:null,status:haigenAIRestored.token?'Saved connection; not yet tested':'Local mind'};
 function haigenAIConfigure(){
- const url=prompt('Private HTTPS brain endpoint (blank disables it)',haigenAI.url);
+ const url=prompt('Private HTTPS brain endpoint (blank disables it)',haigenAI.url||haigenAIDefault);
  if(url===null)return;
- if(!url.trim()){haigenAI.url='';haigenAI.token='';haigenAI.proposal=null;haigenAI.status='Local mind';return}
+ if(!url.trim()){haigenAI.url='';haigenAI.token='';haigenAI.proposal=null;haigenAI.status='Local mind';try{localStorage.removeItem(haigenAIStorage)}catch{}return}
  let parsed;try{parsed=new URL(url)}catch{return notify('Invalid brain endpoint.')}
  if(parsed.protocol!=='https:'||parsed.username||parsed.password||parsed.search||parsed.hash)return notify('Use a private HTTPS endpoint without credentials in the URL.');
- const token=prompt('Private gateway access token (held only until this page closes)','');
+ const token=prompt('Private gateway access token (not your Gemini API key)','');
  if(!token)return;
  haigenAI.url=parsed.href;haigenAI.token=token;haigenAI.status='Connected settings; not yet tested';haigenAI.lastPlan=0;
+ try{localStorage.removeItem(haigenAIStorage);if(parsed.href===haigenAIDefault&&confirm('Remember this gateway token on this trusted device? Other scripts on this website may access it. Choose Cancel for this session only.'))localStorage.setItem(haigenAIStorage,JSON.stringify({url:parsed.href,token}));}catch{haigenAI.status='Connected for this session; browser storage unavailable'}
 }
 function haigenAIContext(){
  const b=livingInner();
