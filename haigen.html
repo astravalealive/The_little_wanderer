@@ -11214,10 +11214,10 @@ function update(dt){
  for(const f of state.structures)if(f.kind==='campfire')tickFire(f,dt);
  tickFire(shipHearth(landingSite()),dt);
  fishRoastTick(dt);if(frostholdRoom){updateFrostholdRoom(dt);return}frostholdEntryCooldown=Math.max(0,frostholdEntryCooldown-dt);if(!frostholdEntryCooldown&&!state.autonomy&&frostholdArtReady()){const p=frostholdPixel(state.x,state.y);if(frostholdArtDoors.some(d=>Math.hypot(state.x-d.x,state.y-d.y)<24)&&frostholdInteract())return;}updateRooster(dt);if(state.mothlightMs>0)state.mothlightMs=Math.max(0,state.mothlightMs-dt);paintingNow=false;updateCaveResidents(dt);if(trollDoorCooldown>0)trollDoorCooldown=Math.max(0,trollDoorCooldown-dt);if(mountainInside){updateMountain(dt);return}if(trollDoorCooldown===0&&!state.autonomy&&!homeInside&&!visitorRoom&&Math.hypot(state.x-trollStumpHome.x,state.y-trollStumpHome.y+12)<75){enterMountain();if(mountainInside)return}if(trollStumpInside){updateNico(dt);state.daytime+=dt*.00015;const pad=controllerMove();checkShoulders();checkActions();if(!trollStumpInside)return;if(supperElapsed){tickSupper(dt);return}let dx=joy.x+pad.x+(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0),dy=joy.y+pad.y+(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0);const mag=Math.hypot(dx,dy);trollRoomPlayer.moving=mag>.08;if(mag>.08){dx/=Math.max(1,mag);dy/=Math.max(1,mag);const nx=trollRoomPlayer.x+dx*dt*.00019,ny=trollRoomPlayer.y+dy*dt*.00019;if(trollRoomWalkable(nx,trollRoomPlayer.y))trollRoomPlayer.x=nx;if(trollRoomWalkable(trollRoomPlayer.x,ny))trollRoomPlayer.y=ny;trollRoomPlayer.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');trollRoomPlayer.steps+=dt;if(inTreasureCave){
- if(dy>0&&trollRoomPlayer.y>=377/400)leaveTrollRoom();
-}else if(dy<0&&trollRoomPlayer.y<=174/600){
+ if(dy>0&&trollRoomPlayer.y>=.94)leaveTrollRoom();
+}else if(dy<0&&trollRoomPlayer.y<=.23){
  changeTrollChamber(true);
-}else if(dy>0&&trollRoomPlayer.y>=455/600)leaveTrollRoom();}time+=dt;return}if(trollDoorCooldown===0&&trollStumpDoorNear()&&!state.autonomy){enterTrollRoom();return}tickArtMarket(dt);updateNico(dt);updateWanderer(dt);updateSurvival(dt);updateWastelandGhosts(dt);if(ghostStunMs>0){time+=dt;return}if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateTrolls(dt);updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);// Old saves could retain an outdoor sleep pose directly on the house roof.
+}else if(dy>0&&trollRoomPlayer.y>=.94)leaveTrollRoom();}time+=dt;return}if(trollDoorCooldown===0&&trollStumpDoorNear()&&!state.autonomy){enterTrollRoom();return}tickArtMarket(dt);updateNico(dt);updateWanderer(dt);updateSurvival(dt);updateWastelandGhosts(dt);if(ghostStunMs>0){time+=dt;return}if(collapseRemaining>0){time+=dt;return}state.energy=Math.max(0,Math.min(100,state.energy+(state.resting?dt*.012:-dt*.00042)));if(state.resting){state.health=Math.min(100,state.health+dt*.0015);if(state.energy>=90&&state.autonomy&&state.health>=77&&state.poisonMs<=0){state.resting=false;think('I dreamed Dylan was in charge. Terrifying.',4400,true)} }state.fun=Math.max(0,state.fun-dt*.000035);state.activity=Math.max(0,state.activity-dt*.00005);state.hungerClock+=dt;if(state.hungerClock>=1000){const ticks=Math.floor(state.hungerClock/1000);state.hungerClock-=ticks*1000;const oldHunger=state.hunger;state.hunger=Math.max(0,state.hunger-ticks*.06);if(oldHunger>45&&state.hunger<=45)notify('🍎 Haigen is getting hungry. Gather food or cook a meal!');if(oldHunger>20&&state.hunger<=20)notify('🥣 Haigen needs something to eat soon.');if(state.hunger===0)state.health=Math.max(10,state.health-ticks*.012)}updateWeather(dt);mindTick(dt);storyTick();updateTrolls(dt);updateRegionalWildlife(dt);updateWoodlandCritters(dt);updateChickens(dt);checkFishingBite();updateBeasts(dt);// Old saves could retain an outdoor sleep pose directly on the house roof.
  // Wake Haigen there so he can approach the proper door and rest in bed.
  if(state.autonomy&&state.resting&&!homeInside&&state.campTier>1&&
     Math.hypot(state.x-(cottage.x+35),state.y-(cottage.y-10))<310){
@@ -12147,14 +12147,14 @@ function drawNico(){
  ctx.restore();
 }
 
-const trollInteriorArt=new Image();trollInteriorArt.src='./7155B1DF-71E9-41F7-9480-9C74F47D1A9A.png';
+const trollInteriorArt=new Image();trollInteriorArt.src='./2712EEB7-35E1-4F5A-8D92-28467A5ACADC.png';
 function drawAbandonedTrollStump(){const old=abandonedTrollStump;if(abandonedTrollStumpImage.complete&&abandonedTrollStumpImage.naturalWidth)ctx.drawImage(abandonedTrollStumpImage,old.x-old.width/2,old.y-old.height+24,old.width,old.height);}
 function drawTrollStump(){const t=trollStumpHome;if(!trollStumpImage.complete||!trollStumpImage.naturalWidth)return;ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(trollStumpImage,t.x-t.width/2,t.y-t.height+24,t.width,t.height);ctx.restore();}
 function trollStumpDoorNear(){return Math.hypot(state.x-abandonedTrollStump.x,state.y-(abandonedTrollStump.y-12))<92;}
 // Independent, controllable room coordinates; never overwrite Haigen's outdoor position.
 const trollRoomPlayer={x:.50,y:.79,dir:'up',moving:false,steps:0};
 const treasureCaveArt=new Image();
-treasureCaveArt.src='./assets/troll-hoard.webp';
+treasureCaveArt.src='./3EFAF5FA-736B-4498-B836-BCD6AEAC90D5.png';
 let inTreasureCave=false;
 let supperElapsed=0;
 const supperSeats=[[295,263],[336,261],[376,268],[300,340],[338,340],[374,341]];
@@ -12207,7 +12207,7 @@ function restoreTrollPosition(){
 }
 function changeTrollChamber(toVault){
  inTreasureCave=toVault;
- const spawn=toVault?{x:298/600,y:334/400,dir:'up'}:{x:303/547,y:191/600,dir:'down'};
+ const spawn=toVault?{x:.50,y:.82,dir:'up'}:{x:.51,y:.32,dir:'down'};
  Object.assign(trollRoomPlayer,spawn,{moving:false,steps:0});
  notify(toVault?'The Trolls’ Hoard':'Back in the trolls’ home.');
 }
@@ -12249,15 +12249,15 @@ const treasureFloorOutline=[
  [389,323],[360,316],[334,324],[314,341],[313,387]
 ];
 function trollRoomWalkable(x,y,vault=inTreasureCave){
- if(vault)return caveContains(treasureFloorOutline,x*600,y*400);
- const px=x*547,py=y*600;
- if(!caveContains(caveFloorOutline,px,py)||caveContains(caveTableOutline,px,py))return false;
- const hearth=((px-181)/52)**2+((py-265)/42)**2;
- const stool=((px-133)/18)**2+((py-366)/16)**2;
- return hearth>1&&stool>1;
+ const floor=vault?[[.45,.98],[.45,.85],[.36,.81],[.18,.79],[.10,.72],[.18,.65],[.23,.59],[.35,.60],[.55,.60],[.73,.59],[.81,.66],[.90,.72],[.82,.79],[.64,.81],[.55,.85],[.55,.98]]:[[.45,.98],[.45,.85],[.32,.81],[.18,.80],[.15,.73],[.18,.67],[.18,.43],[.23,.36],[.43,.35],[.47,.27],[.47,.19],[.55,.19],[.55,.27],[.60,.35],[.79,.39],[.81,.48],[.80,.65],[.87,.74],[.79,.80],[.65,.81],[.55,.85],[.55,.98]];
+ if(!caveContains(floor,x,y))return false;
+ if(vault)return true;
+ if(((x-.30)/.085)**2+((y-.51)/.105)**2<1)return false;
+ if(caveContains([[.42,.46],[.70,.46],[.73,.63],[.69,.74],[.48,.74],[.42,.64]],x,y))return false;
+ return true;
 }
 function enterTrollRoom(){
- Object.assign(trollRoomPlayer,{x:262/547,y:411/600,dir:'up',moving:false,steps:0});
+ Object.assign(trollRoomPlayer,{x:.50,y:.84,dir:'up',moving:false,steps:0});
  trollStumpInside=true;trollDoorCooldown=1300;state.autonomy=false;
  notify('An abandoned home. A tunnel leads deeper.');
 }
@@ -12524,7 +12524,7 @@ function drawTrollStumpInterior(visiting=false){
  let ox=0,oy=0,iw=w,ih=h;
  const art=vault?treasureCaveArt:trollInteriorArt;
  if(art.complete&&art.naturalWidth){
-  const sc=Math.min(w/art.width,h/art.height)*(vault||visiting?1:1.22);
+  const sc=Math.min(w/art.width,h/art.height);
   iw=art.width*sc;ih=art.height*sc;ox=(w-iw)/2;oy=(h-ih)/2;
   if(!vault&&!visiting){ox=Math.min(0,Math.max(w-iw,w/2-iw*trollRoomPlayer.x));oy=Math.min(0,Math.max(h-ih,h/2-ih*trollRoomPlayer.y));}
   ctx.imageSmoothingEnabled=false;
@@ -12561,9 +12561,9 @@ function drawTrollStumpInterior(visiting=false){
  ctx.fillText(vault?'Abandoned Hoard':'Abandoned Tree Stump',w/2,Math.max(95,h*.12));
  if(visiting){
   // Invisible interactive hit areas, matching the visible cave doorways.
-  const outerX=vault?.50:.48,outerY=vault?.93:.75;
+  const outerX=.50,outerY=.93;
   setVisitorDoorBounds(ox+iw*outerX,oy+ih*outerY,iw*.22,ih*.14);
-  if(!vault){const bx=ox+iw*.52,by=oy+ih*.29;visitorInnerDoor={x:bx-iw*.19,y:by-ih*.15,w:iw*.38,h:ih*.30};}
+  if(!vault){const bx=ox+iw*.52,by=oy+ih*.22;visitorInnerDoor={x:bx-iw*.065,y:by-ih*.12,w:iw*.13,h:ih*.24};}
   else visitorInnerDoor=null;
   ctx.restore();return}
  const action=!state.seventhChairHeard&&chairNear();
