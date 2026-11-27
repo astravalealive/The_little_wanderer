@@ -840,13 +840,29 @@ woodlandFloorImage.onload=()=>{
 };
 woodlandFloorImage.src='./woodland_base.png?v=470';
 const woodlandArtCache=new Map();
+const woodlandOverlayImage=new Image();
+woodlandOverlayImage.onload=()=>woodlandArtCache.clear();
+woodlandOverlayImage.src='./woodland_overlay.png?v=471';
+
 function drawWoodlandArtChunk(ix,iy){
  if(!woodlandFloorTile)return;
  const key=ix+','+iy;let cv=woodlandArtCache.get(key);
  if(!cv){
  const size=512,x0=ix*size,y0=iy*size;
  cv=document.createElement('canvas');cv.width=cv.height=size;
- const g=cv.getContext('2d');g.translate(-x0,-y0);g.fillStyle=g.createPattern(woodlandFloorTile,'repeat');g.fillRect(x0,y0,size,size);g.resetTransform();
+ const g=cv.getContext('2d');g.translate(-x0,-y0);g.fillStyle=g.createPattern(woodlandFloorTile,'repeat');g.fillRect(x0,y0,size,size);
+ if(woodlandOverlayImage.complete&&woodlandOverlayImage.naturalWidth){
+ const step=480;
+ for(let yy=Math.floor((y0-800)/step);yy<=Math.ceil((y0+size+800)/step);yy++)
+ for(let xx=Math.floor((x0-800)/step);xx<=Math.ceil((x0+size+800)/step);xx++){
+ const s=xx*173.17+yy*319.31,px=xx*step+seeded(s+1)*step,py=yy*step+seeded(s+2)*step;
+ const w=420+seeded(s+3)*340,h=w*.67;
+ g.globalAlpha=.13+seeded(s+4)*.14;
+ g.drawImage(woodlandOverlayImage,px-w/2,py-h/2,w,h);
+ }
+ g.globalAlpha=1;
+ }
+ g.resetTransform();
  const mask=document.createElement('canvas');mask.width=mask.height=65;
  const m=mask.getContext('2d'),p=m.createImageData(65,65);
  for(let y=0;y<65;y++)for(let x=0;x<65;x++){
