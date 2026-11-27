@@ -6471,13 +6471,13 @@ approvedRunestone.onload=()=>{
 approvedRunestone.src='./assets/849BC9B3-539E-482E-B763-C845385422D2.png';
 function ruin(x,y){
  if(!approvedRunestoneCanvas){ellipse(x,y,70,30,'#304b3c');return}
- const w=158,h=198,left=x-w/2,top=y-h+18;
+ const w=202,h=253,left=x-w/2,top=y-h+18;
  ctx.drawImage(approvedRunestoneCanvas,left,top,w,h);
  // Only the existing luminous central inscription pulses, never redraw or substitute runes.
  const proximity=Math.max(0,1-Math.hypot(state.x-x,state.y-y)/290);
  const connected=!!document.getElementById('runeResult')&&document.getElementById('overlay')?.classList.contains('open');
  const pulse=(.12+.18*proximity+(connected?.45:0))*(.82+.18*Math.sin(time*.003));
- ctx.save();ctx.globalAlpha=Math.min(.7,.12+proximity*.24+(connected?.30:0));ctx.globalCompositeOperation='screen';ctx.shadowColor='#4bbdff';ctx.shadowBlur=18+proximity*22+(connected?25:0);ellipse(x,y-93,28+proximity*17,75,'#57bfff');ctx.restore();
+ ctx.save();ctx.globalAlpha=Math.min(.7,.12+proximity*.24+(connected?.30:0));ctx.globalCompositeOperation='screen';ctx.shadowColor='#4bbdff';ctx.shadowBlur=18+proximity*22+(connected?25:0);ellipse(x,y-124,36+proximity*22,96,'#57bfff');ctx.restore();
  ctx.save();ctx.globalAlpha=pulse;ctx.globalCompositeOperation='screen';
  ctx.shadowColor='#58c9ff';ctx.shadowBlur=11;
  ctx.drawImage(approvedRunestoneCanvas,470,315,185,760,left+w*470/1122,top+h*315/1402,w*185/1122,h*760/1402);
