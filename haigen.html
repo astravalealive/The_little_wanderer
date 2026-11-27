@@ -13833,6 +13833,9 @@ gameCanvas.addEventListener('pointerup',e=>{
  if(!p||Math.hypot(e.clientX-p.x,e.clientY-p.y)>16||visitorRoom||worldEditorActive)return;
  if(p.kind==='cave')enterMountain();else{visitorRoom='stump';visitorDoor=null;visitorInnerDoor=null;}
  homesteadTap.delete(e.pointerId);
+ // Capture-phase room entry consumes pointerup; clear camera gesture before propagation stops.
+ cameraTouches.clear();pinchDistance=0;cameraReleaseAt=performance.now();
+ if(gameCanvas.hasPointerCapture(e.pointerId))gameCanvas.releasePointerCapture(e.pointerId);
  e.preventDefault();e.stopImmediatePropagation();
 },true);
 gameCanvas.addEventListener('pointercancel',e=>stumpTapCapture.delete(e.pointerId),true);
@@ -13876,6 +13879,7 @@ gameCanvas.addEventListener('pointerup',e=>{
 gameCanvas.addEventListener('pointercancel',e=>homesteadTap.delete(e.pointerId));
 
 gameCanvas.addEventListener('pointercancel',stopCameraPointer);
+gameCanvas.addEventListener('lostpointercapture',stopCameraPointer);
 gameCanvas.addEventListener('wheel',e=>{e.preventDefault();setCameraZoom(cameraZoom*Math.exp(-e.deltaY*.001))},{passive:false});
 let lastWorldError='';
 function reportWorldError(error){
