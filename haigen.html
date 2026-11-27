@@ -830,6 +830,39 @@ function coastDepthChunk(ix,iy){
  if(coastDepthChunks.size>coastDepthLimit)coastDepthChunks.delete(coastDepthChunks.keys().next().value);
  return grid;
 }
+const woodlandFloorImage=new Image();
+let woodlandFloorTile=null;
+woodlandFloorImage.onload=()=>{
+ const im=woodlandFloorImage,w=768,h=Math.round(w*im.naturalHeight/im.naturalWidth);
+ const tile=document.createElement('canvas');tile.width=w*2;tile.height=h*2;
+ const g=tile.getContext('2d');g.imageSmoothingEnabled=true;
+ for(let y=0;y<2;y++)for(let x=0;x<2;x++){
+ g.save();g.translate((x+(x?1:0))*w,(y+(y?1:0))*h);g.scale(x?-1:1,y?-1:1);g.drawImage(im,0,0,w,h);g.restore();
+ }
+ woodlandFloorTile=tile;islandCache.clear();
+};
+woodlandFloorImage.src='./woodland_floor.png?v=463';
+const woodlandArtCache=new Map();
+function drawWoodlandArtChunk(ix,iy){
+ if(!woodlandFloorTile)return;
+ const key=ix+','+iy;let cv=woodlandArtCache.get(key);
+ if(!cv){
+ const size=512,x0=ix*size,y0=iy*size;
+ cv=document.createElement('canvas');cv.width=cv.height=size;
+ const g=cv.getContext('2d');g.translate(-x0,-y0);g.fillStyle=g.createPattern(woodlandFloorTile,'repeat');g.fillRect(x0,y0,size,size);g.resetTransform();
+ const mask=document.createElement('canvas');mask.width=mask.height=65;
+ const m=mask.getContext('2d'),p=m.createImageData(65,65);
+ for(let y=0;y<65;y++)for(let x=0;x<65;x++){
+ const wx=x0+x*8,wy=y0+y*8;
+ const edge=Math.min(wx,3500-wx,wy,3100-wy,islandDepth(wx,wy)-25);
+ const region=expandedRegion(wx,wy);
+ p.data[(y*65+x)*4+3]=region?0:Math.round(255*coastSmooth(0,180,edge));
+ }
+ m.putImageData(p,0,0);g.globalCompositeOperation='destination-in';g.drawImage(mask,-4,-4,520,520);
+ woodlandArtCache.set(key,cv);if(woodlandArtCache.size>40)woodlandArtCache.delete(woodlandArtCache.keys().next().value);
+ }
+ ctx.drawImage(cv,ix*512,iy*512,512,512);
+}
 function islandChunk(ix,iy){
  const key=ix+','+iy;
  if(islandCache.has(key)){const c=islandCache.get(key);islandCache.delete(key);islandCache.set(key,c);return c}
@@ -923,7 +956,7 @@ function drawExpandedTerrain(night){
  ctx.save();ctx.imageSmoothingEnabled=true;
  for(let iy=Math.floor(top/islandChunkSize);iy<=Math.floor(bottom/islandChunkSize);iy++)
   for(let ix=Math.floor(left/islandChunkSize);ix<=Math.floor(right/islandChunkSize);ix++)
-   ctx.drawImage(islandChunk(ix,iy),ix*islandChunkSize,iy*islandChunkSize,islandChunkSize,islandChunkSize);
+   {ctx.drawImage(islandChunk(ix,iy),ix*islandChunkSize,iy*islandChunkSize,islandChunkSize,islandChunkSize);if(ix>=0&&ix<=6&&iy>=0&&iy<=6)drawWoodlandArtChunk(ix,iy);}
  if(night>.01){ctx.fillStyle='rgba(20,31,55,'+(night*.26)+')';ctx.fillRect(left,top,right-left,bottom-top)}
  drawRiverwatchTownGround(left,right,top,bottom);
  worldEditorGround(left,right,top,bottom);
