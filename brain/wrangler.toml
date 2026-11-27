@@ -1,0 +1,5 @@
+name = "haigen-brain"
+main = "worker.mjs"
+compatibility_date = "2026-11-26"
+[observability]
+enabled = true
