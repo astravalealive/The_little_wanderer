@@ -14340,6 +14340,24 @@ function drawShipRoom(){
  setVisitorDoorBounds(left+w*.50,top+h*.95,w*.24,h*.14);ctx.restore();
 }
 
+
+let incaHudLast=0;
+function updateIncaHud(){
+ const m=state.incaMind;if(!m)return;
+ let el=$('incaHud');
+ if(!el){
+  el=document.createElement('div');el.id='incaHud';el.className='panel';el.style.cssText='margin-top:6px;pointer-events:auto;max-width:180px';
+  const head=document.createElement('button');head.className='btn';head.style.cssText='display:flex;align-items:center;gap:7px;width:100%;padding:4px';head.innerHTML='<canvas width="40" height="40" id="incaPortrait" style="border-radius:50%;background:#263e34"></canvas><span>Inca · Diary</span>';head.onclick=()=>{const q=incaMind();const esc=v=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');open('<h2>Inca’s Journal</h2><p>'+esc(q.thought)+'</p><h3>Inventory</h3><p>Berries: '+(q.inventory.berries||0)+' · Coins: '+q.coins+'</p><h3>Skills</h3>'+Object.entries(q.skills).map(([k,v])=>'<p>'+esc(k)+': '+Math.round(v)+'</p>').join('')+'<h3>Memories</h3>'+q.memories.slice(-20).reverse().map(v=>'<p>'+esc(v.thought)+'</p>').join(''));};el.appendChild(head);
+  for(const [key,label,color] of [['health','Health','#73c977'],['energy','Sleep','#3985d6'],['hunger','Food','#e99535'],['mana','Mana','#935acb']]){
+   const meter=document.createElement('div');meter.style.cssText='margin:4px 0;font-size:11px;font-weight:bold';meter.setAttribute('role','progressbar');meter.setAttribute('aria-label','Inca '+label);meter.setAttribute('aria-valuemin','0');meter.setAttribute('aria-valuemax','100');meter.id='incaMeter_'+key;meter.innerHTML='<span></span><div style="height:10px;background:#432f2b;border:1px solid #e5cfaa;border-radius:8px;overflow:hidden"><div style="height:100%;width:100%;background:'+color+'"></div></div>';el.appendChild(meter);
+  }
+  const panel=document.querySelector('.hud .panel');if(panel)panel.appendChild(el);
+ }
+ if(performance.now()-incaHudLast<250)return;incaHudLast=performance.now();
+ const f=incaFrames.idle.down,p=$('incaPortrait');if(f&&p&&!p.dataset.ready){const g=p.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(f.c,f.x,f.y,f.w,f.h*.34,0,0,40,40);p.dataset.ready='1';}
+ for(const [key,label,color] of [['health','Health','#73c977'],['energy','Sleep','#3985d6'],['hunger','Food','#e99535'],['mana','Mana','#935acb']]){const meter=$('incaMeter_'+key),v=Math.max(0,Math.min(100,m.needs[key]));if(!meter)continue;meter.firstChild.textContent=label+' '+Math.ceil(v)+'/100';meter.setAttribute('aria-valuenow',String(Math.ceil(v)));const fill=meter.lastChild.firstChild;fill.style.width=v+'%';fill.style.background=v<=20?'#e35c55':color;}
+}
+
 function drawInca(){
  const a=incaActor,frames=incaFrames.walk[a.dir],f=(a.moving&&frames?.length?frames[Math.floor(a.anim/145)%frames.length]:null)||incaFrames.idle[a.dir];if(!f)return;
  const h=142,w=h*f.w/f.h;ctx.save();ctx.imageSmoothingEnabled=false;nordicContactShadow(a.x,a.y+7,22,6);ctx.drawImage(f.c,f.x,f.y,f.w,f.h,a.x-w/2,a.y+7-h,w,h);ctx.restore();
@@ -14354,7 +14372,7 @@ function frame(now){
   menuController();
   if(!$('overlay').classList.contains('open')){const t=measure?performance.now():0;update(dt);tickInca(dt);if(measure)diag.updateMs+=performance.now()-t}
   if(!Number.isFinite(cam.x)||!Number.isFinite(cam.y)){cam.x=Number(state.x)||1250;cam.y=Number(state.y)||1310;}
-  let t=measure?performance.now():0;draw();
+  let t=measure?performance.now():0;draw();updateIncaHud();
   if(visitorRoom==='ship')drawShipRoom();
   else if(visitorRoom==='saltwick')drawSaltwickInterior();
  else if(visitorRoom==='home')drawHomeInteriorScene(true);
