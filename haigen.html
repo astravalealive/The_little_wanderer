@@ -6182,12 +6182,12 @@ function updateWastelandGhosts(dt){
 }
 const woodlandSceneryArt=new Image();
 woodlandSceneryArt.src='./assets/woodland-scenery-v333.webp';
-const forestVarietySprites=['tree_rowan.png','tree_oak_01.png','tree_oak_02.png','tree_oak_03.png','tree_birch_01.png','tree_birch_02.png','tree_birch_03.png'].map((file)=>{
+const forestVarietySprites=['tree_rowan.png','tree_oak_01.png','tree_oak_02.png','tree_oak_03.png','tree_birch_01.png','tree_birch_02.png','tree_birch_03.png','pine_variant_01.png','pine_variant_02.png'].map((file)=>{
  const asset={canvas:null};const img=new Image();
  img.onload=()=>{try{const c=document.createElement('canvas');const scale=Math.min(1,384/Math.max(img.naturalWidth,img.naturalHeight));c.width=Math.round(img.naturalWidth*scale);c.height=Math.round(img.naturalHeight*scale);const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0,c.width,c.height);const p=g.getImageData(0,0,c.width,c.height);cleanCharacterMatte(p,c.width,c.height);for(let i=0;i<p.data.length;i+=4){const lo=Math.min(p.data[i],p.data[i+1],p.data[i+2]),hi=Math.max(p.data[i],p.data[i+1],p.data[i+2]);if(lo>245&&hi-lo<9)p.data[i+3]=0;}g.putImageData(p,0,0);asset.canvas=c;}catch(e){console.warn('Forest sprite',file,e);}};
- img.src='./'+file+'?v=455';return asset;
+ img.src='./'+file+'?v=456';return asset;
 });
-function forestVarietyIndex(o){if(o.type!=='tree'||!rbWoodland(o.x,o.y)||seeded(o.id*73+19)<.35)return -1;const cluster=seeded(Math.floor(o.x/420)*137+Math.floor(o.y/420)*311+7);const v=seeded(o.id*97+31);return cluster<.15?0:cluster<.57?1+Math.floor(v*3):4+Math.floor(v*3);}
+function forestVarietyIndex(o){if(o.type!=='tree'||!rbWoodland(o.x,o.y)||seeded(o.id*73+19)<.35)return -1;const cluster=seeded(Math.floor(o.x/420)*137+Math.floor(o.y/420)*311+7);const v=seeded(o.id*97+31);return cluster<.15?0:cluster<.43?1+Math.floor(v*3):cluster<.73?4+Math.floor(v*3):7+Math.floor(v*2);}
 function drawForestVariety(o){const i=forestVarietyIndex(o);if(i<0)return false;const c=forestVarietySprites[i].canvas;if(!c)return false;const h=136*(o.size||1)*(.88+seeded(o.id*37+5)*.27),w=h*c.width/c.height;ctx.save();ctx.globalAlpha*=foliageVisibility(o);ctx.imageSmoothingEnabled=true;ellipse(o.x,o.y+2,w*.22,h*.045,'#292a2748');ctx.drawImage(c,o.x-w/2,o.y-h+4,w,h);ctx.restore();return true;}
 function drawWoodlandArtwork(o){
  if(drawForestVariety(o))return true;
