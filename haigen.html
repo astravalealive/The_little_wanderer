@@ -881,14 +881,14 @@ function drawWoodlandArtChunk(ix,iy){
  g.globalAlpha=1;
  }
  if(woodlandLeafSprites.length){
- const step=48;
+ const step=32;
  for(let yy=Math.floor((y0-32)/step);yy<=Math.ceil((y0+size+32)/step);yy++)
  for(let xx=Math.floor((x0-32)/step);xx<=Math.ceil((x0+size+32)/step);xx++){
  const s=xx*217.31+yy*431.73,px=xx*step+seeded(s+12)*step,py=yy*step+seeded(s+13)*step;
- const density=.32+.23*Math.sin(px*.009+py*.004)+.18*Math.sin(py*.013-px*.006);
+ const density=.46+.25*Math.sin(px*.009+py*.004)+.21*Math.sin(py*.013-px*.006);
  if(seeded(s+11)>density)continue;
  const leaf=woodlandLeafSprites[Math.floor(seeded(s+16)*woodlandLeafSprites.length)%woodlandLeafSprites.length];
- const w=5+seeded(s+14)*10,h=w*leaf.height/leaf.width*.75;
+ const w=9+seeded(s+14)*15,h=w*leaf.height/leaf.width*.75;
  g.globalAlpha=.65+seeded(s+15)*.3;
  g.drawImage(leaf,px-w/2,py-h/2,w,h);
  }
