@@ -11157,7 +11157,16 @@ function drawFrosthold(){if(frostholdArtReady()){const b=frostholdBounds();ctx.d
  for(const d of frostholdDoors){if(d.id==='keep')continue;rect(d.x-24,d.y-30,48,30,'#415968');rect(d.x-14,d.y-25,28,25,'#785b43');rect(d.x-24,d.y-30,48,5,'#e4eff2')}
  ctx.restore();
 }
-function blockedBySolid(x,y){if(landingBlocked(x,y))return true;if(frostholdBlocked(x,y))return true;if(window.__gloamAddon?.arena(x,y))return false;
+// Ground footprint of the Great Stump, normalized to its rendered artwork.
+// Leave the central path and staircase open; the upper trunk is overhead scenery.
+function greatStumpBlocked(x,y){
+ const a=abandonedTrollStump,u=(x-a.x)/a.width+.5,v=(y-a.y+a.height-24)/a.height;
+ if(u<0||u>1||v<.36||v>1)return false;
+ const left=[[.22,.36],[.49,.36],[.49,.64],[.45,.69],[.44,.76],[.40,.80],[.43,.88],[.39,.88],[.35,.84],[.29,.92],[.25,.93],[.26,.87],[.20,.91],[.15,.88],[.10,.91],[.12,.83],[.07,.85],[.09,.78],[.01,.77],[.02,.70],[.10,.61],[.16,.50]];
+ const right=[[.51,.36],[.76,.36],[.82,.48],[.90,.60],[.96,.69],[.99,.77],[.93,.77],[.89,.75],[.88,.84],[.84,.82],[.82,.85],[.76,.83],[.72,.88],[.68,.86],[.69,.93],[.63,.91],[.59,.85],[.55,.88],[.50,.88],[.53,.80],[.55,.75],[.56,.69],[.51,.64]];
+ return caveContains(left,u,v)||caveContains(right,u,v);
+}
+function blockedBySolid(x,y){if(greatStumpBlocked(x,y))return true;if(landingBlocked(x,y))return true;if(frostholdBlocked(x,y))return true;if(window.__gloamAddon?.arena(x,y))return false;
  if(easternRiverWalkBlocked(x,y))return true;
  if(worldEditorBuildingBlocks(x,y))return true;
  if(islandDepth(x,y)<-105)return true; // V157: generous walkable shallows, deep sea still gated by flippers
@@ -12150,7 +12159,7 @@ function drawNico(){
 const trollInteriorArt=new Image();trollInteriorArt.src='./2712EEB7-35E1-4F5A-8D92-28467A5ACADC.png';
 function drawAbandonedTrollStump(){const old=abandonedTrollStump;if(abandonedTrollStumpImage.complete&&abandonedTrollStumpImage.naturalWidth)ctx.drawImage(abandonedTrollStumpImage,old.x-old.width/2,old.y-old.height+24,old.width,old.height);}
 function drawTrollStump(){const t=trollStumpHome;if(!trollStumpImage.complete||!trollStumpImage.naturalWidth)return;ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(trollStumpImage,t.x-t.width/2,t.y-t.height+24,t.width,t.height);ctx.restore();}
-function trollStumpDoorNear(){return Math.hypot(state.x-abandonedTrollStump.x,state.y-(abandonedTrollStump.y-12))<92;}
+function trollStumpDoorNear(){const a=abandonedTrollStump;return Math.abs(state.x-a.x)<a.width*.045&&Math.abs(state.y-(a.y-a.height*.30+24))<25;}
 // Independent, controllable room coordinates; never overwrite Haigen's outdoor position.
 const trollRoomPlayer={x:.50,y:.79,dir:'up',moving:false,steps:0};
 const treasureCaveArt=new Image();
