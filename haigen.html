@@ -836,16 +836,9 @@ woodlandFloorImage.onload=()=>{
  const im=woodlandFloorImage,w=384,h=Math.round(w*im.naturalHeight/im.naturalWidth);
  const tile=document.createElement('canvas');tile.width=w;tile.height=h;
  const g=tile.getContext('2d');g.drawImage(im,0,0,w,h);
- const p=g.getImageData(0,0,w,h),src=new Uint8ClampedArray(p.data);
- // Crossfade opposite edges without mirroring the artwork.
- for(let y=0;y<h;y++)for(let x=0;x<w;x++){
- const ax=.5*Math.max(0,1-Math.min(x,w-1-x)/32),ay=.5*Math.max(0,1-Math.min(y,h-1-y)/32);
- for(let k=0;k<3;k++){const at=(xx,yy)=>src[(yy*w+xx)*4+k];p.data[(y*w+x)*4+k]=(1-ay)*((1-ax)*at(x,y)+ax*at(w-1-x,y))+ay*((1-ax)*at(x,h-1-y)+ax*at(w-1-x,h-1-y));}
- }
- g.putImageData(p,0,0);
  woodlandFloorTile=tile;islandCache.clear();
 };
-woodlandFloorImage.src='./woodland_primary.png?v=467';
+woodlandFloorImage.src='./woodland_primary.png?v=468';
 const woodlandArtCache=new Map();
 function drawWoodlandArtChunk(ix,iy){
  if(!woodlandFloorTile)return;
