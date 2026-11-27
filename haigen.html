@@ -14167,8 +14167,40 @@ function incaWalkTo(goal,dt,reach){
  Object.assign(a,{x,y,dir:Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'),moving:true,anim:a.anim+dt});
  return false;
 }
+
+function incaMind(){
+ return state.incaMind??={version:1,needs:{health:100,hunger:100,energy:100,mana:100},inventory:{berries:0},coins:0,traits:{art:.95,music:.9,animals:.95,berries:.95,exploration:.8,courage:.85,craft:.85,opportunism:.65},skills:{art:0,music:0,bow:0,spear:0,dagger:0},memories:[],relationships:{},thought:'I wonder what I will discover today.',visits:{},harvested:{},position:null};
+}
+function incaRemember(m,thought,kind){
+ m.thought=thought;m.memories.push({day:state.daytime,kind,thought});if(m.memories.length>120)m.memories.shift();
+}
+let incaMindSaveClock=0,incaMindRestored=false;
+function incaThink(dt,a){
+ const m=incaMind(),n=m.needs;
+ if(!incaMindRestored){incaMindRestored=true;const p=m.position;if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&incaLand(p.x,p.y))Object.assign(a,{x:p.x,y:p.y,ready:true,room:p.room||null});}
+ n.hunger=Math.max(0,n.hunger-dt*.000035);
+ n.energy=Math.max(0,Math.min(100,n.energy+(a.room?dt*.00022:-dt*.000025)));
+ n.health=Math.max(0,Math.min(100,n.health+(n.hunger<5?-dt*.000015:a.room?dt*.00002:0)));
+ incaMindSaveClock+=dt;if(incaMindSaveClock>=15000){incaMindSaveClock=0;if(a.ready)m.position={x:a.x,y:a.y,room:a.room||null};save();}
+ if(a.room||!a.ready||nightStrength()>.60)return false;
+ if(n.hunger<85&&m.inventory.berries>0){m.inventory.berries--;n.hunger=Math.min(100,n.hunger+15);incaRemember(m,'Sweet berries! Just what I needed.','food');a.wait=1200;a.moving=false;save();return true;}
+ if(n.hunger<80||m.inventory.berries<2){
+  if(!a.berryGoal||!berryReady(a.berryGoal)||state.removed.includes(a.berryGoal.id)){
+   a.berryGoal=objects.filter(o=>o.type==='bush'&&berryReady(o)&&!state.removed.includes(o.id)&&dist(a,o)<700&&!(m.harvested[o.id]>state.daytime)).sort((p,q)=>dist(a,p)-dist(a,q))[0]||null;
+  }
+  if(a.berryGoal){
+   const o=a.berryGoal;
+   if(incaWalkTo(o,dt,65)){m.inventory.berries+=2;m.harvested[o.id]=state.daytime+30;incaRemember(m,'Found a lovely patch of berries.','foraging');a.berryGoal=null;a.wait=1600;save();}
+   else {a.berryTime=(a.berryTime||0)+dt;if(a.berryTime>18000){m.harvested[o.id]=state.daytime+10;a.berryGoal=null;a.berryTime=0;}}
+   return true;
+  }
+ }
+ return false;
+}
+
 function tickInca(dt){
  const a=incaActor;
+ if(incaThink(dt,a))return;
  const ship=landingSite(),shared=!!ship?.restored;
  const door=shared?{x:cottage.x+35,y:cottage.y+70}:ship&&shipEntrance(ship);
  if(shared&&state.campTier<2){finishSharedHome();save()}
