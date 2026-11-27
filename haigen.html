@@ -5443,7 +5443,7 @@ function drawHomesteadStyleLock(nightMix){
   if(walkingLakeLevel(x,y)<1.05)continue;
   // Job 233: cooler navy night mix only (no purple wash); calmer day leaf wash.
   const col=mixColour(i%3?homesteadStyle.leaf:homesteadStyle.moss,i%2?'#39547c':'#2f4658',mix);
-  ellipse(x,y,16+seeded(i+3)*22,7+seeded(i+9)*10,col+'44');
+  
  }
  // Readable path grit: cottage south garden + west toward lake shore.
  ctx.save();ctx.globalAlpha=.42-mix*.12;ctx.strokeStyle=homesteadStyle.path;ctx.lineWidth=20;ctx.lineCap='round';
@@ -6331,9 +6331,9 @@ function drawEasternIslandLandmarks(){
  ctx.save();ctx.translate(200,5600);
  const oval=(x,y,rx,ry,fill)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();};
  // Thrummaw's open fighting basin, deliberately free of obstructing scenery.
- oval(8800,1600,450,300,'#cba96c55');
- oval(8800,1600,340,220,'#e9ce9550');
- for(let i=0;i<10;i++){const a=i*Math.PI*2/10;oval(8800+Math.cos(a)*420,1600+Math.sin(a)*285,24,9,'#9f866166');}
+
+
+
  // Oasis: shallow blue-green pool and wet banks.
  oval(8120,2250,185,112,'#aa97665c');
  oval(8120,2250,151,87,'#6eab9e');
@@ -6510,7 +6510,7 @@ function drawCampDecor(){
  for(let i=0;i<15;i++){const a=i*2.399,rx=105+seeded(6100+i)*110,ry=55+seeded(6200+i)*83;
   const px=x+Math.cos(a)*rx,py=y+Math.sin(a)*ry;
   if(Math.hypot(px-firstFire.x,py-firstFire.y)<62||Math.hypot(px-chickenNest.x,py-chickenNest.y)<54)continue;
-  ellipse(px,py,5+seeded(i+6400)*9,3+seeded(i+6500)*5,i%2?'#8d9d73aa':'#c6b18b99');
+  
  }
  // The new physical shed plot displays all stored wood.
  // Hanging lantern on a timber post. Glows gently when night falls.
@@ -9838,8 +9838,8 @@ function drawFenDetail(night){
     for(let k=-2;k<=2;k++){ctx.beginPath();ctx.moveTo(x+k*4,y+5);ctx.quadraticCurveTo(x+k*5-5,y-8-v*8,x+k*6-3,y-16-v*14);ctx.stroke()}
     if(v<.22){ctx.fillStyle='#806e4d';ctx.fillRect(x-2,y-20,4,9)}
    }else{
-    ctx.fillStyle='#45583b';ctx.beginPath();ctx.ellipse(x,y,17,6,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#758c62';ctx.beginPath();ctx.ellipse(x-4,y-2,11,4,0,0,Math.PI*2);ctx.fill();
+    
+    
    }
   }
  }
@@ -9918,8 +9918,7 @@ function overhaulBiomeFloor(nightMix){
   const r=expandedRegion(x,y);if(!r)continue;const id=r.id,p=palettes[id]||['#577c4f','#385b40','#8b9b5e'];
   // Cluster instead of uniform noise: one broad footprint, then local grouped details.
   const radius=18+hash(gx,gy,3)*48,ry=9+hash(gx,gy,4)*24;
-  ctx.fillStyle=p[hash(gx,gy,5)>.52?0:1]+'66';
-  ctx.beginPath();ctx.ellipse(x,y,radius,ry,hash(gx,gy,6)*.6,0,Math.PI*2);ctx.fill();
+
   // Landscape composition: a few deterministic clustered silhouettes per biome.
   // All silhouettes are ground decals, not new objects or collision footprints.
   const landmark=hash(gx,gy,91),group=hash(Math.floor(gx/3),Math.floor(gy/3),92);
@@ -9958,7 +9957,7 @@ function overhaulBiomeFloor(nightMix){
     const light=id==='fen'?'#6d8870':id==='rainforest'?'#3b8159':id==='woodland'?'#67945b':'#89a65b';
     for(let k=0;k<4;k++){
      const bx=(k-1.5)*12+hash(gx,gy,120+k)*5,by=k%2*5,sz=8+hash(gx,gy,130+k)*9;
-     ctx.fillStyle=dark;ctx.beginPath();ctx.ellipse(bx,by,sz,sz*.55,0,0,Math.PI*2);ctx.fill();
+     
      ctx.fillStyle=light;ctx.fillRect(bx-3,by-sz*.4,5+sz*.45,3);
      if(id==='fen'){ctx.strokeStyle='#9caa79';ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx-3,by-sz*1.3);ctx.stroke();}
      if(id==='rainforest'){ctx.fillStyle='#a1b778';ctx.fillRect(bx+3,by-sz*.5,4,4);}
