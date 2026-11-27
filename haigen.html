@@ -9546,6 +9546,23 @@ function updateWoodlandCritters(dt){updateFrogs();updateBirds(dt);updateDucks(dt
 // Paragraph wrapping, touch visibility and font size remain stable at any zoom.
 // V426: prefer above Haigen; if that collides with HUD/controls, use a side safe zone.
 let lastVisibleSpeech='';
+
+let incaSpeechLast='',incaSpeechUntil=0,incaSpeechRepeat=0;
+function updateIncaSpeech(){
+ let el=$('incaSpeech');
+ if(!el){el=document.createElement('div');el.id='incaSpeech';el.setAttribute('aria-label','Inca thought');el.style.cssText='position:fixed;z-index:12;pointer-events:none;transform:translate(-50%,-100%);max-width:min(220px,42vw);padding:7px 10px;border:1px solid #c7b47b;border-radius:10px;background:#fff0cf;color:#26382e;font:600 12px/1.35 system-ui;text-align:center;box-shadow:0 2px 5px #0005;visibility:hidden';document.body.appendChild(el);}
+ const a=incaActor,m=state.incaMind,now=performance.now();
+ if(!a.ready||a.room||!m||visitorRoom||homeInside||trollStumpInside||mountainInside||uiPanelOpen()){el.style.visibility='hidden';return;}
+ const msg=String(m.thought||'');
+ if(msg!==incaSpeechLast||now>=incaSpeechRepeat){incaSpeechLast=msg;incaSpeechUntil=now+4500;incaSpeechRepeat=now+18000;el.textContent='Inca: '+msg;}
+ const z=worldZoom(),px=(a.x-cam.x)*z+W/2,py=(a.y-cam.y)*z+H/2;
+ if(!msg||now>incaSpeechUntil||px<0||px>W||py<0||py>H){el.style.visibility='hidden';return;}
+ const pad=Math.min(120,W*.23);let x=clamp(px,pad,W-pad),y=py-142*z-14;
+ const haigen=$('haigenSpeech');
+ if(haigen&&haigen.style.visibility==='visible'&&Math.abs(x-parseFloat(haigen.style.left))<190&&Math.abs(y-parseFloat(haigen.style.top))<75)y-=65;
+ if(y<145){x=clamp(px+(px<W/2?115:-115),pad,W-pad);y=clamp(py-20,145,H-110);}
+ el.style.left=Math.round(x)+'px';el.style.top=Math.round(y)+'px';el.style.visibility='visible';
+}
 function updateHaigenSpeech(){
  const el=$('haigenSpeech');
  if(!el)return;
@@ -10278,7 +10295,7 @@ const visible=sceneryInView(cam.x,cam.y,W/zoom/2+150,H/zoom/2+150).filter(o=>Mat
 drawables.push(...woodlandDeer.filter(a=>Math.abs(a.x-cam.x)<=1050&&Math.abs(a.y-cam.y)<=800).map(a=>({y:a.y,draw:()=>worldFaunaDraw('stag',a.x,a.y,a.face<0?'left':'right',a.walking,a.gait*150,2.1,time<a.scaredUntil?'flee':time<a.alertUntil?'alert':a.walking?'walk':'forage')})));
 drawables.push(...regionalWildlife.filter(a=>animalAlive(a)&&Math.abs(a.x-cam.x)<=1050&&Math.abs(a.y-cam.y)<=800).map(a=>({y:a.y,draw:()=>drawWildAnimal(a)})));
 drawables.push(...beasts.filter(animalAlive).map(b=>({y:b.y,draw:()=>drawBeast(b)})));for(const t of caveTrolls){if(t.room==='woods'&&Math.abs(t.x-cam.x)<1050&&Math.abs(t.y-cam.y)<800)drawables.push({y:t.y,draw:()=>drawTrollSprite(t.sprite,t.x,t.y,trollSpriteSize,t.dir,t.walking,t.clock)});}for(const e of elfResidents)if(e.room==='woods')drawables.push({y:e.y,draw:()=>drawElf(e,e.x,e.y,120)});artDrawables(drawables);if(nico.ready)drawables.push({y:nico.y,draw:drawNico});if(wanderer.ready)drawables.push({y:wanderer.y,draw:drawWanderer});drawables.push({y:abandonedTrollStump.y+24,draw:drawAbandonedTrollStump},{y:trollStumpHome.y+24,draw:drawTrollStump});if(state.skiffBerth&&!state.skiffAtSea)drawSkiff();if(incaActor.ready&&!incaActor.room)drawables.push({y:incaActor.y,draw:drawInca});drawables.forEach((o,i)=>{o.depthOrder=i});
-drawFrosthold();drawables.sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder).forEach(o=>o.draw());drawFrostholdForeground();worldEditorOutline();if(!state.skiffAtSea)drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
+drawFrosthold();drawables.sort((a,b)=>a.y-b.y||a.depthOrder-b.depthOrder).forEach(o=>o.draw());drawFrostholdForeground();worldEditorOutline();if(!state.skiffAtSea)drawPaddleSplash();if(window.__gloamAddon)window.__gloamAddon.drawEffects();drawStoryMarker();drawWardenOmen();drawRain();drawToolSwing();updateHaigenSpeech();updateIncaSpeech();for(let c of companions){ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#183d32';ctx.fillText(c.name,c.x,c.y-65)}const darkness=nightStrength();if(darkness>.005){
  // Night is now painted into the landscape itself: no purple fog/filter.
  // A very light midnight tint preserves individual object colours and bright flowers.
  const viewX=cam.x-W/zoom,viewY=cam.y-H/zoom,viewW=W/zoom*2,viewH=H/zoom*2;
