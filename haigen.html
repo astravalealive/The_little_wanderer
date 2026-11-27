@@ -3263,20 +3263,29 @@ function mindChooseResource(){
  const kinds=state.tools.pickaxe?['flower','mushroom','bush','rock','tree']:['flower','mushroom','bush','tree'];
  return kinds[(haigenMind.actions+Math.floor(state.daytime/40)+haigenMind.visited.length)%kinds.length];
 }
+// Context-driven reflections; silence is preferable to repeating idle dialogue.
 function mindThought(){
- const region=expandedRegion(state.x,state.y)?.name||'the ancient woodland';
- const favourite=mindFavourite(),character=mindTemperament(),mood=mindMood();
- const choices=[
-  state.health<65?'I had better recover before exploring any more.':'I wonder what is waiting on the next trail.',
-  haigenMind.habits.injury>0&&haigenMind.courage<50?'I remember getting hurt. Maybe I should avoid that part of the map.':'I feel a little braver with every adventure.',
-  haigenMind.habits.companionship>0?'Dylan and Skölli have helped me before. I trust those two.':'I should check on Dylan and Skölli.',
-  character==='Camp Inventor'?'I keep thinking about new buildings for our camp.':'I wonder what I have missed around '+region+'.',
-  favourite?'I seem to enjoy gathering '+favourite+'. I think I am developing a favourite job.':'I am still learning what I enjoy doing.',
-  haigenMind.storyStage>1?'I wonder if the two unseen makers can hear me.':'Sometimes I notice the world changing around me.',
-  'I feel '+mood.toLowerCase()+' today. My plan is to '+(haigenMind.lastGoal||'find something interesting')+'.'
- ];
- const line=choices[(haigenMind.actions+Math.floor(time/19000)+haigenMind.habits.quests)%choices.length];
- haigenMind.lastThought=line;return line;
+ const m=haigenMind;
+ const recent=m.reflectionHistory||(m.reflectionHistory=[]);
+ const candidates=[];
+ const add=(key,line,score)=>{if(line&&!recent.includes(key))candidates.push({key,line,score})};
+ const note=m.notes?.[0];
+ if(note?.text)add('note:'+note.text,note.text,90);
+ if(state.hunger<35)add('hunger','I need something to eat before I travel much further.',100);
+ if(state.energy<30)add('energy','I should find somewhere safe to sleep.',100);
+ if(state.health<50)add('health','I need to recover before risking another adventure.',110);
+ const experience=m.experiences?.[0]?.text;
+ if(experience)add('experience:'+experience,'I remember: '+experience+'. What can I learn from that?',75);
+ const goal=m.lastGoal;
+ if(goal)add('goal:'+goal,'My next priority is to '+goal+'.',60);
+ const region=expandedRegion(state.x,state.y)?.name;
+ if(region)add('region:'+region,'I wonder what I have yet to discover around '+region+'.',25);
+ const favourite=mindFavourite();
+ if(favourite)add('favourite:'+favourite,'I seem to keep returning to '+favourite+'. Perhaps that is something I really enjoy.',40);
+ candidates.sort((a,b)=>b.score-a.score);
+ const choice=candidates[0];if(!choice)return '';
+ recent.push(choice.key);if(recent.length>100)recent.shift();
+ m.lastThought=choice.line;return choice.line;
 }
 function mindEvent(event,details){
  mindExperience(event,details);
@@ -3460,7 +3469,12 @@ function haigenNorseReflection(){
  return entry.fact;
 }
 
-function speak(topic,ms=4300){if(time>=nextThoughtAt)think(Math.random()<.18?haigenNorseReflection()||mindThought():Math.random()<.4?mindThought():topic==='silly'&&Math.random()<.65?oddThoughts[Math.floor(Math.random()*oddThoughts.length)]:pickThought(topic),ms)}
+function speak(topic,ms=4300){
+ if(time<nextThoughtAt||state.resting)return;
+ const thought=mindThought();
+ if(thought){think(thought,ms);nextThoughtAt=time+ms+rand(45000,90000);}
+ else nextThoughtAt=time+rand(30000,60000);
+}
 // Compact, offline language interpretation. Explicit supported goals only, no fake AI promises.
 function understandInstruction(input){
  const text=input.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
