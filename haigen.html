@@ -7404,7 +7404,7 @@ function drawHaigenHair(dir,phase,moving){
  }
  ctx.restore();
 }
-function drawSleepingHaigen(x,y){if(rbEnabled&&drawApprovedRestingHaigen(x,y))return;ctx.save();ctx.translate(x,y);ellipse(0,8,53,15,'#254d3977');ctx.save();ctx.translate(0,-7);ctx.rotate(-.09);ellipse(0,0,43,12,'#713e40');ellipse(36,-5,16,15,'#f3c69e');ellipse(35,-17,16,9,'#d7ae79');ctx.strokeStyle='#b88c5a';ctx.lineWidth=1;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(23+i*6,-19);ctx.lineTo(26+i*6,-13);ctx.stroke()}ctx.strokeStyle='#54483c';ctx.lineWidth=2;ctx.beginPath();ctx.arc(41,-5,4,.1,Math.PI-.1);ctx.stroke();ellipse(-33,2,12,6,'#514b35');ctx.restore();const breath=Math.sin(time*.003)*2;ctx.fillStyle='#e9e5d3';ctx.font='bold 16px system-ui';ctx.fillText('z',54,-24+breath);ctx.font='bold 11px system-ui';ctx.fillText('z',65,-37+breath);ctx.restore()}
+function drawSleepingHaigen(x,y){if(drawApprovedRestingHaigen(x,y))return;ctx.save();ctx.translate(x,y);ellipse(0,8,53,15,'#254d3977');ctx.save();ctx.translate(0,-7);ctx.rotate(-.09);ellipse(0,0,43,12,'#713e40');ellipse(36,-5,16,15,'#f3c69e');ellipse(35,-17,16,9,'#d7ae79');ctx.strokeStyle='#b88c5a';ctx.lineWidth=1;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(23+i*6,-19);ctx.lineTo(26+i*6,-13);ctx.stroke()}ctx.strokeStyle='#54483c';ctx.lineWidth=2;ctx.beginPath();ctx.arc(41,-5,4,.1,Math.PI-.1);ctx.stroke();ellipse(-33,2,12,6,'#514b35');ctx.restore();const breath=Math.sin(time*.003)*2;ctx.fillStyle='#e9e5d3';ctx.font='bold 16px system-ui';ctx.fillText('z',54,-24+breath);ctx.font='bold 11px system-ui';ctx.fillText('z',65,-37+breath);ctx.restore()}
 
 // V114 original pixel-art vertical slice. No third-party tiles or licensing dependency.
 // Deterministic sprite canvases are generated once, then drawn nearest-neighbour on the main canvas.
@@ -8056,24 +8056,14 @@ function drawApprovedHaigen(x,y,actor,deepWater=false){
  ctx.restore();return true;
 }
 const haigenSleepFinal=new Image();
-haigenSleepFinal.src='haigen_sleep_final.png';
+haigenSleepFinal.src='./haigen_sleep_final.png?v=b6e2b147';
 function drawApprovedRestingHaigen(x,y){
- if(haigenSleepFinal.complete&&haigenSleepFinal.naturalWidth>0){
-  const w=110,h=w*haigenSleepFinal.naturalHeight/haigenSleepFinal.naturalWidth;
-  const breath=1+0.018*Math.sin(time*.003);
-  ctx.save();ctx.imageSmoothingEnabled=true;
-  ctx.drawImage(haigenSleepFinal,x-w/2,y+19-h*breath,w,h*breath);
-  ctx.restore();return true;
- }
- if(!haigenApprovedAtlasReady)return false;
- const sx=96,sy=216,sw=96,sh=72,scale=1.15;
- const w=sw*scale,h=sh*scale;
- ctx.save();ctx.imageSmoothingEnabled=false;
- ellipse(x,y+6,48,10,'#173d3466');
- ctx.drawImage(haigenApprovedAtlas,sx,sy,sw,sh,
-  Math.round(x-w/2),Math.round(y-h+19),w,h);
- ctx.restore();
- return true;
+ if(!haigenSleepFinal.complete||!haigenSleepFinal.naturalWidth)return false;
+ const w=110,h=w*haigenSleepFinal.naturalHeight/haigenSleepFinal.naturalWidth;
+ const breath=1+0.012*Math.sin(time*.003);
+ ctx.save();ctx.imageSmoothingEnabled=true;
+ ctx.drawImage(haigenSleepFinal,x-w/2,y+7-h*breath,w,h*breath);
+ ctx.restore();return true;
 }
 
 function rbDrawActor(x,y,type,actor,deepWater){
