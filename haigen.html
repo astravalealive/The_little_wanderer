@@ -9469,7 +9469,8 @@ function updateHaigenSpeech(){
  const padding=Math.min(154,Math.max(16,W*.04));
  const topSafe=Math.min(168,Math.max(96,H*.19));
  const bottomSafe=Math.max(150,H*.24);
- const headY=py-Math.max(58,78*zoom);
+ // Clear the full 120-world-unit sprite and its speech pointer at every zoom.
+ const headY=py-Math.max(58,120*zoom+12);
  let sx=clamp(px,padding,W-padding);
  let sy=headY;
  // If the preferred head anchor sits inside the HUD band or would cover Haigen's torso, shift aside.
