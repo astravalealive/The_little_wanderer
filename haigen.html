@@ -4971,6 +4971,18 @@ const roadRoutes=[
  [{x:3500,y:2220},{x:3520,y:2710},{x:3300,y:3500}]
 ];
 function roadDistance(x,y){let best=Infinity;for(const route of roadRoutes)for(let i=1;i<route.length;i++){const a=route[i-1],b=route[i],dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy)));best=Math.min(best,Math.hypot(x-a.x-t*dx,y-a.y-t*dy))}return best}
+// Expand forest margins and scattered inland groves without changing existing object IDs.
+for(let i=0;i<1400;i++){
+ const seed=710000+i*7,x=-350+seeded(seed)*5100,y=-300+seeded(seed+1)*5100;
+ const region=expandedRegion(x,y);
+ if(region&&region.id!=='downs')continue;
+ if(x>=0&&x<3000&&y>=0&&y<2800)continue;
+ const grove=seeded(Math.floor(x/480)*137+Math.floor(y/480)*311+710);
+ if(grove<.35||islandDepth(x,y)<420||roadDistance(x,y)<155||Math.hypot(x-cottage.x,y-cottage.y)<safeRadius+250)continue;
+ const o={id:710000+i,x,y,type:'tree',size:.72+seeded(seed+2)*.48};
+ if(!canPlaceScenery(o)||Math.hypot(x-hamletCenter.x,y-hamletCenter.y)<550)continue;
+ objects.push(o);
+}
 // V385: world-wide larger tree silhouettes, fewer trunks and open walking lanes.
 // Preserve deterministic IDs and existing saves. No changes to rocks, shrubs or wildlife.
 {
@@ -6216,7 +6228,7 @@ const forestVarietySprites=['tree_rowan.png','tree_oak_01.png','tree_oak_02.png'
  img.onload=()=>{try{const c=document.createElement('canvas');const scale=Math.min(1,384/Math.max(img.naturalWidth,img.naturalHeight));c.width=img.naturalWidth;c.height=img.naturalHeight;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0);const p=g.getImageData(0,0,c.width,c.height);cleanForestMatte(p,c.width,c.height);g.putImageData(p,0,0);const out=document.createElement('canvas');out.width=Math.max(1,Math.round(c.width*scale));out.height=Math.max(1,Math.round(c.height*scale));out.getContext('2d').drawImage(c,0,0,out.width,out.height);asset.canvas=out;}catch(e){console.warn('Forest sprite',file,e);}};
  img.src='./'+file+'?v=457';return asset;
 });
-function forestVarietyIndex(o){if(o.type!=='tree'||!rbWoodland(o.x,o.y)||seeded(o.id*73+19)<.35)return -1;const cluster=seeded(Math.floor(o.x/420)*137+Math.floor(o.y/420)*311+7);const v=seeded(o.id*97+31);return cluster<.15?0:cluster<.43?1+Math.floor(v*3):cluster<.73?4+Math.floor(v*3):7+Math.floor(v*2);}
+function forestVarietyIndex(o){if(o.type!=='tree'||(!rbWoodland(o.x,o.y)&&!(o.id>=710000&&o.id<711400))||seeded(o.id*73+19)<.35)return -1;const cluster=seeded(Math.floor(o.x/420)*137+Math.floor(o.y/420)*311+7);const v=seeded(o.id*97+31);return cluster<.15?0:cluster<.43?1+Math.floor(v*3):cluster<.73?4+Math.floor(v*3):7+Math.floor(v*2);}
 function drawForestVariety(o){const i=forestVarietyIndex(o);if(i<0)return false;const c=forestVarietySprites[i].canvas;if(!c)return false;const h=136*(o.size||1)*(.88+seeded(o.id*37+5)*.27),w=h*c.width/c.height;ctx.save();ctx.globalAlpha*=foliageVisibility(o);ctx.imageSmoothingEnabled=true;ellipse(o.x,o.y+2,w*.22,h*.045,'#292a2748');ctx.drawImage(c,o.x-w/2,o.y-h+4,w,h);ctx.restore();return true;}
 function drawWoodlandArtwork(o){
  if(drawForestVariety(o))return true;
