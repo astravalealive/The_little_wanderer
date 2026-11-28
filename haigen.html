@@ -13598,7 +13598,7 @@ g.save();g.lineCap='round';g.lineJoin='round';g.beginPath();mountainRiverPoints.
  const dock=skiffLanding(state.skiffBerth);
  if(dock){g.fillStyle='#172e39';g.fillRect(dock.x*sc-3,dock.y*sc-3,6,6);g.font='bold 9px system-ui';g.fillText('SKIFF',dock.x*sc+5,dock.y*sc-2)}
 }g.restore();mapBase=document.createElement('canvas');mapBase.width=560;mapBase.height=560;mapBase.getContext('2d').drawImage(canvas,0,0);canvas.style.touchAction='none';const pointers=new Map();let pinch=0;canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});});canvas.addEventListener('pointermove',e=>{const p=pointers.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;if(pointers.size===2){const q=[...pointers.values()],d=Math.hypot(q[0].x-q[1].x,q[0].y-q[1].y);if(pinch)changeMapZoom((d/pinch-1)*mapZoom);pinch=d;}});canvas.addEventListener('pointerup',e=>{const p=pointers.get(e.pointerId),single=pointers.size===1;pointers.delete(e.pointerId);pinch=0;if(!single||!p||Math.hypot(e.clientX-p.sx,e.clientY-p.sy)>12)return;const rect=canvas.getBoundingClientRect(),u=clamp((e.clientX-rect.left)/rect.width,0,1),v=clamp((e.clientY-rect.top)/rect.height,0,1),size=560/mapZoom,sc=560/WORLD_SPAN,cx=clamp((state.x-WORLD_MIN)*sc-size/2,0,560-size),cy=clamp((state.y-WORLD_MIN)*sc-size/2,0,560-size);const hx=((state.x-WORLD_MIN)*sc-cx)*560/size,hy=((state.y-WORLD_MIN)*sc-cy)*560/size;if(Math.hypot(u*560-hx,v*560-hy)<22){cam.x=state.x;cam.y=state.y;cameraDetached=false;close();notify('🧭 Camera following Haigen.');return;}const tx=clamp(WORLD_MIN+(cx+u*size)/sc,WORLD_MIN,WORLD),ty=clamp(WORLD_MIN+(cy+v*size)/sc,WORLD_MIN,WORLD);if($('mapBringHaigen').checked){const spot=worldEditorFindSafeHaigenSpot(tx,ty);if(!spot){notify('⚠️ No safe landing spot here. Choose clearer ground.');return;}leaveSkiffBehind();state.x=spot.x;state.y=spot.y;state.resting=false;autoDestination=null;autoPause=1000;cam.x=spot.x;cam.y=spot.y;cameraDetached=false;save();close();notify('⚔️ Haigen travelled with you to safe ground.');return;}cam.x=tx;cam.y=ty;cameraDetached=true;cameraLastPanAt=performance.now();close();notify('🗺️ Camera moved. Haigen keeps exploring.');});canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);pinch=0;});$('mapZoomIn').onclick=()=>changeMapZoom(.5);$('mapZoomOut').onclick=()=>changeMapZoom(-.5);drawMapZoom()}$('regionsQuickBtn').onclick=showMap;
-setInterval(()=>{if($('worldMap')&&mapBase)drawMapZoom()},220);
+setInterval(()=>{const map=$('worldMap');if(map&&mapBase&&map.getClientRects().length&&$('overlay')?.classList.contains('open'))drawMapZoom()},220);
 function changeMapZoom(delta){if(!mapBase||!$('worldMap'))return;mapZoom=clamp(mapZoom+delta,1,6);drawMapZoom()}function drawMapZoom(){const c=$('worldMap');if(!c||!mapBase)return;const g=c.getContext('2d'),size=560/mapZoom,sc=560/WORLD_SPAN,cx=clamp((state.x-WORLD_MIN)*sc-size/2,0,560-size),cy=clamp((state.y-WORLD_MIN)*sc-size/2,0,560-size);g.clearRect(0,0,560,560);g.imageSmoothingEnabled=true;g.drawImage(mapBase,cx,cy,size,size,0,0,560,560);const px=((state.x-WORLD_MIN)*sc-cx)*560/size,py=((state.y-WORLD_MIN)*sc-cy)*560/size,pulse=2+Math.sin(Date.now()*.006)*1.5;g.fillStyle='#ffe46e';g.strokeStyle='#1d302b';g.lineWidth=2;g.beginPath();g.arc(px,py,6+pulse,0,Math.PI*2);g.fill();g.stroke();g.fillStyle='#fff5d7';g.font='bold 12px system-ui';g.fillText('HAIGEN',Math.min(490,px+12),Math.max(15,py-9));$('mapZoomLabel').textContent=mapZoom.toFixed(1)+'×'}function safeText(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function mood(){if(state.health<35)return 'hurt';if(state.energy<25)return 'sleepy';if(state.hunger<25)return 'hungry';if(state.fun<25)return 'bored';if(state.health>75&&state.energy>55&&state.hunger>45&&state.fun>55)return 'happy';return 'thoughtful'}
 function hairstyleMenu(){const styles=[['waves','🌾 Soft waves'],['curls','🌀 Bouncy curls'],['short','✂️ Short & tousled'],['wild','🌪️ Wild bedhead']];open('<h2>💇 Haigen\'s hair</h2><p>Pick a style. It stays until you choose another.</p>'+styles.map(([id,name])=>'<div class="item"><b>'+name+'</b><button class="btn" data-hair="'+id+'">'+(state.hairStyle===id?'Wearing ✓':'Choose')+'</button></div>').join(''));document.querySelectorAll('[data-hair]').forEach(b=>b.onclick=()=>{state.hairStyle=b.dataset.hair;save();hairstyleMenu()})}
@@ -13909,9 +13909,13 @@ function setCoordinateReadoutVisible(on){
 }
 window.__haigenCoordsVisible=()=>showCoordinateReadout;
 window.__haigenSetCoordsVisible=setCoordinateReadoutVisible;
+let lastCoordinateMarkup='';
 function updateCoordinateReadout(){
+ if(!showCoordinateReadout)return;
  const hx=Math.round(state.x),hy=Math.round(state.y),cx=Math.round(cam.x),cy=Math.round(cam.y);
- coordinateReadout.innerHTML='<span>HAIGEN '+hx+', '+hy+'</span><span style="color:#b9d9ca">VIEW '+cx+', '+cy+'</span>';
+ const markup='<span>HAIGEN '+hx+', '+hy+'</span><span style="color:#b9d9ca">VIEW '+cx+', '+cy+'</span>';
+ if(markup===lastCoordinateMarkup)return;
+ lastCoordinateMarkup=markup;coordinateReadout.innerHTML=markup;
  coordinateReadout.title='Haigen position and current camera centre (updates when you walk or pan)';
 }
 setInterval(updateCoordinateReadout,150);
@@ -14618,8 +14622,9 @@ function drawCollisionAudit(){
  ctx.fillStyle='#111d';ctx.fillRect(8,h-34,270,26);ctx.fillStyle='#fff';ctx.font='14px system-ui';ctx.fillText('COLLISION AUDIT · Red solid / Green clear',14,h-16);
  }finally{ctx.restore();}
 }
+let lastRavenTick=-Infinity;
 function frame(now){
- ravenTick();
+ if(now-lastRavenTick>=200){lastRavenTick=now;ravenTick();}
  const diag=window.__haigenPerfDiag,measure=!!(diag&&diag.enabled),frameStart=measure?performance.now():0,frameGap=measure&&diag.lastFrame?now-diag.lastFrame:0;if(measure)diag.lastFrame=now;
  const dt=Math.min(Math.max(0,now-last),50);last=now;
  if(state.resting&&!homeInside&&campDanger(state.x,state.y)){state.resting=false;travelCamp=null;if(state.autonomy){autoPause=0;autoPlan('danger woke me: escape','escape')}notify('⚠️ Danger nearby! Haigen wakes up.');}
@@ -14762,7 +14767,7 @@ function frame(now){
    location.reload();
  };
  function updatePreviewStats(){
-  const el=$('previewStats');if(!el)return;
+  const el=$('previewStats');if(!el||!el.getClientRects().length)return;
   const loaded=haigenMovementReady?'V121 atlas':haigenApprovedAtlasReady?'V117 fallback':'procedural fallback';
   el.textContent='Haigen '+Math.round(state.x)+','+Math.round(state.y)+' · Camera '+Math.round(cam.x)+','+Math.round(cam.y)+' · Sprite '+loaded+' · '+(rbEnabled?'Pixel look':'Classic look')+'.';
  }
