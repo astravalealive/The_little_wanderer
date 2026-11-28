@@ -14474,6 +14474,23 @@ function incaChooseActivity(dt,a,m){
  incaRemember(m,{sketch:'I made a sketch of this place.',music:'I practised a melody.',explore:'I explored a new part of the woodland.',animals:'I spent some time looking for wildlife.'}[task.kind],task.kind);
  a.activity=null;a.activityPause=3500+Math.random()*3500;save();return true;
 }
+let sharedEncounterCheck=0;
+function sharedEncounter(dt,a,m){
+ sharedEncounterCheck+=dt;if(sharedEncounterCheck<1000)return false;sharedEncounterCheck=0;
+ if(!state.autonomy||state.resting||paintingNow||homeInside||visitorRoom||mountainInside||frostholdRoom||trollStumpInside||state.skiffAtSea||dist(a,state)>115)return false;
+ if(m.needs.energy<25||m.needs.health<35||state.health<35||state.energy<25)return false;
+ const bond=state.sharedSiblingBond??={trust:50,encounters:0,lastAt:-1,memories:[]};
+ if(bond.lastAt>=0&&state.daytime-bond.lastAt<12)return false;
+ let hers,his,kind;
+ if(m.needs.hunger<55&&state.berries>1){state.berries--;m.inventory.berries++;kind='sharing';hers='Haigen gave me some berries. I needed those.';his='I shared some berries with Inca.';}
+ else if(state.hunger<55&&m.inventory.berries>1){m.inventory.berries--;state.berries++;kind='sharing';hers='I gave Haigen some of my berries.';his='Inca shared her berries with me.';}
+ else if(m.needs.hunger>=55&&state.hunger>=55){kind='conversation';hers='It was nice to catch up with Haigen.';his='I enjoyed catching up with Inca.';}
+ else return false;
+ bond.lastAt=state.daytime;bond.encounters++;bond.trust=Math.min(100,bond.trust+(kind==='sharing'?2:1));
+ bond.memories.push({day:state.daytime,kind,x:a.x,y:a.y,haigen:his,inca:hers});if(bond.memories.length>80)bond.memories.shift();
+ incaRemember(m,hers,kind);mindWrite(his,'social');think(his,3400,true);
+ a.activityPause=3500;a.moving=false;m.enjoyment=Math.min(100,(m.enjoyment??65)+5);save();return true;
+}
 function incaThink(dt,a){
  const m=incaMind(),n=m.needs;
  if(!incaMindRestored){incaMindRestored=true;const p=m.position;if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&incaLand(p.x,p.y))Object.assign(a,{x:p.x,y:p.y,ready:true,room:p.room||null});}
@@ -14507,6 +14524,7 @@ function incaThink(dt,a){
    return true;
   }
  }
+ if(sharedEncounter(dt,a,m))return true;
  return incaChooseActivity(dt,a,m);
 }
 
