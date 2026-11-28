@@ -1469,12 +1469,12 @@ function campsiteProtected(o){return !!state.campClearingDone&&campDistance(o.x,
 const firstFire={x:1280,y:1800};
 // Relocate the original home fire in existing saves without resetting its fuel.
 for(const f of state.structures)if(f.kind==='campfire'&&Math.hypot(f.x-1615,f.y-1540)<2){f.x=firstFire.x;f.y=firstFire.y;}const ruins={x:2160,y:460};
-const sacredGroveLayout=[[-215,-75,0,255],[-75,-145,1,255],[85,-140,2,265],[225,-65,3,270],[-245,75,4,270],[245,90,0,265],[-220,225,2,255],[225,235,1,260],[-155,335,3,230],[165,340,4,235]];
+const sacredGroveLayout=[[-215,-75,0,255],[-75,-145,1,255],[85,-140,2,265],[225,-65,3,270],[-245,75,4,270],[245,90,0,265],[-220,225,2,255],[225,235,1,260],[-155,335,3,230],[165,340,4,235],[-345,-185,2,275],[-205,-245,4,280],[-45,-270,0,270],[125,-255,3,280],[305,-205,1,275],[-390,-35,1,285],[390,-30,4,280],[-400,125,3,270],[400,130,2,280],[-365,285,0,275],[365,285,3,270],[-290,415,4,250],[290,420,1,255],[-150,475,2,240],[160,475,0,245]];
 const sacredGroveImages=Array.from({length:5},(_,i)=>{const img=new Image();img.src='./ancient_tree_0'+(i+1)+'.png';return img});
-function sacredGroveClear(o){return Math.abs(o.x-2160)<295&&o.y>260&&o.y<830}
+function sacredGroveClear(o){return Math.abs(o.x-2160)<450&&o.y>155&&o.y<970}
 function sacredGroveReady(){return sacredGroveImages.every(i=>i.complete&&i.naturalWidth>0)}
 function sacredGroveGround(){if(!sacredGroveReady())return;ctx.save();const g=ctx.createRadialGradient(ruins.x,ruins.y+100,40,ruins.x,ruins.y+100,330);g.addColorStop(0,'rgba(54,53,25,0)');g.addColorStop(.65,'rgba(29,34,17,.13)');g.addColorStop(1,'rgba(29,34,17,0)');ctx.fillStyle=g;ctx.fillRect(ruins.x-330,ruins.y-230,660,660);ctx.restore()}
-function sacredGroveQueue(q){if(!sacredGroveReady()||Math.abs(cam.x-ruins.x)>W/worldZoom()/2+400||Math.abs(cam.y-ruins.y)>H/worldZoom()/2+550)return;for(const [dx,dy,i,h] of sacredGroveLayout){const x=ruins.x+dx,y=ruins.y+dy,img=sacredGroveImages[i],w=h*img.naturalWidth/img.naturalHeight;q.push({y,draw:()=>{ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(img,x-w/2,y-h,w,h);ctx.restore()}})}}
+function sacredGroveQueue(q){if(!sacredGroveReady()||Math.abs(cam.x-ruins.x)>W/worldZoom()/2+650||Math.abs(cam.y-ruins.y)>H/worldZoom()/2+800)return;for(const [dx,dy,i,h] of sacredGroveLayout){const x=ruins.x+dx,y=ruins.y+dy,img=sacredGroveImages[i],w=h*img.naturalWidth/img.naturalHeight;q.push({y,draw:()=>{ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(img,x-w/2,y-h,w,h);ctx.restore()}})}}
 function sacredGroveBlocked(x,y){return sacredGroveReady()&&sacredGroveLayout.some(([dx,dy])=>Math.hypot((x-ruins.x-dx)/48,(y-ruins.y-dy+18)/34)<1)}
  // V297: runestone at the northern woodland trail terminus, beneath Stoneback Highlands
 const runeGuardianId=9001;for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(o.type==='tree'&&Math.hypot(o.x-1540,o.y-480)<155)objects.splice(i,1)}// V299: guardian tree permanently removed; keep the rune clearing open.
