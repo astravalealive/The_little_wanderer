@@ -5056,20 +5056,7 @@ function setAutonomy(enabled,keepInstruction=false){
 }
 // Roads connect the camp to actual destinations, rather than ending in the woods.
 // One continuous woodland trail with smaller branches. Junctions share exact endpoints.
-const roadRoutes=[
- [{x:70,y:980},{x:440,y:1040},{x:760,y:1140},{x:1050,y:1100},{x:1350,y:980},{x:1650,y:1030},{x:1880,y:850},{x:2170,y:820},{x:2570,y:730},{x:2910,y:650},{x:3230,y:730},{x:3510,y:970},{x:3810,y:1160},{x:4130,y:1300}],
- [{x:2170,y:820},{x:2200,y:700},{x:2160,y:650},{x:ruins.x,y:ruins.y+180}],
- [{x:1930,y:1200},{x:2200,y:1300},{x:2470,y:1280},{x:2730,y:1490},{x:2890,y:1780},{x:3200,y:2020},{x:3500,y:2220},{x:3780,y:2510},{x:4130,y:2740}],
- [{x:1880,y:850},{x:1930,y:1200}],
- [{x:2200,y:1300},{x:2140,y:1630},{x:2030,y:1950},{x:2100,y:2420},{x:2320,y:2760},{x:2560,y:3060},{x:2930,y:3280},{x:3300,y:3500},{x:3670,y:3790},{x:4130,y:4030}],
- [{x:1050,y:1100},{x:750,y:820},{x:450,y:500},{x:160,y:180}],
- [{x:1350,y:980},{x:1190,y:1220},{x:1120,y:1370},{x:1050,y:1450},{x:920,y:1580},{x:850,y:1700}],
- [{x:1350,y:980},{x:1390,y:1180},{x:1470,y:1360},{x:1500,y:1500}],
- // Job 233: cottage → Silent Pond / Great Lake shore (purposeful heartland walk).
- [{x:1500,y:1500},{x:1320,y:1580},{x:1100,y:1650},{x:900,y:1720},{x:850,y:1700}],
- [{x:2100,y:2420},{x:1760,y:2860},{x:1420,y:3270},{x:1050,y:3630},{x:680,y:4130}],
- [{x:3500,y:2220},{x:3520,y:2710},{x:3300,y:3500}]
-];
+const roadRoutes=[[{"x":70,"y":980},{"x":440,"y":1040},{"x":760,"y":1140},{"x":1050,"y":1100},{"x":1350,"y":1080},{"x":1600,"y":1110},{"x":1900,"y":1120},{"x":2160,"y":1120},{"x":2450,"y":1080},{"x":2750,"y":900},{"x":2910,"y":650},{"x":3230,"y":730},{"x":3510,"y":970},{"x":3810,"y":1160},{"x":4130,"y":1300}],[{"x":2160,"y":1120},{"x":2170,"y":1010},{"x":2160,"y":900},{"x":2165,"y":790},{"x":2160,"y":650}],[{"x":1900,"y":1120},{"x":1930,"y":1200},{"x":2200,"y":1300},{"x":2470,"y":1280},{"x":2730,"y":1490},{"x":2890,"y":1780},{"x":3200,"y":2020},{"x":3500,"y":2220},{"x":3780,"y":2510},{"x":4130,"y":2740}],[{"x":1600,"y":1110},{"x":1570,"y":1330},{"x":1500,"y":1500},{"x":1500,"y":1600},{"x":1660,"y":1740}],[{"x":2200,"y":1300},{"x":2140,"y":1630},{"x":2030,"y":1950},{"x":2100,"y":2420},{"x":2320,"y":2760},{"x":2560,"y":3060},{"x":2930,"y":3280},{"x":3300,"y":3500},{"x":3670,"y":3790},{"x":4130,"y":4030}],[{"x":1050,"y":1100},{"x":750,"y":820},{"x":450,"y":500},{"x":160,"y":180}],[{"x":1350,"y":1080},{"x":1190,"y":1220},{"x":1080,"y":1400},{"x":1050,"y":1450}],[{"x":1500,"y":1600},{"x":1390,"y":1680},{"x":1280,"y":1840}],[{"x":1390,"y":1680},{"x":1250,"y":1580},{"x":1130,"y":1510},{"x":1050,"y":1450}],[{"x":2100,"y":2420},{"x":1760,"y":2860},{"x":1420,"y":3270},{"x":1050,"y":3630},{"x":680,"y":4130}],[{"x":3500,"y":2220},{"x":3520,"y":2710},{"x":3300,"y":3500}]];
 function roadDistance(x,y){let best=Infinity;for(const route of roadRoutes)for(let i=1;i<route.length;i++){const a=route[i-1],b=route[i],dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy)));best=Math.min(best,Math.hypot(x-a.x-t*dx,y-a.y-t*dy))}return best}
 // Expand forest margins and scattered inland groves without changing existing object IDs.
 for(let i=0;i<1400;i++){
@@ -5294,29 +5281,23 @@ function drawWoodlandPathEdges(){
  }
  ctx.restore();
 }
+let purposefulTrailCanvas=null;
 function path(){
- if(paintedTrailsReady){
-  ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(paintedTrails,0,0,7800,7800);ctx.restore();
-  // Issue #263: show the original irregular hand-painted dirt paths alone.
-  // No geometric route strokes over the artwork; roadRoutes remain for gameplay.
-  drawWoodlandPathEdges();return
+ if(!purposefulTrailCanvas){
+ const c=document.createElement('canvas');c.width=c.height=2600;const g=c.getContext('2d');g.scale(1/3,1/3);g.lineCap='round';g.lineJoin='round';
+ for(let i=0;i<roadRoutes.length;i++){
+ const r=roadRoutes[i],w=roadWidths[i]||36;
+ for(let k=0;k<r.length-1;k++){const a=r[k],b=r[k+1],d=Math.hypot(b.x-a.x,b.y-a.y),n=Math.ceil(d/4);
+ for(let z=0;z<=n;z++){const t=z/n,x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t,seed=i*100000+k*1000+z,fade=i===1&&k===r.length-2?Math.min(1,(1-t)*3):1;
+ const radius=w*(.43+seeded(seed)*.15);g.globalAlpha=fade*.48;g.fillStyle='#887655';g.beginPath();g.ellipse(x,y,radius+5,radius+4,0,0,Math.PI*2);g.fill();
+ g.globalAlpha=fade*.55;g.fillStyle='#b29b73';g.beginPath();g.ellipse(x+(seeded(seed+1)-.5)*8,y,radius*.83,radius*.8,0,0,Math.PI*2);g.fill();
+ for(let p=0;p<5;p++){const ang=seeded(seed+p*17+3)*Math.PI*2,rr=radius*Math.sqrt(seeded(seed+p*19+8));g.globalAlpha=fade*.24;g.fillStyle=p%2?'#d0b88c':'#75694e';g.fillRect(x+Math.cos(ang)*rr,y+Math.sin(ang)*rr,3+seeded(seed+p)*6,3+seeded(seed+p+1)*5);}
+ }}
+ }g.globalAlpha=1;purposefulTrailCanvas=c;
  }
- // Draw full road network one material layer at a time so the junctions merge.
- ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
- const bands=[{pad:22,c:'#3f534050'},{pad:14,c:'#6f5f4898'},{pad:5,c:'#9a8358'},{pad:-7,c:'#c4ad82'}];
- for(const band of bands){ctx.strokeStyle=band.c;
-  for(let i=0;i<roadRoutes.length;i++){ctx.lineWidth=Math.max(7,roadWidths[i]+band.pad);roadTrace(ctx,roadRoutes[i]);ctx.stroke()}
- }
- for(let i=0;i<650;i++){
-  const x=WORLD_MIN+seeded(51000+i*5)*WORLD_SPAN,y=WORLD_MIN+seeded(51001+i*5)*WORLD_SPAN;
-  if(Math.abs(x-cam.x)>950||Math.abs(y-cam.y)>750)continue;
-  const hit=roadWidthAt(x,y);if(hit.distance>hit.width*.5-5)continue;
-  const n=seeded(51002+i*5);ctx.fillStyle=n>.7?'#957e5d7c':'#e5d0a070';
-  ctx.beginPath();ctx.ellipse(x,y,1+n*3.5,.5+n,0,0,Math.PI*2);ctx.fill();
- }
- ctx.restore();
- drawWoodlandPathEdges();
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(purposefulTrailCanvas,0,0,7800,7800);ctx.restore();
 }
+
 function ellipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}function poly(points,fill,stroke){ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=3;ctx.stroke()}}// Visibility assist: tall foliage fades softly only while its canopy obscures Haigen.
 // Does not alter harvesting, solidity, save files or tree placement.
 const obscuringTreeAlpha=new Map();
@@ -10081,7 +10062,7 @@ function draw(){if(frostholdRoom){drawFrostholdRoom();return}ensureWorldLocator(
  const nightMix=nightStrength();ctx.fillStyle=mixColour('#7f9f64','#283c65',nightMix);ctx.fillRect(cam.x-W/(2*zoom)-120,cam.y-H/(2*zoom)-120,W/zoom+240,H/zoom+240);drawExpandedTerrain(nightMix);drawFenDetail(nightMix);overhaulBiomeFloor(nightMix);ctx.save();/* V154: do not clip actors and shoreline to obsolete original-island outline; expanded coast lies beyond it. *//* Woodland floor now baked into continuous terrain; retire cell overlays. */if(!woodlandFloorTile)drawHomesteadStyleLock(nightMix);if(!draw.groundPatchLayout){draw.groundPatchLayout=Array.from({length:410},(_,i)=>({x:WORLD_MIN+seeded(i+950)*WORLD_SPAN,y:WORLD_MIN+seeded(i+1200)*WORLD_SPAN,rx:30+seeded(i+800)*90,ry:18+seeded(i+700)*65,shade:i%2}))}for(const p of draw.groundPatchLayout){if(Math.abs(p.x-cam.x)>1100||Math.abs(p.y-cam.y)>850||expandedRegion(p.x,p.y)||!expandedRegion(p.x,p.y))continue;ellipse(p.x,p.y,p.rx,p.ry,mixColour(p.shade?'#8bb06c':'#648c58',p.shade?'#2f4658':'#39547c',nightMix)+'66')}for(const l of landmarks){if(Math.abs(l.x-cam.x)>1300||Math.abs(l.y-cam.y)>1000||(woodlandFloorTile&&rbWoodland(l.x,l.y)))continue;ctx.save();ctx.translate(l.x,l.y);ctx.scale(l.kind==='highlands'?620:510,l.kind==='highlands'?400:360);
 const tint=ctx.createRadialGradient(0,0,.04,0,0,1),shade=l.kind==='highlands'?'#829480':l.kind==='marsh'?'#6e9d83':'#5b9564';
 tint.addColorStop(0,shade+'cc');tint.addColorStop(.67,shade+'77');tint.addColorStop(1,shade+'00');
-ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(const p of l.detailOffsets){const px=l.x+p.x,py=l.y+p.y;if(!expandedRegion(px,py))continue;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],p.shape?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,p.shade?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,p.shade?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();sacredGrovePath();sacredGroveGround();drawWetGround();drawEasternIslandLandmarks();if(window.__gloamAddon)window.__gloamAddon.drawGround();if(window.__thrummaw)window.__thrummaw.ground();if(window.__krakkle)window.__krakkle.draw();if(window.__swampBosses)window.__swampBosses.draw();drawCampDecor();drawDigPatches();drawMountainRiver(nightMix);lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();// V266: the cabin's eastern approach is a broad shallow shelf; depths migrate west.
+ctx.fillStyle=tint;ctx.fillRect(-1,-1,2,2);ctx.restore();for(const p of l.detailOffsets){const px=l.x+p.x,py=l.y+p.y;if(!expandedRegion(px,py))continue;if(l.kind==='highlands'){poly([[px-42,py+20],[px,py-62],[px+44,py+20]],p.shape?'#a6aaa0':'#c1bdb0')}else if(l.kind==='marsh'){ellipse(px,py,32,14,p.shade?'#80b9a4':'#507f6b')}else{ellipse(px,py-28,32,42,p.shade?'#477c4e':'#396a49')}}ctx.fillStyle='#f5e5b5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText(l.name,l.x,l.y-285)}path();sacredGroveGround();drawWetGround();drawEasternIslandLandmarks();if(window.__gloamAddon)window.__gloamAddon.drawGround();if(window.__thrummaw)window.__thrummaw.ground();if(window.__krakkle)window.__krakkle.draw();if(window.__swampBosses)window.__swampBosses.draw();drawCampDecor();drawDigPatches();drawMountainRiver(nightMix);lakeShape(1.055);ctx.fillStyle='#d9c89c';ctx.fill();lakeShape();ctx.fillStyle=mixColour('#69b6bd','#446b91',nightMix);ctx.fill();ctx.save();// V266: the cabin's eastern approach is a broad shallow shelf; depths migrate west.
 lakeShape();ctx.clip();
 ctx.save();ctx.translate(-360,-110);
 lakeShape(.73);ctx.fillStyle=mixColour('#398eaa','#37577c',nightMix);ctx.fill();
