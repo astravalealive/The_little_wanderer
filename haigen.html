@@ -1471,7 +1471,7 @@ const firstFire={x:1280,y:1800};
 for(const f of state.structures)if(f.kind==='campfire'&&Math.hypot(f.x-1615,f.y-1540)<2){f.x=firstFire.x;f.y=firstFire.y;}const ruins={x:2160,y:460};
 const sacredGroveLayout=[[-215,-75,0,255],[-75,-145,1,255],[85,-140,2,265],[225,-65,3,270],[-245,75,4,270],[245,90,0,265],[-220,225,2,255],[225,235,1,260],[-155,335,3,230],[165,340,4,235]];
 const sacredGroveImages=Array.from({length:5},(_,i)=>{const img=new Image();img.src='./ancient_tree_0'+(i+1)+'.png';return img});
-function sacredGroveClear(o){return Math.abs(o.x-ruins.x)<295&&o.y>ruins.y-200&&o.y<ruins.y+370}
+function sacredGroveClear(o){return Math.abs(o.x-2160)<295&&o.y>260&&o.y<830}
 function sacredGroveReady(){return sacredGroveImages.every(i=>i.complete&&i.naturalWidth>0)}
 function sacredGroveGround(){if(!sacredGroveReady())return;ctx.save();const g=ctx.createRadialGradient(ruins.x,ruins.y+100,40,ruins.x,ruins.y+100,330);g.addColorStop(0,'rgba(54,53,25,0)');g.addColorStop(.65,'rgba(29,34,17,.13)');g.addColorStop(1,'rgba(29,34,17,0)');ctx.fillStyle=g;ctx.fillRect(ruins.x-330,ruins.y-230,660,660);ctx.restore()}
 function sacredGroveQueue(q){if(!sacredGroveReady()||Math.abs(cam.x-ruins.x)>W/worldZoom()/2+400||Math.abs(cam.y-ruins.y)>H/worldZoom()/2+550)return;for(const [dx,dy,i,h] of sacredGroveLayout){const x=ruins.x+dx,y=ruins.y+dy,img=sacredGroveImages[i],w=h*img.naturalWidth/img.naturalHeight;q.push({y,draw:()=>{ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(img,x-w/2,y-h,w,h);ctx.restore()}})}}
