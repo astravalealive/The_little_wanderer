@@ -9418,9 +9418,11 @@ function updateFrogs(){
   // Increased rainy activity, leaving sacred frog rendering and movement style intact.
   const wet=state.weather&&state.weather.rain>.3;
   if(wet&&!f.lilyBed&&!f.hopUntil&&f.hopAt>time+900)f.hopAt=time+500+seeded(f.phase+Math.floor(time/1700))*650;
+  const threat=caveTrolls.filter(t=>t.room==='woods'&&dist(t,f)<115).sort((a,b)=>dist(a,f)-dist(b,f))[0];
+  if(threat&&!f.hopUntil&&time>(f.nextTrollReaction||0)){f.nextTrollReaction=time+350+Math.random()*950;if(Math.random()<.82)f.hopAt=time;}
   if(f.hopUntil||time<f.hopAt)continue;
   // Lily pads are optional resting places, never a permanent movement cage.
-  if(f.habitat==='pond'&&Math.random()<.38){
+  if(!threat&&f.habitat==='pond'&&Math.random()<.38){
    const nearby=lilyBeds.flatMap(b=>b.pads).filter(p=>Math.hypot(p.x-f.x,p.y-f.y)<100);
    if(nearby.length){
     const p=nearby[Math.floor(Math.random()*nearby.length)];
@@ -9429,9 +9431,9 @@ function updateFrogs(){
      f.hopAt=time+1400+Math.random()*4000;continue;}
    }
   }
-  const scared=dist(f,state)<125;
-  let a=scared?Math.atan2(f.y-state.y,f.x-state.x):Math.sin(f.phase+time*.0002)*Math.PI*2;
-  const distance=scared?68:24+seeded(Math.floor(time/2000)+f.phase)*54;
+  const danger=threat||state,scared=!!threat||dist(f,state)<125;
+  let a=scared?Math.atan2(f.y-danger.y,f.x-danger.x)+(Math.random()-.5)*.8:Math.sin(f.phase+time*.0002)*Math.PI*2;
+  const distance=scared?55+Math.random()*40:24+seeded(Math.floor(time/2000)+f.phase)*54;
   let nx=f.x+Math.cos(a)*distance,ny=f.y+Math.sin(a)*distance;
   // On danger, escape toward water if a direct hop would leave the habitat.
   if(!frogHabitat(f,nx,ny)&&scared){
@@ -12669,7 +12671,7 @@ function outdoorGoal(t){
 }
 function stepWoodlandResident(t,dt){
  if(!t.goal){t.goal=outdoorGoal(t);t.leg=null;}
- const goal=t.goal;if(goal.frogId!=null){const f=frogs.find(q=>q.id===goal.frogId);if(!f||f.id===state.carriedFrogId||(frogs.length<=26||frogs.filter(q=>q.habitat==='pond').length<=18)){t.goal=null;t.nextFrogHunt=time+30000;return;}if(!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1){goal.x=f.x;goal.y=f.y;}if(dist(t,f)<20&&!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1){state.nextTrollFrogHuntAt=Date.now()+900000;frogs.splice(frogs.indexOf(f),1);t.frogMeal=true;t.headingHome=true;t.goal=null;t.leg=null;return;}}
+ const goal=t.goal;if(goal.frogId!=null){if(!goal.huntStarted)goal.huntStarted=time;if(time-goal.huntStarted>45000){t.goal=null;t.leg=null;t.nextFrogHunt=time+120000;return;}const f=frogs.find(q=>q.id===goal.frogId);if(!f||f.id===state.carriedFrogId||(frogs.length<=26||frogs.filter(q=>q.habitat==='pond').length<=18)){t.goal=null;t.nextFrogHunt=time+30000;return;}if(!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1){goal.x=f.x;goal.y=f.y;}if(!f.hopUntil&&dist(t,f)<9&&!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1){state.nextTrollFrogHuntAt=Date.now()+600000+Math.random()*900000;frogs.splice(frogs.indexOf(f),1);t.frogMeal=true;t.headingHome=true;t.goal=null;t.leg=null;return;}}
  const dx=goal.x-t.x,dy=goal.y-t.y,range=Math.hypot(dx,dy);
  if(range<(goal.to?24:9)){
   if(goal.to==='home'){t.headingHome=false;t.room='mountain-return';t.goal=null;return;}
