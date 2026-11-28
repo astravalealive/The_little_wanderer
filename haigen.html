@@ -3716,7 +3716,19 @@ function awakeningRoute(target,reach,actor=state){
  const cacheKey=origin.x+','+origin.y+'>'+Math.round(target.x/cell)+','+Math.round(target.y/cell)+':'+reach;
  const cached=awakeningRoutes.get(cacheKey);
  if(cached&&time-cached.at<3000)return cached.path.slice();
- const open=[{x:origin.x,y:origin.y,g:0,h:0}],best=new Map(),closed=new Set();
+ const open=[],best=new Map(),closed=new Set();
+ let order=0;
+ const before=(a,b)=>a.g+a.h<b.g+b.h||(a.g+a.h===b.g+b.h&&a.order<b.order);
+ function pushOpen(node){
+  node.order=order++;let i=open.length;open.push(node);
+  while(i>0){const p=(i-1)>>1;if(!before(node,open[p]))break;open[i]=open[p];i=p;}open[i]=node;
+ }
+ function popOpen(){
+  const first=open[0],last=open.pop();if(!open.length)return first;
+  let i=0;
+  while(i*2+1<open.length){let c=i*2+1;if(c+1<open.length&&before(open[c+1],open[c]))c++;if(!before(open[c],last))break;open[i]=open[c];i=c;}open[i]=last;return first;
+ }
+ pushOpen({x:origin.x,y:origin.y,g:0,h:0});
  const id=(x,y)=>x+','+y;
  best.set(id(origin.x,origin.y),0);
  // Check the actual walking segment as trunks can sit between grid centres.
@@ -3733,8 +3745,7 @@ function awakeningRoute(target,reach,actor=state){
  let found=null,finish=null,iterations=0;
  const initialDistance=Math.hypot(target.x-actor.x,target.y-actor.y);
  while(open.length&&iterations++<380){
-  open.sort((a,b)=>(a.g+a.h)-(b.g+b.h));
-  const cur=open.shift(),k=id(cur.x,cur.y);
+  const cur=popOpen(),k=id(cur.x,cur.y);
   if(closed.has(k))continue;
   closed.add(k);
   const px=cur.parent?cur.x*cell:actor.x,py=cur.parent?cur.y*cell:actor.y;
@@ -3760,7 +3771,7 @@ function awakeningRoute(target,reach,actor=state){
    if(g>=(best.get(nk)??Infinity))continue;
    if(!clearSegment(px,py,x*cell,y*cell))continue;
    best.set(nk,g);
-   open.push({x,y,g,h:Math.hypot(target.x/cell-x,target.y/cell-y),parent:cur});
+   pushOpen({x,y,g,h:Math.hypot(target.x/cell-x,target.y/cell-y),parent:cur});
   }
  }
  const path=finish?[finish]:[];
