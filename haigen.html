@@ -3860,10 +3860,11 @@ function campDanger(x,y){
  const bossThreat=window.__swampBosses?.snapshot?.().some(b=>b.phase!=='hidden'&&b.phase!=='defeated'&&Math.hypot(x-b.x,y-b.y)<440)||false;
  const crab=window.__krakkle?.snapshot?.();
  const crabThreat=!!(crab&&crab.phase&&crab.phase!=='hidden'&&crab.phase!=='defeated'&&Number.isFinite(crab.x)&&Math.hypot(x-crab.x,y-crab.y)<440);
- return bossThreat||crabThreat||[...beasts,...regionalWildlife].some(a=>animalAlive(a)&&
+ const threatening=a=>animalAlive(a)&&
  ((a.kind==='wolf'||a.kind==='boar'&&state.story?.stage!==4)||hostileTypes.has(a.type))&&
- Math.hypot(x-a.x,y-a.y)<320)
- ||objects.some(o=>spectorsActive()&&o.type==='specter'&&Math.hypot(x-(ghostBehaviour.get(o.id)?.x??o.x),y-(ghostBehaviour.get(o.id)?.y??o.y))<320);
+ Math.hypot(x-a.x,y-a.y)<320;
+ return bossThreat||crabThreat||beasts.some(threatening)||regionalWildlife.some(threatening)
+ ||(spectorsActive()&&objects.some(o=>o.type==='specter'&&Math.hypot(x-(ghostBehaviour.get(o.id)?.x??o.x),y-(ghostBehaviour.get(o.id)?.y??o.y))<320));
 }
 function safeTravelCamp(x,y){
  if(!autoStand(x,y)||walkingLakeLevel(x,y)<1.14||islandDepth(x,y)<190)return false;
@@ -3872,14 +3873,13 @@ function safeTravelCamp(x,y){
 }
 function autoSafeToRest(){return safeTravelCamp(state.x,state.y)}
 function autoCampSpot(){
- const candidates=[];
+ let best=null,bestScore=Infinity;
  for(let ring=1;ring<=6;ring++)for(let i=0;i<20;i++){
   const angle=i*Math.PI/10+ring*.33,radius=ring*95;
   const p={x:state.x+Math.cos(angle)*radius,y:state.y+Math.sin(angle)*radius};
-  if(safeTravelCamp(p.x,p.y))candidates.push({p,score:radius+campRoadDistance(p.x,p.y)*-.06});
+  if(safeTravelCamp(p.x,p.y)){const score=radius+campRoadDistance(p.x,p.y)*-.06;if(score<bestScore){bestScore=score;best=p;}}
  }
- candidates.sort((a,b)=>a.score-b.score);
- return candidates[0]?.p||null;
+ return best;
 }
 function drawTravelCamp(){
  if(!travelCamp||!state.resting)return;
