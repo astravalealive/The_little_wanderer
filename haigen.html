@@ -170,7 +170,9 @@ function biomePosition(x,y){
 function biomeMargin(r,p){
  return Math.min(p.x-r.x,r.x+r.w-p.x,p.y-r.y,r.y+r.h-p.y);
 }
+function eastWoodland(x,y){return x>=2800&&y>=950&&y<4900&&x<easternRiverX(y)-easternRiverWidth(y);}
 function expandedRegion(x,y){
+ if(eastWoodland(x,y))return null;
  const p=biomePosition(x,y);
  return expandedRegions.find(r=>biomeMargin(r,p)>=0)||null;
 }
@@ -693,7 +695,7 @@ function islandTerrainRGB(x,y){
   // Organic low-frequency variation keeps transitions natural without square borders.
   const offset=18*Math.sin(x*.0037+y*.0019+i*2.1)+12*Math.sin(y*.0053-x*.0027+i*.7);
   const margin=biomeMargin(r,p)+offset;
-  const w=(r.id==='desert'&&x<5800)?0:coastSmooth(-36,36,margin);
+  const w=(eastWoodland(x,y)||(r.id==='desert'&&x<5800))?0:coastSmooth(-36,36,margin);
   red+=(r.rgb[0]-red)*w;green+=(r.rgb[1]-green)*w;blue+=(r.rgb[2]-blue)*w;
   if(r.id==='snow')snow=w;if(r.id==='wasteland')waste=w;if(r.id==='desert')desert=w;
  }
@@ -901,7 +903,8 @@ function drawWoodlandArtChunk(ix,iy){
  const wx=x0+x*8,wy=y0+y*8;
  const wobble=55*Math.sin(wx*.019+wy*.012)+35*Math.sin(wy*.031-wx*.009);let edge=Math.min(wx,3500-wx,wy,3100-wy,islandDepth(wx,wy)-25);for(let a=0;a<8;a++){const t=a*Math.PI/4;for(const d of [48,96,160])if(expandedRegion(wx+Math.cos(t)*d,wy+Math.sin(t)*d))edge=Math.min(edge,d-24);}
  const region=expandedRegion(wx,wy);
- p.data[(y*65+x)*4+3]=region?0:Math.round(255*coastSmooth(0,200,edge+wobble));
+ if(eastWoodland(wx,wy))edge=Math.min(easternRiverX(wy)-easternRiverWidth(wy)-wx,4900-wy,islandDepth(wx,wy)-25);
+ p.data[(y*65+x)*4+3]=region||easternRiverDepth(wx,wy)<0?0:eastWoodland(wx,wy)?Math.round(255*coastSmooth(0,24,edge)):Math.round(255*coastSmooth(0,200,edge+wobble));
  }
  m.putImageData(p,0,0);g.globalCompositeOperation='destination-in';g.drawImage(mask,-4,-4,520,520);
  woodlandArtCache.set(key,cv);if(woodlandArtCache.size>40)woodlandArtCache.delete(woodlandArtCache.keys().next().value);
@@ -1001,7 +1004,7 @@ function drawExpandedTerrain(night){
  ctx.save();ctx.imageSmoothingEnabled=true;
  for(let iy=Math.floor(top/islandChunkSize);iy<=Math.floor(bottom/islandChunkSize);iy++)
   for(let ix=Math.floor(left/islandChunkSize);ix<=Math.floor(right/islandChunkSize);ix++)
-   {ctx.drawImage(islandChunk(ix,iy),ix*islandChunkSize,iy*islandChunkSize,islandChunkSize,islandChunkSize);if(ix>=0&&ix<=6&&iy>=0&&iy<=6)drawWoodlandArtChunk(ix,iy);}
+   {ctx.drawImage(islandChunk(ix,iy),ix*islandChunkSize,iy*islandChunkSize,islandChunkSize,islandChunkSize);if(ix>=0&&ix<=9&&iy>=0&&iy<=9)drawWoodlandArtChunk(ix,iy);}
  if(night>.01){ctx.fillStyle='rgba(20,31,55,'+(night*.26)+')';ctx.fillRect(left,top,right-left,bottom-top)}
  drawRiverwatchTownGround(left,right,top,bottom);
  worldEditorGround(left,right,top,bottom);
@@ -5325,7 +5328,7 @@ function foliageVisibility(o){
 // V114 original 16-bit-inspired woodland, generated offline on the user's device.
 // The first art slice covers Haigen's home woodland and the Silent Pond.
 const rbTileCache={grass:null,tree:new Map(),rock:new Map()};
-function rbWoodland(x,y){return x>=0&&x<3500&&y>=0&&y<3100&&!expandedRegion(x,y)}
+function rbWoodland(x,y){return (eastWoodland(x,y)||(x>=0&&x<3500&&y>=0&&y<3100))&&!expandedRegion(x,y)}
 // Repeating 8x8 atlas of 16x16 ground tiles, with sub-tile 8x8 details.
 function rbGrass(){
  if(rbTileCache.grass)return rbTileCache.grass;
@@ -8564,6 +8567,16 @@ function collectCampDebris(d){
  }else notify('🏕️ Clear the Campsite: '+state.campClearingPicked.length+'/'+campDebris.length);
  save();
 }
+// Extend the living woodland to the west bank, keeping stable resource IDs.
+for(const o of objects){if(eastWoodland(o.x,o.y)){if(o.type==='bareTree')o.type='tree';if(o.type==='specter')o.type='bush';}}
+for(let i=0;i<1800;i++){
+ const id=8200000+i,x=3000+seeded(id*3)*1800,y=1100+seeded(id*3+1)*3800,v=seeded(id*3+2);
+ if(!eastWoodland(x,y)||easternRiverDepth(x,y)<55||islandDepth(x,y)<100||inPond(x,y,40)||roadDistance(x,y)<95||!canPlaceScenery({x,y}))continue;
+ if(easternBridges.some(b=>Math.abs(y-b.y)<100&&Math.abs(x-easternRiverX(b.y))<300))continue;
+ const type=v<.42?'tree':v<.65?'bush':v<.83?'mushroom':v<.94?'flower':'rock';
+ objects.push({id,x,y,type,size:.8+seeded(id+5)*.4});
+}
+for(const a of regionalWildlife){if(a.region==='wasteland'&&eastWoodland(a.x,a.y)){const x=easternRiverX(a.y)+easternRiverWidth(a.y)+160+seeded(a.id+17)*220;a.x=a.homeX=a.targetX=x;}}
 const woodlandDetails=[];for(let i=0;i<340;i++){const x=85+seeded(5500+i*3)*2830,y=85+seeded(5501+i*3)*2830;if(inPond(x,y,22)||Math.hypot(x-cottage.x,y-cottage.y)<150)continue;woodlandDetails.push({x,y,kind:['moss','moss','log','fungi','fern','stump'][i%6],seed:i})}
 // Keep both harvestable scenery and decorative forest-floor objects off paths.
 for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(o.id!==runeGuardianId&&roadDistance(o.x,o.y)<(o.type==='tree'?110:o.type==='rock'?90:75))objects.splice(i,1)}
@@ -8996,6 +9009,7 @@ for(let i=0;i<235;i++){
  if(kind==='firefly'&&roadDistance(x,y)<100)continue;
  woodlandCritters.push({x,y,homeX:x,homeY:y,kind,phase:i*1.73,scaredUntil:0})
 }
+for(let i=0;i<36;i++){const x=3300+seeded(830000+i*3)*1350,y=1200+seeded(830001+i*3)*3500;if(!eastWoodland(x,y)||easternRiverDepth(x,y)<75||inPond(x,y,40)||islandDepth(x,y)<100)continue;woodlandCritters.push({x,y,homeX:x,homeY:y,kind:i%3===0?'squirrel':i%3===1?'butterfly':'firefly',phase:i*1.73,scaredUntil:0});}
 function drawWoodlandDetail(o){const x=o.x,y=o.y;if(o.kind==='log'&&!looseWoodReady(o))return;if(rbEnabled&&['log','stump','fungi','grass'].includes(o.kind)){worldSprite(o.kind==='fungi'?'mushroom':o.kind==='grass'?'grass':o.kind,x,y,o.kind==='log'?66:44,o.kind==='stump'?45:38,o.id||0);return}if(o.kind==='moss'){ellipse(x,y,22,9,'#52844b');ellipse(x-8,y-4,13,6,'#7da660');ellipse(x+8,y-2,10,6,'#659652')}
 else if(o.kind==='log'){ellipse(x,y+7,39,11,'#345d39');ctx.save();ctx.translate(x,y);ctx.rotate(.12);ctx.fillStyle='#765337';ctx.fillRect(-31,-8,60,17);ellipse(29,0,9,9,'#c6a57b');ellipse(29,0,5,5,'#98754d');ctx.restore();ellipse(x-12,y-8,15,4,'#74a05c')}
 else if(o.kind==='fungi'){for(let j=0;j<3;j++){const xx=x+j*13-13;ctx.fillStyle='#e4d6b2';ctx.fillRect(xx-2,y-11-(j%2)*5,4,13);ellipse(xx,y-12-(j%2)*5,8,5,medicinalMushroom(o)?'#91b9c9':j===1?'#b85b44':'#d39a68')}}
