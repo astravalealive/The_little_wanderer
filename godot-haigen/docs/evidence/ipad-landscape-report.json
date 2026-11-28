@@ -1,0 +1,45 @@
+{
+  "collision_gap": 41.5447692871094,
+  "collision_player": "(1733.0, 1641.0)",
+  "collision_target": "(1748.88, 1679.39)",
+  "cottage": {
+    "x": 1500.0,
+    "y": 1500.0
+  },
+  "device": "emulated-ipad-landscape-framebuffer",
+  "door_enter": true,
+  "door_exit": true,
+  "failures": [],
+  "frame_ms_avg": 5.63769166666667,
+  "frame_ms_p95": 6.587,
+  "frame_sample_note": "llvmpipe/Xvfb frame gaps, not a physical iPad GPU",
+  "ground_mode": "moss_plus_trails_plus_glaze",
+  "ground_scale": "(1.0, 1.0)",
+  "ground_texture_size": "(1440.0, 1440.0)",
+  "interior_static_bodies": 9,
+  "joystick_delta": "(126.0, 0.0)",
+  "joystick_rect": "[P: (24.0, 568.0), S: (176.0, 176.0)]",
+  "node_count": 205,
+  "ok": true,
+  "physical_ipad": false,
+  "pond_path_sample_rgba": [
+    0.368627458810806,
+    0.301960796117783,
+    0.211764708161354,
+    1.0
+  ],
+  "road_glaze": true,
+  "scene_bridge_after_exit": "yard",
+  "scene_bridge_place": "interior",
+  "slice": "godot-v1-real-homestead-pocket",
+  "solid_count": 36,
+  "touch_vector_while_held": "(1.0, 0.0)",
+  "trails_composited": true,
+  "trails_sample_rgba": [
+    0.47843137383461,
+    0.396078437566757,
+    0.282352954149246,
+    1.0
+  ],
+  "viewport": "1024x768"
+}
