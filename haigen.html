@@ -11211,9 +11211,10 @@ function tidySceneryPlacement(){
  const c=document.createElement('canvas');c.width=c.height=2600;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(paintedTrails,0,0);const pixels=g.getImageData(0,0,2600,2600).data;
  function onTrail(x,y,r){for(let a=0;a<9;a++){const angle=a*2.399,rr=a===0?0:r;const px=Math.round((x+Math.cos(angle)*rr)/3),py=Math.round((y+Math.sin(angle)*rr)/3);if(px>=0&&py>=0&&px<2600&&py<2600&&pixels[(py*2600+px)*4+3]>85)return true;}return false;}
  const trunks=all.filter(o=>trees.has(o.type));
- function move(o,valid){if(valid(o))return;const x=o.x,y=o.y;for(let k=0;k<96;k++){const a=k*2.399+seeded(o.id)*6.28,r=25+Math.floor(k/8)*24;const p={...o,x:x+Math.cos(a)*r,y:y+Math.sin(a)*r};if(canPlaceScenery(p)&&valid(p)){o.x=p.x;o.y=p.y;return;}}}
+ function dry(p){const margin=trees.has(p.type)?45*(p.size||1):18;return !inPond(p.x,p.y,margin)&&mountainRiverDistance(p.x,p.y)>margin&&islandDepth(p.x,p.y)>margin;}
+ function move(o,valid){if(dry(o)&&valid(o))return;const x=o.x,y=o.y;for(let k=0;k<480;k++){const a=k*2.399+seeded(o.id)*6.28,r=25+Math.floor(k/12)*35;const p={...o,x:x+Math.cos(a)*r,y:y+Math.sin(a)*r};if(dry(p)&&canPlaceScenery(p)&&valid(p)){o.x=p.x;o.y=p.y;return;}}if(!dry(o)){const list=objects.includes(o)?objects:worldEditorData.placed;const i=list.indexOf(o);if(i>=0)list.splice(i,1);}}
  for(const o of trunks)move(o,p=>!onTrail(p.x,p.y,42*(p.size||1))&&!trunks.some(t=>t!==o&&Math.hypot(t.x-p.x,t.y-p.y)<70));
- for(const o of all.filter(o=>plants.has(o.type)))move(o,p=>!onTrail(p.x,p.y,12)&&!trunks.some(t=>Math.abs(t.x-p.x)<48*(t.size||1)&&p.y>t.y-125*(t.size||1)&&p.y<t.y+12));
+ for(const o of all.filter(o=>plants.has(o.type)||['rock','stump','log','twig'].includes(o.type)))move(o,p=>!onTrail(p.x,p.y,12)&&!trunks.some(t=>Math.abs(t.x-p.x)<48*(t.size||1)&&p.y>t.y-125*(t.size||1)&&p.y<t.y+12));
 }
 let sceneryTidied=false;
 function rebuildWorldEditorSolids(){
