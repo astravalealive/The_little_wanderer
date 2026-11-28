@@ -14473,7 +14473,18 @@ function incaThink(dt,a){
  if(n.hunger<85&&m.inventory.berries>0){m.inventory.berries--;n.hunger=Math.min(100,n.hunger+15);incaRemember(m,'Sweet berries! Just what I needed.','food');a.foodPause=1200;a.moving=false;save();return true;}
  if(n.hunger<80||m.inventory.berries<2){
   if(!a.berryGoal||!berryReady(a.berryGoal)||state.removed.includes(a.berryGoal.id)){
-   a.berryGoal=objects.filter(o=>o.type==='bush'&&berryReady(o)&&!state.removed.includes(o.id)&&dist(a,o)<700&&!(m.harvested[o.id]>state.daytime)).sort((p,q)=>dist(a,p)-dist(a,q))[0]||null;
+   a.berryGoal=null;
+   const now=performance.now();
+   if(now>=(a.nextBerrySearch||0)){
+    a.nextBerrySearch=now+750;
+    let nearest=700;
+    for(const o of objects){
+     if(o.type!=='bush')continue;
+     const distance=dist(a,o);
+     if(distance>=nearest||!berryReady(o)||state.removed.includes(o.id)||m.harvested[o.id]>state.daytime)continue;
+     nearest=distance;a.berryGoal=o;
+    }
+   }
   }
   if(a.berryGoal){
    const o=a.berryGoal;
