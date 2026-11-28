@@ -6728,11 +6728,11 @@ function worldDrawHomestead(p,tier){
  ctx.restore();return true;
 }
 // Three approved, transparent garden images. The old renderer remains a loading fallback.
+// Legacy garden artwork is loaded only if its retired renderer is explicitly invoked.
 const gardenTierImages=[null];
-for(let tier=1;tier<=3;tier++){
- const art=new Image();art.decoding='async';
- art.src='assets/garden-tier-'+tier+'.png?v=366';
- gardenTierImages[tier]=art;
+function legacyGardenImage(tier){
+ if(!gardenTierImages[tier]){const art=new Image();art.decoding='async';art.src='assets/garden-tier-'+tier+'.png?v=366';gardenTierImages[tier]=art;}
+ return gardenTierImages[tier];
 }
 
 /* V367: the approved garden art stays in place. Only the matching planted crop row
@@ -6835,7 +6835,7 @@ function drawGardenCropLifecycle(art,tier,x,y,width,height){
 
 function worldDrawGarden(p,tier){
  const level=Math.max(1,Math.min(3,Math.floor(tier)||1));
- const art=gardenTierImages[level];
+ const art=legacyGardenImage(level);
  if(art&&art.complete&&art.naturalWidth>0){
   const height=[0,260,305,354][level];
   const width=height*art.naturalWidth/art.naturalHeight;
