@@ -1299,7 +1299,7 @@ function drawLilyBeds(zoom){
 function drawFrogNursery(){
  const now=Date.now(),clutches=state.frogLifecycle||[];
  for(const c of clutches){
-  const age=now-c.born,stage=age<120000?0:age<300000?1:2;
+  const age=now-c.born,stage=age<60000?0:age<180000?1:2;
   if(stage===2)continue;
   const count=stage===0?8:6;
   for(let k=0;k<count;k++){
@@ -1320,7 +1320,7 @@ function updateFrogLifecycle(){
  if(!Array.isArray(state.frogLifecycle))state.frogLifecycle=[];
  const now=Date.now();
  for(const c of state.frogLifecycle){
-  if(now-c.born<300000||c.spawned)continue;
+  if(now-c.born<180000||c.spawned)continue;
   c.hatched=true;
   if(frogs.length>=38)continue;
   const p=nearestLakeReeds(c.x,c.y);
@@ -1337,12 +1337,12 @@ function updateFrogLifecycle(){
  state.frogLifecycle=state.frogLifecycle.filter(c=>now-c.born<86400000).slice(-24);
  if(now<(state.nextFrogMateAt||0)||frogs.length>=38)return;
  const adults=frogs.filter(f=>f.habitat==='pond'&&f.lakeZoneReady&&!f.hopUntil);
- const female=adults.find(f=>f.sex==='female'&&adults.some(m=>m.sex==='male'&&Math.hypot(m.x-f.x,m.y-f.y)<160));
+ const female=adults.find(f=>f.sex==='female'&&adults.some(m=>m.sex==='male'&&Math.hypot(m.x-f.x,m.y-f.y)<280));
  if(!female)return;
  const p=nearestLakeReeds(female.x,female.y);
  const id=(state.frogClutchSerial||0)+1;state.frogClutchSerial=id;
  state.frogLifecycle.push({id,x:p.x,y:p.y,born:now});
- state.nextFrogMateAt=now+180000+seeded(id)*120000;
+ state.nextFrogMateAt=now+60000+seeded(id)*60000;
 }
 
 function drawLakeHabitat(){
@@ -12655,7 +12655,7 @@ function stepIndoorResident(t,dt){
 function outdoorGoal(t){
  const home=trollStumpHome;
  if(t.frogMeal)return {x:home.x,y:home.y+45,to:'home'};
- if(frogs.length>16&&time>(t.nextFrogHunt||0)&&!caveTrolls.some(q=>q!==t&&(q.goal?.frogId!=null||q.frogMeal))){const prey=frogs.filter(f=>f.id!==state.carriedFrogId&&!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1).sort((a,b)=>dist(t,a)-dist(t,b))[0];if(prey)return {x:prey.x,y:prey.y,frogId:prey.id};}
+ if(frogs.length>26&&frogs.filter(f=>f.habitat==='pond').length>18&&Date.now()>(state.nextTrollFrogHuntAt||0)&&time>(t.nextFrogHunt||0)&&!caveTrolls.some(q=>q!==t&&(q.goal?.frogId!=null||q.frogMeal))){const prey=frogs.filter(f=>f.id!==state.carriedFrogId&&!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1).sort((a,b)=>dist(t,a)-dist(t,b))[0];if(prey)return {x:prey.x,y:prey.y,frogId:prey.id};}
  if(!t.headingHome&&(t.stops||0)>0&&Math.random()<.25&&atelier.works.some(w=>!w.buyer&&w.price<=atelier.stash))return {x:artCart.x,y:artCart.y+45,market:true};
  if(t.headingHome||((t.stops||0)>1&&Math.random()<.55)){
   
@@ -12669,7 +12669,7 @@ function outdoorGoal(t){
 }
 function stepWoodlandResident(t,dt){
  if(!t.goal){t.goal=outdoorGoal(t);t.leg=null;}
- const goal=t.goal;if(goal.frogId!=null){const f=frogs.find(q=>q.id===goal.frogId);if(!f||f.id===state.carriedFrogId||frogs.length<=16){t.goal=null;t.nextFrogHunt=time+30000;return;}if(!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1){goal.x=f.x;goal.y=f.y;}if(dist(t,f)<45){frogs.splice(frogs.indexOf(f),1);t.frogMeal=true;t.headingHome=true;t.goal=null;t.leg=null;return;}}
+ const goal=t.goal;if(goal.frogId!=null){const f=frogs.find(q=>q.id===goal.frogId);if(!f||f.id===state.carriedFrogId||(frogs.length<=26||frogs.filter(q=>q.habitat==='pond').length<=18)){t.goal=null;t.nextFrogHunt=time+30000;return;}if(!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1){goal.x=f.x;goal.y=f.y;}if(dist(t,f)<20&&!blockedBySolid(f.x,f.y)&&walkingLakeLevel(f.x,f.y)>=1){state.nextTrollFrogHuntAt=Date.now()+900000;frogs.splice(frogs.indexOf(f),1);t.frogMeal=true;t.headingHome=true;t.goal=null;t.leg=null;return;}}
  const dx=goal.x-t.x,dy=goal.y-t.y,range=Math.hypot(dx,dy);
  if(range<(goal.to?24:9)){
   if(goal.to==='home'){t.headingHome=false;t.room='mountain-return';t.goal=null;return;}
@@ -12761,7 +12761,7 @@ function updateCaveResidents(frameDt){
   }
   if(t.room!=='mountain'){t.room='mountain';t.routeIndex=0;t.node=0;const p=mountainRoutes[t.routeIndex][0];t.x=p[0];t.y=p[1];t.wait=1000+t.sprite*700;t.direction=1;}
   t.walking=false;if(t.wait>0){t.wait-=dt;continue}
-  if(t.frogMeal&&t.node>=2){t.frogMeal=false;t.nextFrogHunt=time+180000;t.wait=12000;continue;}
+  if(t.frogMeal&&t.node>=2){t.frogMeal=false;t.nextFrogHunt=time+900000;t.wait=12000;continue;}
   const route=mountainRoutes[t.routeIndex],p=route[t.node],dx=p[0]-t.x,dy=p[1]-t.y,d=Math.hypot(dx,dy),step=Math.min(d,dt*.035);
   if(d>1){t.x+=dx/d*step;t.y+=dy/d*step;t.dir=trollFacing(dx,dy);t.walking=true;t.clock+=dt;continue}
   if(t.node===route.length-1)t.direction=-1;if(t.node===0)t.direction=1;
