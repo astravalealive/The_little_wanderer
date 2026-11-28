@@ -11381,8 +11381,9 @@ function blockedBySolid(x,y){if(sacredGroveBlocked(x,y))return true;if(greatStum
  for(let ix=cx-1;ix<=cx+1;ix++)for(let iy=cy-1;iy<=cy+1;iy++){
   const bucket=solidCells.get(ix+','+iy);if(!bucket)continue;
   for(const o of bucket){
-   if(state.removed.includes(o.id)||campsiteProtected(o)||frostholdSceneryClear(o)||landingClear(o))continue;
    const dx=x-o.x,dy=(y-o.y)*.92,rad=solidRadius(o)+10;
+   if(dx*dx+dy*dy>=rad*rad)continue;
+   if(state.removed.includes(o.id)||campsiteProtected(o)||frostholdSceneryClear(o)||landingClear(o))continue;
    if(dx*dx+dy*dy<rad*rad)return true;
   }
  }
