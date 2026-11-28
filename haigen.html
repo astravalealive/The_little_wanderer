@@ -6432,6 +6432,7 @@ function drawNewFungi(o){
  ctx.drawImage(im,o.x-w/2,o.y-h+5,w,h);return true;
 }
 function drawSceneryNearHaigen(o){
+ if(o.type==='bush'){bush(o);return;}
  if(drawNewFungi(o))return;
  if(overhaulBeachScenery(o))return;
  // Route woodland flowers before the cached atlas path, which otherwise returns early.
@@ -10896,6 +10897,8 @@ function worldEditorGround(left,right,top,bottom){
 }
 // V196: detailed, reusable editor palette scenery drawn in the playable world.
 function drawWorldEditorNatureArt(o){
+ if(o.type==='bush'){bush(o);return true;}
+
  if(overhaulBeachScenery(o))return;
  if(drawWoodlandArtwork(o))return;
  const type=o.type,v=seeded(o.id*19+11),s=o.size||1;
