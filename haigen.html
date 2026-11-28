@@ -7785,17 +7785,21 @@ function haigenActiveAction(){
 const travelKits=['snow','beach','desert','swim','downs','fen','wasteland'];
 const travelAtlases=new Map();
 const travelSheet=new Image();
+let travelSheetReady=false;
 travelSheet.onload=()=>{
- if(travelSheet.naturalWidth!==192||travelSheet.naturalHeight!==travelKits.length*288)return;
- for(let i=0;i<travelKits.length;i++){
-  const c=document.createElement('canvas');c.width=192;c.height=288;
-  const g=c.getContext('2d');if(!g)continue;
-  g.imageSmoothingEnabled=false;
-  g.drawImage(travelSheet,0,i*288,192,288,0,0,192,288);
-  travelAtlases.set(travelKits[i],c);
- }
- window.__haigenTravelAtlasesReady=travelAtlases.size;
+ travelSheetReady=travelSheet.naturalWidth===192&&travelSheet.naturalHeight===travelKits.length*288;
+ window.__haigenTravelAtlasesReady=travelSheetReady?travelKits.length:0;
 };
+function getTravelAtlas(kind){
+ if(travelAtlases.has(kind))return travelAtlases.get(kind);
+ const i=travelKits.indexOf(kind);
+ if(!travelSheetReady||i<0)return null;
+ const c=document.createElement('canvas');c.width=192;c.height=288;
+ const g=c.getContext('2d');if(!g)return null;
+ g.imageSmoothingEnabled=false;
+ g.drawImage(travelSheet,0,i*288,192,288,0,0,192,288);
+ travelAtlases.set(kind,c);return c;
+}
 travelSheet.src='./assets/haigen-region-outfits.png?v=129';
 function haigenOutfit(){
  const region=expandedRegion(state.x,state.y)?.id;
@@ -7812,7 +7816,7 @@ function haigenOutfit(){
 // approved blonde hair and original thick hoodie/three-quarter outlines remain.
 // Each 48x72 cell keeps the EXACT same draw width and foot baseline.
 function haigenCostumeAtlas(base,kind){
- if(travelAtlases.has(kind))return travelAtlases.get(kind);
+ const regional=getTravelAtlas(kind);if(regional)return regional;
  const newSheet=base===haigenMovementAtlas;
  const rows=newSheet?4:3;
  const sheetHeight=rows*72;
@@ -14812,7 +14816,7 @@ window.__haigenArtAudit=()=>({
   woodlandFauna:!!illustratedFaunaReady,
   regionalFauna:!!illustratedExtraReady,
   wildlifeMotion:wildlifeMotionSheet.naturalWidth===576,
-  regionOutfits:travelAtlases.size===travelKits.length,
+  regionOutfits:travelSheetReady,
   gloamjaw:!!window.__gloamQA?.().artReady
  },
  animal:window.__v126LastCreature||null,
