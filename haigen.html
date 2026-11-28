@@ -14576,6 +14576,30 @@ function drawInca(){
  const h=142,w=h*f.w/f.h;ctx.save();ctx.imageSmoothingEnabled=false;nordicContactShadow(a.x,a.y+7,22,6);ctx.drawImage(f.c,f.x,f.y,f.w,f.h,a.x-w/2,a.y+7-h,w,h);ctx.restore();
 }
 
+const collisionAudit={enabled:new URLSearchParams(location.search).get('collision')==='1',last:0,canvas:null,key:''};
+function collisionGrid(x,y,w,h,test,key){
+ const c=collisionAudit,now=performance.now();
+ if(!c.canvas||c.key!==key||now-c.last>650){
+ const a=document.createElement('canvas');a.width=64;a.height=48;const g=a.getContext('2d');
+ for(let j=0;j<48;j++)for(let i=0;i<64;i++){const blocked=test((i+.5)/64,(j+.5)/48);g.fillStyle=blocked?'rgba(255,48,48,.35)':'rgba(40,230,110,.13)';g.fillRect(i,j,1,1);}
+ c.canvas=a;c.key=key;c.last=now;
+ }
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(c.canvas,x,y,w,h);ctx.restore();
+}
+function drawCollisionAudit(){
+ if(!collisionAudit.enabled)return;
+ const w=ctx.canvas.width,h=ctx.canvas.height;
+ ctx.save();ctx.setTransform(1,0,0,1,0,0);
+ try{
+ if(mountainInside){const v=mountainView();collisionGrid(v.x,v.y,1536*v.sc,1024*v.sc,(u,v)=>!mountainWalkable(u*1536,v*1024),'mountain');}
+ else if(frostholdRoom){const sc=Math.min(W/480,H/400);collisionGrid((W-480*sc)/2,(H-400*sc)/2,480*sc,400*sc,(u,v)=>!frostholdRoomClear(frostholdRoom.id,u*480,v*400),'frost'+frostholdRoom.id);}
+ else if(visitorRoom==='ship'||visitorRoom==='saltwick'){ctx.fillStyle='#fff';ctx.font='16px system-ui';ctx.fillText('Tap-only interior: no walking collision map',12,h-45);}
+ else if(visitorRoom==='stump'||visitorRoom==='vault'||trollStumpInside){const vault=visitorRoom==='vault'||inTreasureCave,art=vault?treasureCaveArt:trollInteriorArt,sc=Math.min(w/art.width,h/art.height),iw=art.width*sc,ih=art.height*sc;let x=(w-iw)/2,y=(h-ih)/2;if(!vault&&!visitorRoom){x=Math.min(0,Math.max(w-iw,w/2-iw*trollRoomPlayer.x));y=Math.min(0,Math.max(h-ih,h/2-ih*trollRoomPlayer.y));}collisionGrid(x,y,iw,ih,(u,v)=>!trollRoomWalkable(u,v,vault),'stump'+vault);}
+ else if(homeInside||visitorRoom==='home'){const tier=displayedHouseTier(),art=approvedHomes.interior[tier];if(tier>=3&&art?.naturalWidth){const ratio=art.naturalWidth/art.naturalHeight,ww=Math.min(w*.99,h*.94*ratio),hh=ww/ratio;collisionGrid((w-ww)/2,(h-hh)/2,ww,hh,tier===3?tier3Blocked:tier===4?tier4Blocked:longhouseBlocked,'home'+tier);}else{ctx.fillStyle='#fff';ctx.font='16px system-ui';ctx.fillText('Tier 2: separate movement rules require inspection',12,h-45);}}
+ else{const z=worldZoom(),cx=cam.x,cy=cam.y;collisionGrid(0,0,w,h,(u,v)=>blockedBySolid(cx+(u-.5)*W/z,cy+(v-.5)*H/z),'world:'+Math.round(cx/4)+':'+Math.round(cy/4)+':'+z);}
+ ctx.fillStyle='#111d';ctx.fillRect(8,h-34,270,26);ctx.fillStyle='#fff';ctx.font='14px system-ui';ctx.fillText('COLLISION AUDIT · Red solid / Green clear',14,h-16);
+ }finally{ctx.restore();}
+}
 function frame(now){
  ravenTick();
  const diag=window.__haigenPerfDiag,measure=!!(diag&&diag.enabled),frameStart=measure?performance.now():0,frameGap=measure&&diag.lastFrame?now-diag.lastFrame:0;if(measure)diag.lastFrame=now;
@@ -14591,7 +14615,7 @@ function frame(now){
  else if(visitorRoom==='home')drawHomeInteriorScene(true);
   else if(visitorRoom==='stump'||visitorRoom==='vault')drawTrollStumpInterior(true);
   else if(!state.autonomy&&!cameraDetached&&!autonomousHomeVisit){drawHomeInteriorScene();drawTrollStumpInterior()}
-  if(mountainInside)drawMountain();if(measure)diag.renderMs+=performance.now()-t;
+  if(mountainInside)drawMountain();drawCollisionAudit();if(measure)diag.renderMs+=performance.now()-t;
   window.__haigenWorldReady=true;
   const error=$('worldError');if(error&&error.style.display!=='none'){error.style.display='none';lastWorldError='';}
  }catch(error){reportWorldError(error);}
@@ -14604,7 +14628,7 @@ function frame(now){
  previewTools.setAttribute('aria-label','Haigen preview troubleshooting');
  previewTools.style.cssText='position:fixed;z-index:8;left:9px;top:calc(env(safe-area-inset-top,0px) + 93px);display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:min(90vw,300px);pointer-events:auto';
  previewTools.innerHTML='<details style="background:#153e32e8;border:1px solid #c7b47b;border-radius:6px;padding:4px 7px;font:11px system-ui"><summary>Game troubleshooting</summary><div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0"><button type="button" id="previewFind" class="btn" style="font-size:11px;padding:5px">🔎 Find Haigen</button><button type="button" id="previewLook" class="btn" style="font-size:11px;padding:5px">🎨 Change look</button><button type="button" id="previewPond" class="btn" style="font-size:11px;padding:5px">🐸 Visit frog pond</button><button type="button" id="previewFriends" class="btn" style="font-size:11px;padding:5px">🐇 Meet Dylan &amp; Skölli</button><button type="button" id="previewCopySave" class="btn" style="font-size:11px;padding:5px">Use my V120 save</button><button type="button" id="previewStartFresh" class="btn" style="font-size:11px;padding:5px">New preview</button><button type="button" id="previewPerfToggle" class="btn" style="font-size:11px;padding:5px">📊 Performance: Off</button></div><div id="previewStats" style="max-width:260px;overflow-wrap:anywhere"></div></details>';
- document.body.appendChild(previewTools);
+ document.body.appendChild(previewTools);const collisionButton=document.createElement('button');collisionButton.className='btn';collisionButton.textContent='Collision: '+(collisionAudit.enabled?'On':'Off');collisionButton.onclick=()=>{collisionAudit.enabled=!collisionAudit.enabled;collisionAudit.canvas=null;collisionButton.textContent='Collision: '+(collisionAudit.enabled?'On':'Off')};previewTools.querySelector('details div').appendChild(collisionButton);
  const perfPanel=document.createElement('div');perfPanel.id='haigenPerfPanel';perfPanel.style.cssText='position:fixed;z-index:30;right:9px;top:calc(env(safe-area-inset-top,0px) + 9px);max-width:min(88vw,270px);padding:8px 10px;border:1px solid #c7b47b;border-radius:8px;background:#102b25ed;color:#fff0cf;font:11px/1.45 ui-monospace,monospace;white-space:pre-line;pointer-events:none;display:none';document.body.appendChild(perfPanel);
  window.__haigenPerfDiag={enabled:false,frames:0,updateMs:0,renderMs:0,frameMs:[],frameGapMs:[],lastFrame:0,lastPanel:0,renderPanel(){const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;const mem=performance.memory&&Number.isFinite(performance.memory.usedJSHeapSize)?'Heap: '+(performance.memory.usedJSHeapSize/1048576).toFixed(1)+' MB':'Heap: unavailable in this browser';perfPanel.textContent='PERFORMANCE DIAGNOSTICS\nFPS: '+(1000/Math.max(1,avg(this.frameGapMs))).toFixed(1)+'\nFrame work: '+avg(this.frameMs).toFixed(2)+' ms avg\nUpdate: '+(this.updateMs/Math.max(1,this.frames)).toFixed(2)+' ms avg\nRender: '+(this.renderMs/Math.max(1,this.frames)).toFixed(2)+' ms avg\n'+mem+'\nSamples: '+this.frameMs.length;perfPanel.style.display=this.enabled?'block':'none'}};
  $('previewPerfToggle').onclick=()=>{const d=window.__haigenPerfDiag;d.enabled=!d.enabled;d.frames=0;d.updateMs=0;d.renderMs=0;d.frameMs=[];d.frameGapMs=[];d.lastFrame=0;d.lastPanel=0;$('previewPerfToggle').textContent='📊 Performance: '+(d.enabled?'On':'Off');perfPanel.style.display=d.enabled?'block':'none';if(d.enabled)d.renderPanel()};
